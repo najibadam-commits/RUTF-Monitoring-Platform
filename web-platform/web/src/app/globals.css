@@ -1,0 +1,389 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+@import "leaflet.markercluster/dist/MarkerCluster.css";
+@import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Enterprise Light — design tokens. Supersedes the earlier dark "Nocturne"
+   theme (still visible in git history / design_handoff_tpm_monitoring_platform
+   /styles.css) per an explicit redesign request: a light, professional
+   navy/blue/white palette for an enterprise GIS/monitoring product. Every
+   token NAME below is unchanged from Nocturne on purpose — the rest of the
+   app references these by name via CSS custom properties, so the values
+   alone carry the redesign. This file is still the source of truth for the
+   system's look — extend it, don't reintroduce one-off inline colors.
+   ══════════════════════════════════════════════════════════════════════ */
+:root {
+  --color-bg: #f6f8fb;
+  --color-surface: #ffffff;
+  --color-text: #14213d;
+  --color-accent: #1677d2;
+  --color-accent-2: #123b73;
+  --color-divider: #d9e2ec;
+
+  --color-neutral-100: #f6f8fb;
+  --color-neutral-200: #eef2f7;
+  --color-neutral-300: #e1e7ee;
+  --color-neutral-400: #c9d2dc;
+  --color-neutral-500: #a6b0bf;
+  --color-neutral-600: #808a99;
+  --color-neutral-700: #667085;
+  --color-neutral-800: #4a5568;
+  --color-neutral-900: #2d3748;
+
+  --color-accent-100: #dceeff;
+  --color-accent-200: #c3e2ff;
+  --color-accent-300: #9bcdfc;
+  --color-accent-400: #6bb3f7;
+  --color-accent-500: #3b94ed;
+  --color-accent-600: #1677d2;
+  --color-accent-700: #125fad;
+  --color-accent-800: #123b73;
+  --color-accent-900: #0c2850;
+
+  /* Subtle cyan accent ramp — used sparingly (secondary tags, chart highlight),
+     never as the dominant color, per the brief's "don't make every component
+     blue" guidance. */
+  --color-accent-2-100: #e4f7fd;
+  --color-accent-2-200: #c7eefb;
+  --color-accent-2-300: #9fe0f7;
+  --color-accent-2-400: #6fcdf0;
+  --color-accent-2-500: #43bae8;
+  --color-accent-2-600: #29a9e8;
+  --color-accent-2-700: #1d86bb;
+  --color-accent-2-800: #17638c;
+  --color-accent-2-900: #0f415e;
+
+  /* Status / priority — hue meaning preserved from Nocturne, re-tuned for
+     light-background contrast. Reuses the brief's system colors (success/
+     warning/danger) where the status maps cleanly onto one. */
+  --status-new: #94a3b8;
+  --status-pending-review: #8b5cf6;
+  --status-returned-for-correction: #f2994a;
+  --status-assigned: #3b82f6;
+  --status-in-progress: #e7a52b;
+  --status-resolved: #2e9b62;
+  --status-verified-closed: #123b73;
+  --status-reopened: #d9534f;
+  --priority-critical: #d9534f;
+  --priority-high: #e7a52b;
+  --priority-medium: #3b94ed;
+  --priority-low: #94a3b8;
+
+  --font-heading: var(--font-inter), system-ui, sans-serif;
+  --font-heading-weight: 500;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --space-1: 2.8px;
+  --space-2: 5.6px;
+  --space-3: 8.4px;
+  --space-4: 11.2px;
+  --space-6: 16.8px;
+  --space-8: 22.4px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  /* Sidebar — professional slate-blue, distinct from the light content area (see
+     AppShell.tsx). White text on this bg is ~7.7:1 contrast, well past WCAG AA. */
+  --color-sidebar: #3c548a;
+  --color-sidebar-border: color-mix(in srgb, #fff 14%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #fff 10%, transparent);
+
+  /* Thin border ring + soft blur, tuned light — matches the brief's login-card
+     spec ("subtle shadow, thin border") and stays subtle everywhere else. */
+  --shadow-sm: 0 0 0 1px #d9e2ec;
+  --shadow-md: 0 0 0 1px #d9e2ec, 0 4px 16px rgba(20, 33, 61, 0.08);
+  --shadow-lg: 0 0 0 1px #d9e2ec, 0 12px 32px rgba(20, 33, 61, 0.12);
+}
+
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-text: var(--color-text);
+  --color-accent: var(--color-accent);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2);
+}
+h1 { font-size: 42px; }
+h2 { font-size: 32px; }
+h3 { font-size: 25px; }
+h4 { font-size: 20px; }
+h5 { font-size: 16px; }
+h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+p { margin: 0 0 var(--space-3); }
+a { color: var(--color-accent); text-underline-offset: 3px; }
+img { display: block; max-width: 100%; }
+.text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+:focus { outline: none; }
+:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--color-neutral-700); border-radius: 4px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { animation: spin 1s linear infinite; }
+
+/* Route-level loading.tsx skeletons — shape-matched placeholder blocks shown by Next.js while
+   a page's Server Component data fetch is in flight. Purely a perceived-latency aid; it doesn't
+   make the underlying fetch faster (see the query/index/RPC work that's paired with these). */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  border-radius: var(--radius-md);
+  background: linear-gradient(90deg, var(--color-neutral-200) 25%, var(--color-neutral-300) 37%, var(--color-neutral-200) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.hr {
+  height: 1px; border: 0; margin: var(--space-4) 0;
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px), transparent);
+}
+
+/* — buttons — */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; text-decoration: none;
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.2; color: var(--color-text);
+  background: transparent; border: 1px solid transparent;
+  padding: var(--space-2) calc(var(--space-3) * 1.2);
+  border-radius: var(--radius-md);
+}
+.btn svg { display: block; }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
+.btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.btn-primary:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.btn-secondary { border-color: var(--color-divider); }
+.btn-secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.btn-secondary:active:not(:disabled) { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+.btn-ghost:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
+.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-block { width: 100%; margin-top: var(--space-2); }
+
+/* — forms — */
+.field > label {
+  display: block; font-size: 12px; margin-bottom: 5px;
+  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+}
+.input {
+  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
+  font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
+.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+textarea.input { min-height: 90px; resize: vertical; }
+select.input {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23808a99'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px;
+}
+.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-size: 14px; }
+.radio input, .seg-opt input {
+  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+}
+.radio .dot {
+  width: 16px; height: 16px; flex: none; border-radius: 50%;
+  border: 1.5px solid var(--color-divider);
+}
+.radio:hover .dot { border-color: var(--color-accent); }
+.radio input:checked + .dot {
+  border-color: var(--color-accent); background: var(--color-accent);
+  box-shadow: inset 0 0 0 4px var(--color-bg);
+}
+.radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.seg {
+  display: inline-flex; overflow: hidden;
+  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+}
+.seg-opt {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 12px; font-size: 13px; cursor: pointer;
+}
+.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
+.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
+.seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+
+/* — cards — */
+.card {
+  display: flex; flex-direction: column; gap: var(--space-2);
+  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+}
+.card-kicker { font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent); }
+.card-title {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 17px; line-height: 1.2;
+}
+.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-meta {
+  display: flex; align-items: center; gap: 6px; font-size: 11px;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+.elev-sm { box-shadow: var(--shadow-sm); }
+.elev-md { box-shadow: var(--shadow-md); }
+.elev-lg { box-shadow: var(--shadow-lg); }
+
+/* — filter bar — row-flex sibling of .card (same surface/padding/radius/shadow), so a row of
+   filter controls doesn't have to fight .card's default flex-direction:column via inline style. */
+.filter-bar {
+  display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--space-3);
+  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* — tags — */
+.tag {
+  display: inline-flex; align-items: center; font-size: 11px;
+  letter-spacing: 0.02em; padding: 3px 10px;
+  border-radius: calc(var(--radius-md) * 0.75);
+}
+.tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
+.tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }
+.tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
+.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+
+/* — tables — */
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th {
+  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  padding: var(--space-3); border-bottom: 1px solid transparent;
+}
+.table td { padding: var(--space-3); border-bottom: 1px solid transparent; }
+.table thead tr {
+  background: linear-gradient(to right,
+    transparent, var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+.table tbody tr {
+  background: linear-gradient(to right,
+    transparent, color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
+    color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+.table tbody tr:hover {
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-text) 4%, transparent),
+                    color-mix(in srgb, var(--color-text) 4%, transparent)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(to right,
+      transparent, color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
+      color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+}
+.table-actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
+
+/* — app shell (sidebar + mobile drawer) — */
+.app-sidebar {
+  width: 236px; transition: width 0.18s ease;
+}
+.app-sidebar.collapsed { width: 68px; }
+.app-nav-section-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: color-mix(in srgb, #fff 55%, transparent);
+  padding: var(--space-3) var(--space-3) var(--space-1);
+  white-space: nowrap; overflow: hidden;
+}
+.app-sidebar.collapsed .app-nav-section-label { opacity: 0; height: 0; padding: 0; overflow: hidden; }
+.app-sidebar.collapsed .app-nav-label,
+.app-sidebar.collapsed .app-brand-label,
+.app-sidebar.collapsed .app-profile-detail { display: none; }
+.app-hamburger { display: none; }
+.app-sidebar-backdrop {
+  position: fixed; inset: 0; background: color-mix(in srgb, #000 45%, transparent);
+  z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+}
+.app-sidebar-backdrop.open { opacity: 1; pointer-events: auto; }
+
+@media (max-width: 1024px) {
+  .app-hamburger { display: inline-flex; }
+  .app-sidebar {
+    /* z-index above Leaflet's own panes (map/marker/popup panes go up to ~700), so the
+       Live Issue Map on Dashboard doesn't bleed through the open mobile drawer. */
+    position: fixed; inset: 0 auto 0 0; z-index: 1000; width: 236px;
+    transform: translateX(-100%); transition: transform 0.2s ease;
+    box-shadow: var(--shadow-lg);
+  }
+  .app-sidebar.mobile-open { transform: translateX(0); }
+  .app-sidebar.collapsed { width: 236px; }
+  .app-sidebar.collapsed .app-nav-section-label { opacity: 1; height: auto; padding: var(--space-3) var(--space-3) var(--space-1); }
+  .app-sidebar.collapsed .app-nav-label,
+  .app-sidebar.collapsed .app-brand-label { display: inline; }
+  .app-sidebar.collapsed .app-profile-detail { display: block; }
+  .app-collapse-toggle { display: none; }
+}
+
+/* — login page: enlarged form scale (scoped to the login card only, does not affect
+   .field/.input/.btn anywhere else in the app) — */
+.login-form-lg .field > label { font-size: 14px; margin-bottom: 6px; }
+.login-form-lg .input { min-height: 46px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; }
+.login-form-lg .btn { font-size: 16px; padding: 12px 20px; min-height: 48px; }
+
+/* — dialog — */
+.dialog-backdrop {
+  position: fixed; inset: 0; display: grid; place-items: center;
+  padding: var(--space-4); background: color-mix(in srgb, #000 45%, transparent);
+  z-index: 50;
+}
+.dialog {
+  width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-4); border-radius: var(--radius-lg);
+  background: var(--color-surface); box-shadow: var(--shadow-lg);
+  max-height: 90vh; overflow: auto;
+}
+.dialog-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
+.dialog-body { font-size: 14px; opacity: 0.85; }
+.dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* — leaflet theme overrides — */
+.leaflet-container { background: var(--color-neutral-200); font-family: var(--font-body); }
+.leaflet-control-zoom a { background: var(--color-surface) !important; color: var(--color-text) !important; border-color: var(--color-divider) !important; }
+.leaflet-control-zoom a:hover { background: color-mix(in srgb, var(--color-accent) 10%, var(--color-surface)) !important; }
+.leaflet-control-attribution { background: color-mix(in srgb, var(--color-surface) 85%, transparent) !important; color: var(--color-neutral-600) !important; }
+.leaflet-control-attribution a { color: var(--color-neutral-700) !important; }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--color-surface) !important; color: var(--color-text) !important; box-shadow: var(--shadow-md) !important; }
+
+/* Basemap/layers control (L.control.layers) — GIS map */
+.leaflet-control-layers { background: var(--color-surface) !important; color: var(--color-text) !important; border: 1px solid var(--color-divider) !important; border-radius: var(--radius-md) !important; box-shadow: var(--shadow-md) !important; }
+.leaflet-control-layers-toggle { filter: none; }
+.leaflet-control-layers-list { font-size: 12.5px; }
+.leaflet-control-layers-separator { border-top: 1px solid var(--color-divider) !important; margin: 6px -6px !important; }
+
+/* Issue marker pins (divIcon) — GIS map */
+.gis-marker-pin { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(20, 33, 61, 0.35); }
+.gis-marker-pin.selected { width: 22px; height: 22px; border-width: 3px; box-shadow: 0 0 0 1px var(--color-accent-900), var(--shadow-md); }
+
+/* leaflet.markercluster theme overrides — accent-blue family, not the plugin's default
+   yellow/orange, so cluster bubbles match the rest of the GIS map/app palette. */
+.marker-cluster-small { background-color: color-mix(in srgb, var(--color-accent-300) 55%, transparent) !important; }
+.marker-cluster-small div { background-color: var(--color-accent-400) !important; }
+.marker-cluster-medium { background-color: color-mix(in srgb, var(--color-accent-500) 55%, transparent) !important; }
+.marker-cluster-medium div { background-color: var(--color-accent-600) !important; }
+.marker-cluster-large { background-color: color-mix(in srgb, var(--color-accent-700) 55%, transparent) !important; }
+.marker-cluster-large div { background-color: var(--color-accent-800) !important; }
+.marker-cluster span { color: #fff !important; font-weight: 600; }

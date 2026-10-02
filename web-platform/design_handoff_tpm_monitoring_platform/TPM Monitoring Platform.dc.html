@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="./image-slot.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    body{margin:0}
+    ::-webkit-scrollbar{width:8px;height:8px}
+    ::-webkit-scrollbar-thumb{background:var(--color-neutral-700);border-radius:4px}
+    select.input{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239397ab'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+    .leaflet-container{background:#eae6d8;font-family:var(--font-body)}
+    .leaflet-control-zoom a{background:var(--color-surface) !important;color:var(--color-text) !important;border-color:var(--color-divider) !important}
+    .leaflet-control-zoom a:hover{background:color-mix(in srgb, var(--color-accent) 14%, var(--color-surface)) !important}
+    .leaflet-control-attribution{background:color-mix(in srgb, var(--color-surface) 80%, transparent) !important;color:var(--color-neutral-400) !important}
+    .leaflet-control-attribution a{color:var(--color-neutral-300) !important}
+    .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--color-surface) !important;color:var(--color-text) !important}
+  </style>
+</helmet>
+
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+  <div style="display:flex;min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+    <div style="flex:1.15;display:flex;flex-direction:column;justify-content:center;padding:64px 72px;background:linear-gradient(160deg, var(--color-surface), var(--color-bg));border-right:1px solid var(--color-divider)">
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:48px">
+        <i class="ph-fill ph-shield-check" style="font-size:28px;color:var(--color-accent)"></i>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:19px">TPM Monitoring Platform</span>
+      </div>
+      <h1 style="max-width:520px">Third-Party Monitoring &amp; Live GIS Oversight</h1>
+      <p class="text-muted" style="max-width:480px;font-size:15px">Track field-reported issues from discovery through DRI resolution and final verification, with a live geographic view of where and how monitoring activity is unfolding.</p>
+      <div style="display:flex;gap:32px;margin-top:48px">
+        <div><div style="font-family:var(--font-heading);font-size:24px">10</div><div class="text-muted" style="font-size:12px">States monitored</div></div>
+        <div><div style="font-family:var(--font-heading);font-size:24px">70+</div><div class="text-muted" style="font-size:12px">Active field reports</div></div>
+        <div><div style="font-family:var(--font-heading);font-size:24px">5-stage</div><div class="text-muted" style="font-size:12px">Verification workflow</div></div>
+      </div>
+    </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:48px">
+      <div style="width:100%;max-width:360px;display:flex;flex-direction:column;gap:16px">
+        <h3 style="margin-bottom:0">Sign in</h3>
+        <p class="text-muted" style="font-size:13px;margin-top:-8px">This is a demo environment — credentials are pre-filled.</p>
+        <div class="field"><label>Email</label><input class="input" type="email" value="{{ loginEmail }}" onChange="{{ setLoginEmail }}"></div>
+        <div class="field"><label>Password</label><input class="input" type="password" value="{{ loginPassword }}" onChange="{{ setLoginPassword }}"></div>
+        <div class="field">
+          <label>Role</label>
+          <div class="seg">
+            <label class="seg-opt"><input type="radio" name="role" checked="{{ isRoleSuperAdmin }}" onChange="{{ setRoleSuperAdmin }}">Super Admin</label>
+            <label class="seg-opt"><input type="radio" name="role" checked="{{ isRoleProjectAdmin }}" onChange="{{ setRoleProjectAdmin }}">Project Admin</label>
+            <label class="seg-opt"><input type="radio" name="role" checked="{{ isRoleViewer }}" onChange="{{ setRoleViewer }}">Viewer</label>
+          </div>
+          <div class="text-muted" style="font-size:11.5px;line-height:1.5">
+            <sc-if value="{{ isRoleSuperAdmin }}" hint-placeholder-val="{{ true }}">Full platform control: manage all users and Project Admins, global datasets, and system settings.</sc-if>
+            <sc-if value="{{ isRoleProjectAdmin }}" hint-placeholder-val="{{ false }}">Manage users, tasks and roles within your assigned project. No access to Settings or global datasets.</sc-if>
+            <sc-if value="{{ isRoleViewer }}" hint-placeholder-val="{{ false }}">Read-only access to dashboards, maps and reports. No Users, Project Admin Panel or Settings, and no ability to create, edit or delete data.</sc-if>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" onClick="{{ login }}">Sign In</button>
+        <div class="hr"></div>
+        <div style="font-size:12px" class="text-muted">By continuing you agree this session runs on sample monitoring data.</div>
+      </div>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ showLoadingShell }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+      <i class="ph ph-circle-notch" style="font-size:28px;color:var(--color-accent);animation:spin 1s linear infinite"></i>
+      <div class="text-muted" style="font-size:13px">Loading monitoring data…</div>
+    </div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</sc-if>
+
+<sc-if value="{{ showApp }}" hint-placeholder-val="{{ false }}">
+  <div style="display:flex;height:100vh;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body);font-size:14px">
+    <aside style="width:236px;flex:none;display:flex;flex-direction:column;background:var(--color-surface);border-right:1px solid var(--color-divider)">
+      <div style="display:flex;align-items:center;gap:10px;padding:18px 16px 16px">
+        <i class="ph-fill ph-shield-check" style="font-size:22px;color:var(--color-accent)"></i>
+        <span style="font-family:var(--font-heading);font-weight:600;font-size:14px;line-height:1.25">TPM Monitoring<br>Platform</span>
+      </div>
+      <nav style="display:flex;flex-direction:column;gap:2px;padding:4px 10px;flex:1;overflow:auto">
+        <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="7">
+          <a href="javascript:void(0)" onClick="{{ item.onClick }}" style="{{ item.style }}">
+            <i class="{{ item.icon }}" style="font-size:16px"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        </sc-for>
+      </nav>
+      <div style="padding:12px 16px;border-top:1px solid var(--color-divider)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <div style="width:32px;height:32px;flex:none;border-radius:50%;background:var(--color-accent-800);display:flex;align-items:center;justify-content:center;color:var(--color-accent-100);font-size:12px;font-weight:600">FA</div>
+          <div style="min-width:0">
+            <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Fatima Yusuf</div>
+            <div style="font-size:11px" class="text-muted">{{ currentRoleLabel }}</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-block" onClick="{{ logout }}"><i class="ph ph-sign-out"></i>Sign Out</button>
+      </div>
+    </aside>
+
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+      <header style="height:58px;flex:none;display:flex;align-items:center;gap:16px;padding:0 24px;border-bottom:1px solid var(--color-divider)">
+        <h4 style="margin:0;white-space:nowrap">{{ viewTitle }}</h4>
+        <div style="flex:1;max-width:360px;margin-left:16px;position:relative">
+          <i class="ph ph-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.5;font-size:14px"></i>
+          <input class="input" style="padding-left:30px" placeholder="Search issue ID, state, category…" value="{{ topSearch }}" onChange="{{ setTopSearch }}" onKeyDown="{{ onTopSearchKey }}">
+        </div>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative">
+          <button class="btn btn-icon btn-secondary" style="position:relative" onClick="{{ toggleNotif }}">
+            <i class="ph ph-bell"></i>
+            <span style="position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:#d97a6a"></span>
+          </button>
+          <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
+            <div class="card elev-lg" style="position:absolute;top:44px;right:40px;width:300px;padding:10px;gap:8px;z-index:20">
+              <div class="card-title" style="font-size:14px">Notifications</div>
+              <sc-for list="{{ notifications }}" as="n" hint-placeholder-count="4">
+                <div style="display:flex;gap:8px;padding:8px 0;border-top:1px solid var(--color-divider)">
+                  <i class="{{ n.icon }}" style="font-size:15px;color:var(--color-accent);margin-top:2px"></i>
+                  <div style="min-width:0">
+                    <div style="font-size:12.5px">{{ n.text }}</div>
+                    <div class="text-muted" style="font-size:11px">{{ n.time }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <div class="tag tag-outline">{{ currentRoleLabel }}</div>
+        </div>
+      </header>
+
+      <main style="flex:1;overflow:auto">
+
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:20px">
+            <div>
+              <h2 style="margin-bottom:2px">Operations Overview</h2>
+              <p class="text-muted" style="font-size:13px">Live snapshot across all monitored states — {{ kpis.total }} issues tracked.</p>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+              <sc-for list="{{ kpiCards }}" as="card" hint-placeholder-count="8">
+                <div class="card elev-sm">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span class="card-kicker">{{ card.label }}</span>
+                    <i class="{{ card.icon }}" style="{{ card.iconStyle }}"></i>
+                  </div>
+                  <div style="font-family:var(--font-heading);font-size:27px;font-weight:500">{{ card.value }}</div>
+                  <div class="card-meta">{{ card.sub }}</div>
+                </div>
+              </sc-for>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px">
+              <div class="card elev-sm" style="padding:0;overflow:hidden">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 0">
+                  <div class="card-title">Live Issue Map</div>
+                  <a href="javascript:void(0)" onClick="{{ goGis }}" style="font-size:12.5px">Open full map <i class="ph ph-arrow-right"></i></a>
+                </div>
+                <div style="position:relative;height:260px;margin:12px;border-radius:var(--radius-md);overflow:hidden">
+                  <div ref="{{ dashMapRef }}" style="position:absolute;inset:0"></div>
+                </div>
+              </div>
+              <div class="card elev-sm">
+                <div class="card-title">Issues Reported — Last 14 Days</div>
+                <div style="display:flex;align-items:flex-end;gap:5px;height:150px;margin-top:10px">
+                  <sc-for list="{{ trendBars }}" as="d" hint-placeholder-count="14">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end">
+                      <div style="{{ d.barStyle }}" title="{{ d.count }}"></div>
+                      <div class="text-muted" style="font-size:9px">{{ d.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:14px">
+              <div class="card elev-sm">
+                <div class="card-title">Issues by Status</div>
+                <div style="display:flex;align-items:center;gap:16px;margin-top:8px">
+                  <div style="{{ donutStyle }}"></div>
+                  <div style="display:flex;flex-direction:column;gap:6px;flex:1">
+                    <sc-for list="{{ donutSegs }}" as="seg" hint-placeholder-count="5">
+                      <div style="display:flex;align-items:center;gap:6px;font-size:11.5px">
+                        <span style="width:8px;height:8px;border-radius:50%;background:{{ seg.color }};flex:none"></span>
+                        <span style="flex:1">{{ seg.status }}</span>
+                        <span class="text-muted">{{ seg.count }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <div class="card elev-sm">
+                <div class="card-title">Issues by State</div>
+                <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+                  <sc-for list="{{ stateBreakdown }}" as="s" hint-placeholder-count="6">
+                    <div>
+                      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px"><span>{{ s.name }}</span><span class="text-muted">{{ s.count }}</span></div>
+                      <div style="height:6px;border-radius:3px;background:var(--color-neutral-800)"><div style="{{ s.barStyle }}"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="card elev-sm">
+                <div style="display:flex;align-items:center;justify-content:space-between">
+                  <div class="card-title">Recent Issues</div>
+                  <a href="javascript:void(0)" onClick="{{ goIssues }}" style="font-size:12.5px">View all</a>
+                </div>
+                <div style="display:flex;flex-direction:column;margin-top:6px">
+                  <sc-for list="{{ recentIssues }}" as="i" hint-placeholder-count="6">
+                    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--color-divider);cursor:pointer" onClick="{{ i.openFn }}">
+                      <span style="width:8px;height:8px;border-radius:50%;background:{{ i.statusColor }};flex:none"></span>
+                      <div style="min-width:0;flex:1">
+                        <div style="font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ i.category }}</div>
+                        <div class="text-muted" style="font-size:11px">{{ i.id }} · {{ i.state }}</div>
+                      </div>
+                      <span class="text-muted" style="font-size:11px">{{ i.status }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div class="card elev-sm">
+              <div class="card-title">Activity &amp; Resolution Timeline</div>
+              <div style="display:flex;flex-direction:column;margin-top:8px">
+                <sc-for list="{{ timeline }}" as="h" hint-placeholder-count="8">
+                  <div style="display:flex;gap:12px;padding:9px 0;border-top:1px solid var(--color-divider)">
+                    <div class="text-muted" style="font-size:11px;width:130px;flex:none">{{ h.date }}</div>
+                    <div style="flex:1;font-size:13px">
+                      <strong style="font-weight:500">{{ h.action }}</strong> — {{ h.note }}
+                    </div>
+                    <div class="text-muted" style="font-size:11px;width:150px;flex:none;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ h.issueId }} · {{ h.actor }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isGis }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;height:100%;min-height:0">
+            <div style="width:250px;flex:none;padding:18px;border-right:1px solid var(--color-divider);overflow:auto;display:flex;flex-direction:column;gap:14px">
+              <h5 style="margin:0">Filters</h5>
+              <div class="field"><label>State</label>
+                <select class="input" value="{{ gisFilters.state }}" onChange="{{ setGisState }}">
+                  <option value="All">All States</option>
+                  <sc-for list="{{ statesList }}" as="s" hint-placeholder-count="10"><option value="{{ s }}">{{ s }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Category</label>
+                <select class="input" value="{{ gisFilters.category }}" onChange="{{ setGisCategory }}">
+                  <option value="All">All Categories</option>
+                  <sc-for list="{{ categoriesList }}" as="c" hint-placeholder-count="10"><option value="{{ c }}">{{ c }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Status</label>
+                <select class="input" value="{{ gisFilters.status }}" onChange="{{ setGisStatus }}">
+                  <option value="All">All Statuses</option>
+                  <sc-for list="{{ statusesList }}" as="st" hint-placeholder-count="5"><option value="{{ st }}">{{ st }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>TPM / Monitor</label>
+                <select class="input" value="{{ gisFilters.tpm }}" onChange="{{ setGisTpm }}">
+                  <option value="All">All Monitors</option>
+                  <sc-for list="{{ tpmNames }}" as="t" hint-placeholder-count="5"><option value="{{ t }}">{{ t }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>DRI</label>
+                <select class="input" value="{{ gisFilters.dri }}" onChange="{{ setGisDri }}">
+                  <option value="All">All DRIs</option>
+                  <sc-for list="{{ driNames }}" as="d" hint-placeholder-count="8"><option value="{{ d }}">{{ d }}</option></sc-for>
+                </select>
+              </div>
+              <button class="btn btn-secondary btn-block" onClick="{{ resetGisFilters }}"><i class="ph ph-arrow-counter-clockwise"></i>Reset Filters</button>
+              <div class="hr" style="margin:4px 0"></div>
+              <h6 style="margin-bottom:6px">Legend</h6>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ legendItems }}" as="l" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                    <span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }};flex:none"></span>{{ l.status }}
+                  </div>
+                </sc-for>
+              </div>
+              <div class="hr" style="margin:4px 0"></div>
+              <div style="font-size:12px" class="text-muted">{{ gisFiltered.length }} of {{ kpis.total }} issues shown</div>
+            </div>
+
+            <div style="flex:1;position:relative;min-width:0">
+              <div ref="{{ gisMapRef }}" style="position:absolute;inset:0"></div>
+
+              <sc-if value="{{ hasSelectedMarker }}" hint-placeholder-val="{{ false }}">
+                <div class="card elev-lg" style="position:absolute;top:16px;right:16px;width:300px;padding:14px;gap:10px">
+                  <div style="display:flex;align-items:center;justify-content:space-between">
+                    <span class="tag tag-outline">{{ selectedMarker.id }}</span>
+                    <button class="btn btn-icon btn-ghost" onClick="{{ closeMarkerPanel }}"><i class="ph ph-x"></i></button>
+                  </div>
+                  <div class="card-title" style="font-size:15px">{{ selectedMarker.category }}</div>
+                  <div class="card-body" style="font-size:12.5px">{{ selectedMarker.description }}</div>
+                  <div style="display:flex;gap:6px;flex-wrap:wrap">
+                    <span class="tag" style="background:{{ selectedMarker.statusBg }};color:{{ selectedMarker.statusColor }}">{{ selectedMarker.status }}</span>
+                    <span class="tag" style="background:{{ selectedMarker.priorityBg }};color:{{ selectedMarker.priorityColor }}">{{ selectedMarker.priority }}</span>
+                  </div>
+                  <div class="text-muted" style="font-size:11.5px">{{ selectedMarker.state }} · {{ selectedMarker.lga }} · {{ selectedMarker.ward }}</div>
+                  <div class="text-muted" style="font-size:11px">GPS {{ selectedMarker.lat }}, {{ selectedMarker.lng }} · {{ selectedMarker.reportedAt }}</div>
+                  <button class="btn btn-primary btn-block" onClick="{{ selectedMarker.openFn }}">View Full Details</button>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isIssues }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <h2 style="margin-bottom:2px">Issue Management</h2>
+                <p class="text-muted" style="font-size:13px">{{ filteredIssues.length }} matching issues</p>
+              </div>
+              <button class="btn btn-secondary" onClick="{{ exportIssues }}"><i class="ph ph-download-simple"></i>Export CSV</button>
+            </div>
+            <div class="card elev-sm" style="flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px">
+              <input class="input" style="max-width:220px" placeholder="Search…" value="{{ issueFilters.search }}" onChange="{{ setIssueSearch }}">
+              <select class="input" style="max-width:170px" value="{{ issueFilters.status }}" onChange="{{ setIssueStatus }}">
+                <option value="All">All Statuses</option>
+                <sc-for list="{{ statusesList }}" as="s" hint-placeholder-count="5"><option value="{{ s }}">{{ s }}</option></sc-for>
+              </select>
+              <select class="input" style="max-width:210px" value="{{ issueFilters.category }}" onChange="{{ setIssueCategory }}">
+                <option value="All">All Categories</option>
+                <sc-for list="{{ categoriesList }}" as="c" hint-placeholder-count="10"><option value="{{ c }}">{{ c }}</option></sc-for>
+              </select>
+              <select class="input" style="max-width:170px" value="{{ issueFilters.state }}" onChange="{{ setIssueState }}">
+                <option value="All">All States</option>
+                <sc-for list="{{ statesList }}" as="s" hint-placeholder-count="10"><option value="{{ s }}">{{ s }}</option></sc-for>
+              </select>
+              <select class="input" style="max-width:150px" value="{{ issueFilters.priority }}" onChange="{{ setIssuePriority }}">
+                <option value="All">All Priorities</option>
+                <sc-for list="{{ prioritiesList }}" as="p" hint-placeholder-count="4"><option value="{{ p }}">{{ p }}</option></sc-for>
+              </select>
+            </div>
+            <div class="card elev-sm" style="padding:0">
+              <table class="table">
+                <thead><tr><th>ID</th><th>Category</th><th>Location</th><th>Priority</th><th>Status</th><th>Assigned DRI</th><th>Reported</th><th></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ pagedIssues }}" as="i" hint-placeholder-count="10">
+                    <tr style="cursor:pointer" onClick="{{ i.openFn }}">
+                      <td style="font-family:var(--font-heading)">{{ i.id }}</td>
+                      <td>{{ i.category }}</td>
+                      <td class="text-muted">{{ i.state }}, {{ i.lga }}</td>
+                      <td><span class="tag" style="background:{{ i.priorityBg }};color:{{ i.priorityColor }}">{{ i.priority }}</span></td>
+                      <td><span class="tag" style="background:{{ i.statusBg }};color:{{ i.statusColor }}">{{ i.status }}</span></td>
+                      <td class="text-muted">{{ i.driLabel }}</td>
+                      <td class="text-muted">{{ i.reportedAt }}</td>
+                      <td><i class="ph ph-caret-right"></i></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--color-divider)">
+                <span class="text-muted" style="font-size:12.5px">Page {{ issuePage }} of {{ totalPages }}</span>
+                <div style="display:flex;gap:8px">
+                  <button class="btn btn-secondary" onClick="{{ prevIssuePage }}" disabled="{{ isFirstPage }}">Previous</button>
+                  <button class="btn btn-secondary" onClick="{{ nextIssuePage }}" disabled="{{ isLastPage }}">Next</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1100px">
+            <div>
+              <a href="javascript:void(0)" onClick="{{ backFromDetail }}" style="font-size:12.5px"><i class="ph ph-arrow-left"></i> Back</a>
+            </div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+              <div>
+                <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
+                  <h2 style="margin:0">{{ selectedIssue.id }}</h2>
+                  <span class="tag" style="background:{{ selectedIssue.statusBg }};color:{{ selectedIssue.statusColor }}">{{ selectedIssue.status }}</span>
+                  <span class="tag" style="background:{{ selectedIssue.priorityBg }};color:{{ selectedIssue.priorityColor }}">{{ selectedIssue.priorityLabel }}</span>
+                </div>
+                <h4 style="margin:0;font-weight:500">{{ selectedIssue.category }}</h4>
+              </div>
+              <div style="display:flex;gap:8px;flex:none">
+                <sc-if value="{{ !isViewer }}" hint-placeholder-val="{{ true }}">
+                <sc-if value="{{ selectedIssue.canAssign }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" onClick="{{ openAssignModal }}"><i class="ph ph-user-plus"></i>Assign DRI</button></sc-if>
+                <sc-if value="{{ selectedIssue.canRespond }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" onClick="{{ openResponseModal }}"><i class="ph ph-chat-circle-text"></i>Record DRI Response</button></sc-if>
+                <sc-if value="{{ selectedIssue.canCorrective }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" onClick="{{ openCorrectiveModal }}"><i class="ph ph-wrench"></i>Record Corrective Action</button></sc-if>
+                <sc-if value="{{ selectedIssue.canVerify }}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" onClick="{{ openVerifyModal }}"><i class="ph ph-check-circle"></i>Verify &amp; Close</button></sc-if>
+                </sc-if>
+                <sc-if value="{{ isSuperAdmin }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn btn-secondary" onClick="{{ openEditIssueModal }}"><i class="ph ph-note-pencil"></i>Edit Submission</button>
+                  <button class="btn btn-secondary" onClick="{{ openDeleteIssueModal }}"><i class="ph ph-trash"></i>Delete</button>
+                </sc-if>
+              </div>
+            </div>
+
+            <div class="card elev-sm" style="padding:14px 16px">
+              <div style="display:flex;justify-content:space-between;gap:4px">
+                <sc-for list="{{ selectedIssue.stepper }}" as="step" hint-placeholder-count="5">
+                  <div style="flex:1;text-align:center;position:relative">
+                    <div style="{{ step.dotStyle }}"><i class="{{ step.icon }}" style="font-size:11px"></i></div>
+                    <div style="{{ step.lineStyle }}"></div>
+                    <div style="{{ step.labelStyle }}">{{ step.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:16px">
+              <div style="display:flex;flex-direction:column;gap:16px">
+                <div class="card elev-sm">
+                  <div class="card-title">Description</div>
+                  <p class="card-body">{{ selectedIssue.description }}</p>
+                  <div class="hr" style="margin:6px 0"></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+                    <div><span class="text-muted">State / LGA / Ward</span><br>{{ selectedIssue.state }} / {{ selectedIssue.lga }} / {{ selectedIssue.ward }}</div>
+                    <div><span class="text-muted">GPS Coordinates</span><br>{{ selectedIssue.lat }}, {{ selectedIssue.lng }}</div>
+                    <div><span class="text-muted">Reported</span><br>{{ selectedIssue.reportedAt }}</div>
+                    <div><span class="text-muted">Reporting TPM</span><br>{{ selectedIssue.reportedBy }}</div>
+                    <div><span class="text-muted">Assigned DRI</span><br>{{ selectedIssue.driLabel }}</div>
+                    <div><span class="text-muted">Resolution Date</span><br>{{ selectedIssue.resolutionLabel }}</div>
+                  </div>
+                </div>
+                <div class="card elev-sm">
+                  <div class="card-title">Photographs &amp; Attachments</div>
+                  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:6px">
+                    <image-slot id="{{ selectedIssue.photoId0 }}" shape="rounded" radius="8" style="width:100%;height:90px" placeholder="Field photo"></image-slot>
+                    <image-slot id="{{ selectedIssue.photoId1 }}" shape="rounded" radius="8" style="width:100%;height:90px" placeholder="Field photo"></image-slot>
+                    <image-slot id="{{ selectedIssue.photoId2 }}" shape="rounded" radius="8" style="width:100%;height:90px" placeholder="Field photo"></image-slot>
+                    <image-slot id="{{ selectedIssue.photoId3 }}" shape="rounded" radius="8" style="width:100%;height:90px" placeholder="Field photo"></image-slot>
+                  </div>
+                </div>
+                <sc-if value="{{ selectedIssue.driResponse }}" hint-placeholder-val="{{ false }}">
+                  <div class="card elev-sm"><div class="card-title">DRI Response</div><p class="card-body">{{ selectedIssue.driResponse }}</p></div>
+                </sc-if>
+                <sc-if value="{{ selectedIssue.correctiveAction }}" hint-placeholder-val="{{ false }}">
+                  <div class="card elev-sm"><div class="card-title">Corrective Action Taken</div><p class="card-body">{{ selectedIssue.correctiveAction }}</p></div>
+                </sc-if>
+              </div>
+              <div class="card elev-sm">
+                <div class="card-title">Activity History</div>
+                <div style="display:flex;flex-direction:column;margin-top:6px">
+                  <sc-for list="{{ selectedIssue.history }}" as="h" hint-placeholder-count="5">
+                    <div style="padding:9px 0;border-top:1px solid var(--color-divider)">
+                      <div style="font-size:12.5px"><strong style="font-weight:500">{{ h.action }}</strong></div>
+                      <div class="text-muted" style="font-size:11.5px;margin:2px 0">{{ h.date }} · {{ h.actor }}</div>
+                      <div style="font-size:12px">{{ h.note }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSubpanel }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <h2 style="margin-bottom:2px">TPM Sub-Panel</h2>
+              <p class="text-muted" style="font-size:13px">Assigned monitoring activity awaiting supervisor review, DRI response, or final verification.</p>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+              <div class="card elev-sm"><span class="card-kicker">Awaiting DRI Response</span><div style="font-family:var(--font-heading);font-size:26px">{{ subKpis.assigned }}</div></div>
+              <div class="card elev-sm"><span class="card-kicker">In Progress</span><div style="font-family:var(--font-heading);font-size:26px">{{ subKpis.progress }}</div></div>
+              <div class="card elev-sm"><span class="card-kicker">Awaiting Verification</span><div style="font-family:var(--font-heading);font-size:26px">{{ subKpis.resolved }}</div></div>
+            </div>
+            <div class="card elev-sm" style="padding:0">
+              <table class="table">
+                <thead><tr><th>ID</th><th>Category</th><th>Location</th><th>Status</th><th>DRI</th><th>Reported</th><th></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ subpanelIssues }}" as="i" hint-placeholder-count="8">
+                    <tr style="cursor:pointer" onClick="{{ i.openSubFn }}">
+                      <td style="font-family:var(--font-heading)">{{ i.id }}</td>
+                      <td>{{ i.category }}</td>
+                      <td class="text-muted">{{ i.state }}, {{ i.lga }}</td>
+                      <td><span class="tag" style="background:{{ i.statusBg }};color:{{ i.statusColor }}">{{ i.status }}</span></td>
+                      <td class="text-muted">{{ i.driLabel }}</td>
+                      <td class="text-muted">{{ i.reportedAt }}</td>
+                      <td><i class="ph ph-caret-right"></i></td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isAnalytics }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+            <h2 style="margin-bottom:2px">Analytics &amp; KPI Dashboard</h2>
+            <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:14px">
+              <div class="card elev-sm">
+                <div class="card-title">Issues Reported — Last 30 Days</div>
+                <div style="display:flex;align-items:flex-end;gap:3px;height:150px;margin-top:10px">
+                  <sc-for list="{{ trendBars30 }}" as="d" hint-placeholder-count="30">
+                    <div style="flex:1;height:100%;display:flex;align-items:flex-end">
+                      <div style="{{ d.barStyle }}" title="{{ d.count }}"></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div class="card elev-sm">
+                <div class="card-title">Issues by Category</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">
+                  <sc-for list="{{ categoryBreakdown }}" as="c" hint-placeholder-count="10">
+                    <div>
+                      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span>{{ c.name }}</span><span class="text-muted">{{ c.count }}</span></div>
+                      <div style="height:6px;border-radius:3px;background:var(--color-neutral-800)"><div style="{{ c.barStyle }}"></div></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div class="card elev-sm" style="padding:0">
+                <div class="card-title" style="padding:14px 16px 0">DRI Performance</div>
+                <table class="table" style="margin-top:6px">
+                  <thead><tr><th>DRI</th><th>Assigned</th><th>Resolved</th><th>Avg Days</th></tr></thead>
+                  <tbody>
+                    <sc-for list="{{ driPerf }}" as="d" hint-placeholder-count="6">
+                      <tr><td>{{ d.name }}<div class="text-muted" style="font-size:11px">{{ d.title }}</div></td><td>{{ d.assignedCount }}</td><td>{{ d.resolvedCount }}</td><td>{{ d.avgDays }}</td></tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+              <div class="card elev-sm" style="padding:0">
+                <div class="card-title" style="padding:14px 16px 0">TPM Monitoring Performance</div>
+                <table class="table" style="margin-top:6px">
+                  <thead><tr><th>TPM</th><th>Reported</th><th>Verified</th><th>Close Rate</th></tr></thead>
+                  <tbody>
+                    <sc-for list="{{ tpmPerf }}" as="t" hint-placeholder-count="5">
+                      <tr><td>{{ t.name }}</td><td>{{ t.reportedCount }}</td><td>{{ t.verifiedCount }}</td><td>{{ t.closeRate }}%</td></tr>
+                    </sc-for>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isUsers }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <h2 style="margin-bottom:2px">Users &amp; Role Management</h2>
+                <p class="text-muted" style="font-size:13px">{{ users.length }} accounts across Admin, TPM Supervisor, DRI and Viewer roles.</p>
+              </div>
+              <div style="display:flex;gap:8px">
+                <sc-if value="{{ canManageUsers }}" hint-placeholder-val="{{ true }}">
+                  <button class="btn btn-primary" onClick="{{ openAddUserModal }}"><i class="ph ph-user-plus"></i>Add User</button>
+                </sc-if>
+                <sc-if value="{{ isSuperAdmin }}" hint-placeholder-val="{{ false }}">
+                  <button class="btn btn-secondary" onClick="{{ openRemoveUserModal }}" disabled="{{ noUserSelected }}" title="Select a row below, then remove"><i class="ph ph-user-minus"></i>Remove User</button>
+                </sc-if>
+              </div>
+            </div>
+            <div class="card elev-sm" style="padding:0">
+              <table class="table">
+                <thead><tr><th style="{{ selectColHeaderStyle }}"></th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Last Login</th><th style="{{ selectColHeaderStyle }}"></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ users }}" as="u" hint-placeholder-count="7">
+                    <tr style="{{ u.rowStyle }}">
+                      <td style="{{ u.selectCellStyle }}"><input type="radio" name="userSelect" checked="{{ u.isSelected }}" onChange="{{ u.selectFn }}"></td>
+                      <td>{{ u.name }}</td>
+                      <td class="text-muted">{{ u.email }}</td>
+                      <td class="text-muted">{{ u.phoneLabel }}</td>
+                      <td><span class="tag tag-accent">{{ u.role }}</span></td>
+                      <td><span class="tag" style="{{ u.statusStyle }}">{{ u.status }}</span></td>
+                      <td class="text-muted">{{ u.lastLogin }}</td>
+                      <td style="{{ u.selectCellStyle }}">
+                        <sc-if value="{{ u.canEdit }}" hint-placeholder-val="{{ false }}">
+                          <button class="btn btn-icon btn-ghost" onClick="{{ u.editFn }}" title="Edit user"><i class="ph ph-pencil-simple"></i></button>
+                          <button class="btn btn-icon btn-ghost" onClick="{{ u.removeFn }}" title="Remove user"><i class="ph ph-user-minus"></i></button>
+                        </sc-if>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px;max-width:760px">
+            <h2 style="margin-bottom:2px">System Settings</h2>
+            <div class="seg" style="width:fit-content">
+              <label class="seg-opt"><input type="radio" name="stab" checked="{{ isGeneralTab }}" onChange="{{ setTabGeneral }}">General</label>
+              <label class="seg-opt"><input type="radio" name="stab" checked="{{ isNotifTab }}" onChange="{{ setTabNotif }}">Notifications</label>
+              <label class="seg-opt"><input type="radio" name="stab" checked="{{ isDataTab }}" onChange="{{ setTabData }}">Data &amp; Export</label>
+            </div>
+
+            <sc-if value="{{ isGeneralTab }}" hint-placeholder-val="{{ true }}">
+              <div class="card elev-sm" style="gap:14px">
+                <div class="field"><label>Organization Name</label><input class="input" value="{{ settingsForm.orgName }}" onChange="{{ setSettingsOrgName }}"></div>
+                <div class="field"><label>Default Timezone</label>
+                  <select class="input" value="{{ settingsForm.timezone }}" onChange="{{ setSettingsTimezone }}">
+                    <option>West Africa Time (WAT)</option><option>UTC</option><option>Eastern European Time (EET)</option>
+                  </select>
+                </div>
+                <div class="field"><label>Default GIS Map View</label>
+                  <select class="input" value="{{ settingsForm.defaultState }}" onChange="{{ setSettingsDefaultState }}">
+                    <option value="All">All States</option>
+                    <sc-for list="{{ statesList }}" as="s" hint-placeholder-count="10"><option value="{{ s }}">{{ s }}</option></sc-for>
+                  </select>
+                </div>
+                <button class="btn btn-primary" style="width:fit-content" onClick="{{ saveSettings }}"><i class="ph ph-floppy-disk"></i>Save Changes</button>
+                <sc-if value="{{ settingsSaved }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#6fb98a">Settings saved.</div></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isNotifTab }}" hint-placeholder-val="{{ false }}">
+              <div class="card elev-sm" style="gap:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center"><span>Email alerts for new issues</span><div class="seg"><label class="seg-opt"><input type="radio" name="emailAlerts" checked="{{ settingsForm.emailAlertsOn }}" onChange="{{ setEmailAlertsOn }}">On</label><label class="seg-opt"><input type="radio" name="emailAlerts" checked="{{ settingsForm.emailAlertsOff }}" onChange="{{ setEmailAlertsOff }}">Off</label></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><span>SMS alerts for critical priority</span><div class="seg"><label class="seg-opt"><input type="radio" name="smsAlerts" checked="{{ settingsForm.smsAlertsOn }}" onChange="{{ setSmsAlertsOn }}">On</label><label class="seg-opt"><input type="radio" name="smsAlerts" checked="{{ settingsForm.smsAlertsOff }}" onChange="{{ setSmsAlertsOff }}">Off</label></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center"><span>Auto-assign DRI by ward</span><div class="seg"><label class="seg-opt"><input type="radio" name="autoAssign" checked="{{ settingsForm.autoAssignOn }}" onChange="{{ setAutoAssignOn }}">On</label><label class="seg-opt"><input type="radio" name="autoAssign" checked="{{ settingsForm.autoAssignOff }}" onChange="{{ setAutoAssignOff }}">Off</label></div></div>
+                <button class="btn btn-primary" style="width:fit-content" onClick="{{ saveSettings }}"><i class="ph ph-floppy-disk"></i>Save Changes</button>
+              </div>
+            </sc-if>
+            <sc-if value="{{ isDataTab }}" hint-placeholder-val="{{ false }}">
+              <div class="card elev-sm" style="gap:14px">
+                <div class="field"><label>Data Retention Period</label>
+                  <select class="input" value="{{ settingsForm.retention }}" onChange="{{ setSettingsRetention }}">
+                    <option>6 months</option><option>12 months</option><option>24 months</option><option>Indefinite</option>
+                  </select>
+                </div>
+                <div class="field"><label>Export Format</label>
+                  <div class="seg"><label class="seg-opt"><input type="radio" name="fmt" checked="{{ settingsForm.fmtCsv }}" onChange="{{ setFmtCsv }}">CSV</label><label class="seg-opt"><input type="radio" name="fmt" checked="{{ settingsForm.fmtJson }}" onChange="{{ setFmtJson }}">JSON</label></div>
+                </div>
+                <button class="btn btn-secondary" style="width:fit-content" onClick="{{ exportIssues }}"><i class="ph ph-download-simple"></i>Export All Issue Data</button>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isProjectAdmins }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:24px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <h2 style="margin-bottom:2px">Project Admin Panel</h2>
+                <p class="text-muted" style="font-size:13px">Create and manage Project Admin accounts and their access — Super Admin only.</p>
+              </div>
+              <button class="btn btn-primary" onClick="{{ openAddProjectAdminModal }}"><i class="ph ph-user-plus"></i>Create Project Admin</button>
+            </div>
+            <div class="card elev-sm" style="padding:0">
+              <table class="table">
+                <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th>Last Login</th><th></th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ projectAdmins }}" as="p" hint-placeholder-count="4">
+                    <tr>
+                      <td>{{ p.name }}</td>
+                      <td class="text-muted">{{ p.email }}</td>
+                      <td class="text-muted">{{ p.phoneLabel }}</td>
+                      <td><span class="tag" style="{{ p.statusStyle }}">{{ p.status }}</span></td>
+                      <td class="text-muted">{{ p.lastLogin }}</td>
+                      <td style="display:flex;gap:4px;justify-content:flex-end">
+                        <button class="btn btn-icon btn-ghost" onClick="{{ p.editFn }}" title="Edit"><i class="ph ph-pencil-simple"></i></button>
+                        <button class="btn btn-icon btn-ghost" onClick="{{ p.resetFn }}" title="Reset password"><i class="ph ph-key"></i></button>
+                        <button class="btn btn-icon btn-ghost" onClick="{{ p.toggleFn }}" title="{{ p.toggleLabel }}"><i class="{{ p.toggleIcon }}"></i></button>
+                        <button class="btn btn-icon btn-ghost" onClick="{{ p.removeFn }}" title="Remove"><i class="ph ph-trash"></i></button>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </sc-if>
+
+      </main>
+    </div>
+  </div>
+
+  <sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog">
+        <div class="dialog-title">{{ modalTitle }}</div>
+        <sc-if value="{{ modalIsAssign }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body">
+            <div class="field"><label>Assign to DRI</label>
+              <select class="input" value="{{ modalDriId }}" onChange="{{ setModalDri }}">
+                <option value="">Select a DRI…</option>
+                <sc-for list="{{ driOptions }}" as="d" hint-placeholder-count="8"><option value="{{ d.id }}">{{ d.name }} — {{ d.title }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsAddUser }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body" style="display:flex;flex-direction:column;gap:10px">
+            <div class="field"><label>Full Name</label><input class="input" value="{{ addUserForm.name }}" onChange="{{ setAddUserName }}"></div>
+            <div class="field"><label>Email</label><input class="input" value="{{ addUserForm.email }}" onChange="{{ setAddUserEmail }}"></div>
+            <div class="field"><label>Phone Number</label><input class="input" type="tel" placeholder="+234…" value="{{ addUserForm.phone }}" onChange="{{ setAddUserPhone }}"></div>
+            <div class="field"><label>Role</label>
+              <select class="input" value="{{ addUserForm.role }}" onChange="{{ setAddUserRole }}">
+                <sc-for list="{{ assignableRoles }}" as="r" hint-placeholder-count="4"><option>{{ r }}</option></sc-for>
+              </select>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsEditUser }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body" style="display:flex;flex-direction:column;gap:10px">
+            <div class="field"><label>Full Name</label><input class="input" value="{{ editUserForm.name }}" onChange="{{ setEditUserName }}"></div>
+            <div class="field"><label>Email</label><input class="input" value="{{ editUserForm.email }}" onChange="{{ setEditUserEmail }}"></div>
+            <div class="field"><label>Phone Number</label><input class="input" type="tel" value="{{ editUserForm.phone }}" onChange="{{ setEditUserPhone }}"></div>
+            <div class="field"><label>Role</label>
+              <select class="input" value="{{ editUserForm.role }}" onChange="{{ setEditUserRole }}">
+                <sc-for list="{{ allRoles }}" as="r" hint-placeholder-count="5"><option>{{ r }}</option></sc-for>
+              </select>
+            </div>
+            <div class="field"><label>Status</label>
+              <div class="seg"><label class="seg-opt"><input type="radio" name="editUserStatus" checked="{{ editUserForm.isActive }}" onChange="{{ setEditUserActive }}">Active</label><label class="seg-opt"><input type="radio" name="editUserStatus" checked="{{ editUserForm.isInactive }}" onChange="{{ setEditUserInactive }}">Inactive</label></div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsRemoveUser }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body">
+            <p style="margin-top:0">You are about to remove <strong>{{ removeUserTargetName }}</strong>. This cannot be undone if permanently deleted.</p>
+            <div class="field"><label>Action</label>
+              <div class="seg"><label class="seg-opt"><input type="radio" name="removeMode" checked="{{ removeModeIsDeactivate }}" onChange="{{ setRemoveModeDeactivate }}">Deactivate</label><label class="seg-opt"><input type="radio" name="removeMode" checked="{{ removeModeIsDelete }}" onChange="{{ setRemoveModeDelete }}">Permanently Remove</label></div>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsEditIssue }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body" style="display:flex;flex-direction:column;gap:10px">
+            <div class="field"><label>Category</label>
+              <select class="input" value="{{ editIssueForm.category }}" onChange="{{ setEditIssueCategory }}">
+                <sc-for list="{{ categoriesList }}" as="c" hint-placeholder-count="10"><option value="{{ c }}">{{ c }}</option></sc-for>
+              </select>
+            </div>
+            <div class="field"><label>Priority</label>
+              <select class="input" value="{{ editIssueForm.priority }}" onChange="{{ setEditIssuePriority }}">
+                <sc-for list="{{ prioritiesList }}" as="p" hint-placeholder-count="4"><option value="{{ p }}">{{ p }}</option></sc-for>
+              </select>
+            </div>
+            <div class="field"><label>Description</label><textarea class="input" value="{{ editIssueForm.description }}" onChange="{{ setEditIssueDescription }}"></textarea></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsDeleteIssue }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body"><p style="margin-top:0">Delete submission <strong>{{ modalIssueId }}</strong> permanently? This removes it from all lists, the map, and reports. This cannot be undone.</p></div>
+        </sc-if>
+        <sc-if value="{{ modalIsAddProjectAdmin }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body" style="display:flex;flex-direction:column;gap:10px">
+            <div class="field"><label>Full Name</label><input class="input" value="{{ addUserForm.name }}" onChange="{{ setAddUserName }}"></div>
+            <div class="field"><label>Email</label><input class="input" value="{{ addUserForm.email }}" onChange="{{ setAddUserEmail }}"></div>
+            <div class="field"><label>Phone Number</label><input class="input" type="tel" placeholder="+234…" value="{{ addUserForm.phone }}" onChange="{{ setAddUserPhone }}"></div>
+            <p class="text-muted" style="font-size:12px;margin:0">Role is fixed to Project Admin. Login credentials are generated automatically.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsResetPassword }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body">
+            <p style="margin-top:0">Generate a new temporary password for <strong>{{ resetPasswordTargetName }}</strong>? They will be required to change it on next sign-in.</p>
+          </div>
+        </sc-if>
+        <sc-if value="{{ modalIsToggleProjectAdmin }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body"><p style="margin-top:0">{{ toggleProjectAdminPrompt }}</p></div>
+        </sc-if>
+        <sc-if value="{{ modalIsRemoveProjectAdmin }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body"><p style="margin-top:0">Permanently remove Project Admin <strong>{{ removeUserTargetName }}</strong>? This cannot be undone.</p></div>
+        </sc-if>
+        <sc-if value="{{ modalNeedsNote }}" hint-placeholder-val="{{ false }}">
+          <div class="dialog-body">
+            <p style="margin-top:0">{{ modalPrompt }}</p>
+            <div class="field"><label>Notes</label><textarea class="input" value="{{ modalNote }}" onChange="{{ setModalNote }}" placeholder="Add supporting detail…"></textarea></div>
+          </div>
+        </sc-if>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" onClick="{{ closeModal }}">Cancel</button>
+          <button class="btn btn-primary" onClick="{{ confirmModal }}">{{ modalConfirmLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    authed: false,
+    loginEmail: 'admin@tpmops.org',
+    loginPassword: 'demo1234',
+    loginRole: 'Super Admin',
+    view: 'dashboard',
+    loaded: false,
+    issues: [],
+    users: [],
+    selectedIssueId: null,
+    cameFrom: 'issues',
+    issueFilters: { status: 'All', category: 'All', state: 'All', priority: 'All', search: '' },
+    issuePage: 1,
+    gisFilters: { state: 'All', category: 'All', status: 'All', tpm: 'All', dri: 'All' },
+    selectedMarkerId: null,
+    modal: null,
+    modalIssueId: null,
+    modalDriId: '',
+    modalNote: '',
+    addUserForm: { name: '', email: '', phone: '', role: 'TPM Supervisor' },
+    selectedUserId: null,
+    editUserForm: null,
+    editUserTargetId: null,
+    removeUserTargetId: null,
+    removeMode: 'deactivate',
+    editIssueForm: null,
+    resetPasswordTargetId: null,
+    toggleProjectAdminTargetId: null,
+    notifOpen: false,
+    settingsTab: 'general',
+    settingsForm: {
+      orgName: 'TPM Monitoring Platform', timezone: 'West Africa Time (WAT)', defaultState: 'All',
+      emailAlertsOn: true, emailAlertsOff: false, smsAlertsOn: false, smsAlertsOff: true,
+      autoAssignOn: false, autoAssignOff: true, retention: '12 months', fmtCsv: true, fmtJson: false,
+    },
+    settingsSaved: false,
+    topSearch: '',
+  };
+
+  componentDidMount() {
+    import('./mock-data.js').then(mod => {
+      this._mod = mod;
+      this.setState({ issues: mod.generateIssues(70), users: mod.USERS.slice(), loaded: true });
+    });
+  }
+
+  componentDidUpdate() {
+    this.tryInitGisMap();
+    this.tryInitDashMap();
+    if (this._gisMap) { this.updateGisMarkers(); this._gisMap.invalidateSize(); }
+    if (this._dashMap) { this.updateDashMarkers(); this._dashMap.invalidateSize(); }
+  }
+
+  gisMapRef(el) { this.gisMapNode = el; this.tryInitGisMap(); }
+  dashMapRef(el) { this.dashMapNode = el; this.tryInitDashMap(); }
+
+  tryInitGisMap() {
+    if (this._gisMap || !this.gisMapNode || !window.L) return;
+    const L = window.L;
+    this._gisMap = L.map(this.gisMapNode, { zoomControl: true }).setView([9.08, 8.68], 6);
+    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors, SRTM &copy; OpenTopoMap (CC-BY-SA)', subdomains: 'abc', maxZoom: 17,
+    }).addTo(this._gisMap);
+    this._gisMarkers = L.layerGroup().addTo(this._gisMap);
+    this.updateGisMarkers();
+    setTimeout(() => this._gisMap && this._gisMap.invalidateSize(), 150);
+  }
+
+  tryInitDashMap() {
+    if (this._dashMap || !this.dashMapNode || !window.L) return;
+    const L = window.L;
+    this._dashMap = L.map(this.dashMapNode, { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, boxZoom: false, keyboard: false, touchZoom: false, attributionControl: false }).setView([9.08, 8.68], 5.6);
+    L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { subdomains: 'abc', maxZoom: 17 }).addTo(this._dashMap);
+    this._dashMarkers = L.layerGroup().addTo(this._dashMap);
+    this.updateDashMarkers();
+    setTimeout(() => this._dashMap && this._dashMap.invalidateSize(), 150);
+  }
+
+  updateGisMarkers() {
+    if (!this._gisMarkers) return;
+    this._gisMarkers.clearLayers();
+    const L = window.L;
+    (this._lastGisFiltered || []).forEach(i => {
+      const selected = this.state.selectedMarkerId === i.id;
+      L.circleMarker([parseFloat(i.lat), parseFloat(i.lng)], {
+        radius: selected ? 9 : 6, color: selected ? '#e9e9ed' : '#161826', weight: selected ? 2 : 1.5,
+        fillColor: i.statusColor, fillOpacity: 0.95,
+      }).on('click', () => this.selectMarker(i.id)).addTo(this._gisMarkers);
+    });
+  }
+
+  updateDashMarkers() {
+    if (!this._dashMarkers) return;
+    this._dashMarkers.clearLayers();
+    const L = window.L;
+    (this._lastAllIssues || []).forEach(i => {
+      L.circleMarker([parseFloat(i.lat), parseFloat(i.lng)], { radius: 4, color: '#161826', weight: 1, fillColor: i.statusColor, fillOpacity: 0.9 }).addTo(this._dashMarkers);
+    });
+  }
+
+  go(view) {
+    if (view === 'settings' && this.state.loginRole === 'Project Admin') return;
+    if (['settings', 'users', 'projectadmins'].includes(view) && this.state.loginRole === 'Viewer') return;
+    this.setState({ view, notifOpen: false });
+  }
+
+  goGis() { this.go('gis'); }
+  goIssues() { this.go('issues'); }
+  logout() { this.setState({ authed: false, view: 'dashboard' }); }
+  login() {
+    const view = this.state.loginRole === 'Project Admin' && this.state.view === 'settings' ? 'dashboard' : this.state.view;
+    this.setState({ authed: true, view });
+  }
+  setLoginEmail(e) { this.setState({ loginEmail: e.target.value }); }
+  setLoginPassword(e) { this.setState({ loginPassword: e.target.value }); }
+  setRoleSuperAdmin() { this.setState({ loginRole: 'Super Admin' }); }
+  setRoleProjectAdmin() { this.setState({ loginRole: 'Project Admin' }); }
+  setRoleViewer() { this.setState({ loginRole: 'Viewer' }); }
+
+  setTopSearch(e) { this.setState({ topSearch: e.target.value }); }
+  onTopSearchKey(e) {
+    if (e.key !== 'Enter') return;
+    const q = this.state.topSearch.trim();
+    if (!q) return;
+    const found = this.state.issues.find(i => i.id.toLowerCase() === q.toLowerCase());
+    if (found) { this.openIssue(found.id, 'issues'); }
+    else { this.setState(s => ({ view: 'issues', issueFilters: { ...s.issueFilters, search: q } })); }
+  }
+
+  toggleNotif() { this.setState(s => ({ notifOpen: !s.notifOpen })); }
+
+  openIssue(id, cameFrom) { this.setState({ view: 'detail', selectedIssueId: id, cameFrom: cameFrom || 'issues' }); }
+  backFromDetail() { this.setState(s => ({ view: s.cameFrom })); }
+
+  setIssueSearch(e) { this.setState(s => ({ issueFilters: { ...s.issueFilters, search: e.target.value }, issuePage: 1 })); }
+  setIssueStatus(e) { this.setState(s => ({ issueFilters: { ...s.issueFilters, status: e.target.value }, issuePage: 1 })); }
+  setIssueCategory(e) { this.setState(s => ({ issueFilters: { ...s.issueFilters, category: e.target.value }, issuePage: 1 })); }
+  setIssueState(e) { this.setState(s => ({ issueFilters: { ...s.issueFilters, state: e.target.value }, issuePage: 1 })); }
+  setIssuePriority(e) { this.setState(s => ({ issueFilters: { ...s.issueFilters, priority: e.target.value }, issuePage: 1 })); }
+  nextIssuePage() { this.setState(s => ({ issuePage: s.issuePage + 1 })); }
+  prevIssuePage() { this.setState(s => ({ issuePage: Math.max(1, s.issuePage - 1) })); }
+  exportIssues() { window.alert('Exporting issue data as ' + (this.state.settingsForm.fmtJson ? 'JSON' : 'CSV') + ' — a real deployment streams this from the API.'); }
+
+  setGisState(e) { this.setState(s => ({ gisFilters: { ...s.gisFilters, state: e.target.value } })); }
+  setGisCategory(e) { this.setState(s => ({ gisFilters: { ...s.gisFilters, category: e.target.value } })); }
+  setGisStatus(e) { this.setState(s => ({ gisFilters: { ...s.gisFilters, status: e.target.value } })); }
+  setGisTpm(e) { this.setState(s => ({ gisFilters: { ...s.gisFilters, tpm: e.target.value } })); }
+  setGisDri(e) { this.setState(s => ({ gisFilters: { ...s.gisFilters, dri: e.target.value } })); }
+  resetGisFilters() { this.setState({ gisFilters: { state: 'All', category: 'All', status: 'All', tpm: 'All', dri: 'All' } }); }
+  selectMarker(id) { this.setState({ selectedMarkerId: id }); }
+  closeMarkerPanel() { this.setState({ selectedMarkerId: null }); }
+
+  openAssignModal() { this.setState({ modal: 'assign', modalIssueId: this.state.selectedIssueId, modalDriId: '', modalNote: '' }); }
+  openResponseModal() { this.setState({ modal: 'response', modalIssueId: this.state.selectedIssueId, modalNote: '' }); }
+  openCorrectiveModal() { this.setState({ modal: 'corrective', modalIssueId: this.state.selectedIssueId, modalNote: '' }); }
+  openVerifyModal() { this.setState({ modal: 'verify', modalIssueId: this.state.selectedIssueId, modalNote: '' }); }
+  openAddUserModal() { this.setState({ modal: 'addUser', addUserForm: { name: '', email: '', phone: '', role: this.state.loginRole === 'Super Admin' ? 'Project Admin' : 'TPM Supervisor' } }); }
+  openAddProjectAdminModal() { this.setState({ modal: 'addProjectAdmin', addUserForm: { name: '', email: '', phone: '', role: 'Project Admin' } }); }
+  selectUser(id) { this.setState({ selectedUserId: id }); }
+  openEditUserModal(u) { this.setState({ modal: 'editUser', editUserTargetId: u.id, editUserForm: { name: u.name, email: u.email, phone: u.phone || '', role: u.role, isActive: u.status === 'Active', isInactive: u.status !== 'Active' } }); }
+  openRemoveUserModal() {
+    if (!this.state.selectedUserId) return;
+    this.setState({ modal: 'removeUser', removeUserTargetId: this.state.selectedUserId, removeMode: 'deactivate' });
+  }
+  openRemoveUserModalFor(id) { this.setState({ modal: 'removeUser', removeUserTargetId: id, removeMode: 'deactivate' }); }
+  openEditIssueModal() {
+    const issue = this.getIssue(this.state.selectedIssueId);
+    if (!issue) return;
+    this.setState({ modal: 'editIssue', modalIssueId: issue.id, editIssueForm: { category: issue.category, priority: issue.priority, description: issue.description } });
+  }
+  openDeleteIssueModal() { this.setState({ modal: 'deleteIssue', modalIssueId: this.state.selectedIssueId }); }
+  openResetPasswordModal(id) { this.setState({ modal: 'resetPassword', resetPasswordTargetId: id }); }
+  openToggleProjectAdminModal(id) { this.setState({ modal: 'toggleProjectAdmin', toggleProjectAdminTargetId: id }); }
+  openRemoveProjectAdminModal(id) { this.setState({ modal: 'removeProjectAdmin', removeUserTargetId: id }); }
+  closeModal() { this.setState({ modal: null, modalIssueId: null, editUserForm: null, editUserTargetId: null, removeUserTargetId: null, editIssueForm: null, resetPasswordTargetId: null, toggleProjectAdminTargetId: null }); }
+  setEditUserName(e) { this.setState(s => ({ editUserForm: { ...s.editUserForm, name: e.target.value } })); }
+  setEditUserEmail(e) { this.setState(s => ({ editUserForm: { ...s.editUserForm, email: e.target.value } })); }
+  setEditUserPhone(e) { this.setState(s => ({ editUserForm: { ...s.editUserForm, phone: e.target.value } })); }
+  setEditUserRole(e) { this.setState(s => ({ editUserForm: { ...s.editUserForm, role: e.target.value } })); }
+  setEditUserActive() { this.setState(s => ({ editUserForm: { ...s.editUserForm, isActive: true, isInactive: false } })); }
+  setEditUserInactive() { this.setState(s => ({ editUserForm: { ...s.editUserForm, isActive: false, isInactive: true } })); }
+  setRemoveModeDeactivate() { this.setState({ removeMode: 'deactivate' }); }
+  setRemoveModeDelete() { this.setState({ removeMode: 'delete' }); }
+  setEditIssueCategory(e) { this.setState(s => ({ editIssueForm: { ...s.editIssueForm, category: e.target.value } })); }
+  setEditIssuePriority(e) { this.setState(s => ({ editIssueForm: { ...s.editIssueForm, priority: e.target.value } })); }
+  setEditIssueDescription(e) { this.setState(s => ({ editIssueForm: { ...s.editIssueForm, description: e.target.value } })); }
+  setModalDri(e) { this.setState({ modalDriId: e.target.value }); }
+  setModalNote(e) { this.setState({ modalNote: e.target.value }); }
+  setAddUserName(e) { this.setState(s => ({ addUserForm: { ...s.addUserForm, name: e.target.value } })); }
+  setAddUserEmail(e) { this.setState(s => ({ addUserForm: { ...s.addUserForm, email: e.target.value } })); }
+  setAddUserPhone(e) { this.setState(s => ({ addUserForm: { ...s.addUserForm, phone: e.target.value } })); }
+  setAddUserRole(e) { this.setState(s => ({ addUserForm: { ...s.addUserForm, role: e.target.value } })); }
+
+  getIssue(id) { return this.state.issues.find(i => i.id === id); }
+  updateIssue(id, patch, historyEntry) {
+    const now = '2026-08-05 ' + new Date().toTimeString().slice(0, 5);
+    this.setState(s => ({ issues: s.issues.map(i => i.id === id ? { ...i, ...patch, history: [...i.history, { date: now, ...historyEntry }] } : i) }));
+  }
+
+  confirmModal() {
+    const { modal, modalIssueId, modalDriId, modalNote } = this.state;
+    const mod = this._mod;
+    if (modal === 'assign') {
+      const dri = mod.DRIS.find(d => d.id === modalDriId);
+      if (dri) this.updateIssue(modalIssueId, { status: 'Assigned', assignedDRI: dri.name, driId: dri.id }, { actor: 'TPM Sub-Panel', action: 'Assigned to DRI', note: `Routed to ${dri.name} (${dri.title}) for action.` });
+    } else if (modal === 'response') {
+      const issue = this.getIssue(modalIssueId);
+      const note = modalNote || 'DRI acknowledged issue and began corrective steps.';
+      this.updateIssue(modalIssueId, { status: 'In Progress', driResponse: note }, { actor: issue.assignedDRI, action: 'Response submitted', note });
+    } else if (modal === 'corrective') {
+      const issue = this.getIssue(modalIssueId);
+      const note = modalNote || 'Remedial action completed and evidence submitted for review.';
+      this.updateIssue(modalIssueId, { status: 'Resolved', correctiveAction: note }, { actor: issue.assignedDRI, action: 'Corrective action recorded', note });
+    } else if (modal === 'verify') {
+      const today = '2026-08-05 ' + new Date().toTimeString().slice(0, 5);
+      const note = modalNote || 'TPM confirmed resolution during follow-up visit.';
+      this.updateIssue(modalIssueId, { status: 'Verified/Closed', verifiedBy: 'Fatima Yusuf', resolutionDate: today }, { actor: 'Fatima Yusuf', action: 'Verified and closed', note });
+    } else if (modal === 'addUser' || modal === 'addProjectAdmin') {
+      const f = this.state.addUserForm;
+      if (f.name && f.email) {
+        this.setState(s => ({ users: [...s.users, { id: 'u-' + Date.now(), name: f.name, email: f.email, phone: f.phone, role: f.role, status: 'Active', lastLogin: '—' }], addUserForm: { name: '', email: '', phone: '', role: 'TPM Supervisor' } }));
+      }
+    } else if (modal === 'editUser') {
+      const f = this.state.editUserForm, id = this.state.editUserTargetId;
+      this.setState(s => ({ users: s.users.map(u => u.id === id ? { ...u, name: f.name, email: f.email, phone: f.phone, role: f.role, status: f.isActive ? 'Active' : 'Inactive' } : u) }));
+    } else if (modal === 'removeUser' || modal === 'removeProjectAdmin') {
+      const id = this.state.removeUserTargetId;
+      if (modal === 'removeUser' && this.state.removeMode === 'deactivate') {
+        this.setState(s => ({ users: s.users.map(u => u.id === id ? { ...u, status: 'Inactive' } : u), selectedUserId: null }));
+      } else {
+        this.setState(s => ({ users: s.users.filter(u => u.id !== id), selectedUserId: null }));
+      }
+    } else if (modal === 'editIssue') {
+      const f = this.state.editIssueForm;
+      this.updateIssue(modalIssueId, { category: f.category, priority: f.priority, description: f.description }, { actor: 'Super Admin', action: 'Submission edited', note: 'Corrected field data on this submission.' });
+    } else if (modal === 'deleteIssue') {
+      this.setState(s => ({ issues: s.issues.filter(i => i.id !== modalIssueId), view: s.cameFrom === 'detail' ? 'issues' : (s.view === 'detail' ? s.cameFrom : s.view), selectedIssueId: null }));
+    } else if (modal === 'resetPassword') {
+      window.alert('A new temporary password has been generated and sent to the account\u2019s registered email.');
+    } else if (modal === 'toggleProjectAdmin') {
+      const id = this.state.toggleProjectAdminTargetId;
+      this.setState(s => ({ users: s.users.map(u => u.id === id ? { ...u, status: u.status === 'Active' ? 'Inactive' : 'Active' } : u) }));
+    }
+    this.closeModal();
+  }
+
+  setTabGeneral() { this.setState({ settingsTab: 'general', settingsSaved: false }); }
+  setTabNotif() { this.setState({ settingsTab: 'notif', settingsSaved: false }); }
+  setTabData() { this.setState({ settingsTab: 'data', settingsSaved: false }); }
+  setSettingsOrgName(e) { this.setState(s => ({ settingsForm: { ...s.settingsForm, orgName: e.target.value } })); }
+  setSettingsTimezone(e) { this.setState(s => ({ settingsForm: { ...s.settingsForm, timezone: e.target.value } })); }
+  setSettingsDefaultState(e) { this.setState(s => ({ settingsForm: { ...s.settingsForm, defaultState: e.target.value } })); }
+  setSettingsRetention(e) { this.setState(s => ({ settingsForm: { ...s.settingsForm, retention: e.target.value } })); }
+  setEmailAlertsOn() { this.setState(s => ({ settingsForm: { ...s.settingsForm, emailAlertsOn: true, emailAlertsOff: false } })); }
+  setEmailAlertsOff() { this.setState(s => ({ settingsForm: { ...s.settingsForm, emailAlertsOn: false, emailAlertsOff: true } })); }
+  setSmsAlertsOn() { this.setState(s => ({ settingsForm: { ...s.settingsForm, smsAlertsOn: true, smsAlertsOff: false } })); }
+  setSmsAlertsOff() { this.setState(s => ({ settingsForm: { ...s.settingsForm, smsAlertsOn: false, smsAlertsOff: true } })); }
+  setAutoAssignOn() { this.setState(s => ({ settingsForm: { ...s.settingsForm, autoAssignOn: true, autoAssignOff: false } })); }
+  setAutoAssignOff() { this.setState(s => ({ settingsForm: { ...s.settingsForm, autoAssignOn: false, autoAssignOff: true } })); }
+  setFmtCsv() { this.setState(s => ({ settingsForm: { ...s.settingsForm, fmtCsv: true, fmtJson: false } })); }
+  setFmtJson() { this.setState(s => ({ settingsForm: { ...s.settingsForm, fmtCsv: false, fmtJson: true } })); }
+  saveSettings() { this.setState({ settingsSaved: true }); setTimeout(() => this.setState({ settingsSaved: false }), 2500); }
+
+  daysBetween(a, b) { return Math.max(0, Math.round((new Date(b) - new Date(a)) / 86400000)); }
+
+  withDisplay(i, mod) {
+    return {
+      ...i,
+      statusColor: mod.STATUS_COLOR[i.status],
+      statusBg: `color-mix(in srgb, ${mod.STATUS_COLOR[i.status]} 20%, transparent)`,
+      priorityColor: mod.PRIORITY_COLOR[i.priority],
+      priorityBg: `color-mix(in srgb, ${mod.PRIORITY_COLOR[i.priority]} 20%, transparent)`,
+      driLabel: i.assignedDRI || 'Unassigned',
+      resolutionLabel: i.resolutionDate || 'Pending',
+      openFn: () => this.openIssue(i.id, 'issues'),
+      openSubFn: () => this.openIssue(i.id, 'subpanel'),
+    };
+  }
+
+  renderVals() {
+    const st = this.state;
+    const mod = this._mod;
+
+    if (!st.authed) {
+      return {
+        showLogin: true, showLoadingShell: false, showApp: false,
+        loginEmail: st.loginEmail, loginPassword: st.loginPassword,
+        isRoleSuperAdmin: st.loginRole === 'Super Admin', isRoleProjectAdmin: st.loginRole === 'Project Admin', isRoleViewer: st.loginRole === 'Viewer',
+        setLoginEmail: e => this.setLoginEmail(e), setLoginPassword: e => this.setLoginPassword(e),
+        setRoleSuperAdmin: () => this.setRoleSuperAdmin(), setRoleProjectAdmin: () => this.setRoleProjectAdmin(), setRoleViewer: () => this.setRoleViewer(), login: () => this.login(),
+      };
+    }
+    if (!st.loaded || !mod) {
+      return { showLogin: false, showLoadingShell: true, showApp: false };
+    }
+
+    const issues = st.issues;
+    const withDisplay = (i) => this.withDisplay(i, mod);
+    const total = issues.length;
+    const countStatus = s => issues.filter(i => i.status === s).length;
+    const kNew = countStatus('New'), kAssigned = countStatus('Assigned'), kProgress = countStatus('In Progress'), kResolved = countStatus('Resolved'), kVerified = countStatus('Verified/Closed');
+    const pending = kNew + kAssigned + kProgress;
+    const resolvedIssues = issues.filter(i => i.resolutionDate);
+    const avgRes = resolvedIssues.length ? (resolvedIssues.reduce((a, i) => a + this.daysBetween(i.reportedAt, i.resolutionDate), 0) / resolvedIssues.length).toFixed(1) : '—';
+    const kpis = { total, kNew, kAssigned, kProgress, kResolved, kVerified, pending, avgRes };
+
+    const kpiCards = [
+      { label: 'Total Issues', value: total, sub: 'All time', icon: 'ph ph-list-bullets', iconStyle: { color: 'var(--color-accent)' } },
+      { label: 'New', value: kNew, sub: 'Awaiting assignment', icon: 'ph ph-sparkle', iconStyle: { color: mod.STATUS_COLOR['New'] } },
+      { label: 'Assigned', value: kAssigned, sub: 'Routed to DRI', icon: 'ph ph-user-plus', iconStyle: { color: mod.STATUS_COLOR['Assigned'] } },
+      { label: 'In Progress', value: kProgress, sub: 'Corrective action underway', icon: 'ph ph-wrench', iconStyle: { color: mod.STATUS_COLOR['In Progress'] } },
+      { label: 'Resolved', value: kResolved, sub: 'Awaiting verification', icon: 'ph ph-check', iconStyle: { color: mod.STATUS_COLOR['Resolved'] } },
+      { label: 'Verified / Closed', value: kVerified, sub: 'Confirmed complete', icon: 'ph ph-check-circle', iconStyle: { color: mod.STATUS_COLOR['Verified/Closed'] } },
+      { label: 'Pending', value: pending, sub: 'Open across all stages', icon: 'ph ph-hourglass', iconStyle: { color: '#d7a24a' } },
+      { label: 'Avg Resolution', value: avgRes + (avgRes !== '—' ? 'd' : ''), sub: 'Discovery to closure', icon: 'ph ph-timer', iconStyle: { color: 'var(--color-accent)' } },
+    ];
+
+
+
+    const buildTrend = (n) => {
+      const days = [];
+      for (let i = n - 1; i >= 0; i--) {
+        const d = new Date('2026-08-05'); d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0, 10);
+        const count = issues.filter(is => is.reportedAt.startsWith(key)).length;
+        days.push({ key, label: d.getDate(), count });
+      }
+      const max = Math.max(1, ...days.map(d => d.count));
+      return days.map(d => ({ ...d, barStyle: { width: '100%', height: (6 + (d.count / max) * 90) + '%', background: 'var(--color-accent-500)', borderRadius: '2px 2px 0 0' } }));
+    };
+    const trendBars = buildTrend(14);
+    const trendBars30 = buildTrend(30).map(d => ({ ...d, barStyle: { ...d.barStyle, background: 'var(--color-accent-600)' } }));
+
+    let acc = 0;
+    const donutSegs = mod.STATUS_ORDER.map(s => {
+      const c = countStatus(s); const pct = total ? c / total * 100 : 0; const start = acc; acc += pct;
+      return { status: s, count: c, pct: pct.toFixed(0), color: mod.STATUS_COLOR[s], start: start.toFixed(2), end: acc.toFixed(2) };
+    });
+    const donutGradient = total ? donutSegs.map(s => `${s.color} ${s.start}% ${s.end}%`).join(', ') : 'var(--color-neutral-800) 0% 100%';
+    const donutStyle = { width: '84px', height: '84px', borderRadius: '50%', flex: 'none', background: `conic-gradient(${donutGradient})`, boxShadow: 'inset 0 0 0 14px var(--color-surface)' };
+
+    const stateCounts = {};
+    issues.forEach(i => { stateCounts[i.state] = (stateCounts[i.state] || 0) + 1; });
+    const maxStateCount = Math.max(1, ...Object.values(stateCounts));
+    const stateBreakdown = Object.entries(stateCounts).sort((a, b) => b[1] - a[1]).slice(0, 6)
+      .map(([name, count]) => ({ name, count, barStyle: { height: '100%', width: (count / maxStateCount * 100) + '%', background: 'var(--color-accent-500)', borderRadius: '3px' } }));
+
+    const catCounts = {};
+    issues.forEach(i => { catCounts[i.category] = (catCounts[i.category] || 0) + 1; });
+    const maxCatCount = Math.max(1, ...Object.values(catCounts));
+    const categoryBreakdown = mod.CATEGORIES.map(name => ({ name, count: catCounts[name] || 0 }))
+      .sort((a, b) => b.count - a.count)
+      .map(c => ({ ...c, barStyle: { height: '100%', width: (c.count / maxCatCount * 100) + '%', background: 'var(--color-accent-500)', borderRadius: '3px' } }));
+
+    const recentIssues = issues.slice(0, 6).map(withDisplay);
+
+    let allHistory = [];
+    issues.forEach(i => { i.history.forEach(h => allHistory.push({ ...h, issueId: i.id })); });
+    allHistory.sort((a, b) => (a.date < b.date ? 1 : -1));
+    const timeline = allHistory.slice(0, 8);
+
+    this._lastAllIssues = issues.map(withDisplay);
+
+    // Issue list
+    const categoriesList = mod.CATEGORIES;
+    const statesList = mod.STATES.map(s => s.name);
+    const statusesList = mod.STATUS_ORDER;
+    const prioritiesList = ['Critical', 'High', 'Medium', 'Low'];
+    const f = st.issueFilters;
+    const q = f.search.toLowerCase();
+    const filteredIssues = issues.filter(i =>
+      (f.status === 'All' || i.status === f.status) &&
+      (f.category === 'All' || i.category === f.category) &&
+      (f.state === 'All' || i.state === f.state) &&
+      (f.priority === 'All' || i.priority === f.priority) &&
+      (!q || i.id.toLowerCase().includes(q) || i.state.toLowerCase().includes(q) || i.lga.toLowerCase().includes(q) || i.category.toLowerCase().includes(q))
+    ).map(withDisplay);
+    const pageSize = 10;
+    const totalPages = Math.max(1, Math.ceil(filteredIssues.length / pageSize));
+    const issuePage = Math.min(st.issuePage, totalPages);
+    const pagedIssues = filteredIssues.slice((issuePage - 1) * pageSize, issuePage * pageSize);
+
+    // GIS
+    const gf = st.gisFilters;
+    const gisFiltered = issues.filter(i =>
+      (gf.state === 'All' || i.state === gf.state) &&
+      (gf.category === 'All' || i.category === gf.category) &&
+      (gf.status === 'All' || i.status === gf.status) &&
+      (gf.tpm === 'All' || i.reportedBy === gf.tpm) &&
+      (gf.dri === 'All' || i.assignedDRI === gf.dri)
+    ).map(withDisplay);
+    this._lastGisFiltered = gisFiltered;
+    const legendItems = mod.STATUS_ORDER.map(s => ({ status: s, color: mod.STATUS_COLOR[s] }));
+    const tpmNames = mod.TPMS.map(t => t.name);
+    const driNames = mod.DRIS.map(d => d.name);
+    const selectedMarker = st.selectedMarkerId ? { ...withDisplay(this.getIssue(st.selectedMarkerId)), openFn: () => this.openIssue(st.selectedMarkerId, 'gis') } : null;
+
+    // Detail
+    let selectedIssue = null;
+    if (st.selectedIssueId) {
+      const raw = this.getIssue(st.selectedIssueId);
+      if (raw) {
+        const d = withDisplay(raw);
+        const rank = mod.STATUS_ORDER.indexOf(raw.status) + 1;
+        const stepIcons = ['ph ph-flag', 'ph ph-user-plus', 'ph ph-wrench', 'ph ph-magnifying-glass', 'ph ph-check-circle'];
+        const stepper = mod.STATUS_ORDER.map((s, idx) => {
+          const state = idx < rank - 1 ? 'done' : idx === rank - 1 ? 'current' : 'upcoming';
+          const color = state === 'upcoming' ? 'var(--color-neutral-700)' : mod.STATUS_COLOR[s];
+          return {
+            label: s,
+            icon: stepIcons[idx],
+            dotStyle: { width: '26px', height: '26px', borderRadius: '50%', margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: state === 'upcoming' ? 'transparent' : color, border: `1.5px solid ${color}`, color: state === 'upcoming' ? color : '#161826' },
+            lineStyle: { display: idx === mod.STATUS_ORDER.length - 1 ? 'none' : 'block', position: 'absolute', top: '13px', left: '50%', width: '100%', height: '1.5px', background: idx < rank - 1 ? mod.STATUS_COLOR[s] : 'var(--color-neutral-800)', zIndex: -1 },
+            labelStyle: { fontSize: '10.5px', color: state === 'upcoming' ? 'var(--color-neutral-500)' : 'var(--color-text)' },
+          };
+        });
+        selectedIssue = {
+          ...d, stepper,
+          photoId0: raw.id + '-p0', photoId1: raw.id + '-p1', photoId2: raw.id + '-p2', photoId3: raw.id + '-p3',
+          canAssign: st.loginRole !== 'Viewer' && raw.status === 'New', canRespond: st.loginRole !== 'Viewer' && raw.status === 'Assigned', canCorrective: st.loginRole !== 'Viewer' && raw.status === 'In Progress', canVerify: st.loginRole !== 'Viewer' && raw.status === 'Resolved',
+          priorityLabel: raw.priority + ' priority',
+        };
+      }
+    }
+
+    // Sub-panel
+    const subpanelIssues = issues.filter(i => i.status === 'Assigned' || i.status === 'In Progress' || i.status === 'Resolved').map(withDisplay);
+    const subKpis = { assigned: countStatus('Assigned'), progress: countStatus('In Progress'), resolved: countStatus('Resolved') };
+
+    // Users
+    const isSuperAdmin = st.loginRole === 'Super Admin';
+    const isViewer = st.loginRole === 'Viewer';
+    const statusStyleFor = (status) => status === 'Active' ? { background: 'color-mix(in srgb, #6fb98a 20%, transparent)', color: '#6fb98a' } : { background: 'var(--color-neutral-800)', color: 'var(--color-neutral-400)' };
+    const nonProjectAdminUsers = st.users.filter(u => u.role !== 'Project Admin');
+    const users = nonProjectAdminUsers.map(u => ({
+      ...u, phoneLabel: u.phone || '—', statusStyle: statusStyleFor(u.status),
+      isSelected: st.selectedUserId === u.id, selectFn: () => this.selectUser(u.id),
+      canEdit: isSuperAdmin, editFn: () => this.openEditUserModal(u), removeFn: () => this.openRemoveUserModalFor(u.id),
+    }));
+    const noUserSelected = !st.selectedUserId;
+    const removeUserTarget = st.removeUserTargetId ? st.users.find(u => u.id === st.removeUserTargetId) : null;
+    const removeUserTargetName = removeUserTarget ? removeUserTarget.name : '';
+    const allRoles = ['Super Admin', 'Project Admin', 'TPM Supervisor', 'DRI', 'Viewer'];
+    const selectColHeaderStyle = { width: '36px' };
+
+    const projectAdmins = st.users.filter(u => u.role === 'Project Admin').map(p => ({
+      ...p, phoneLabel: p.phone || '—', statusStyle: statusStyleFor(p.status),
+      editFn: () => this.openEditUserModal(p),
+      resetFn: () => this.openResetPasswordModal(p.id),
+      toggleFn: () => this.openToggleProjectAdminModal(p.id),
+      toggleLabel: p.status === 'Active' ? 'Deactivate' : 'Activate',
+      toggleIcon: p.status === 'Active' ? 'ph ph-pause-circle' : 'ph ph-play-circle',
+      removeFn: () => this.openRemoveProjectAdminModal(p.id),
+    }));
+    const toggleProjectAdminTarget = st.toggleProjectAdminTargetId ? st.users.find(u => u.id === st.toggleProjectAdminTargetId) : null;
+    const toggleProjectAdminPrompt = toggleProjectAdminTarget ? `${toggleProjectAdminTarget.status === 'Active' ? 'Deactivate' : 'Activate'} ${toggleProjectAdminTarget.name}'s account?` : '';
+    const resetPasswordTarget = st.resetPasswordTargetId ? st.users.find(u => u.id === st.resetPasswordTargetId) : null;
+    const resetPasswordTargetName = resetPasswordTarget ? resetPasswordTarget.name : '';
+
+    // Analytics
+    const driPerf = mod.DRIS.map(d => {
+      const assigned = issues.filter(i => i.driId === d.id);
+      const resolved = assigned.filter(i => i.resolutionDate);
+      const avg = resolved.length ? (resolved.reduce((a, i) => a + this.daysBetween(i.reportedAt, i.resolutionDate), 0) / resolved.length).toFixed(1) : '—';
+      return { ...d, assignedCount: assigned.length, resolvedCount: resolved.length, avgDays: avg };
+    }).sort((a, b) => b.assignedCount - a.assignedCount);
+    const tpmPerf = mod.TPMS.map(t => {
+      const reported = issues.filter(i => i.tpmId === t.id);
+      const verified = reported.filter(i => i.status === 'Verified/Closed');
+      return { ...t, reportedCount: reported.length, verifiedCount: verified.length, closeRate: reported.length ? Math.round(verified.length / reported.length * 100) : 0 };
+    }).sort((a, b) => b.reportedCount - a.reportedCount);
+
+    // Nav / view
+    const viewTitles = { dashboard: 'Dashboard', gis: 'Live GIS Dashboard', issues: 'Issue Management', detail: selectedIssue ? selectedIssue.id + ' — Issue Detail' : 'Issue Detail', subpanel: 'TPM Sub-Panel', analytics: 'Analytics & KPI Dashboard', users: 'Users & Role Management', settings: 'System Settings' };
+    const viewTitle = viewTitles[st.view] || 'Dashboard';
+
+    const currentRoleLabel = isSuperAdmin ? 'Super Admin' : isViewer ? 'Viewer' : 'Project Admin';
+    const canManageUsers = !isViewer;
+    const canManageGlobalData = isSuperAdmin;
+    const assignableRoles = isSuperAdmin ? ['Project Admin', 'TPM Supervisor', 'DRI', 'Viewer'] : ['TPM Supervisor', 'DRI', 'Viewer'];
+
+    const navDefs = [
+      { key: 'dashboard', label: 'Dashboard', icon: 'ph ph-squares-four' },
+      { key: 'gis', label: 'Live GIS Map', icon: 'ph ph-map-trifold' },
+      { key: 'issues', label: 'Issues', icon: 'ph ph-list-checks' },
+      { key: 'subpanel', label: 'TPM Sub-Panel', icon: 'ph ph-user-focus' },
+      { key: 'analytics', label: 'Analytics', icon: 'ph ph-chart-line' },
+      ...(!isViewer ? [{ key: 'users', label: 'Users & Roles', icon: 'ph ph-users-three' }] : []),
+      ...(isSuperAdmin ? [{ key: 'projectadmins', label: 'Project Admin Panel', icon: 'ph ph-identification-badge' }] : []),
+      ...(isSuperAdmin ? [{ key: 'settings', label: 'Settings', icon: 'ph ph-gear-six' }] : []),
+    ];
+    const activeView = st.view === 'detail' ? st.cameFrom : st.view;
+    const navItems = navDefs.map(n => {
+      const active = n.key === activeView;
+      return {
+        ...n, onClick: () => this.go(n.key),
+        style: { display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 12px', borderRadius: 'var(--radius-md)', color: active ? 'var(--color-accent)' : 'var(--color-text)', background: active ? 'color-mix(in srgb, var(--color-accent) 14%, transparent)' : 'transparent', fontSize: '13.5px', textDecoration: 'none', cursor: 'pointer' },
+      };
+    });
+
+    const notifications = [
+      { icon: 'ph ph-warning', text: 'Critical safety incident reported in Borno.', time: '12 min ago' },
+      { icon: 'ph ph-user-plus', text: 'Issue ISS-1042 assigned to Grace Effiong.', time: '1 hr ago' },
+      { icon: 'ph ph-check-circle', text: '3 issues verified and closed today.', time: '3 hrs ago' },
+      { icon: 'ph ph-clock', text: '5 issues pending DRI response beyond SLA.', time: 'Today, 08:10' },
+    ];
+
+    // Modal
+    const modalIsAssign = st.modal === 'assign';
+    const modalIsAddUser = st.modal === 'addUser';
+    const modalIsEditUser = st.modal === 'editUser';
+    const modalIsRemoveUser = st.modal === 'removeUser';
+    const modalIsEditIssue = st.modal === 'editIssue';
+    const modalIsDeleteIssue = st.modal === 'deleteIssue';
+    const modalIsAddProjectAdmin = st.modal === 'addProjectAdmin';
+    const modalIsResetPassword = st.modal === 'resetPassword';
+    const modalIsToggleProjectAdmin = st.modal === 'toggleProjectAdmin';
+    const modalIsRemoveProjectAdmin = st.modal === 'removeProjectAdmin';
+    const modalNeedsNote = st.modal === 'response' || st.modal === 'corrective' || st.modal === 'verify';
+    const modalTitleMap = {
+      assign: 'Assign Issue to DRI', response: 'Record DRI Response', corrective: 'Record Corrective Action', verify: 'Verify & Close Issue',
+      addUser: 'Add User', editUser: 'Edit User', removeUser: 'Remove User', editIssue: 'Edit Submission', deleteIssue: 'Delete Submission',
+      addProjectAdmin: 'Create Project Admin', resetPassword: 'Reset Password', toggleProjectAdmin: 'Change Account Status', removeProjectAdmin: 'Remove Project Admin',
+    };
+    const modalPromptMap = { response: 'Log the Directly Responsible Individual\u2019s response to this issue.', corrective: 'Describe the corrective action taken to resolve this issue.', verify: 'Confirm the corrective action adequately resolved the issue.' };
+    const modalConfirmMap = {
+      assign: 'Assign', response: 'Submit Response', corrective: 'Record Action', verify: 'Verify & Close', addUser: 'Add User',
+      editUser: 'Save Changes', removeUser: 'Confirm', editIssue: 'Save Changes', deleteIssue: 'Delete', addProjectAdmin: 'Create Account',
+      resetPassword: 'Generate Password', toggleProjectAdmin: 'Confirm', removeProjectAdmin: 'Remove',
+    };
+
+    return {
+      showLogin: false, showLoadingShell: false, showApp: true,
+      logout: () => this.logout(),
+      viewTitle, navItems,
+      topSearch: st.topSearch, setTopSearch: e => this.setTopSearch(e), onTopSearchKey: e => this.onTopSearchKey(e),
+      notifOpen: st.notifOpen, toggleNotif: () => this.toggleNotif(), notifications,
+      goGis: () => this.goGis(), goIssues: () => this.goIssues(),
+
+      isDashboard: st.view === 'dashboard', isGis: st.view === 'gis', isIssues: st.view === 'issues',
+      isDetail: st.view === 'detail' && !!selectedIssue, isSubpanel: st.view === 'subpanel',
+      isAnalytics: st.view === 'analytics', isUsers: st.view === 'users' && !isViewer, isSettings: st.view === 'settings' && isSuperAdmin,
+      isProjectAdmins: st.view === 'projectadmins' && isSuperAdmin,
+      currentRoleLabel, canManageUsers, canManageGlobalData, assignableRoles, isSuperAdmin, isViewer,
+
+      kpis, kpiCards, trendBars, trendBars30, donutSegs, donutStyle, stateBreakdown, categoryBreakdown, recentIssues, timeline,
+      dashMapRef: el => this.dashMapRef(el), gisMapRef: el => this.gisMapRef(el),
+
+
+      categoriesList, statesList, statusesList, prioritiesList,
+      issueFilters: f, setIssueSearch: e => this.setIssueSearch(e), setIssueStatus: e => this.setIssueStatus(e), setIssueCategory: e => this.setIssueCategory(e), setIssueState: e => this.setIssueState(e), setIssuePriority: e => this.setIssuePriority(e),
+      filteredIssues, pagedIssues, issuePage, totalPages, isFirstPage: issuePage <= 1, isLastPage: issuePage >= totalPages,
+      nextIssuePage: () => this.nextIssuePage(), prevIssuePage: () => this.prevIssuePage(), exportIssues: () => this.exportIssues(),
+
+      gisFilters: gf, setGisState: e => this.setGisState(e), setGisCategory: e => this.setGisCategory(e), setGisStatus: e => this.setGisStatus(e), setGisTpm: e => this.setGisTpm(e), setGisDri: e => this.setGisDri(e), resetGisFilters: () => this.resetGisFilters(),
+      tpmNames, driNames, gisFiltered, legendItems,
+      hasSelectedMarker: !!selectedMarker, selectedMarker, closeMarkerPanel: () => this.closeMarkerPanel(),
+
+      selectedIssue, backFromDetail: () => this.backFromDetail(),
+      openAssignModal: () => this.openAssignModal(), openResponseModal: () => this.openResponseModal(), openCorrectiveModal: () => this.openCorrectiveModal(), openVerifyModal: () => this.openVerifyModal(),
+      openEditIssueModal: () => this.openEditIssueModal(), openDeleteIssueModal: () => this.openDeleteIssueModal(),
+
+      subpanelIssues, subKpis,
+
+      driPerf, tpmPerf,
+
+      users, openAddUserModal: () => this.openAddUserModal(), openRemoveUserModal: () => this.openRemoveUserModal(), noUserSelected, allRoles, selectColHeaderStyle,
+      projectAdmins, openAddProjectAdminModal: () => this.openAddProjectAdminModal(),
+      removeUserTargetName, resetPasswordTargetName, toggleProjectAdminPrompt,
+
+      isGeneralTab: st.settingsTab === 'general', isNotifTab: st.settingsTab === 'notif', isDataTab: st.settingsTab === 'data',
+      setTabGeneral: () => this.setTabGeneral(), setTabNotif: () => this.setTabNotif(), setTabData: () => this.setTabData(),
+      settingsForm: st.settingsForm, settingsSaved: st.settingsSaved, saveSettings: () => this.saveSettings(),
+      setSettingsOrgName: e => this.setSettingsOrgName(e), setSettingsTimezone: e => this.setSettingsTimezone(e), setSettingsDefaultState: e => this.setSettingsDefaultState(e), setSettingsRetention: e => this.setSettingsRetention(e),
+      setEmailAlertsOn: () => this.setEmailAlertsOn(), setEmailAlertsOff: () => this.setEmailAlertsOff(), setSmsAlertsOn: () => this.setSmsAlertsOn(), setSmsAlertsOff: () => this.setSmsAlertsOff(),
+      setAutoAssignOn: () => this.setAutoAssignOn(), setAutoAssignOff: () => this.setAutoAssignOff(), setFmtCsv: () => this.setFmtCsv(), setFmtJson: () => this.setFmtJson(),
+
+      modalOpen: !!st.modal, modalIsAssign, modalIsAddUser, modalIsEditUser, modalIsRemoveUser, modalIsEditIssue, modalIsDeleteIssue, modalIsAddProjectAdmin, modalIsResetPassword, modalIsToggleProjectAdmin, modalIsRemoveProjectAdmin, modalNeedsNote,
+      editUserForm: st.editUserForm, setEditUserName: e => this.setEditUserName(e), setEditUserEmail: e => this.setEditUserEmail(e), setEditUserPhone: e => this.setEditUserPhone(e), setEditUserRole: e => this.setEditUserRole(e), setEditUserActive: () => this.setEditUserActive(), setEditUserInactive: () => this.setEditUserInactive(),
+      removeModeIsDeactivate: st.removeMode === 'deactivate', removeModeIsDelete: st.removeMode === 'delete', setRemoveModeDeactivate: () => this.setRemoveModeDeactivate(), setRemoveModeDelete: () => this.setRemoveModeDelete(),
+      editIssueForm: st.editIssueForm, setEditIssueCategory: e => this.setEditIssueCategory(e), setEditIssuePriority: e => this.setEditIssuePriority(e), setEditIssueDescription: e => this.setEditIssueDescription(e),
+      modalTitle: modalTitleMap[st.modal] || '', modalPrompt: modalPromptMap[st.modal] || '', modalConfirmLabel: modalConfirmMap[st.modal] || 'Confirm',
+      modalDriId: st.modalDriId, modalNote: st.modalNote, driOptions: mod.DRIS,
+      setModalDri: e => this.setModalDri(e), setModalNote: e => this.setModalNote(e),
+      closeModal: () => this.closeModal(), confirmModal: () => this.confirmModal(),
+      addUserForm: st.addUserForm, setAddUserName: e => this.setAddUserName(e), setAddUserEmail: e => this.setAddUserEmail(e), setAddUserPhone: e => this.setAddUserPhone(e), setAddUserRole: e => this.setAddUserRole(e),
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+# RUTF platform — decisions log
+
+TPM-era decisions are in `web-platform/DECISIONS.md` and still apply unless overridden here.
+
+| # | Date | Decision | Why |
+| --- | --- | --- | --- |
+| R1 | 2026-10-02 | Model is **facility recording + supervisor checks** (brief v0.3), not sample-and-verify by external monitors. | Najib: data is recorded by government facility staff; no community-level collection. |
+| R2 | 2026-10-02 | Proposal runs on generated dummy data (`data/dummy/`), every row tagged `DUMMY`. | Najib: real DRIs, OTP list, stores, DHIS2 not at hand; replace during implementation. |
+| R3 | 2026-10-02 | One repo for both apps: `web-platform/` + `android/`, fresh history, secrets excluded by root `.gitignore`. | Brief §2. |
+| R4 | 2026-10-02 | Renamed only user-visible identity: "RUTF Monitoring", `applicationId org.tpmnigeria.rutf`; Kotlin package `org.tpmnigeria.tpm` kept. | Brief §2.5: renaming packages adds risk without value. |
+| R5 | 2026-10-02 | `tpm_supervisor` label is now "Supervisor"; enum values unchanged. | Brief §4; enum names are stored on device (Room), so values are never renamed. |
+| R6 | 2026-10-02 | Supabase publishable key used as the anon key in untracked `web/.env.local` and `android/local.properties`. | Publishable keys are client-safe; RLS is the boundary. |
+| R7 | 2026-10-02 | Signed adjustments allowed only for `txn_type = 'adjustment'`; month-end count shortfalls are recorded as adjustments pending supervisor confirmation. | Keeps the ledger replayable; corrections are visible, never silent. |

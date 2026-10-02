@@ -1,0 +1,13 @@
+## Copy this file to local.properties (gitignored) and fill in real values.
+## local.properties is machine-specific — Android Studio writes sdk.dir here
+## automatically on first open; the Supabase values below you add yourself.
+
+sdk.dir=/path/to/Android/Sdk
+
+## Supabase project URL and anon (public) key — from the TPM Monitoring
+## Platform Supabase project's Settings > API (same project the web app at
+## ../TPM Monitoring Platform Design/web uses — see its .env.local).
+## Safe to embed client-side: RLS is the real security boundary, not this key.
+## Never put the service_role/secret key here or anywhere in this app.
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your-anon-key

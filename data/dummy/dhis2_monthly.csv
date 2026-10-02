@@ -1,0 +1,1633 @@
+facility_id,facility_name,lga,period,otp_admissions,rutf_sachets_received,rutf_sachets_distributed,rutf_sachets_wasted,rutf_stockout_days
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202604,12,1050,1617,0,0
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202605,5,1050,937,0,0
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202606,5,450,885,0,0
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202607,6,1350,1150,0,0
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202608,7,1050,1042,0,0
+00b49c06-4f5c-5840-8357-d9e3ad4abd62,Zango Health Center,Ingawa,202609,6,1500,980,0,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202604,19,2250,3070,0,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202605,16,2850,2371,14,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202606,16,3450,2901,0,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202607,23,2850,3762,0,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202608,20,4050,3009,0,0
+011486e2-f41d-53e8-afaf-61a7b3ecedcb,Shargalle Model Primary Health Center,Dutsi,202609,18,2550,3464,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202604,12,1500,1849,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202605,8,1500,1529,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202606,13,1500,1801,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202607,7,900,949,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202608,9,900,1293,0,0
+02c35ee3-21ad-5632-a38b-6f877f21a8fc,Sabaru Health Clinic,Charanchi,202609,11,2100,1415,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202604,17,2550,2671,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202605,12,1950,1660,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202606,12,1350,1555,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202607,16,2100,2080,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202608,9,1350,1471,0,0
+02d1f601-0463-5200-9477-85f7b9641b82,Burta Health Clinic,Sandamu,202609,14,1950,2078,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202604,15,1050,1919,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202605,10,2100,1650,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202606,9,1800,1754,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202607,13,1350,1933,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202608,11,2100,1668,0,0
+03dc530f-d856-52ea-9937-e42cbe828367,Jibia General Hospital,Jibia,202609,14,2400,2018,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202604,14,1298,2452,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202605,14,1800,1885,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202606,20,2400,2726,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202607,19,3000,2219,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202608,17,2400,2344,0,0
+07d97bf6-aafa-55a0-8c46-078c5267b158,Gandun Karfi Health Clinic,Malumfashi,202609,19,1950,2591,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202604,7,0,1044,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202605,7,600,1023,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202606,9,1800,1274,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202607,10,1050,1577,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202608,11,2400,1832,0,0
+0980fc30-0c75-5199-9da5-913b2c4de26e,Sabon Garin Safana Health Clinic,Dutsin Ma,202609,10,1050,1507,0,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202604,35,6600,4607,0,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202605,30,4800,4560,12,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202606,37,4350,5745,0,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202607,34,6000,4666,0,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202608,32,4800,4675,0,0
+09ca5070-7b78-5b57-81e6-4d229feeb0a2,Baiga Health Clinic,Kurfi,202609,41,4800,5842,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202604,10,750,1629,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202605,6,1350,1047,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202606,10,1800,1582,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202607,15,1950,2255,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202608,11,2400,1833,0,0
+0b4de9e5-c352-5fd8-bb7c-735bc847ea32,Yanmaulu Maternal and Child Health Clinic,Baure,202609,14,1350,1626,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202604,18,3000,2460,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202605,19,1800,2668,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202606,14,2700,2030,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202607,18,1800,2434,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202608,15,2238,1917,0,0
+0bd300ad-26a5-537e-9d84-57b1388c92f4,Zana Health Post,Charanchi,202609,12,2100,1988,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202604,26,4950,3877,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202605,27,3600,4484,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202606,25,4050,3319,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202607,26,3000,3806,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202608,21,3300,2803,0,0
+0ca38da5-0931-50fc-8881-c9a2d531e75e,Jiba Primary Health Center,Danja,202609,18,2390,2604,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202604,29,6450,4650,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202605,34,4800,5886,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202606,35,6150,4831,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202607,39,4500,5635,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202608,31,5700,4647,0,0
+0da0fe30-21cf-5998-be60-d291061f0b88,Damawa Health Post,Mani,202609,29,4500,4640,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202604,10,1500,1773,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202605,14,1800,2144,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202606,12,1650,1552,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202607,11,1200,1709,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202608,11,2550,1650,0,0
+0ef102d3-dc79-567c-b9c7-7698b7fb4b12,Comprehensive Clinic,Matazu,202609,10,900,1236,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202604,12,2400,2060,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202605,16,2250,2155,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202606,22,2700,3386,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202607,24,4500,3095,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202608,20,2250,2554,0,0
+0fb83e2f-8d36-5f28-bb5e-65f9015965e1,Bandaga Health Clinic,Sabuwa,202609,20,2100,2892,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202604,26,4800,3764,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202605,24,3150,3633,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202606,27,3300,4168,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202607,23,4650,3599,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202608,32,3450,4510,0,0
+0fc16e02-a42c-5ab3-b226-d4a1955aecf4,Ketare Primary Health Center,Kankara,202609,22,4200,3385,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202604,25,5550,4070,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202605,20,5550,3263,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202606,23,5100,3485,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202607,15,4950,2345,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202608,25,6150,3704,0,0
+0fdf41e0-11b7-5042-8ed2-d9497a9b50f2,Ungwar Sai Health Center,Danja,202609,52,5700,6812,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202604,29,5100,5039,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202605,27,5250,4008,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202606,26,2100,3903,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202607,28,5850,4846,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202608,32,3000,4258,0,0
+1005c9c3-d32a-588a-b11a-002821e94ed7,Dono Health Clinic,Kaita,202609,33,6150,4820,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202604,19,4350,2973,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202605,15,2100,2465,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202606,19,1650,2691,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202607,17,2850,2923,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202608,18,2100,2685,0,0
+101b154f-e0c7-504e-abe3-9905e76933ae,Tsanban Bakwai Dispensary,Jibia,202609,13,2550,1932,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202604,24,3150,3706,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202605,21,3900,3005,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202606,19,2700,2813,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202607,21,2700,3353,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202608,18,3150,2674,0,0
+110de30a-26b7-5ac2-81d7-ace3decdc28c,Gure Health Clinic,Baure,202609,25,3150,3587,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202604,12,1200,1738,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202605,9,1650,1641,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202606,14,900,2171,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202607,12,3300,1780,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202608,17,750,2270,0,0
+11d0ccb5-abed-546b-8860-c6eb71ab4b7c,Gunaswa Health Center,Kusada,202609,16,3750,2215,0,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202604,30,6000,4055,2,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202605,24,3600,3908,0,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202606,32,3415,4516,0,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202607,30,4950,3971,0,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202608,30,4200,4735,0,0
+1314b244-9b08-59be-972f-769b31864f86,Nasarawa Health Clinic,Kankia,202609,26,3750,3431,0,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202604,25,5250,4179,0,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202605,26,4950,4479,0,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202606,40,4650,5616,18,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202607,31,6150,4764,0,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202608,34,4950,4843,0,0
+132c28f6-ae77-5365-a248-9c7f0d0c7888,Kunkunna Health Clinic,Safana,202609,41,4350,5885,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202604,11,1350,1591,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202605,14,2100,1877,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202606,16,2250,2507,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202607,15,2850,2210,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202608,23,2850,3161,0,0
+13a18ec4-a800-5f12-998c-6c9a8b022eda,Unguwar Tukur Health Clinic,Sabuwa,202609,15,3450,2788,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202604,10,150,1397,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202605,7,750,1047,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202606,5,1050,1047,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202607,3,600,601,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202608,4,450,537,0,0
+1483c6a3-0b6e-5233-a158-bb980b161035,Gadar Danzara Health Center,Kankia,202609,5,300,653,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202604,27,4950,3789,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202605,28,4200,3958,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202606,37,1800,4853,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202607,29,7950,4339,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202608,35,1800,5064,0,0
+1574557f-9f12-516d-ad0a-776bc1b0a611,Karaduwa Maternal and Child Health Clinic,Matazu,202609,27,4744,4154,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202604,31,6150,4321,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202605,31,5250,4616,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202606,41,5250,5734,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202607,30,5400,4225,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202608,30,4500,4404,0,0
+15ff47ed-745c-5d8e-a533-5871ff867bb8,Burtu Health Clinic,Charanchi,202609,40,4650,5545,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202604,23,4800,3951,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202605,29,4200,3987,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202606,32,4050,5008,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202607,26,5250,4264,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202608,36,4650,7033,0,0
+17102888-85a8-59ef-b7c4-0abbc5766523,Yangora Primary Health Center,Bindawa,202609,36,5700,4600,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202604,12,450,1648,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202605,6,1650,1150,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202606,7,1500,1054,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202607,8,600,973,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202608,4,900,493,0,0
+17b9fa9e-9b04-546b-a9d2-378e769b424f,Alareni Health Center,Rimi,202609,3,150,422,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202604,16,4800,2645,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202605,21,3150,3258,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202606,5,3300,649,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202607,12,2100,1908,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202608,11,4050,2176,0,0
+17e37f20-dfaf-5fc5-8f2b-a8e5d286fe6b,Gundawa Health Center,Kankara,202609,11,2700,1427,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202604,7,7050,1266,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202605,6,5829,1151,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202606,16,3900,2158,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202607,16,4350,2248,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202608,13,5700,2427,0,0
+185bfde5-4d34-5e8b-b0a0-3d15c67bed58,Maigamji Primary Health Center,Funtua,202609,0,4350,0,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202604,32,5850,5960,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202605,41,5250,5805,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202606,36,5400,4655,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202607,40,5400,6229,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202608,32,5700,4872,0,0
+18cb9527-542d-5e67-85e7-c1ab200a9b7b,Danbau Dispensary,Faskari,202609,36,5100,5646,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202604,12,750,1511,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202605,13,2250,2081,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202606,12,1350,1717,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202607,8,750,1116,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202608,8,1200,1100,0,0
+18e27bac-3bd8-5d3f-8be5-ff25043814d7,Lemo Health Clinic,Sandamu,202609,10,1350,1503,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202604,26,5100,4759,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202605,26,4800,3671,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202606,25,3300,3401,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202607,27,2700,3816,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202608,19,3450,2929,0,0
+1b24e47d-5033-5ec1-823d-1c520602bac5,Agama Lafiya Health Clinic,Kurfi,202609,15,2250,2441,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202604,10,300,1417,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202605,13,2400,1975,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202606,17,2100,2635,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202607,19,3150,2325,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202608,15,2400,2242,0,0
+1db3bc54-7132-5a41-b755-76aa5e2b3ba4,Tudun Wada Health Center,Bakori,202609,19,2250,2780,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202604,18,2100,2793,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202605,14,3150,2253,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202606,16,1950,2166,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202607,23,2550,2842,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202608,16,3150,2456,0,0
+1f62e170-aeb6-5077-b6f0-3166f4830d9c,Barawa Health Clinic,Batagarawa,202609,22,2700,3183,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202604,8,0,1129,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202605,5,900,938,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202606,5,0,579,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202607,4,600,534,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202608,5,900,732,0,0
+1fd47c9d-e705-590c-ad19-329f006175d3,Muraye Dispensary,Mashi,202609,6,750,990,0,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202604,34,5550,4401,12,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202605,31,5700,4648,0,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202606,37,4800,5679,0,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202607,29,4950,3997,0,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202608,28,4350,3859,0,0
+2088c631-3c03-566f-9ac9-ec2fdadbe691,Burdudu Health Clinic,Baure,202609,37,4950,5493,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202604,16,2100,2591,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202605,14,1950,1849,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202606,14,2550,2064,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202607,13,1800,2297,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202608,11,2250,1610,0,0
+20a03a97-d9b6-534e-a98d-927622b5c567,Habul Health Center,Katsina,202609,11,450,1720,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202604,15,1500,1822,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202605,10,1050,1186,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202606,10,450,1042,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202607,10,1500,1339,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202608,8,1200,1386,0,0
+20dae2c7-44ab-5a59-b765-15ca019667ee,Kukoki Health Clinic,Mani,202609,10,1350,1280,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202604,35,5400,5057,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202605,30,5550,4156,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202606,21,3703,4096,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202607,42,5100,5928,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202608,35,6600,4966,0,0
+216a1935-2051-597a-8ab2-b386ca060372,Yanzaru Health Clinic,Kusada,202609,32,4200,4553,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202604,26,4500,4437,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202605,25,3750,3417,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202606,23,4200,3922,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202607,30,4350,5094,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202608,29,4800,3912,0,0
+2263ef6d-152e-50f0-8263-7e545fce3647,Yandi Maternal and Child Health,Mai'Adua,202609,34,4350,5155,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202604,16,1650,2057,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202605,15,1350,1755,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202606,17,2250,2711,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202607,13,3000,2055,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202608,14,1050,1999,0,0
+22ce5d22-2fc5-5cfb-ad8d-3a165ccb02f9,Yar Ungwa Dispensary,Kurfi,202609,9,900,1254,20,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202604,16,1800,2208,0,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202605,10,2400,1758,0,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202606,10,1200,1487,0,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202607,13,1650,1829,0,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202608,8,1500,1290,0,0
+23845b96-41cd-50c5-8c39-cdaeb38e4a99,Bugaje Health Clinic,Zango,202609,15,1200,1778,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202604,24,3600,3609,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202605,15,2400,2445,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202606,21,3150,3259,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202607,21,3600,4994,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202608,21,4350,3348,0,0
+25132761-0f37-54f7-b762-59b5060fd1c5,Duguneji Health Center,Mashi,202609,24,4050,3696,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202604,23,5550,3813,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202605,33,3750,4905,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202606,30,5550,4108,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202607,38,4200,5345,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202608,30,5400,4285,0,0
+2561d9b3-ef29-5f78-b13e-34d307a4ed9b,Dasha Health Center,Zango,202609,34,4800,6489,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202604,28,4800,4015,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202605,23,3600,3856,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202606,36,3900,4672,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202607,31,5250,4029,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202608,38,3900,5092,0,0
+25cf9f58-726d-5436-bbcc-5b20f7885094,Kuka Shida Health Clinic,Faskari,202609,25,4800,3774,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202604,11,1650,1613,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202605,14,1500,1560,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202606,15,1350,2030,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202607,13,1800,1959,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202608,16,2100,1700,0,0
+26152d1a-0eae-5670-979e-93039f694a3f,Kacika Health Clinic,Sandamu,202609,19,1650,2159,0,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202604,43,6600,5675,2,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202605,31,5550,4456,0,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202606,29,4050,4295,0,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202607,45,5100,5803,0,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202608,27,6300,4920,0,0
+28280fd4-e7b6-540e-97ce-b31674fa36de,Yardaddo Dispensary,Mashi,202609,40,5250,6261,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202604,26,5100,3839,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202605,33,3750,4735,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202606,24,4800,3682,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202607,35,4050,4864,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202608,29,4350,3764,0,0
+299ba3ce-4a33-537f-ac69-50f4a34b2d61,Yamel Maternal and Child Health Clinic,Dutsi,202609,28,3750,3764,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202604,15,2550,2158,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202605,20,1800,2649,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202606,12,3000,2176,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202607,17,2081,2660,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202608,14,2400,2143,0,0
+2a4a6f41-f8ba-5369-bd76-e1dadedaa77e,Kwarare Health Clinic,Jibia,202609,16,2400,2153,13,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202604,14,2700,2226,0,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202605,20,1800,2637,0,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202606,14,2700,2056,0,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202607,22,2250,2864,0,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202608,17,3600,2622,0,0
+2ab0659b-1d9f-510e-ae56-114ec8453730,Huguma Health Center,Kafur,202609,15,2850,2736,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202604,9,1626,1308,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202605,6,1800,1048,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202606,4,900,636,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202607,4,1650,800,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202608,8,2100,1083,0,0
+2ae4b803-07ab-5eb5-bbf3-05e94797640e,Gora Primary Health Center,Safana,202609,9,1500,1647,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202604,14,1350,1824,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202605,10,1950,1936,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202606,19,2100,2657,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202607,22,4050,2868,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202608,24,3750,3252,0,0
+2e543b26-4156-52e1-a044-12f8c3925bae,Pauwa Health Center,Kankara,202609,27,3750,4347,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202604,15,1950,2317,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202605,14,2100,2280,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202606,19,1950,2625,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202607,13,2250,1922,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202608,14,2100,1836,0,0
+2e8c790e-083c-5b83-9252-472bee7a2231,Yarshanya Health Clinic,Batagarawa,202609,12,1200,1880,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202604,16,1350,2280,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202605,12,3300,2216,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202606,16,2400,2321,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202607,21,2400,3041,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202608,15,2850,2336,0,0
+2f800906-aabd-5e21-8023-020becf77f18,Gojo Gojo Maternal and Child Health Clinic,Mai'Adua,202609,22,2550,3030,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202604,27,5700,4154,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202605,30,4350,4204,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202606,34,4500,5705,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202607,25,5400,4299,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202608,30,4500,4302,0,0
+30dbf47b-2519-568d-8bd6-c5668ad58e14,Farfaru Health Post,Charanchi,202609,38,3750,6647,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202604,21,3000,2875,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202605,15,4446,2902,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202606,23,4800,3413,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202607,26,3750,3987,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202608,24,4800,3110,0,0
+336d09ec-5f45-502f-954c-abbd39b1fbe6,Kurfi Primary Health Center,Kurfi,202609,18,4050,3345,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202604,9,900,1270,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202605,8,750,1094,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202606,11,1350,1711,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202607,10,2250,1496,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202608,9,900,1439,0,0
+353ea846-74eb-5d0d-91d3-b2883e3d4c47,Danbanja Health Clinic,Matazu,202609,4,900,887,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202604,30,7050,4899,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202605,28,5250,4822,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202606,41,4950,7856,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202607,37,7350,5505,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202608,46,4950,7350,0,0
+364768f8-0698-513d-8fc6-3192b5389fa1,Bajinawa Health Clinic,Mashi,202609,38,6900,5384,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202604,19,3750,2852,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202605,18,2100,2434,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202606,22,2367,3155,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202607,18,2850,2319,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202608,15,2250,2248,0,0
+395953a2-08fc-5987-aba6-4410313ff5eb,Habul Dispensary,Safana,202609,26,2700,3289,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202604,20,2700,3220,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202605,15,2537,2405,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202606,14,2700,2528,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202607,20,2100,3698,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202608,13,2550,2044,0,0
+3cb39c8c-ce5d-5c54-884d-58a690ad49bc,Gidan Bakoshi Health Center,Bakori,202609,14,2100,2145,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202604,32,5100,4516,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202605,24,4950,3726,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202606,28,4050,3914,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202607,36,4950,5284,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202608,27,5700,4321,0,0
+3df7bcb4-6774-5360-93e3-e198721f714c,Dogon Awo Health Clinic,Faskari,202609,33,5250,5631,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202604,20,2850,2290,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202605,17,1950,2142,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202606,24,3000,3243,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202607,19,3450,2544,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202608,19,3000,2958,0,0
+3e663618-9dcb-51d6-b64b-5aefa0663ff9,Kurneji Maternal and Child Health Clinic,Daura,202609,34,3000,3807,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202604,22,5684,4193,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202605,28,4200,4456,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202606,29,4200,5070,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202607,27,4800,4030,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202608,27,3900,3876,0,0
+3f1b53ea-35b4-5221-8603-2844d671589e,Dayi Primary Health Care,Malumfashi,202609,36,4050,4924,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202604,14,1500,1993,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202605,19,3150,2892,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202606,13,2400,2067,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202607,16,1800,2137,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202608,7,1050,1060,0,0
+41023856-6c83-5b49-8acb-fd0d53c1834f,Bambami Health Center,Batagarawa,202609,4,150,683,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202604,28,5400,5316,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202605,29,3900,3817,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202606,34,3900,4621,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202607,24,3900,4372,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202608,17,2550,3040,0,0
+4202ad2d-2272-5b78-8e5f-0ff92b1c324c,Yandoma Maternal and Child Health Clinic,Ingawa,202609,25,3000,3810,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202604,30,3150,4854,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202605,26,5100,3655,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202606,25,4050,3826,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202607,28,3900,4829,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202608,23,4896,4122,0,0
+420a2a67-17ed-57c2-a000-033d2a8b916c,Unguwan Gaje Health Center,Zango,202609,25,4650,4364,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202604,37,5400,5219,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202605,27,5250,4231,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202606,28,4800,4557,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202607,42,4650,5708,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202608,31,5400,4462,0,0
+4647a1fb-820e-5ec0-be3c-0010a5d4a09d,Nasarawa Health Center,Ingawa,202609,38,4800,5656,0,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202604,12,900,1958,0,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202605,10,2400,1626,0,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202606,7,600,1115,9,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202607,7,562,1070,0,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202608,4,1050,663,0,0
+466c74c7-a09a-5cae-ad0d-b7485f85807f,Gurjiya Health Clinic,Daura,202609,5,150,655,0,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202604,13,1050,1899,0,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202605,15,2250,2096,5,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202606,21,2250,2883,0,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202607,15,3450,2386,0,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202608,11,1500,2097,0,0
+487c366c-ac4e-50fe-b3a8-b2e2701a42ae,Fadumawa Dispensary,Kurfi,202609,13,2100,2367,0,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202604,12,2250,2201,0,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202605,17,1950,2669,0,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202606,11,2250,1896,0,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202607,16,1950,2444,2,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202608,14,2523,2062,0,0
+4896feb7-4a3a-5fd1-b183-e0a143e29684,Kofar Sauri Clinic,Katsina,202609,13,2100,1935,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202604,22,5100,3505,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202605,24,3900,3405,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202606,30,4500,4606,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202607,21,5700,3698,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202608,32,4500,4936,0,0
+48f23921-bb4a-57cb-9e2c-2c4eebc68135,Sabon Sara Health Post,Ingawa,202609,24,5400,3452,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202604,16,1800,2274,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202605,11,2700,1904,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202606,12,2250,1948,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202607,10,1350,1845,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202608,12,1950,1600,0,0
+4b0a1687-65f5-592a-9719-cf8293890641,Unguwar Sarkin Bakka Dispensary,Bakori,202609,16,2250,2425,0,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202604,18,1800,2548,0,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202605,18,3450,2396,9,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202606,14,2400,2523,0,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202607,20,2100,2776,0,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202608,15,2850,2248,0,0
+4b5f889d-c451-5574-a608-abf9015973c1,Tudun Wada Health Center,Jibia,202609,15,2100,2185,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202604,7,150,1132,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202605,6,750,980,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202606,13,600,1334,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202607,11,3000,1705,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202608,14,750,1795,0,0
+4c5ca357-ddd7-54ab-ac05-52f459860318,Gidan Zomo Health Center,Musawa,202609,17,3300,2594,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202604,22,5400,3725,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202605,23,4050,3777,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202606,33,3600,4677,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202607,26,4050,3506,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202608,31,3600,4405,0,0
+4df2d785-e9c5-585f-a4cd-4a60084023fc,Maikoni Health Clinic,Mai'Adua,202609,23,3900,3248,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202604,34,5700,4933,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202605,29,6150,3901,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202606,22,4950,4068,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202607,32,4500,4733,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202608,28,5100,3720,0,0
+4f3882b2-59bb-5a81-9c69-bbfad84628c7,Gamji Primary Health Center,Sabuwa,202609,28,5100,4599,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202604,28,6450,4542,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202605,28,3600,4069,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202606,28,3600,4576,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202607,20,4350,3467,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202608,21,3150,3518,0,0
+4f9e9156-08df-5596-bc49-e1ed06bda7c4,Unguwar Rimi Health Clinic,Dandume,202609,30,3900,4822,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202604,46,6600,6117,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202605,39,7050,5309,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202606,43,5400,5330,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202607,41,5550,6802,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202608,38,7190,5696,0,0
+50264aa9-99ec-5426-b4e3-95c3699dcd37,Tufani Health Clinic,Kusada,202609,52,5850,7411,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202604,23,4650,3592,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202605,25,3600,3644,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202606,32,3900,5081,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202607,33,5550,4213,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202608,29,4650,4374,0,0
+51d05739-cca8-5b29-9355-3300dc2bb37c,Galadimawa Health Center,Mai'Adua,202609,30,4500,5447,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202604,23,2400,3445,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202605,15,3450,2766,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202606,19,3108,2864,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202607,23,3000,3513,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202608,19,3300,2654,0,0
+5414752e-7c30-57b9-9814-69d5238d8876,Unguwar Alhaji Amadu Maternal and Child Health Clinic,Kafur,202609,16,2250,2374,0,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202604,25,4800,3421,0,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202605,22,3150,3382,0,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202606,31,4350,6248,0,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202607,27,5100,4196,5,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202608,34,4350,5054,0,0
+5555a257-d5c7-57a2-94ad-27b70d22ac2f,Zabakau Health Clinic,Kaita,202609,29,4650,3862,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202604,21,4200,3414,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202605,24,2700,3719,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202606,20,3600,2747,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202607,21,1500,2773,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202608,17,2250,1968,0,0
+558a3764-a52c-5c8c-9b2f-46acfd572f59,Kutubi Health Clinic,Batagarawa,202609,15,3150,2516,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202604,25,3900,3690,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202605,19,3150,2711,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202606,14,2250,2478,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202607,20,1800,3609,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202608,15,2700,2299,0,0
+55aa7a0a-e554-5189-84ff-c5567d50a56a,Sabon Garin Borindawa,Malumfashi,202609,21,2550,2892,0,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202604,16,3000,2308,0,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202605,16,1950,2300,0,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202606,24,2550,2894,0,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202607,16,2700,3125,0,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202608,18,2250,2763,7,0
+55cbe84a-37e8-57f1-bbce-bf205f938c9d,Yarchakarande Health Clinic,Mani,202609,14,3000,2411,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202604,30,6900,4911,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202605,32,4800,4894,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202606,42,4800,5998,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202607,33,6450,4926,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202608,32,4950,5106,0,0
+5788b9e1-569f-5688-ad90-85be5f94f587,Dannabaso Health Center,Musawa,202609,48,5100,6217,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202604,19,1500,2228,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202605,23,3450,2343,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202606,18,2100,2169,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202607,23,1950,2693,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202608,16,3000,2135,0,0
+58cf87b1-fa29-55b8-bdfb-632cdc426aa6,Dagora Primary Health Clinic,Rimi,202609,16,1950,2051,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202604,9,300,1186,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202605,8,1500,1345,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202606,10,1200,1497,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202607,9,1350,1209,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202608,5,600,851,0,0
+5a1f525c-1f40-59d0-968e-bfb0721dad56,Kabalawa Health Clinic,Dandume,202609,7,1050,1420,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202604,9,150,1256,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202605,11,1950,1502,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202606,13,900,1686,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202607,10,1800,1350,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202608,12,1950,1705,0,0
+5ab02d3d-e5f2-5954-8cfc-a9d98245c07e,Mabai Maternal and Child Health,Kankara,202609,19,2550,2733,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202604,21,1907,2930,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202605,11,2550,2053,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202606,10,1050,1656,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202607,15,1950,2494,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202608,21,4050,3551,0,0
+5ac2bae7-f567-57b5-9f41-591195c77358,Yan Shuni Health Clinic,Bakori,202609,24,3300,3513,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202604,23,5100,3856,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202605,31,4500,4835,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202606,24,5850,3855,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202607,29,5100,5082,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202608,28,5700,3866,0,0
+5b47279a-ccfc-5347-bf99-f6f461e2cbf3,Rugar Bade Dispensary,Bindawa,202609,26,5400,4510,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202604,13,1350,1807,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202605,12,1350,1934,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202606,10,1650,1360,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202607,13,1350,1999,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202608,15,3150,2096,0,0
+5b483705-d3f2-5933-afe8-c9fa4ad2282f,Yanhoho Health Center,Kaita,202609,13,1950,1992,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202604,23,4200,3515,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202605,19,3150,3388,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202606,28,3450,4113,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202607,23,3750,3259,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202608,23,2700,4246,0,0
+5b7e4dd7-2db4-599c-b741-61e77271c85a,Shaiskawa Dispensary,Mani,202609,21,5100,3399,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202604,9,0,1317,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202605,8,750,1015,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202606,9,1650,1300,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202607,9,1200,1598,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202608,7,991,1168,0,0
+5c0c9dc3-3910-502c-b6aa-dcfb2ab93cff,Bahirawa Health Clinic,Kurfi,202609,5,900,886,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202604,12,300,1421,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202605,7,450,888,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202606,7,1050,883,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202607,9,750,1150,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202608,9,1650,1164,0,0
+5c600983-834f-50d4-aaf7-7f11bda65ab4,Burma Health Clinic,Funtua,202609,11,1800,1649,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202604,21,4950,4188,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202605,19,3300,3312,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202606,21,1350,4016,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202607,20,4950,2959,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202608,22,1950,3351,0,0
+5d0fb62a-578a-5e88-a32b-e5e4474007d7,Kabobi Health Clinic,Kaita,202609,31,5400,4295,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202604,11,1350,1702,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202605,10,1800,1365,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202606,9,1200,1447,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202607,15,2055,2194,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202608,10,1650,1547,0,0
+5e756991-eee0-552e-a29d-8b951572dedd,Gizawa Health Clinic,Dutsin Ma,202609,16,1650,2065,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202604,16,3450,2610,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202605,18,3000,2940,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202606,30,3900,4114,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202607,25,4200,3440,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202608,31,3600,4123,0,0
+6004544a-bb64-5040-9e21-d6b76c39048f,Bado Health Clinic,Batagarawa,202609,18,3000,2846,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202604,33,6300,4522,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202605,31,4050,4304,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202606,39,5100,5813,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202607,31,6150,4877,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202608,41,4933,6349,0,0
+61607145-4ef7-56dc-9eab-e46bf08893cd,Karare Health Center,Rimi,202609,34,6450,5053,10,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202604,10,450,1215,0,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202605,9,1050,1093,0,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202606,9,900,1140,0,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202607,3,150,441,0,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202608,4,450,484,0,0
+61878f5f-77e8-5ad8-840d-3f7b5d3b3bf9,Nasarawa Dispensary,Rimi,202609,5,150,511,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202604,11,1200,1554,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202605,11,1500,2029,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202606,9,2250,1538,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202607,13,900,1799,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202608,12,2550,1658,0,0
+6279e797-059b-5379-8bd3-201ea99da9ec,Tsabu Health Center,Mai'Adua,202609,9,1184,1392,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202604,29,6300,4851,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202605,43,4800,5922,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202606,35,6450,4942,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202607,46,4950,6174,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202608,32,5850,5012,0,0
+62a86cef-d9b2-5fc2-88cf-71c5747a6620,Taura Health Clinic,Sabuwa,202609,33,4786,6044,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202604,22,4050,3520,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202605,26,2655,3760,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202606,16,3000,2685,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202607,20,2980,3444,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202608,17,3150,2628,0,0
+6302d85d-edf3-5f98-bac6-d5e4041bdda1,Sharawa Health Post,Daura,202609,18,2550,2618,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202604,14,1200,1845,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202605,10,2550,1723,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202606,11,2100,1844,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202607,13,900,1833,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202608,10,1500,1345,0,0
+630c48fb-2ba5-54c4-bc08-8e595d88e51c,Maidas Maternal Child Health Clinic,Kusada,202609,9,1500,1186,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202604,32,5250,5088,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202605,31,5700,4555,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202606,26,4800,4408,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202607,38,4350,5527,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202608,31,5550,4597,0,0
+63144120-9916-5df8-bb80-723c3ee6247f,Mahuta Primary Health Clinic,Kafur,202609,30,4950,4575,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202604,19,3000,3006,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202605,23,3600,3381,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202606,25,4050,4382,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202607,24,3900,3247,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202608,21,2700,2990,0,0
+6363f545-d4cf-54c4-b87c-8b8765a266d7,Dan Waila Dispensary,Bakori,202609,22,2550,3331,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202604,19,3000,2747,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202605,20,3000,2871,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202606,24,3150,3752,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202607,20,3750,3035,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202608,22,3000,3218,0,0
+643cf426-178f-5791-a9d6-8a90e23ae815,Gargarawa Health Clinic,Sandamu,202609,28,3600,4032,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202604,37,4350,4638,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202605,31,5400,4170,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202606,26,4500,4456,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202607,43,5250,5808,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202608,35,5250,4457,0,0
+64975f95-cea0-592e-95d4-ca32e450b892,Sabon Layi A Health Clinic,Kankara,202609,43,4200,5658,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202604,6,0,946,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202605,7,1200,1148,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202606,7,1200,1298,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202607,4,450,487,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202608,3,0,436,0,0
+654a2d5f-6ae9-571d-816c-dc86f6b08c5c,Garo Health Center,Mashi,202609,3,600,524,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202604,25,4650,3952,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202605,29,4950,4452,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202606,35,4800,6369,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202607,31,5850,4335,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202608,29,4800,4562,0,0
+65c99f15-c58d-5289-aed8-c1bef6b367d1,Machinawa Health Center,Dutsi,202609,42,4950,5634,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202604,14,2250,2100,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202605,12,1650,1852,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202606,14,1800,2261,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202607,11,2100,1591,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202608,13,1500,1706,0,0
+65e3b183-26eb-5c2e-a005-62a54f8cfc50,Dankama Dispensary,Kaita,202609,10,1350,1625,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202604,10,0,1131,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202605,4,300,611,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202606,3,300,424,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202607,4,300,476,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202608,2,450,354,0,0
+66ddc8ea-79da-53de-991e-a248e03fd3ae,Madaka Health Clinic,Zango,202609,4,450,577,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202604,11,1350,1605,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202605,9,1650,1613,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202606,14,1350,2115,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202607,11,2100,1583,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202608,15,1950,2226,0,0
+6871d55e-aa79-50df-ab45-0fd09faceb4f,Dabawa Dispensary,Dutsin Ma,202609,16,2700,1937,0,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202604,33,6900,5439,0,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202605,32,5250,4505,0,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202606,36,5100,4959,0,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202607,47,5850,6597,19,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202608,32,5850,4861,0,0
+69988d5b-3f4f-55ad-aee3-93f29960a031,Sakkwatawa Health Center,Dan Musa,202609,37,4500,5800,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202604,22,4350,3223,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202605,25,2700,3003,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202606,30,2850,3730,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202607,25,3900,2936,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202608,24,1950,3794,0,0
+6a8c46a1-e004-5292-b8af-731122917320,Kanti Maternal and Child Health Clinic,Daura,202609,25,3450,2706,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202604,26,5550,3358,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202605,25,3000,3250,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202606,33,2700,3841,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202607,22,3450,2727,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202608,24,2850,2908,0,0
+6ae64c9a-de0f-50b2-b612-fae688794bf8,Yarkadir Health Center,Rimi,202609,30,3450,4037,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202604,34,6300,5272,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202605,14,4650,1948,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202606,24,4350,3126,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202607,25,3450,3835,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202608,12,5400,2027,0,0
+6b341b04-9091-5219-be8e-f9f1eaa0e74b,Buzaye Health Clinic,Danja,202609,25,3750,3724,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202604,26,3150,3801,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202605,20,4200,3148,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202606,19,2250,2782,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202607,27,3450,3837,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202608,24,3900,3200,0,0
+6baadb4e-ca08-582a-a719-6ace5ea0ce3c,Tokarchi Health Clinic,Kankia,202609,23,3150,3283,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202604,19,4500,3410,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202605,21,4500,3582,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202606,31,4950,4964,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202607,31,6450,4054,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202608,36,4950,5212,0,0
+6c668174-e447-550e-8a98-545e32020b2f,Doro Primary Health Center,Bindawa,202609,24,6000,3735,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202604,30,7200,5298,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202605,31,5100,4772,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202606,40,4350,5568,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202607,34,6150,4524,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202608,38,4800,5487,0,0
+6de135c7-98b8-5772-8afe-2d2283efa4ae,Gwaigwaye Health Clinic,Funtua,202609,27,4950,4270,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202604,12,900,2286,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202605,10,1500,1457,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202606,12,1050,1531,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202607,12,1950,1708,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202608,7,900,1141,0,0
+6eaf20bf-7e12-5351-94f9-fe7bf4148423,Birnin Kogo Health Clinic,Faskari,202609,9,1950,1331,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202604,28,3600,3741,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202605,18,3900,2878,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202606,20,2700,2940,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202607,27,3000,3683,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202608,19,3852,3048,0,0
+703a005f-ac70-5491-8f1e-6c0efd2a8634,Mallamawa Health Clinic,Batsari,202609,20,3000,3065,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202604,27,5400,3821,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202605,25,3750,3977,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202606,34,4500,5120,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202607,32,5250,4263,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202608,36,3750,4837,0,0
+70f01bcd-86cd-5385-805a-abdd4d4c8a7c,Takalmawa Health Clinic,Dandume,202609,22,4500,3832,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202604,12,1200,1725,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202605,9,900,1292,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202606,9,1050,1266,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202607,9,1050,1233,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202608,9,1200,1440,0,0
+7146fa61-22b9-52a8-a814-0d360e348656,Madunka Dispensary,Rimi,202609,5,1200,788,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202604,26,5550,4196,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202605,28,4050,4052,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202606,38,4200,5207,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202607,26,5250,4224,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202608,36,4650,6775,0,0
+71c955d4-528f-52ba-bb9f-e6dacb4ed39e,Salahawa Health Center,Batagarawa,202609,25,4650,3917,0,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202604,12,1500,1996,0,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202605,12,1800,1894,0,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202606,16,1950,2481,13,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202607,16,2850,2179,0,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202608,17,2550,2430,0,0
+71cbd170-02b9-5746-9855-81a412765844,Magaji Wando Primary Health Center,Dandume,202609,24,3150,3611,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202604,20,3750,3431,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202605,26,3750,4065,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202606,29,3600,4107,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202607,21,2700,2715,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202608,27,2850,3627,0,0
+7394a1f3-e726-57e8-904b-11a0271d83e0,Autawa Health Clinic,Batagarawa,202609,22,4338,3294,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202604,30,5550,4797,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202605,27,4050,3532,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202606,24,3900,3604,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202607,29,3450,4604,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202608,29,5100,4030,0,0
+73b91565-7065-5be0-b9b0-2d5e04122fee,Rinjin Baushi Dispensary,Bindawa,202609,28,4350,4015,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202604,19,1950,2643,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202605,17,3000,2247,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202606,19,2850,2654,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202607,29,3300,3416,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202608,18,2400,2980,0,0
+73c1a786-3a97-55f2-8699-f6839dd61fc1,Ginchawa Clinic,Matazu,202609,23,2400,2978,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202604,26,4950,3866,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202605,25,4350,3644,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202606,35,4500,4731,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202607,34,6600,4119,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202608,29,5044,4228,0,0
+763381c7-c606-5a6b-9c12-3ffd8564d64f,Tudun Kanwa Dispensary,Danja,202609,33,5400,5179,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202604,30,6300,4628,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202605,34,4650,4576,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202606,41,4650,5695,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202607,27,5850,4479,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202608,28,3900,4312,0,0
+79b36385-51b8-55e6-be55-cd72e7d87045,Shinkafi Maternal and Child Health Clinic,Katsina,202609,34,4050,5269,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202604,14,1200,2351,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202605,9,2250,1677,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202606,11,1500,1661,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202607,13,1350,1841,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202608,11,2100,1625,0,0
+7b544ea2-e5b0-57a7-ab3b-048baf2c65f5,Lugga Health Clinic,Sandamu,202609,11,1800,1631,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202604,13,1800,1885,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202605,18,2550,2726,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202606,17,3450,2463,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202607,21,2250,2973,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202608,18,3150,2666,0,0
+7b8a49a0-b428-5de3-b114-eb0f471cff52,Sabo Garin Rabe Dispensary,Jibia,202609,19,2850,2714,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202604,36,5850,5152,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202605,27,5700,4299,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202606,26,3900,4241,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202607,34,4200,5225,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202608,25,4650,3793,0,0
+7c7a944d-6d9d-5353-bde4-543777e90b67,Gorgoro Health Clinic,Kankia,202609,25,3450,3538,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202604,25,3900,4189,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202605,21,3900,3074,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202606,17,3150,2959,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202607,28,3000,3980,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202608,23,3900,3270,0,0
+7dec537b-3a39-53d2-badd-a759b2312dee,Nasarawa Health Clinic,Matazu,202609,18,3450,3344,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202604,36,5250,5456,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202605,27,5550,4255,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202606,27,4050,4123,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202607,36,4350,5511,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202608,30,5250,4258,0,0
+7ebd649c-fee5-5db4-a79a-e4124d0525dd,Kaliyawa Health Clinic,Funtua,202609,33,5250,4836,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202604,34,4500,4764,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202605,25,4650,3766,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202606,27,3600,3718,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202607,32,3600,6300,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202608,22,4350,3444,0,0
+7f998d10-c58b-518c-bcf4-38adacf3b1e2,Tabobi Health Clinic,Matazu,202609,26,2700,4421,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202604,13,3000,1821,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202605,11,2850,1739,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202606,11,1500,1504,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202607,0,1800,0,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202608,6,1800,813,0,0
+8003a3a6-85fe-5411-bacd-48ac93861fa9,Madogara Dispensary,Batsari,202609,10,1650,1345,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202604,8,300,1183,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202605,8,750,1326,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202606,6,1650,1119,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202607,8,900,1356,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202608,9,1500,1215,0,0
+812b4bed-90d4-548f-b31a-f71563ffd82f,Daddara Model Primary Health Center,Jibia,202609,9,1800,1610,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202604,10,1500,1554,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202605,10,1500,1613,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202606,14,1800,2159,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202607,15,2550,1956,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202608,15,2550,2088,0,0
+816109a5-02a1-511e-bd0b-fc2c3b84beb0,Maiyadiya Health Clinic,Bakori,202609,16,1950,2548,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202604,23,3150,3322,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202605,15,2685,2477,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202606,14,1650,2014,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202607,16,1500,2275,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202608,9,2250,1672,0,0
+81f9811e-f73c-5b1b-9196-31c1dd849615,Akata Dispensary,Batsari,202609,13,1500,1951,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202604,23,3750,3240,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202605,20,3150,3279,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202606,27,3750,4349,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202607,21,3600,2997,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202608,20,2850,3016,0,0
+82059348-fd44-5340-b7e5-c42c35ad9045,Kunamawa Health Clinic,Safana,202609,25,3000,3691,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202604,21,4350,3092,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202605,28,2850,3644,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202606,19,2850,2456,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202607,16,1800,2462,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202608,13,1800,1977,0,0
+83b9d7a6-bb34-59f9-93c2-0fac4461df51,Gallawa Health Clinic,Dutsi,202609,11,2250,2018,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202604,11,150,1874,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202605,10,2400,1564,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202606,10,1350,1621,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202607,15,2100,2192,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202608,13,2700,2025,0,0
+83c3d3b7-8bf4-56b0-8b32-15ad891a79f1,Magama Health Clinic,Charanchi,202609,18,2250,2553,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202604,8,300,1254,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202605,5,1050,824,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202606,4,150,575,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202607,6,600,886,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202608,4,1350,1155,0,0
+859a4dba-3609-5257-83f3-4884bf9360a1,Jofalawa Health Clinic,Kusada,202609,5,1050,871,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202604,22,3900,3586,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202605,17,2850,2493,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202606,17,2100,2343,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202607,18,1800,2399,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202608,12,2250,1784,0,0
+8709ad16-3684-59a5-8794-eda4aa696611,Unguwan Moda Health Clinic,Funtua,202609,12,1145,1696,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202604,28,5550,3956,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202605,23,4950,4255,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202606,32,4050,5279,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202607,31,5100,4139,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202608,43,4350,5563,0,0
+8a94d75c-76e5-5738-9c54-490ca10e0959,Gezawa Health Post,Kankia,202609,33,5850,4477,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202604,14,1200,2149,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202605,9,1800,1418,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202606,10,1800,1501,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202607,8,1350,1349,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202608,5,1500,885,0,0
+8e609c8e-8f18-54d6-bfec-57bc6e6450dc,Dan Nakola Health Center,Daura,202609,5,450,766,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202604,33,7050,4734,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202605,30,4950,4652,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202606,36,3150,5145,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202607,28,5850,4258,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202608,40,3900,5309,0,0
+91e44e52-ea33-568a-a77d-0f8fd020ca2d,Bargaja Health Clinic,Batsari,202609,35,6450,4643,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202604,31,6000,5068,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202605,29,4650,3964,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202606,29,4500,4245,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202607,35,4800,6602,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202608,31,5250,4302,0,0
+93d4a79f-ece1-5afe-9f61-a156b23d4204,Unguwar Doka Health Clinic,Faskari,202609,34,4337,5594,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202604,41,6900,6257,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202605,40,6000,4805,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202606,36,4650,4692,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202607,39,4050,5449,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202608,33,5700,4582,0,0
+93f0cd66-6854-5a29-88f4-a0e0008b6049,Barebari Health Center,Safana,202609,35,4650,4658,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202604,14,1350,1733,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202605,11,1350,1472,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202606,12,450,1745,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202607,13,3600,1965,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202608,11,900,2009,0,0
+94156ef2-1960-5f55-ab16-639768673823,Kafi Health Center,Ingawa,202609,18,2550,2207,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202604,19,3900,3154,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202605,28,3600,4234,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202606,21,4500,3276,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202607,30,3600,4384,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202608,23,4650,3514,0,0
+94cfb3b8-24ae-5288-803d-3f6e471c9022,Dan Ali Model Primary Health Center,Dan Musa,202609,24,4050,3459,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202604,24,4200,3905,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202605,19,3300,2794,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202606,22,3450,3397,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202607,32,4500,4753,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202608,23,4650,3612,0,0
+950ae331-7cfb-5972-8359-79e4b8f56236,Ruwan Dorowa Dispensary,Dutsin Ma,202609,31,3000,4406,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202604,5,0,808,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202605,8,300,935,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202606,4,150,315,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202607,4,300,468,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202608,3,150,319,0,0
+955055c6-65a5-5893-b1c3-15376715b006,Faskari Health Clinic,Faskari,202609,3,300,354,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202604,13,1350,2015,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202605,12,1800,1532,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202606,11,2700,1770,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202607,17,3150,3317,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202608,19,4350,2676,0,0
+9678021f-1dd3-5f3e-9587-e3e731b51586,Husamawa Health Clinic,Baure,202609,19,3300,2533,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202604,29,5250,4174,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202605,34,4950,5619,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202606,28,5100,4319,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202607,35,4350,5404,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202608,32,6000,4484,0,0
+96fe5d7c-d2ed-5b91-9a4d-8a5fb57d8f89,Gya Samar Fulani Health Clinic,Dandume,202609,32,3750,4151,0,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202604,12,1650,1420,0,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202605,12,1200,1278,0,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202606,9,450,1213,12,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202607,9,1500,1125,0,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202608,15,2100,1622,0,0
+975697ac-072d-594c-823d-be567a64606b,Kurmi Health Clinic,Kafur,202609,15,1950,2103,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202604,25,4350,3793,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202605,25,3450,3821,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202606,31,4050,4891,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202607,31,5400,4214,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202608,33,4800,4490,0,0
+97f73fd9-bc27-5cd2-8e74-1916bf5cef47,Jarkasa Health Center,Dutsi,202609,43,5250,6076,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202604,9,450,1496,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202605,9,600,1451,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202606,9,1650,1224,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202607,12,1350,1650,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202608,11,2250,1644,0,0
+981f929a-8800-59ff-b9fa-ed213e6a1e63,Karofi Health Clinic,Danja,202609,13,2400,2032,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202604,11,1650,1978,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202605,14,2250,2053,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202606,15,1650,2391,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202607,17,3000,2333,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202608,16,2700,2313,0,0
+985d57e5-f186-5063-973f-31ce4649a9d9,Balari Health Post,Dutsi,202609,18,1800,2891,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202604,8,750,1212,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202605,9,1350,1070,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202606,10,900,1426,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202607,10,1950,1317,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202608,11,1200,1562,0,0
+98c976fd-83a8-5800-9c4b-3a44e9d5826d,Dan Gawo Health Clinic,Kurfi,202609,11,1050,1551,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202604,22,2250,3232,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202605,17,3849,2697,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202606,21,3150,3027,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202607,26,3600,4196,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202608,22,4050,3119,0,0
+9ab267df-245f-5b87-a540-2e2031ab7aef,Dandume Primary Health Care Center,Dandume,202609,17,2250,2813,0,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202604,16,2550,2495,0,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202605,12,3000,1979,0,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202606,13,1800,1797,4,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202607,14,2550,2382,0,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202608,11,3150,1891,0,0
+9ade8b15-db2b-5cee-84f3-5a80d6afcd8a,Jargaba Primary Health Center,Bakori,202609,11,1650,1884,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202604,34,4950,4139,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202605,23,4800,3585,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202606,35,4050,3720,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202607,41,4050,5113,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202608,36,4950,3919,0,0
+9b1e9aa1-03f6-5cf4-aa13-a6216ac98a5e,Kwangwama Health Clinic,Dutsi,202609,35,3600,4559,4,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202604,8,570,1139,0,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202605,10,1050,1262,0,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202606,6,1050,961,0,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202607,8,600,989,0,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202608,5,1200,708,0,0
+9c6788c6-f1c6-579d-8c2b-9bb3db8367a1,Marabar Kindo Health Post,Sabuwa,202609,4,300,372,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202604,14,900,2178,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202605,12,2100,1825,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202606,15,2550,2191,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202607,20,2550,2747,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202608,16,1950,1966,0,0
+9cd25394-a5df-5e0e-b1e7-7784747bb287,Shema Primary Health Center,Dutsin Ma,202609,19,2100,2716,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202604,19,2850,2591,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202605,14,2250,1905,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202606,15,2250,2142,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202607,25,2700,2821,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202608,18,2400,2113,0,0
+9ef7fc50-56b0-51f3-bb68-4104fb9d427f,Unguwan Dandada Health Post,Funtua,202609,20,1650,2180,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202604,34,4950,4403,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202605,27,4350,3457,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202606,24,3150,3530,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202607,28,3300,3862,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202608,21,3150,2777,0,0
+a0ff80be-d3e6-594c-aba3-833f64ca234d,Bakam Health Post,Musawa,202609,26,2700,3615,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202604,6,600,1096,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202605,8,750,1021,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202606,5,900,719,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202607,5,150,703,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202608,7,1500,913,0,0
+a263c0ac-7323-538d-b345-0966d53b5a48,Tunas Primary Health Center,Ingawa,202609,6,900,1250,0,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202604,18,1650,2862,0,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202605,20,3713,2544,10,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202606,18,2400,2466,0,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202607,21,2100,2941,15,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202608,12,2850,2253,0,0
+a2e6d03f-557f-5e34-99cf-90a3d1de9648,Yar Kinda Dispensary,Sabuwa,202609,19,2400,2711,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202604,29,3900,3841,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202605,19,3600,3016,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202606,22,2850,3067,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202607,32,4050,4331,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202608,22,3450,2957,0,0
+a37fab83-41d2-5ea7-b898-3d5e9cbf18c1,Dusten Yanki Health Clinic,Kafur,202609,29,3405,4065,6,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202604,6,0,1030,0,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202605,7,600,957,0,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202606,8,450,1226,0,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202607,6,1800,1130,0,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202608,8,1188,1137,0,0
+a4bd8a6b-6d50-5625-b6e7-345bc8265ccd,Unguwar Gago Health Clinic,Faskari,202609,8,750,1183,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202604,27,6300,4472,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202605,32,4350,4356,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202606,31,4800,5630,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202607,32,6000,4581,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202608,38,5100,4784,0,0
+a57a3c6e-2fc4-5cd3-9a79-87c9821bee60,Dan Kalgo Health Center,Kankara,202609,38,5400,5955,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202604,8,750,1204,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202605,14,1950,1945,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202606,12,2250,1895,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202607,20,2850,2866,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202608,12,2850,2250,0,0
+a71c5967-399b-5741-9415-f1c9e781fcfb,Jauga Health Clinic,Kankia,202609,18,2250,2392,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202604,20,3000,3288,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202605,14,2850,2279,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202606,13,900,2107,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202607,20,3600,3777,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202608,16,1950,2229,0,0
+aa0bef83-f2ab-5f1d-9945-3a6091348c19,Yargoje Primary Health Care,Kankara,202609,19,2550,2579,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202604,10,450,1370,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202605,7,750,899,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202606,8,1800,1276,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202607,11,900,1505,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202608,8,1500,1198,0,0
+aa40c8a0-a43d-53f6-90d7-58dfb1518e24,Mobile Ambulance,Batsari,202609,9,1650,1181,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202604,23,3300,2960,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202605,26,3450,3750,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202606,19,3900,2926,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202607,22,2100,3046,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202608,16,3150,2418,0,0
+abf6d65f-6488-5994-af77-638d4c0ab361,Kuki Primary Health Center,Katsina,202609,14,2100,2304,0,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202604,27,5250,3560,0,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202605,28,3150,4323,0,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202606,26,4950,3857,0,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202607,37,4350,6866,11,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202608,27,4500,3610,0,0
+ac110bad-e6ed-596a-acc6-0ce20f798634,Kadanya Health Clinic,Kankia,202609,24,3600,3582,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202604,31,4500,5961,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202605,27,5250,3925,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202606,26,3450,3803,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202607,31,3750,4566,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202608,26,4500,3737,0,0
+ad0ad2fe-17a6-5a57-9b93-135969390b89,Mai Kiliya Health Post,Baure,202609,21,3300,3312,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202604,15,2550,2550,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202605,18,4050,3184,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202606,15,3553,2592,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202607,19,2250,2842,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202608,14,3150,2029,0,0
+ae83455e-aa0f-58c5-b5b1-24640ee65292,Unguwar Malamai Health Center,Dan Musa,202609,14,3150,2366,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202604,39,5400,5115,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202605,27,4950,4144,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202606,24,3900,3889,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202607,30,4050,5129,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202608,31,5550,4147,0,0
+ae9ef1ff-9d77-5e22-a5e4-801bbb0ae161,Dangau Health Clinic,Sandamu,202609,34,4050,5199,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202604,16,1500,2131,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202605,12,1800,1949,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202606,15,1500,2171,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202607,10,2250,1798,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202608,19,2550,2674,0,0
+af9ca82e-267b-5f48-b6f9-10ecf01c21e9,Rimi General Hospital,Rimi,202609,15,2700,2124,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202604,20,4200,3142,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202605,26,2700,3896,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202606,22,2550,3422,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202607,29,5850,4543,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202608,19,2850,4453,0,0
+afca824f-5053-52d5-9d51-32a96c24b7b5,Rigiyar Tsamiya Maternal and Child Health Clinic,Sandamu,202609,25,5100,3569,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202604,8,863,1306,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202605,13,2250,2952,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202606,12,2400,1845,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202607,12,1200,1771,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202608,7,900,1094,0,0
+b017dbd2-da80-57ac-983a-a9478e19c038,Sirika Health Clinic,Dutsi,202609,6,1050,1015,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202604,29,3750,4141,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202605,21,4050,3928,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202606,25,3600,3335,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202607,32,3000,4224,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202608,29,4800,3606,0,0
+b138e000-5e5e-5329-b426-2731d4862983,Bajinawa Health Clinic,Dutsin Ma,202609,36,4050,4815,0,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202604,13,2250,1674,0,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202605,11,1350,1894,0,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202606,11,2550,1523,0,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202607,9,1650,1289,0,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202608,5,1800,736,13,0
+b1d42be7-2c58-54ef-99d4-0fd4212a81ac,Gidan Dukku Dispensary,Musawa,202609,3,600,530,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202604,26,3300,4020,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202605,22,4650,3459,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202606,21,3900,3622,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202607,32,3750,4723,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202608,28,5100,3870,0,0
+b24ac57e-9a6e-57a2-9f04-e080199b3a74,Zangon Borindawa Clinic,Malumfashi,202609,32,1800,5560,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202604,14,1924,1850,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202605,16,1800,2173,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202606,14,2250,1959,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202607,22,3150,4087,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202608,17,3450,2577,0,0
+b27fd808-e276-5253-aa8f-7b57d776c860,Tuge Health Clinic,Musawa,202609,14,1650,2070,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202604,29,5100,4200,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202605,36,3750,5224,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202606,26,5700,4154,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202607,37,3900,5257,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202608,27,5400,4159,0,0
+b2d68fe3-c6eb-513d-ab8b-aa381947b097,Araha Health Clinic,Mai'Adua,202609,29,4350,4268,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202604,11,1500,1816,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202605,17,2100,2308,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202606,12,1950,1709,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202607,15,1650,2344,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202608,12,2100,1970,0,0
+b355896d-6bce-59c8-9fd3-5afbf8ad340a,Ungunwar Malam Hajji,Dandume,202609,8,1200,1319,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202604,14,1800,2217,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202605,16,2100,1928,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202606,15,1350,2243,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202607,20,3450,2822,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202608,14,2100,2629,0,0
+b404e7c1-6255-598a-aa92-ab746b7a85be,Salai Health Clinic,Baure,202609,19,3900,2583,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202604,27,5400,3984,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202605,30,3900,3830,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202606,29,3997,4840,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202607,27,4323,3790,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202608,36,4500,4890,0,0
+b5176fa9-7c1b-5521-9890-b136f8023fba,Jifatu Dispensary,Kaita,202609,32,5400,4139,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202604,17,2550,2526,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202605,16,2550,2412,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202606,25,3900,3521,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202607,17,3900,2686,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202608,19,4050,3061,0,0
+b54987c9-a23b-5fde-883f-9dc181860037,Daura General Hospital,Daura,202609,29,2100,3291,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202604,40,7200,6382,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202605,35,6900,5352,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202606,37,5700,5457,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202607,43,5100,6527,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202608,41,6600,5354,0,0
+b6ef87c7-59ed-5454-8bc6-d34b08c3a38c,Yaryandi Health Clinic,Mai'Adua,202609,43,5250,6361,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202604,23,3900,3639,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202605,26,3450,3480,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202606,28,3900,4670,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202607,21,4200,3473,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202608,21,2850,3104,0,0
+bbd44c9d-1aee-58d1-8cb2-8bb7f22d0f0a,Zango Primary Health Center,Malumfashi,202609,23,3150,3763,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202604,30,6300,4384,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202605,32,4650,4613,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202606,35,4650,5693,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202607,34,6300,5102,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202608,38,5100,4920,0,0
+bc607160-ea90-51a3-969e-a5318aa9ec64,Salihawa Health Clinic,Musawa,202609,39,4350,5592,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202604,24,4800,3767,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202605,25,4650,4283,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202606,36,4800,5391,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202607,23,4650,3922,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202608,21,2550,3143,0,0
+bd87ac7c-ba70-5220-b1d8-a66c6014b08b,Abdallawa Health Clinic,Kaita,202609,22,2850,3545,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202604,25,4800,3526,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202605,25,3750,3854,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202606,35,4950,5241,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202607,29,4500,3770,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202608,32,3428,4585,0,0
+bddbdfc5-e89e-52db-86b7-318f0fe0a82f,Walawa Health Clinic,Mani,202609,25,4650,3922,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202604,10,750,1504,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202605,7,750,985,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202606,5,300,700,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202607,3,150,418,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202608,2,450,419,0,0
+bec26ae4-fbe5-5530-bf7c-181f61d2b139,Nahuce Primary Health Center,Danja,202609,3,300,419,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202604,26,4350,4081,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202605,24,4200,3536,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202606,26,3900,3526,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202607,28,3600,4654,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202608,21,5342,3872,0,0
+bf9120f2-fe7c-58e4-b207-ba835778db54,Kofar Guga Maternal and Child Health Clinic,Katsina,202609,29,3000,4353,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202604,21,2100,3617,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202605,17,3000,2171,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202606,16,1500,2349,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202607,15,2250,2478,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202608,11,1800,1570,0,0
+c261ac8c-ef96-5428-8081-f30971b57b7d,Aduwawa Health Clinic,Zango,202609,11,1050,1734,0,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202604,28,5400,3930,0,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202605,24,3300,3544,8,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202606,31,3450,4542,0,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202607,28,4950,3751,0,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202608,34,3900,5058,0,0
+c3e54f32-1717-5018-8dac-34bb9d093aaf,Sayaya Primary Health Center,Matazu,202609,30,6000,4485,0,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202604,18,2850,3027,20,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202605,17,3450,2699,0,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202606,17,3000,2914,0,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202607,27,2964,3696,0,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202608,22,4350,3332,0,0
+c5846de1-3f4d-5d9b-a118-16b67ba8d2a9,Kagadama Health Clinic,Kusada,202609,30,3450,4260,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202604,20,4200,2986,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202605,22,2700,3462,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202606,22,3450,2836,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202607,18,2850,3389,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202608,15,2400,2303,0,0
+c93e3cae-5cd8-519a-bb5e-d3b3e35c6156,Hindatu Maternal and Child Health Clinic,Daura,202609,15,2250,2340,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202604,12,3450,2084,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202605,6,3150,1260,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202606,16,2700,2004,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202607,13,2550,1890,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202608,13,3450,2094,0,0
+cafaf494-3240-511b-bcf9-e646f510cae8,Tashar Mai Alewa Health Clinic,Dan Musa,202609,5,2100,597,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202604,28,6000,4271,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202605,36,4050,5226,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202606,34,5400,4324,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202607,39,3900,5167,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202608,27,5250,4101,0,0
+cdc7754a-8826-5ef4-855f-b35c021c8a22,Kawari Health Clinic,Matazu,202609,23,3300,3453,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202604,22,3600,2926,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202605,22,2400,2725,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202606,23,2700,3141,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202607,20,2550,2241,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202608,17,1920,2304,0,0
+ce04dd7f-2f09-564e-9c4f-5c36ddcafa30,Yar Malamai Clinic,Charanchi,202609,23,1350,2523,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202604,25,5700,3922,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202605,32,3150,4622,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202606,31,5700,4216,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202607,33,4650,5524,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202608,30,4800,4246,0,0
+cfd6812b-a112-5c1d-a142-687942006654,Dan Amarya Health Clinic,Danja,202609,26,4500,4183,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202604,37,7018,5933,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202605,32,6000,4733,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202606,34,4650,4768,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202607,45,5700,6751,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202608,39,7305,5706,0,0
+d03d0aca-2c21-5846-9da9-708988cc254d,Comprehensive Hospital Kafur,Kafur,202609,47,6150,5830,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202604,23,3600,2938,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202605,19,2961,2769,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202606,20,3450,3336,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202607,17,3900,2433,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202608,25,2550,3872,0,0
+d0a167d4-b3f3-5de2-9ffb-2d932d8c8502,Unguwar Sarkin Noma Health Clinic,Danja,202609,18,3750,2388,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202604,12,1200,2027,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202605,16,1800,2519,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202606,14,3300,2312,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202607,23,2550,2896,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202608,18,3300,2758,0,0
+d1474b45-9c2d-50f5-a7b6-7892ccb02ce5,Dustin Dadi Health Clinic,Dan Musa,202609,19,2700,2718,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202604,24,5850,3952,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202605,28,3000,4224,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202606,23,3900,3333,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202607,29,4200,4485,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202608,27,3900,3399,0,0
+d1cf3b68-a4ea-53f5-8392-05d4219cc56f,Yardaje Maternal and Child Health Clinic,Zango,202609,26,3600,3515,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202604,28,4800,4470,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202605,25,4950,3715,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202606,23,3750,3730,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202607,33,4050,4799,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202608,24,4800,4073,0,0
+d2d0af0c-325d-57b0-b9d2-bb34d59b28f8,Damari Primary Health Center,Sabuwa,202609,32,4650,5322,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202604,10,1350,1461,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202605,9,1001,1561,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202606,8,2100,1306,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202607,13,2100,1871,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202608,9,2100,1455,0,0
+d686d1d3-5451-5379-bf13-855006d85621,Hayin Kasuwa Health Clinic,Sabuwa,202609,10,1950,1559,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202604,35,4650,4619,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202605,23,4500,3614,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202606,23,3750,3619,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202607,34,3750,4843,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202608,34,5550,4257,0,0
+d9920a44-051e-56d3-a8ae-aa45c55a7ecb,Jana Dispensary,Mashi,202609,36,4350,4997,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202604,19,2550,2765,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202605,15,2700,2752,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202606,22,2850,3512,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202607,18,3900,3080,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202608,21,2850,2840,0,0
+d9a0130f-7c65-51e1-b599-49ecbf3d49be,Chidawa Dispensary,Mashi,202609,18,2400,3291,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202604,29,4950,3946,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202605,30,4800,4415,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202606,33,4650,5460,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202607,29,5100,4233,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202608,41,4650,5571,0,0
+daf9551d-b183-5640-9cae-877e8cfffd83,Gwanza Maternal and Child Health Clinic,Bindawa,202609,24,4500,3949,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202604,25,5850,4069,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202605,27,5850,4518,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202606,36,4800,5154,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202607,33,7200,4649,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202608,30,5250,4489,0,0
+db9332c2-a9a5-5b1c-b214-6d4fcdffd17b,Gimi Dispensary,Bindawa,202609,37,6000,5667,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202604,20,1800,2968,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202605,15,2100,2042,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202606,18,2700,2269,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202607,16,2100,2773,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202608,19,3150,2361,0,0
+dc95d29e-deb1-5a7d-b8b3-289d2fcb9a63,Majen Gobir Health Center,Rimi,202609,18,3000,2772,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202604,27,5700,4744,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202605,29,3750,3997,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202606,34,3300,4675,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202607,27,5550,3936,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202608,33,3600,6319,0,0
+dcb58062-1def-50c1-b6c5-fee25dd9815d,Jambage Health Clinic,Daura,202609,24,4800,3948,0,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202604,30,6600,4315,0,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202605,29,3900,3750,0,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202606,37,3750,4898,16,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202607,29,5400,4011,0,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202608,43,3600,4961,19,0
+dda5bf22-51e4-56fc-9cc7-cb4f0b469257,Yar Santa Health Clinic,Musawa,202609,29,5250,4002,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202604,24,3750,2758,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202605,14,2100,2119,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202606,17,2400,2092,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202607,17,1350,2412,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202608,16,2850,2085,0,0
+ddd0b665-8fa3-5523-8b46-a26340b7d776,Bare Bari Health Post,Dan Musa,202609,16,1950,2022,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202604,27,3750,4442,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202605,22,4200,3346,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202606,19,2850,2948,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202607,22,2100,3286,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202608,14,2700,2309,0,0
+de4709cc-379b-5780-a5cb-fdee9d400c4c,Goya Primary Health Center,Funtua,202609,15,2250,2168,0,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202604,25,6150,4508,10,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202605,33,4650,4633,0,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202606,38,4650,5928,0,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202607,29,6150,4582,0,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202608,40,4200,5523,4,0
+debdb3f1-9f5c-563a-b9a0-21060b7aebda,Rayi Dispensary,Batsari,202609,32,5400,4473,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202604,32,6000,4434,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202605,33,4500,4533,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202606,38,4500,5489,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202607,30,6000,4470,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202608,28,3600,4148,0,0
+e0c3db2d-1e56-5541-91e4-87da049db702,Kulere Health Clinic,Dan Musa,202609,35,3900,4824,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202604,26,3900,3808,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202605,22,4050,3103,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202606,19,3000,2879,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202607,23,2250,3267,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202608,17,3750,2790,0,0
+e180be76-23bb-53db-a8d6-8488274641c6,Dantutture Maternal and Child Health Clinic,Kafur,202609,20,1950,2851,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202604,12,1200,2024,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202605,13,2400,2050,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202606,21,2400,2762,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202607,17,2700,2228,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202608,20,2550,2783,0,0
+e18aa617-1e6c-50a3-9773-6fcff600e22c,Danyawa Health Clinic,Mai'Adua,202609,14,1650,1898,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202604,18,2400,2479,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202605,16,2250,2562,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202606,23,3150,3352,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202607,17,3300,3863,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202608,17,3000,2867,0,0
+e1916012-4889-5903-ab85-a937c7ad3b98,Kwasarawa Maternal and Child Health Clinic,Sandamu,202609,21,2400,3170,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202604,36,6900,4770,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202605,41,4950,6108,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202606,30,5700,4660,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202607,42,4650,5915,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202608,36,6000,4835,0,0
+e1dc938d-8b98-52b8-87bc-7b22a3969f1e,Aliyaba Maternal and Child Health Clinic,Mani,202609,38,5828,5221,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202604,13,2250,1919,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202605,9,1350,1545,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202606,10,1500,1780,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202607,9,1500,1387,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202608,12,1200,1643,0,0
+e1eef03f-786a-5dbb-919f-1f9d99c5aefc,Sabi Health Clinic,Kaita,202609,8,1650,1337,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202604,18,5088,3683,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202605,24,3150,3436,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202606,23,2550,3562,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202607,16,2550,2373,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202608,22,2100,2665,0,0
+e2bd5a35-b7d1-5f9d-b318-eb2c3007b4f3,Maikada Dispensary,Safana,202609,13,2100,1961,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202604,6,0,1037,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202605,9,900,1352,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202606,15,2550,2422,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202607,10,2250,1840,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202608,11,1500,1680,0,0
+e348366a-8a65-5506-82b0-b824d9d5e175,Police Health Clinic,Funtua,202609,14,1800,2032,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202604,10,1950,1589,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202605,14,2250,2185,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202606,12,2700,1791,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202607,12,2550,1529,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202608,4,1635,503,0,0
+e5bc28d0-cf8e-5e81-a1e1-c6be791d8898,Ggpss Kankia Health Clinic,Kankia,202609,6,2400,969,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202604,8,450,1251,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202605,7,600,761,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202606,6,750,998,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202607,5,709,733,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202608,4,450,545,0,0
+e61153f9-a9db-5442-9a5d-2e3bf6fe694c,Kagadama Health Post,Kusada,202609,5,450,573,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202604,9,900,1991,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202605,12,1950,1622,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202606,7,450,1317,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202607,8,1200,1037,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202608,8,1500,1600,0,0
+e7386bc8-15be-520c-906e-6f72eb9cacaf,Kurra Katoge Health Clinic,Dutsin Ma,202609,12,1200,1696,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202604,19,1650,2416,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202605,13,2100,1842,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202606,11,1800,1876,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202607,15,2100,2359,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202608,14,2400,1880,0,0
+e81b0546-7b26-50d3-be6c-0896ef609dad,Daunaka Health Center,Ingawa,202609,11,1650,1850,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202604,26,5550,4042,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202605,23,3600,4181,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202606,33,3450,4536,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202607,29,4950,3969,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202608,29,4950,5241,0,0
+e8785749-c402-5d81-87b9-6e5123be7aef,Maigamawa Health Clinic,Kusada,202609,25,4050,3718,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202604,30,6450,4579,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202605,35,5250,5083,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202606,41,5250,6032,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202607,34,6150,5027,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202608,39,4950,4968,0,0
+e8d3d8c7-282e-5471-bf6b-8afb4db8e1b3,Alhazawa Health Clinic,Musawa,202609,51,5250,6516,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202604,11,300,1616,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202605,11,1800,1380,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202606,11,1800,1610,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202607,14,2550,2424,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202608,12,2550,2375,0,0
+e9764e29-7998-56c4-83c8-c754a86f3eb2,Bakankara Health Clinic,Mani,202609,13,2250,2128,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202604,8,300,1231,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202605,7,1350,1063,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202606,5,450,986,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202607,7,1500,1383,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202608,6,1350,1065,0,0
+eb2b148c-0a7d-5945-b46c-a3403045432b,Bidawa Dispensary,Zango,202609,6,1050,980,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202604,7,750,1106,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202605,5,450,847,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202606,6,600,911,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202607,6,1050,812,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202608,5,900,917,0,0
+eb45b26a-3de3-53b5-b461-f80668a155ea,Farun Bala Health Facility Center,Jibia,202609,10,750,1399,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202604,22,4500,3701,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202605,33,3900,4600,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202606,22,4200,3491,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202607,30,3450,4360,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202608,25,4800,3561,0,0
+ee127ba3-fad9-5be0-9c34-ffa5ea9de397,Safana Primary Health Center,Safana,202609,23,2850,3376,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202604,7,0,1191,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202605,8,1050,1197,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202606,9,1650,1438,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202607,17,2250,2346,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202608,11,2400,1815,0,0
+efa19e70-f87c-5267-a616-8d23ebb10574,Naalma Primary Health Center,Malumfashi,202609,17,2047,2251,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202604,17,2550,2476,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202605,14,2100,2310,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202606,18,2250,2904,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202607,15,2700,2023,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202608,11,1650,1917,0,0
+f02a6df2-bf97-5d1a-a1a4-e80a420cef2f,Faru Health Clinic,Bindawa,202609,16,1800,2301,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202604,36,5550,5151,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202605,24,4950,3858,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202606,27,4050,3872,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202607,30,3300,4307,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202608,23,3600,3191,0,0
+f0566faf-b844-5b70-be9e-21f36dcd423d,Asfa U Clinic,Katsina,202609,24,3450,3405,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202604,33,5700,5237,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202605,31,6150,4476,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202606,29,4308,4478,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202607,33,4350,5390,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202608,32,5700,4544,0,0
+f1411f69-e7af-5718-8488-fc8ac121c7c1,Kawo Health Clinic,Batagarawa,202609,35,5250,5195,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202604,18,1500,2693,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202605,17,3150,2428,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202606,16,2550,2486,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202607,21,2700,3030,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202608,18,3000,2468,0,0
+f2187cc1-33e9-5db9-878a-84ddd059aa35,Bayala Health Clinic,Kafur,202609,21,2700,3023,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202604,16,1650,2213,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202605,10,1200,1415,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202606,12,2250,1802,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202607,12,1350,2080,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202608,11,2400,1588,0,0
+f2f77034-4445-5087-ab45-c5b294f3f382,Bugaje Model Primary Health Center,Jibia,202609,9,1050,1268,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202604,24,4800,3523,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202605,17,3450,2608,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202606,21,3750,2742,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202607,24,4800,3646,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202608,13,3750,1902,0,0
+f309f145-611a-5a35-a2ba-c5d8e81ff332,Katoge Health Clinic,Batsari,202609,13,3450,1844,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202604,32,5850,4408,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202605,30,3450,4065,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202606,35,4500,5404,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202607,27,5550,4452,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202608,30,4650,5311,0,0
+f342139e-19a5-5345-a466-08603919da9d,Yardaddo Dispensary,Katsina,202609,31,4800,4057,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202604,30,5250,4657,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202605,22,4350,3563,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202606,20,3600,3491,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202607,30,3300,3982,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202608,17,2700,2862,0,0
+f4211857-28b8-511e-b6ec-4053153d4624,Birinya Health Clinic,Kurfi,202609,21,2700,3143,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202604,13,2250,2008,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202605,11,1200,1703,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202606,16,2400,2641,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202607,12,3000,2150,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202608,16,2100,2093,0,0
+f459b715-2cbe-5ae0-ab5a-88f72ca33ecb,Kawo Health Clinic,Bakori,202609,17,1800,2776,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202604,23,4050,3025,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202605,22,2850,3573,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202606,23,3450,2967,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202607,28,3900,4231,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202608,23,4350,3585,0,0
+f5c016e0-c4ea-5cea-a1d3-8129be3ca83c,Batsari General Hospital,Batsari,202609,24,3600,3598,0,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202604,20,3450,2472,0,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202605,20,3150,2593,0,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202606,27,2850,3438,0,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202607,23,3600,2950,20,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202608,32,4200,4295,0,0
+f5cb580c-f322-5ba9-aea4-7efee3ef1514,Bula Dispensary,Mashi,202609,31,4950,3619,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202604,33,5850,4588,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202605,41,4500,5724,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202606,30,5850,4553,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202607,37,4950,5813,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202608,29,5250,4573,0,0
+f61deffc-cb7b-5ff9-a5b0-68dbb820d768,Marke Dispensary,Dan Musa,202609,30,4350,4429,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202604,14,2550,2138,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202605,18,3000,2581,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202606,19,2049,2767,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202607,14,2081,1948,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202608,17,1950,2329,0,0
+f621b867-f8c7-5ef9-ab7c-29762fa69bde,Todai Health Clinic,Ingawa,202609,12,2400,1877,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202604,11,1500,1519,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202605,11,750,1547,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202606,10,2550,1671,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202607,14,1650,2096,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202608,15,2550,2041,0,0
+f63844ad-da41-5257-9f22-1a2b1bb22584,Dudi General Hospital,Malumfashi,202609,15,2700,2357,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202604,34,5700,4625,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202605,32,5250,4866,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202606,43,4800,6047,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202607,28,5550,4773,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202608,32,4800,4595,0,0
+f64dd637-d6f2-5cf5-8706-b48f157181ab,Larabawa Dispensary,Bindawa,202609,29,4200,5542,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202604,29,3150,3876,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202605,23,3600,3120,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202606,16,3900,3262,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202607,28,3150,4154,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202608,19,3750,3146,0,0
+f7058503-26c6-5dfb-a24c-e6b5da6d409e,Agiri Dispensary,Katsina,202609,26,3000,3693,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202604,28,6000,4228,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202605,8,4050,1048,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202606,30,3255,4577,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202607,8,4500,946,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202608,29,4650,4446,0,0
+f814a5f0-d0da-51af-84cd-4fc6a584eb93,Babbanduhu Health Clinic,Malumfashi,202609,25,5550,3073,12,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202604,42,6150,5834,0,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202605,25,5550,4468,0,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202606,32,3900,4266,0,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202607,43,4950,7603,0,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202608,31,5700,4683,20,0
+f865eaf6-0484-5d08-8696-7915537c0b36,Agala Health Clinic,Baure,202609,40,5400,6270,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202604,20,6900,3375,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202605,14,4800,2913,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202606,19,3900,3216,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202607,15,4800,1915,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202608,23,3600,2887,0,0
+f9206b25-5bff-5af7-8465-03c4fb1d0748,Unguwar Maigayya Health Clinic,Dandume,202609,31,3600,3882,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202604,34,5700,4928,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202605,26,5400,4230,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202606,28,4200,4130,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202607,38,4500,5375,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202608,22,4350,3927,0,0
+f9a229c2-665b-5922-9c87-3f4cafdbdd98,Tsagem Health Clinic,Mani,202609,30,4200,4683,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202604,10,1800,1631,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202605,9,750,1252,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202606,12,1650,1841,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202607,10,1800,1475,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202608,9,1200,1477,0,0
+f9c5b2c1-9177-5435-83a3-19c5135809ef,Hurtumi Health Clinic,Baure,202609,6,1200,1046,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202604,31,6750,4783,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202605,44,5100,6090,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202606,36,6150,4866,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202607,41,4650,5976,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202608,29,5700,4803,0,0
+f9f1a6de-2600-5db1-b4f7-316d7f9bc491,Sara Maternal and Child Health Clinic,Zango,202609,33,4650,4643,0,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202604,10,1050,1482,7,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202605,11,1500,1463,0,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202606,7,600,1141,0,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202607,4,600,679,0,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202608,4,150,481,0,0
+fb7cb43d-e91c-5484-8756-028fbe0a2678,Dan Awo Health Center,Safana,202609,3,450,363,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202604,11,600,1560,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202605,8,1350,1117,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202606,7,450,1019,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202607,14,1950,1932,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202608,11,1950,1369,0,0
+fc5c6599-7132-580a-a2fd-76ed92856592,Dutsinma General Hospital,Dutsin Ma,202609,16,1800,2080,0,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202604,28,5850,4437,0,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202605,25,3750,3998,0,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202606,34,3600,4818,0,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202607,22,4950,3855,0,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202608,27,4050,3901,7,0
+fcbfb093-a2f8-5e6f-a1e0-6b16bfce8538,Jewa Gari Health Post,Charanchi,202609,31,4050,4934,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202604,30,3750,4225,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202605,27,4950,3724,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202606,25,3150,3402,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202607,27,3450,4395,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202608,31,5400,4022,0,0
+fd94358e-8b3d-5029-93bf-f802ab09a161,Garango Dispensary,Kankara,202609,32,4500,4270,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202604,20,3450,3298,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202605,29,4650,4198,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202606,21,5100,3243,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202607,27,3900,4196,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202608,27,5400,3616,0,0
+fea7f823-43c5-5f4e-ac09-f0d87a079754,Mai Sabo Health Clinic,Faskari,202609,31,5700,4187,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202604,21,3900,4028,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202605,10,2550,1965,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202606,10,3300,1393,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202607,17,3300,2147,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202608,18,3750,2447,0,0
+ff7f8e55-b6da-55e4-a24e-7a232d72eec3,Kodar Jalli Dispensary,Charanchi,202609,13,3000,2386,0,0

@@ -1,0 +1,26 @@
+# Secrets — never commit real values. See .env.example files for the
+# variable names each part of the project expects.
+.env
+.env.*
+!.env.example
+!*/.env.example
+
+# Dependencies
+node_modules/
+
+# Next.js build output
+web/.next/
+web/out/
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# Temporary sample-data bookkeeping (tools/db/sample-findings.js)
+tools/db/.sample-findings-state.json
+tools/db/sample-assets/

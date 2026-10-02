@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Core -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- GPS capture (FusedLocationProviderClient) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Photo/selfie capture (CameraX, camera-only — no gallery) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+
+    <!-- Voice-to-text -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- TODO(fcm): POST_NOTIFICATIONS is required on API 33+ once FCM push is wired up (see NotificationsSetup TODO). -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <application
+        android:name=".TpmApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.TpmApp"
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="35">
+
+        <!-- Disable WorkManager's default eager auto-init (androidx.startup) so it doesn't
+             initialize itself with the default Configuration/WorkerFactory before
+             TpmApplication.onCreate() runs — that default init would win the race and
+             TpmApplication's Configuration.Provider (which supplies SyncWorkerFactory, the
+             thing that actually knows how to construct SyncWorker's non-default constructor)
+             would never take effect, leaving every SyncWorker instantiation to fail with
+             NoSuchMethodException on the reflective 2-arg fallback. See "on-demand
+             initialization" in the WorkManager docs. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.TpmApp.Splash"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Invitation/password-reset email redirect target — see Supabase.kt's Auth
+                 scheme/host config and AppSession.handleAuthDeepLink. singleTask above (not the
+                 default standard launchMode) so re-tapping the link while the app is already
+                 running delivers onNewIntent instead of spawning a second MainActivity instance. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="tpmapp" android:host="auth-callback" />
+            </intent-filter>
+        </activity>
+
+        <!-- Captured MOV/selfie photos are written to app-private storage and shared with CameraX/gallery-less flows via this provider. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!--
+        <service
+            android:name=".sync.TpmFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        -->
+
+        <!-- WorkManager auto-initializes via its own merged manifest provider; TpmApplication implements
+             Configuration.Provider so the sync worker is handed the app's repository/DI graph
+             (see SyncWorker + TODO(backend) for the real API contract). -->
+
+    </application>
+
+</manifest>

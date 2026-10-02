@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/industry-b38b4cf0-e0cb-4b3c-8394-93b8afaf9075/styles.css">
+  <script src="_ds/industry-b38b4cf0-e0cb-4b3c-8394-93b8afaf9075/_ds_bundle.js"></script>
+  <script src="./android-frame.jsx"></script>
+  <style>
+    body{margin:0;background:#dcdcdc;}
+    @keyframes tpmPulse{0%{transform:scale(0.85);opacity:.9}70%{transform:scale(1.8);opacity:0}100%{transform:scale(1.8);opacity:0}}
+    @keyframes tpmBar{0%,100%{transform:scaleY(0.3)}50%{transform:scaleY(1)}}
+    @keyframes tpmSpin{to{transform:rotate(360deg)}}
+    @keyframes tpmRise{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+    @keyframes tpmSheet{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  </style>
+</helmet>
+<x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" width="412" height="892" hint-size="412px,892px" style="{{ deviceWrapStyle }}">
+  <div style="{{ shellStyle }}">
+
+    <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+      <div style="{{ loginWrapStyle }}">
+        <div style="flex:1"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:36px">
+          <div class="blueprint" style="width:56px;height:56px;border-color:var(--color-accent);display:flex;align-items:center;justify-content:center;position:relative">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>
+          </div>
+          <h1 style="font-size:23px;margin:10px 0 0;letter-spacing:-0.01em;text-align:center">TPM Process Monitoring</h1>
+          <div class="text-muted" style="font-size:12.5px">Field Monitoring &amp; Issue Resolution</div>
+        </div>
+        <div class="field" style="margin-bottom:14px">
+          <label for="tpm-user">Username</label>
+          <input id="tpm-user" class="input" placeholder="e.g. chidinma.okafor" value="{{ username }}" onChange="{{ onUsernameChange }}"/>
+        </div>
+        <div class="field" style="margin-bottom:6px">
+          <label for="tpm-pass">Password</label>
+          <input id="tpm-pass" type="password" class="input" placeholder="••••••••" value="{{ password }}" onChange="{{ onPasswordChange }}"/>
+        </div>
+        <sc-if value="{{ loginError }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:var(--color-accent-800);margin-bottom:10px">{{ loginError }}</div>
+        </sc-if>
+        <button type="button" class="btn btn-ghost" style="align-self:flex-start;padding-left:0;margin-bottom:18px;font-size:12.5px" onClick="{{ onForgotPassword }}">Forgot password?</button>
+        <button type="button" class="btn btn-primary btn-block blueprint" style="height:46px;font-size:15px" onClick="{{ onLogin }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Log in</button>
+        <p class="text-muted" style="font-size:11px;text-align:center;margin-top:16px">Your role and profile are detected automatically after login.</p>
+        <div style="flex:1.4"></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ loggedIn }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ headerStyle }}">
+        <button type="button" class="btn btn-ghost btn-icon" style="{{ backBtnStyle }}" onClick="{{ onHeaderBack }}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+        </button>
+        <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
+          <div class="blueprint" style="width:26px;height:26px;border-color:var(--color-accent);display:flex;align-items:center;justify-content:center;position:relative;flex:none">
+            <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><path d="m8.5 12 2.5 2.5 5-5"/></svg>
+          </div>
+          <div style="min-width:0">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:18px;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ headerTitle }}</div>
+            <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+              <span class="tag tag-outline" style="margin-top:3px">{{ roleLabel }}</span>
+            </sc-if>
+          </div>
+        </div>
+        <button type="button" onClick="{{ onOpenProfile }}" style="width:36px;height:36px;border-radius:50%;background:var(--color-accent-800);color:var(--color-bg);border:none;display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:600;font-size:13px;cursor:pointer;flex:none">{{ userInitials }}</button>
+      </div>
+
+      <sc-if value="{{ showSyncBanner }}" hint-placeholder-val="{{ false }}">
+        <button type="button" onClick="{{ goToSyncQueue }}" style="{{ syncBannerStyle }}">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6.5 19h11z"/></svg>
+          <span style="flex:1;text-align:left">{{ syncBannerText }}</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+      </sc-if>
+
+      <div style="{{ contentStyle }}">
+
+        <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px 16px 8px">
+            <div style="font-size:13px" class="text-muted">Good day,</div>
+            <h2 style="font-size:24px;margin:2px 0 14px">{{ userName }}</h2>
+
+            <sc-if value="{{ isFM }}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="btn btn-primary btn-block blueprint" style="height:46px;font-size:14.5px;margin:0 0 18px" onClick="{{ startNewIssue }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>Register New Issue</button>
+            </sc-if>
+            <sc-if value="{{ isDri }}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="btn btn-primary btn-block blueprint" style="height:46px;font-size:14.5px;margin:0 0 18px" onClick="{{ startDriLookup }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Look Up Issue ID</button>
+            </sc-if>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
+              <sc-for list="{{ kpis }}" as="kpi" hint-placeholder-count="6">
+                <button type="button" class="card blueprint" style="text-align:left;cursor:pointer;background:transparent;padding:12px" onClick="{{ kpi.onClick }}">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <div style="font-family:var(--font-heading);font-size:28px;font-weight:600;line-height:1">{{ kpi.count }}</div>
+                  <div class="text-muted" style="font-size:11.5px;margin-top:2px">{{ kpi.label }}</div>
+                </button>
+              </sc-for>
+            </div>
+
+            <h6 style="margin-bottom:10px">Recent Issues</h6>
+          </div>
+          <sc-for list="{{ recentIssues }}" as="ri" hint-placeholder-count="3">
+            <button type="button" style="{{ ri.rowStyle }}" onClick="{{ ri.onClick }}">
+              <div style="flex:1;min-width:0">
+                <div style="font-family:var(--font-heading);font-weight:600;font-size:13.5px">{{ ri.id }}</div>
+                <div class="text-muted" style="font-size:12px;margin-top:1px">{{ ri.site }} · {{ ri.dateReported }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                <span class="{{ ri.tagClass }}">{{ ri.statusLabel }}</span>
+                <sc-if value="{{ ri.slaOverdue }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">{{ ri.slaLabel }}</span></sc-if>
+              </div>
+            </button>
+          </sc-for>
+          <div style="height:20px"></div>
+        </sc-if>
+
+        <sc-if value="{{ isIssueList }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:14px 16px 4px;display:flex;gap:7px;overflow-x:auto">
+            <sc-for list="{{ filterChips }}" as="fc" hint-placeholder-count="6">
+              <button type="button" class="{{ fc.tagClass }}" style="border:none;cursor:pointer;white-space:nowrap;flex:none" onClick="{{ fc.onClick }}">{{ fc.label }}</button>
+            </sc-for>
+          </div>
+          <sc-if value="{{ issueListEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:60px 30px;text-align:center" class="text-muted">
+              <div style="font-size:13px">No issues in this filter yet.</div>
+            </div>
+          </sc-if>
+          <div style="padding-top:6px">
+            <sc-for list="{{ filteredIssues }}" as="fi" hint-placeholder-count="4">
+              <button type="button" style="{{ fi.rowStyle }}" onClick="{{ fi.onClick }}">
+                <div style="flex:1;min-width:0">
+                  <div style="font-family:var(--font-heading);font-weight:600;font-size:13.5px">{{ fi.id }}</div>
+                  <div class="text-muted" style="font-size:12px;margin-top:1px">{{ fi.category }} · {{ fi.site }}</div>
+                  <div class="text-muted" style="font-size:11px;margin-top:2px">{{ fi.dateReported }}</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+                  <span class="{{ fi.tagClass }}">{{ fi.statusLabel }}</span>
+                  <sc-if value="{{ fi.slaOverdue }}" hint-placeholder-val="{{ false }}"><span class="tag tag-outline">{{ fi.slaLabel }}</span></sc-if>
+                </div>
+              </button>
+            </sc-for>
+          </div>
+          <div style="height:24px"></div>
+        </sc-if>
+
+        <sc-if value="{{ isIssueDetail }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+            <div class="card blueprint elev-sm" style="position:relative;padding:16px">
+              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+                <div class="card-kicker">{{ det.category }}</div>
+                <span class="{{ det.tagClass }}">{{ det.statusLabel }}</span>
+              </div>
+              <div style="font-family:var(--font-heading);font-weight:600;font-size:19px;margin-top:2px">{{ det.id }}</div>
+              <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+                <span class="{{ det.severityClass }}">{{ det.severityLabel }}</span>
+                <sc-if value="{{ det.hasSla }}" hint-placeholder-val="{{ false }}"><span class="{{ det.slaClass }}">{{ det.slaLabel }}</span></sc-if>
+              </div>
+              <div class="text-muted" style="font-size:12.5px;margin-top:4px">{{ det.site }} · {{ det.ward }}, {{ det.lga }}, {{ det.state }}</div>
+              <p class="card-body" style="margin-top:10px">{{ det.description }}</p>
+              <div class="card-meta" style="margin-top:8px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg><span>Reported by {{ det.reporter }} · {{ det.dateReported }}</span></div>
+            </div>
+
+            <div>
+              <h6 style="margin-bottom:8px">Evidence</h6>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="blueprint" style="position:relative;aspect-ratio:4/3;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                  <span style="font-size:10.5px" class="text-muted">MOV Photo</span>
+                </div>
+                <div class="blueprint" style="position:relative;aspect-ratio:4/3;background:var(--color-neutral-200);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+                  <span style="font-size:10.5px" class="text-muted">Selfie</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h6 style="margin-bottom:8px">Geographic Records</h6>
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ det.locations }}" as="loc" hint-placeholder-count="1">
+                  <div class="blueprint" style="position:relative;padding:10px 12px;display:flex;align-items:center;gap:10px">
+                    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <div style="flex:1">
+                      <div style="font-size:11.5px" class="text-muted">{{ loc.label }}</div>
+                      <div style="font-family:ui-monospace,monospace;font-size:12.5px">{{ loc.coords }}</div>
+                    </div>
+                    <span class="tag tag-neutral">±{{ loc.acc }}m</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div>
+              <h6 style="margin-bottom:8px">Case History</h6>
+              <div style="display:flex;flex-direction:column">
+                <sc-for list="{{ det.history }}" as="ev" hint-placeholder-count="3">
+                  <div style="display:flex;gap:12px;padding-bottom:16px;position:relative">
+                    <div style="flex:none;display:flex;flex-direction:column;align-items:center;width:14px">
+                      <div style="width:9px;height:9px;border-radius:50%;background:var(--color-accent);flex:none;margin-top:4px"></div>
+                      <sc-if value="{{ ev.showLine }}" hint-placeholder-val="{{ true }}"><div style="flex:1;width:1px;background:var(--color-divider);margin-top:4px"></div></sc-if>
+                    </div>
+                    <div style="flex:1;padding-bottom:2px">
+                      <div style="font-family:var(--font-heading);font-weight:600;font-size:13.5px">{{ ev.event }}</div>
+                      <div class="text-muted" style="font-size:11.5px;margin-top:2px">{{ ev.user }} · {{ ev.date }} {{ ev.time }}</div>
+                      <div class="text-muted" style="font-size:11.5px">{{ ev.location }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="height:70px"></div>
+          </div>
+
+          <sc-if value="{{ det.ctaVisible }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ stickyFooterStyle }}">
+              <button type="button" class="btn btn-primary btn-block blueprint" style="height:46px;margin:0" onClick="{{ det.ctaAction }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ det.ctaLabel }}</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ det.showHomeCta }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ stickyFooterStyle }}">
+              <button type="button" class="btn btn-secondary btn-block blueprint" style="height:46px;margin:0" onClick="{{ goHome }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Close &amp; Back to Home</button>
+            </div>
+          </sc-if>
+        </sc-if>
+
+        <sc-if value="{{ isNewIssue }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ progressWrapStyle }}">
+            <div class="text-muted" style="font-size:11.5px;margin-bottom:5px">Step {{ ni.step }} of 6 · {{ ni.stepLabel }}</div>
+            <div style="height:4px;background:var(--color-divider);position:relative"><div style="{{ ni.progressBarStyle }}"></div></div>
+          </div>
+
+          <sc-if value="{{ ni.onStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Location</h4>
+              <div class="field"><label>State</label>
+                <select class="input" value="{{ ni.stateName }}" onChange="{{ ni.onStateChange }}">
+                  <option value="">Select state</option>
+                  <sc-for list="{{ stateOptions }}" as="s" hint-placeholder-count="3"><option value="{{ s }}">{{ s }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>LGA</label>
+                <select class="input" value="{{ ni.lga }}" onChange="{{ ni.onLgaChange }}" disabled="{{ ni.lgaDisabled }}">
+                  <option value="">Select LGA</option>
+                  <sc-for list="{{ ni.lgaOptions }}" as="l" hint-placeholder-count="2"><option value="{{ l }}">{{ l }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Ward</label>
+                <select class="input" value="{{ ni.ward }}" onChange="{{ ni.onWardChange }}" disabled="{{ ni.wardDisabled }}">
+                  <option value="">Select ward</option>
+                  <sc-for list="{{ ni.wardOptions }}" as="w" hint-placeholder-count="2"><option value="{{ w }}">{{ w }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Settlement</label>
+                <select class="input" value="{{ ni.settlement }}" onChange="{{ ni.onSettlementChange }}" disabled="{{ ni.settlementDisabled }}">
+                  <option value="">Select settlement</option>
+                  <sc-for list="{{ ni.settlementOptions }}" as="stl" hint-placeholder-count="2"><option value="{{ stl }}">{{ stl }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Activity Site</label>
+                <select class="input" value="{{ ni.site }}" onChange="{{ ni.onSiteChange }}" disabled="{{ ni.siteDisabled }}">
+                  <option value="">Select site</option>
+                  <sc-for list="{{ ni.siteOptions }}" as="st" hint-placeholder-count="2"><option value="{{ st }}">{{ st }}</option></sc-for>
+                </select>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ ni.onStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Issue Details</h4>
+              <div class="field"><label>Issue category</label>
+                <select class="input" value="{{ ni.category }}" onChange="{{ ni.onCategoryChange }}">
+                  <option value="">Select category</option>
+                  <sc-for list="{{ categoryOptions }}" as="c" hint-placeholder-count="4"><option value="{{ c }}">{{ c }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field"><label>Severity</label>
+                <div class="seg" style="width:100%">
+                  <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="niseverity" checked="{{ ni.sevHigh }}" onChange="{{ ni.onSeverityHigh }}"/>High</label>
+                  <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="niseverity" checked="{{ ni.sevMedium }}" onChange="{{ ni.onSeverityMedium }}"/>Medium</label>
+                  <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="niseverity" checked="{{ ni.sevLow }}" onChange="{{ ni.onSeverityLow }}"/>Low</label>
+                </div>
+              </div>
+              <div class="field">
+                <label>Issue description</label>
+                <textarea class="input" rows="4" placeholder="Describe what you observed…" value="{{ ni.description }}" onChange="{{ ni.onDescriptionChange }}"></textarea>
+                <button type="button" class="btn btn-secondary blueprint" style="margin-top:8px;font-size:12.5px" onClick="{{ ni.onVoice }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>Speak instead</button>
+              </div>
+              <div class="field"><label>Date of registration</label>
+                <input type="date" class="input" value="{{ ni.date }}" max="{{ today }}" onChange="{{ ni.onDateChange }}"/>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ ni.onStep3 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px">
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px;font-weight:600;font-family:var(--font-heading);margin-bottom:8px">{{ ni.gpsField.title }}</div>
+                <sc-if value="{{ ni.gpsField.gps }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:ui-monospace,monospace;font-size:13.5px">{{ ni.gpsField.coords }}</div>
+                  <span class="{{ ni.gpsField.accTagClass }}" style="margin-top:6px;display:inline-flex">±{{ ni.gpsField.acc }}m accuracy</span>
+                </sc-if>
+                <sc-if value="{{ ni.gpsField.noGps }}" hint-placeholder-val="{{ true }}">
+                  <div class="text-muted" style="font-size:12.5px">Not captured yet.</div>
+                </sc-if>
+                <button type="button" class="btn {{ ni.gpsField.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ ni.gpsField.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ ni.gpsField.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ni.onStep4 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px">
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ ni.movSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ ni.movSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ ni.movSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ ni.movSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ ni.movSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ ni.movSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ ni.movSlot.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ ni.onStep5 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px">
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ ni.selfieSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ ni.selfieSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ ni.selfieSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ ni.selfieSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ ni.selfieSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ ni.selfieSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ ni.selfieSlot.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ ni.onStep6 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:12px">
+              <h4 style="margin:0">Review &amp; Submit</h4>
+              <div class="card blueprint" style="position:relative;padding:14px;gap:6px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px"><b>Location:</b> {{ ni.site }}, {{ ni.settlement }}, {{ ni.ward }}, {{ ni.lga }}, {{ ni.stateName }}</div>
+                <div style="font-size:12.5px"><b>Category:</b> {{ ni.category }}</div>
+                <div style="font-size:12.5px"><b>Description:</b> {{ ni.description }}</div>
+                <div style="font-size:12.5px"><b>Date:</b> {{ ni.date }}</div>
+                <div style="font-size:12.5px"><b>GPS:</b> {{ ni.gpsSummary }}</div>
+                <div style="font-size:12.5px"><b>MOV photo:</b> Captured ✓</div>
+                <div style="font-size:12.5px"><b>Selfie:</b> Captured ✓</div>
+              </div>
+              <p class="text-muted" style="font-size:11.5px">Your name, ID and role are attached automatically. A unique Issue ID will be generated on submit.</p>
+            </div>
+          </sc-if>
+
+          <div style="{{ stickyFooterWrapStyle }}">
+            <sc-if value="{{ ni.stepWarning }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ warningTextStyle }}">⚠ {{ ni.stepWarning }}</div>
+            </sc-if>
+            <div style="{{ stickyFooterRowStyle }}">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1;height:44px" onClick="{{ ni.onBack }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Back</button>
+              <sc-if value="{{ ni.isLastStep }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ ni.stepBlocked }}" onClick="{{ ni.onSubmit }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Submit Issue</button>
+              </sc-if>
+              <sc-if value="{{ !ni.isLastStep }}" hint-placeholder-val="{{ true }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ ni.stepBlocked }}" onClick="{{ ni.onNext }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Continue</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isDriRespond }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ progressWrapStyle }}">
+            <div class="text-muted" style="font-size:11.5px;margin-bottom:5px">Step {{ dri.step }} of 6 · {{ dri.stepLabel }}</div>
+            <div style="height:4px;background:var(--color-divider);position:relative"><div style="{{ dri.progressBarStyle }}"></div></div>
+          </div>
+
+          <sc-if value="{{ dri.onStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Look Up Issue</h4>
+              <div class="field"><label>Issue ID</label>
+                <input class="input" placeholder="e.g. KAN-HLT-2026-000041" value="{{ dri.lookupId }}" onChange="{{ dri.onLookupChange }}"/>
+              </div>
+              <button type="button" class="btn btn-secondary blueprint" onClick="{{ dri.onSearch }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Search</button>
+              <sc-if value="{{ dri.lookupError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:var(--color-accent-800)">{{ dri.lookupError }}</div>
+              </sc-if>
+              <sc-if value="{{ dri.foundIssue }}" hint-placeholder-val="{{ false }}">
+                <div class="card blueprint" style="position:relative;padding:14px;gap:6px">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <div class="card-kicker">{{ dri.foundIssue.category }}</div>
+                  <div class="card-title">{{ dri.foundIssue.id }}</div>
+                  <div style="font-size:12.5px" class="text-muted">{{ dri.foundIssue.site }}, {{ dri.foundIssue.ward }}</div>
+                  <p class="card-body">{{ dri.foundIssue.description }}</p>
+                  <div class="card-meta"><span>Reported by {{ dri.foundIssue.reporter }} on {{ dri.foundIssue.dateReported }}</span></div>
+                </div>
+              </sc-if>
+              <div style="height:4px"></div>
+              <h6 style="margin:6px 0 4px">Or pick from assigned issues</h6>
+              <sc-for list="{{ driAssignable }}" as="ai" hint-placeholder-count="3">
+                <button type="button" style="{{ ai.rowStyle }}" onClick="{{ ai.onClick }}">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-family:var(--font-heading);font-weight:600;font-size:13px">{{ ai.id }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ ai.category }}</div>
+                  </div>
+                  <span class="{{ ai.tagClass }}">{{ ai.statusLabel }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dri.onStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Response</h4>
+              <div class="field"><label>Designation</label>
+                <select class="input" value="{{ dri.designation }}" onChange="{{ dri.onDesignationChange }}">
+                  <option value="">Select designation</option>
+                  <sc-for list="{{ designationOptions }}" as="d" hint-placeholder-count="4"><option value="{{ d }}">{{ d }}</option></sc-for>
+                </select>
+              </div>
+              <div class="field">
+                <label>Action taken / mitigation</label>
+                <textarea class="input" rows="4" placeholder="Describe the action taken…" value="{{ dri.action }}" onChange="{{ dri.onActionChange }}"></textarea>
+                <button type="button" class="btn btn-secondary blueprint" style="margin-top:8px;font-size:12.5px" onClick="{{ dri.onVoice }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>Speak instead</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dri.onStep3 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Date &amp; Location</h4>
+              <div class="field"><label>Date of action</label>
+                <input type="date" class="input" value="{{ dri.date }}" max="{{ today }}" onChange="{{ dri.onDateChange }}"/>
+              </div>
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px;font-weight:600;font-family:var(--font-heading);margin-bottom:8px">{{ dri.gpsField.title }}</div>
+                <sc-if value="{{ dri.gpsField.gps }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:ui-monospace,monospace;font-size:13.5px">{{ dri.gpsField.coords }}</div>
+                  <span class="{{ dri.gpsField.accTagClass }}" style="margin-top:6px;display:inline-flex">±{{ dri.gpsField.acc }}m accuracy</span>
+                </sc-if>
+                <sc-if value="{{ dri.gpsField.noGps }}" hint-placeholder-val="{{ true }}">
+                  <div class="text-muted" style="font-size:12.5px">Not captured yet.</div>
+                </sc-if>
+                <button type="button" class="btn {{ dri.gpsField.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ dri.gpsField.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ dri.gpsField.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dri.onStep4 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Issue Status</h4>
+              <div class="seg" style="width:100%">
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="dristatus" checked="{{ dri.statusOngoing }}" onChange="{{ dri.onStatusOngoing }}"/>Ongoing</label>
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="dristatus" checked="{{ dri.statusResolved }}" onChange="{{ dri.onStatusResolved }}"/>Resolved</label>
+              </div>
+              <p class="text-muted" style="font-size:12px">{{ dri.statusHint }}</p>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dri.onStep5 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ dri.movSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ dri.movSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ dri.movSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ dri.movSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ dri.movSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ dri.movSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ dri.movSlot.btnLabel }}</button>
+              </div>
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ dri.selfieSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ dri.selfieSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ dri.selfieSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ dri.selfieSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ dri.selfieSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ dri.selfieSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ dri.selfieSlot.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ dri.onStep6 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:12px">
+              <h4 style="margin:0">Review &amp; Submit</h4>
+              <div class="card blueprint" style="position:relative;padding:14px;gap:6px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px"><b>Issue:</b> {{ dri.foundIssue.id }}</div>
+                <div style="font-size:12.5px"><b>Designation:</b> {{ dri.designation }}</div>
+                <div style="font-size:12.5px"><b>Action taken:</b> {{ dri.action }}</div>
+                <div style="font-size:12.5px"><b>Status:</b> {{ dri.status }}</div>
+                <div style="font-size:12.5px"><b>GPS:</b> {{ dri.gpsSummary }}</div>
+                <div style="font-size:12.5px"><b>MOV / Selfie:</b> Captured ✓</div>
+              </div>
+              <sc-if value="{{ dri.statusResolved }}" hint-placeholder-val="{{ false }}">
+                <p class="text-muted" style="font-size:11.5px">Marking Resolved notifies the original Field Monitor for final verification — it does not close the issue.</p>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <div style="{{ stickyFooterWrapStyle }}">
+            <sc-if value="{{ dri.stepWarning }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ warningTextStyle }}">⚠ {{ dri.stepWarning }}</div>
+            </sc-if>
+            <div style="{{ stickyFooterRowStyle }}">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1;height:44px" onClick="{{ dri.onBack }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Back</button>
+              <sc-if value="{{ dri.isLastStep }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ dri.stepBlocked }}" onClick="{{ dri.onSubmit }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Submit Response</button>
+              </sc-if>
+              <sc-if value="{{ !dri.isLastStep }}" hint-placeholder-val="{{ true }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ dri.stepBlocked }}" onClick="{{ dri.onNext }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Continue</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isFinalVerify }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ progressWrapStyle }}">
+            <div class="text-muted" style="font-size:11.5px;margin-bottom:5px">Step {{ fv.step }} of 5 · {{ fv.stepLabel }}</div>
+            <div style="height:4px;background:var(--color-divider);position:relative"><div style="{{ fv.progressBarStyle }}"></div></div>
+          </div>
+
+          <sc-if value="{{ fv.onStep1 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Look Up Issue</h4>
+              <div class="field"><label>Issue ID</label>
+                <input class="input" placeholder="e.g. LAG-HLT-2026-000052" value="{{ fv.lookupId }}" onChange="{{ fv.onLookupChange }}"/>
+              </div>
+              <button type="button" class="btn btn-secondary blueprint" onClick="{{ fv.onSearch }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Search</button>
+              <sc-if value="{{ fv.lookupError }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:12.5px;color:var(--color-accent-800)">{{ fv.lookupError }}</div>
+              </sc-if>
+              <sc-if value="{{ fv.foundIssue }}" hint-placeholder-val="{{ false }}">
+                <div class="card blueprint" style="position:relative;padding:14px;gap:6px">
+                  <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                  <div class="card-title">{{ fv.foundIssue.id }}</div>
+                  <div style="font-size:12.5px" class="text-muted">DRI response by {{ fv.foundIssue.driResponse.name }}</div>
+                  <p class="card-body">{{ fv.foundIssue.driResponse.action }}</p>
+                </div>
+                <h6 style="margin:6px 0 4px">Case History</h6>
+                <sc-for list="{{ fv.foundIssue.history }}" as="ev" hint-placeholder-count="3">
+                  <div style="display:flex;gap:10px;padding-bottom:10px">
+                    <div style="width:7px;height:7px;border-radius:50%;background:var(--color-accent);flex:none;margin-top:5px"></div>
+                    <div style="flex:1">
+                      <div style="font-size:12.5px;font-weight:600;font-family:var(--font-heading)">{{ ev.event }}</div>
+                      <div class="text-muted" style="font-size:11px">{{ ev.user }} · {{ ev.date }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </sc-if>
+              <sc-if value="{{ fv.verifiable }}" hint-placeholder-val="{{ false }}"><div style="height:2px"></div></sc-if>
+              <h6 style="margin:6px 0 4px">Or pick from your queue</h6>
+              <sc-for list="{{ fvAssignable }}" as="vi" hint-placeholder-count="2">
+                <button type="button" style="{{ vi.rowStyle }}" onClick="{{ vi.onClick }}">
+                  <div style="flex:1;min-width:0">
+                    <div style="font-family:var(--font-heading);font-weight:600;font-size:13px">{{ vi.id }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ vi.category }}</div>
+                  </div>
+                  <span class="tag tag-accent">Awaiting verification</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ fv.onStep2 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Confirm Resolution</h4>
+              <p style="font-size:13px" class="text-muted">Did the DRI's corrective action adequately resolve the reported issue?</p>
+              <div class="seg" style="width:100%">
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="fvconfirm" checked="{{ fv.isYes }}" onChange="{{ fv.onYes }}"/>Yes</label>
+                <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="fvconfirm" checked="{{ fv.isNo }}" onChange="{{ fv.onNo }}"/>No</label>
+              </div>
+              <sc-if value="{{ fv.isNo }}" hint-placeholder-val="{{ false }}">
+                <div class="field">
+                  <label>Why does the issue remain unresolved? (required)</label>
+                  <textarea class="input" rows="4" placeholder="Explain what is still wrong…" value="{{ fv.comment }}" onChange="{{ fv.onCommentChange }}"></textarea>
+                  <button type="button" class="btn btn-secondary blueprint" style="margin-top:8px;font-size:12.5px" onClick="{{ fv.onVoice }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>Speak instead</button>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ fv.onStep3 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <h4 style="margin:0">Date &amp; Location</h4>
+              <div class="field"><label>Date of confirmation</label>
+                <input type="date" class="input" value="{{ fv.date }}" max="{{ today }}" onChange="{{ fv.onDateChange }}"/>
+              </div>
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px;font-weight:600;font-family:var(--font-heading);margin-bottom:8px">{{ fv.gpsField.title }}</div>
+                <sc-if value="{{ fv.gpsField.gps }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-family:ui-monospace,monospace;font-size:13.5px">{{ fv.gpsField.coords }}</div>
+                  <span class="{{ fv.gpsField.accTagClass }}" style="margin-top:6px;display:inline-flex">±{{ fv.gpsField.acc }}m accuracy</span>
+                </sc-if>
+                <sc-if value="{{ fv.gpsField.noGps }}" hint-placeholder-val="{{ true }}">
+                  <div class="text-muted" style="font-size:12.5px">Not captured yet.</div>
+                </sc-if>
+                <button type="button" class="btn {{ fv.gpsField.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ fv.gpsField.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ fv.gpsField.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ fv.onStep4 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:14px">
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ fv.selfieSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ fv.selfieSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 0 0-16 0"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ fv.selfieSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ fv.selfieSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ fv.selfieSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ fv.selfieSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ fv.selfieSlot.btnLabel }}</button>
+              </div>
+              <div class="blueprint" style="position:relative;padding:14px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div style="width:48px;height:48px;flex:none;background:var(--color-neutral-200);display:flex;align-items:center;justify-content:center">
+                    <sc-if value="{{ fv.movSlot.captured }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6"><path d="M20 6 9 17l-5-5"/></svg></sc-if>
+                    <sc-if value="{{ fv.movSlot.notCaptured }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></sc-if>
+                  </div>
+                  <div style="flex:1">
+                    <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ fv.movSlot.label }}</div>
+                    <div class="text-muted" style="font-size:11.5px">{{ fv.movSlot.hint }}</div>
+                  </div>
+                </div>
+                <button type="button" class="btn {{ fv.movSlot.btnClass }} btn-block blueprint" style="margin-top:10px" onClick="{{ fv.movSlot.onCapture }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>{{ fv.movSlot.btnLabel }}</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ fv.onStep5 }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:18px 16px 90px;display:flex;flex-direction:column;gap:12px">
+              <h4 style="margin:0">Review &amp; Submit</h4>
+              <div class="card blueprint" style="position:relative;padding:14px;gap:6px">
+                <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+                <div style="font-size:12.5px"><b>Issue:</b> {{ fv.foundIssue.id }}</div>
+                <div style="font-size:12.5px"><b>Confirmed resolved:</b> {{ fv.confirmedLabel }}</div>
+                <sc-if value="{{ fv.isNo }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px"><b>Comment:</b> {{ fv.comment }}</div></sc-if>
+                <div style="font-size:12.5px"><b>GPS:</b> {{ fv.gpsSummary }}</div>
+                <div style="font-size:12.5px"><b>Selfie:</b> Captured ✓</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <div style="{{ stickyFooterWrapStyle }}">
+            <sc-if value="{{ fv.stepWarning }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ warningTextStyle }}">⚠ {{ fv.stepWarning }}</div>
+            </sc-if>
+            <div style="{{ stickyFooterRowStyle }}">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1;height:44px" onClick="{{ fv.onBack }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Back</button>
+              <sc-if value="{{ fv.isLastStep }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ fv.stepBlocked }}" onClick="{{ fv.onSubmit }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Submit Verification</button>
+              </sc-if>
+              <sc-if value="{{ !fv.isLastStep }}" hint-placeholder-val="{{ true }}">
+                <button type="button" class="btn btn-primary blueprint" style="flex:2;height:44px" disabled="{{ fv.stepBlocked }}" onClick="{{ fv.onNext }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Continue</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isNotifications }}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{ notifEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:60px 30px;text-align:center" class="text-muted"><div style="font-size:13px">No notifications yet.</div></div>
+          </sc-if>
+          <sc-for list="{{ notifList }}" as="nt" hint-placeholder-count="3">
+            <button type="button" style="{{ nt.rowStyle }}" onClick="{{ nt.onClick }}">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.6" style="flex:none;margin-top:2px"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ nt.title }}</div>
+                <div class="text-muted" style="font-size:12px;margin-top:2px">{{ nt.body }}</div>
+                <div class="text-muted" style="font-size:10.5px;margin-top:4px">{{ nt.time }}</div>
+              </div>
+              <sc-if value="{{ nt.unread }}" hint-placeholder-val="{{ false }}"><div style="width:7px;height:7px;border-radius:50%;background:var(--color-accent);flex:none;margin-top:6px"></div></sc-if>
+            </button>
+          </sc-for>
+          <div style="height:20px"></div>
+        </sc-if>
+
+        <sc-if value="{{ isSyncQueue }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:16px">
+            <div class="card blueprint" style="position:relative;padding:14px;margin-bottom:14px">
+              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div style="font-size:13px">Offline-first: submissions save to this device first and sync automatically when a connection is available.</div>
+              <button type="button" class="btn btn-primary blueprint" style="margin-top:10px" onClick="{{ onSyncNow }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6.5 19h11z"/></svg>Sync Now</button>
+            </div>
+          </div>
+          <sc-if value="{{ syncEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:30px;text-align:center" class="text-muted"><div style="font-size:13px">Nothing queued — everything is synced.</div></div>
+          </sc-if>
+          <sc-for list="{{ syncList }}" as="sq" hint-placeholder-count="3">
+            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--color-divider)">
+              <div style="flex:1;min-width:0">
+                <div style="font-size:13px;font-weight:600;font-family:var(--font-heading)">{{ sq.issueId }}</div>
+                <div class="text-muted" style="font-size:11.5px">{{ sq.type }} · {{ sq.time }}</div>
+              </div>
+              <span class="{{ sq.tagClass }}">{{ sq.statusLabel }}</span>
+            </div>
+          </sc-for>
+          <div style="height:20px"></div>
+        </sc-if>
+
+        <sc-if value="{{ isMap }}" hint-placeholder-val="{{ false }}">
+          <x-import component-from-global-scope="IssueMap" from="./issue-map.jsx" issues="{{ mapIssues }}" on-select="{{ onMapSelect }}" hint-size="100%,700px" style="display:block;width:100%;height:700px"></x-import>
+        </sc-if>
+
+      </div>
+
+      <sc-if value="{{ showBottomNav }}" hint-placeholder-val="{{ false }}">
+        <div style="{{ bottomNavStyle }}">
+          <sc-for list="{{ navItems }}" as="nav" hint-placeholder-count="4">
+            <button type="button" style="{{ nav.style }}" onClick="{{ nav.onClick }}">
+              <span style="{{ nav.iconWrapStyle }}">{{ nav.icon }}<sc-if value="{{ nav.badge }}" hint-placeholder-val="{{ false }}"><span style="{{ badgeDotStyle }}"></span></sc-if></span>
+              <span style="font-size:10.5px">{{ nav.label }}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ toastStyle }}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--color-bg)" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>{{ toast }}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ profileSheetOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ sheetBackdropStyle }}" onClick="{{ onCloseProfile }}">
+        <div style="{{ sheetStyle }}" onClick="{{ stopProp }}">
+          <div style="display:flex;justify-content:center;margin-bottom:12px"><div style="width:36px;height:4px;background:var(--color-divider);border-radius:2px"></div></div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+            <div style="width:44px;height:44px;border-radius:50%;background:var(--color-accent-800);color:var(--color-bg);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:600;font-size:15px">{{ userInitials }}</div>
+            <div>
+              <div style="font-family:var(--font-heading);font-weight:600;font-size:16px">{{ userName }}</div>
+              <div class="text-muted" style="font-size:12px">{{ userSub }}</div>
+            </div>
+          </div>
+          <div class="field"><label>Preview as (demo)</label>
+            <div class="seg" style="width:100%">
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="roleseg" checked="{{ isFM }}" onChange="{{ onSetRoleFM }}"/>Field Monitor</label>
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="roleseg" checked="{{ isDri }}" onChange="{{ onSetRoleDri }}"/>DRI</label>
+            </div>
+          </div>
+          <div class="field"><label>Connectivity</label>
+            <div class="seg" style="width:100%">
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="connseg" checked="{{ isOnline }}" onChange="{{ onSetOnline }}"/>Online</label>
+              <label class="seg-opt" style="flex:1;justify-content:center"><input type="radio" name="connseg" checked="{{ offlineMode }}" onChange="{{ onSetOffline }}"/>Offline</label>
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary btn-block blueprint" style="margin-top:16px" onClick="{{ onLogout }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Log out</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ gpsModal.open }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ modalBackdropStyle }}">
+        <div style="{{ modalCardStyle }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:15px">{{ gpsModal.title }}</div>
+            <button type="button" class="btn btn-ghost btn-icon" onClick="{{ closeGps }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+          </div>
+          <sc-if value="{{ gpsModal.acquiring }}" hint-placeholder-val="{{ true }}">
+            <div style="height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+              <div style="position:relative;width:60px;height:60px;display:flex;align-items:center;justify-content:center">
+                <div style="{{ gpsPulseStyle }}"></div>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div class="text-muted" style="font-size:12.5px">Acquiring GPS signal…</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ gpsModal.done }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:8px 0 4px;display:flex;flex-direction:column;gap:10px">
+              <div style="font-family:ui-monospace,monospace;font-size:15px;text-align:center">{{ gpsModal.coords }}</div>
+              <div style="display:flex;justify-content:center"><span class="{{ gpsModal.accTagClass }}">±{{ gpsModal.acc }}m accuracy</span></div>
+              <sc-if value="{{ gpsModal.poor }}" hint-placeholder-val="{{ false }}">
+                <p class="text-muted" style="font-size:11.5px;text-align:center">Accuracy is low — recapture for a more precise fix, or continue if this is acceptable.</p>
+              </sc-if>
+            </div>
+          </sc-if>
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <sc-if value="{{ gpsModal.done }}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1" onClick="{{ recaptureGps }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Recapture</button>
+              <button type="button" class="btn btn-primary blueprint" style="flex:1" onClick="{{ confirmGps }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Use Location</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ cameraModal.open }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ modalBackdropStyle }}">
+        <div style="{{ modalCardStyle }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:15px">{{ cameraModal.title }}</div>
+            <button type="button" class="btn btn-ghost btn-icon" onClick="{{ closeCamera }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+          </div>
+          <sc-if value="{{ cameraModal.viewfinder }}" hint-placeholder-val="{{ true }}">
+            <div style="{{ cameraModal.frameStyle }}">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--color-neutral-500)" stroke-width="1.4"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </div>
+            <p class="text-muted" style="font-size:11.5px;text-align:center;margin:10px 0 0">Camera capture only — gallery upload is disabled for evidence integrity.</p>
+            <button type="button" class="btn btn-primary btn-block blueprint" style="margin-top:14px" onClick="{{ captureShot }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Capture</button>
+          </sc-if>
+          <sc-if value="{{ cameraModal.captured }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ cameraModal.frameStyle }};background:var(--color-neutral-300)">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-700)" stroke-width="1.5"><path d="M20 6 9 17l-5-5"/></svg>
+            </div>
+            <div class="text-muted" style="font-size:11px;text-align:center;margin-top:8px">Captured {{ cameraModal.timestamp }} · GPS attached</div>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1" onClick="{{ retakeShot }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Retake</button>
+              <button type="button" class="btn btn-primary blueprint" style="flex:1" onClick="{{ usePhoto }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Use Photo</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ voiceModal.open }}" hint-placeholder-val="{{ false }}">
+      <div style="{{ modalBackdropStyle }}">
+        <div style="{{ modalCardStyle }}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div style="font-family:var(--font-heading);font-weight:600;font-size:15px">Voice to Text</div>
+            <button type="button" class="btn btn-ghost btn-icon" onClick="{{ cancelVoice }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></svg></button>
+          </div>
+          <sc-if value="{{ voiceModal.idle }}" hint-placeholder-val="{{ true }}">
+            <div style="padding:20px 0;display:flex;flex-direction:column;align-items:center;gap:12px">
+              <button type="button" onClick="{{ startListening }}" style="width:64px;height:64px;border-radius:50%;border:1px solid var(--color-accent);background:var(--color-accent-100);display:flex;align-items:center;justify-content:center;cursor:pointer">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent-800)" stroke-width="1.6"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v1a7 7 0 0 1-14 0v-1"/><path d="M12 18v4"/><path d="M8 22h8"/></svg>
+              </button>
+              <div class="text-muted" style="font-size:12px">Tap to speak</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ voiceModal.listening }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:24px 0;display:flex;flex-direction:column;align-items:center;gap:12px">
+              <div style="display:flex;align-items:center;gap:4px;height:34px">
+                <sc-for list="{{ waveformBars }}" as="bar" hint-placeholder-count="9">
+                  <div style="{{ bar.style }}"></div>
+                </sc-for>
+              </div>
+              <div class="text-muted" style="font-size:12px">Listening…</div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ voiceModal.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <textarea class="input" rows="4" value="{{ voiceModal.transcript }}" onChange="{{ onEditTranscript }}"></textarea>
+              <p class="text-muted" style="font-size:11px">Review and edit the transcribed text before using it.</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{ voiceModal.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button type="button" class="btn btn-secondary blueprint" style="flex:1" onClick="{{ startListening }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Redo</button>
+              <button type="button" class="btn btn-primary blueprint" style="flex:1" onClick="{{ useTranscript }}"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>Use Text</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+  </div>
+</x-import>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STATE_DATA = {
+  Kano: { 'Kano Municipal': ['Sabon Gari', 'Fagge'], Nassarawa: ['Gwale', 'Naibawa'] },
+  Lagos: { Ikeja: ['Alausa', 'Oregun'], 'Eti-Osa': ['Lekki Phase 1', 'Ikoyi'] },
+  Niger: { Chanchaga: ['Tunga', 'Maitumbi'], Bosso: ['Maikunkele', 'Shata'] },
+};
+const STATE_CODES = { Kano: 'KAN', Lagos: 'LAG', Niger: 'NIG' };
+const CATEGORY_OPTIONS = ['Commodity Stockout', 'Cold Chain Failure', 'Health Worker Absenteeism', 'Infrastructure Damage', 'Data Discrepancy', 'Service Denial', 'Other'];
+const DESIGNATION_OPTIONS = ['LGA Desk Officer', 'M&E Officer', 'Program Officer', 'State Coordinator'];
+const SEVERITY_OPTIONS = ['High', 'Medium', 'Low'];
+const SLA_DAYS = { High: 2, Medium: 5, Low: 14 };
+const VOICE_TRANSCRIPTS = {
+  description: [
+    "The cold chain refrigerator at the facility has been non-functional for four days. Vaccines are being stored at a nearby facility as a temporary measure.",
+    "No RUTF stock has been available at this site since last week. Caregivers are being turned away without commodities.",
+    "The health worker assigned to this post was absent during the scheduled visit and has reportedly not been seen in two weeks.",
+  ],
+  action: [
+    "Contacted the LGA store officer and arranged an emergency restock. Commodities were delivered to the site this morning.",
+    "Escalated to the facility in-charge and a technician has been scheduled to repair the cold chain equipment within 48 hours.",
+    "Spoke with the ward supervisor. The health worker has been redeployed and a replacement is now covering the post.",
+  ],
+  comment: [
+    "The commodity delivered only covers half of the reported shortfall. A follow-up delivery is still required.",
+    "Visited the site again and the equipment is still not functioning. The reported repair did not take place.",
+    "The issue appears resolved on paper, but the health worker was still absent during my visit.",
+  ],
+};
+const FM_USER = { name: 'Chidinma Okafor', id: 'FM-2201', role: 'Field Monitor', org: 'eHealth Nigeria · TPM Programme' };
+const DRI_USER = { name: 'Ahmed Bello', id: 'DRI-1187', role: 'DRI', org: 'LGA Desk Officer · Kano Municipal' };
+
+function pad(n) { return String(n).padStart(6, '0'); }
+function todayStr() { return new Date().toISOString().slice(0, 10); }
+function jitter(base, amt) { return base + (Math.random() - 0.5) * amt; }
+function fmtCoords(lat, lng) { return lat.toFixed(5) + '° N, ' + lng.toFixed(5) + '° E'; }
+function computeSla(issue) {
+  if (!issue.severity || issue.status === 'Verified / Closed') return { hasSla: false, overdue: false, label: '', cls: '' };
+  const due = new Date(issue.dateReported + 'T00:00:00');
+  due.setDate(due.getDate() + SLA_DAYS[issue.severity]);
+  const diffDays = Math.ceil((due - new Date()) / 86400000);
+  const overdue = diffDays < 0;
+  return { hasSla: true, overdue, label: overdue ? ('Overdue ' + Math.abs(diffDays) + 'd') : ('Due in ' + diffDays + 'd'), cls: overdue ? 'tag tag-outline' : 'tag tag-neutral' };
+}
+function severityCls(sev) {
+  return { High: 'tag tag-outline', Medium: 'tag tag-accent', Low: 'tag tag-neutral' }[sev] || 'tag tag-neutral';
+}
+
+function seedIssues() {
+  return [
+    {
+      id: 'KAN-HLT-2026-000041', state: 'Kano', lga: 'Kano Municipal', ward: 'Sabon Gari', site: 'Sabon Gari PHC',
+      category: 'Commodity Stockout', severity: 'High',
+      description: 'No RUTF stock has been available at this site since last week. Caregivers are being turned away without commodities.',
+      reporter: FM_USER.name, dateReported: '2026-08-06',
+      gpsIssue: { lat: 12.00234, lng: 8.51789, acc: 6 },
+      status: 'New', driResponse: null, verification: null,
+      history: [{ event: 'Issue Registered', user: FM_USER.name, date: '2026-08-06', time: '10:12', location: 'Sabon Gari PHC' }],
+    },
+    {
+      id: 'KAN-HLT-2026-000038', state: 'Kano', lga: 'Nassarawa', ward: 'Gwale', site: 'Gwale PHC',
+      category: 'Cold Chain Failure', severity: 'High',
+      description: 'The cold chain refrigerator at the facility has been non-functional for four days. Vaccines are being stored at a nearby facility as a temporary measure.',
+      reporter: FM_USER.name, dateReported: '2026-08-01',
+      gpsIssue: { lat: 12.01122, lng: 8.49765, acc: 5 },
+      status: 'Ongoing',
+      driResponse: { name: DRI_USER.name, designation: 'LGA Desk Officer', action: 'Escalated to the facility in-charge and a technician has been scheduled to repair the cold chain equipment within 48 hours.', date: '2026-08-03', gps: { lat: 12.01130, lng: 8.49770, acc: 7 }, status: 'Ongoing' },
+      verification: null,
+      history: [
+        { event: 'Issue Registered', user: FM_USER.name, date: '2026-08-01', time: '09:20', location: 'Gwale PHC' },
+        { event: 'Issue Assigned', user: 'System', date: '2026-08-01', time: '09:25', location: '—' },
+        { event: 'DRI Response Logged', user: DRI_USER.name, date: '2026-08-03', time: '14:05', location: 'Gwale PHC' },
+      ],
+    },
+    {
+      id: 'LAG-HLT-2026-000052', state: 'Lagos', lga: 'Ikeja', ward: 'Alausa', site: 'Alausa PHC',
+      category: 'Health Worker Absenteeism', severity: 'Medium',
+      description: 'The health worker assigned to this post was absent during the scheduled visit and has reportedly not been seen in two weeks.',
+      reporter: FM_USER.name, dateReported: '2026-07-28',
+      gpsIssue: { lat: 6.60584, lng: 3.35891, acc: 4 },
+      status: 'Resolved — Pending Verification',
+      driResponse: { name: DRI_USER.name, designation: 'M&E Officer', action: 'Spoke with the ward supervisor. The health worker has been redeployed and a replacement is now covering the post.', date: '2026-07-30', gps: { lat: 6.60590, lng: 3.35900, acc: 6 }, status: 'Resolved' },
+      verification: null,
+      history: [
+        { event: 'Issue Registered', user: FM_USER.name, date: '2026-07-28', time: '11:40', location: 'Alausa PHC' },
+        { event: 'Issue Assigned', user: 'System', date: '2026-07-28', time: '11:45', location: '—' },
+        { event: 'DRI Response Logged', user: DRI_USER.name, date: '2026-07-30', time: '16:10', location: 'Alausa PHC' },
+        { event: 'DRI Marked Resolved', user: DRI_USER.name, date: '2026-07-30', time: '16:12', location: 'Alausa PHC' },
+      ],
+    },
+    {
+      id: 'NIG-HLT-2026-000019', state: 'Niger', lga: 'Chanchaga', ward: 'Tunga', site: 'Tunga PHC',
+      category: 'Infrastructure Damage', severity: 'High',
+      description: 'The roof of the outpatient ward collapsed partially after recent rains, exposing patient waiting areas.',
+      reporter: FM_USER.name, dateReported: '2026-07-10',
+      gpsIssue: { lat: 9.61456, lng: 6.55123, acc: 5 },
+      status: 'Verified / Closed',
+      driResponse: { name: DRI_USER.name, designation: 'State Coordinator', action: 'Mobilised local contractor for emergency roof repair; work completed and inspected on site.', date: '2026-07-15', gps: { lat: 9.61460, lng: 6.55130, acc: 6 }, status: 'Resolved' },
+      verification: { confirmed: true, comment: '', date: '2026-07-20', gps: { lat: 9.61458, lng: 6.55125, acc: 5 } },
+      history: [
+        { event: 'Issue Registered', user: FM_USER.name, date: '2026-07-10', time: '08:30', location: 'Tunga PHC' },
+        { event: 'Issue Assigned', user: 'System', date: '2026-07-10', time: '08:35', location: '—' },
+        { event: 'DRI Response Logged', user: DRI_USER.name, date: '2026-07-15', time: '13:00', location: 'Tunga PHC' },
+        { event: 'DRI Marked Resolved', user: DRI_USER.name, date: '2026-07-15', time: '13:02', location: 'Tunga PHC' },
+        { event: 'Final Verification — Confirmed Resolved', user: FM_USER.name, date: '2026-07-20', time: '10:15', location: 'Tunga PHC' },
+      ],
+    },
+    {
+      id: 'LAG-HLT-2026-000047', state: 'Lagos', lga: 'Eti-Osa', ward: 'Lekki Phase 1', site: 'Lekki Phase 1 PHC',
+      category: 'Data Discrepancy', severity: 'Low',
+      description: 'Facility register shows 340 doses administered this month, but commodity ledger only accounts for 210 doses received.',
+      reporter: FM_USER.name, dateReported: '2026-07-15',
+      gpsIssue: { lat: 6.43965, lng: 3.47259, acc: 5 },
+      status: 'Reopened',
+      driResponse: { name: DRI_USER.name, designation: 'Program Officer', action: 'Reviewed the register with facility staff and corrected the entry for the affected week.', date: '2026-07-18', gps: { lat: 6.43970, lng: 3.47265, acc: 6 }, status: 'Resolved' },
+      verification: { confirmed: false, comment: 'The issue appears resolved on paper, but the health worker was still absent during my visit.', date: '2026-07-22', gps: { lat: 6.43968, lng: 3.47260, acc: 5 } },
+      history: [
+        { event: 'Issue Registered', user: FM_USER.name, date: '2026-07-15', time: '09:00', location: 'Lekki Phase 1 PHC' },
+        { event: 'Issue Assigned', user: 'System', date: '2026-07-15', time: '09:05', location: '—' },
+        { event: 'DRI Response Logged', user: DRI_USER.name, date: '2026-07-18', time: '15:20', location: 'Lekki Phase 1 PHC' },
+        { event: 'DRI Marked Resolved', user: DRI_USER.name, date: '2026-07-18', time: '15:22', location: 'Lekki Phase 1 PHC' },
+        { event: 'Final Verification — Not Resolved', user: FM_USER.name, date: '2026-07-22', time: '11:30', location: 'Lekki Phase 1 PHC' },
+        { event: 'Issue Reopened', user: 'System', date: '2026-07-22', time: '11:31', location: '—' },
+      ],
+    },
+  ];
+}
+
+function seedNotifications() {
+  return [
+    { id: 1, role: 'fieldMonitor', issueId: 'LAG-HLT-2026-000052', title: 'Issue awaiting your verification', body: 'DRI marked LAG-HLT-2026-000052 as resolved.', time: '2 days ago', unread: true },
+    { id: 2, role: 'fieldMonitor', issueId: 'LAG-HLT-2026-000047', title: 'Verification rejected — reopened', body: 'You reopened LAG-HLT-2026-000047; DRI has been notified.', time: '2 weeks ago', unread: false },
+    { id: 3, role: 'dri', issueId: 'KAN-HLT-2026-000041', title: 'New issue assigned', body: 'KAN-HLT-2026-000041 needs your response.', time: '1 day ago', unread: true },
+    { id: 4, role: 'dri', issueId: 'LAG-HLT-2026-000047', title: 'Additional action required', body: 'Field Monitor rejected your resolution on LAG-HLT-2026-000047.', time: '2 weeks ago', unread: false },
+  ];
+}
+
+const niValidArr = ni => [
+  !!(ni.stateName && ni.lga && ni.ward && ni.settlement && ni.site),
+  !!(ni.category && ni.severity && ni.description.trim() && ni.date),
+  !!ni.gps, !!ni.movCaptured, !!ni.selfieCaptured, true,
+];
+const driValidArr = dri => [
+  !!dri.foundIssue, !!(dri.designation && dri.action.trim()), !!(dri.date && dri.gps), !!dri.status, !!(dri.movCaptured && dri.selfieCaptured), true,
+];
+const fvValidArr = fv => [
+  !!fv.foundIssue, fv.confirmed === true || (fv.confirmed === false && fv.comment.trim()), !!(fv.date && fv.gps), !!fv.selfieCaptured, true,
+];
+const emptyNewIssue = () => ({ step: 1, stateName: '', lga: '', ward: '', settlement: '', site: '', category: '', severity: '', description: '', date: todayStr(), gps: null, movCaptured: false, selfieCaptured: false });
+const emptyDri = () => ({ step: 1, lookupId: '', lookupError: '', foundIssue: null, designation: '', action: '', date: todayStr(), gps: null, status: 'Ongoing', movCaptured: false, selfieCaptured: false });
+const emptyVerify = () => ({ step: 1, lookupId: '', lookupError: '', foundIssue: null, confirmed: null, comment: '', date: todayStr(), gps: null, movCaptured: false, selfieCaptured: false, movSkipped: false });
+
+class Component extends DCLogic {
+  state = {
+    loggedIn: false, username: '', password: '', loginError: '',
+    role: 'fieldMonitor', screen: 'login', navHistory: [],
+    profileSheetOpen: false, offlineMode: false, toast: null,
+    issues: seedIssues(), notifications: seedNotifications(), syncQueue: [], nextSeq: 53,
+    issueFilter: 'all', selectedIssueId: null,
+    newIssue: emptyNewIssue(), dri: emptyDri(), verify: emptyVerify(),
+    gpsModal: { open: false, ctx: null, phase: 'idle', lat: 0, lng: 0, acc: 0 },
+    cameraModal: { open: false, ctx: null, kind: null, phase: 'viewfinder', timestamp: '' },
+    voiceModal: { open: false, ctx: null, field: null, phase: 'idle', transcript: '' },
+  };
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._toastT);
+    this._toastT = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+
+  navigate(screen) {
+    this.setState(s => ({ navHistory: [...s.navHistory, s.screen], screen }));
+  }
+  tabNavigate(screen) {
+    this.setState({ navHistory: [], screen });
+  }
+  goBack() {
+    this.setState(s => {
+      const h = [...s.navHistory];
+      const prev = h.pop();
+      return { navHistory: h, screen: prev !== undefined ? prev : 'home' };
+    });
+  }
+  onHeaderBack = () => {
+    const s = this.state;
+    if (s.screen === 'newIssue' && s.newIssue.step > 1) { this.setState(st => ({ newIssue: { ...st.newIssue, step: st.newIssue.step - 1 } })); return; }
+    if (s.screen === 'driRespond' && s.dri.step > 1) { this.setState(st => ({ dri: { ...st.dri, step: st.dri.step - 1 } })); return; }
+    if (s.screen === 'finalVerify' && s.verify.step > 1) { this.setState(st => ({ verify: { ...st.verify, step: st.verify.step - 1 } })); return; }
+    this.goBack();
+  };
+
+  onUsernameChange = e => this.setState({ username: e.target.value });
+  onPasswordChange = e => this.setState({ password: e.target.value });
+  onForgotPassword = () => this.showToast('Password reset link sent to your registered email.');
+  onLogin = () => {
+    if (!this.state.username.trim() || !this.state.password.trim()) { this.setState({ loginError: 'Enter your username and password.' }); return; }
+    this.setState({ loggedIn: true, loginError: '', navHistory: [], screen: 'home', role: 'fieldMonitor' });
+  };
+  onLogout = () => this.setState({ loggedIn: false, username: '', password: '', profileSheetOpen: false, navHistory: [], screen: 'login' });
+
+  onOpenProfile = () => this.setState({ profileSheetOpen: true });
+  onCloseProfile = () => this.setState({ profileSheetOpen: false });
+  stopProp = e => e.stopPropagation();
+  onSetRoleFM = () => this.setState({ role: 'fieldMonitor', navHistory: [], screen: 'home', issueFilter: 'all' });
+  onSetRoleDri = () => this.setState({ role: 'dri', navHistory: [], screen: 'home', issueFilter: 'all' });
+  onSetOnline = () => this.setState({ offlineMode: false });
+  onSetOffline = () => this.setState({ offlineMode: true });
+
+  updateDraft(ctx, patch) { this.setState(s => ({ [ctx]: { ...s[ctx], ...patch } })); }
+
+  startNewIssue = () => { this.setState({ newIssue: emptyNewIssue() }); this.navigate('newIssue'); };
+  startDriLookup = () => { this.setState({ dri: emptyDri() }); this.navigate('driRespond'); };
+  goToSyncQueue = () => this.navigate('syncQueue');
+
+  onNewIssueStateChange = e => this.updateDraft('newIssue', { stateName: e.target.value, lga: '', ward: '', site: '' });
+  onNewIssueLgaChange = e => this.updateDraft('newIssue', { lga: e.target.value, ward: '', site: '' });
+  onNewIssueWardChange = e => this.updateDraft('newIssue', { ward: e.target.value, settlement: '', site: '' });
+  onNewIssueSettlementChange = e => this.updateDraft('newIssue', { settlement: e.target.value, site: '' });
+  onNewIssueSiteChange = e => this.updateDraft('newIssue', { site: e.target.value });
+  onNewIssueCategoryChange = e => this.updateDraft('newIssue', { category: e.target.value });
+  onNewIssueSeverityHigh = () => this.updateDraft('newIssue', { severity: 'High' });
+  onNewIssueSeverityMedium = () => this.updateDraft('newIssue', { severity: 'Medium' });
+  onNewIssueSeverityLow = () => this.updateDraft('newIssue', { severity: 'Low' });
+  onNewIssueDescriptionChange = e => this.updateDraft('newIssue', { description: e.target.value });
+  onNewIssueDateChange = e => this.updateDraft('newIssue', { date: e.target.value });
+  newIssueNext = () => {
+    if (!niValidArr(this.state.newIssue)[this.state.newIssue.step - 1]) return;
+    this.setState(s => ({ newIssue: { ...s.newIssue, step: Math.min(6, s.newIssue.step + 1) } }));
+  };
+  newIssueBack = () => {
+    if (this.state.newIssue.step === 1) { this.goBack(); return; }
+    this.setState(s => ({ newIssue: { ...s.newIssue, step: s.newIssue.step - 1 } }));
+  };
+  submitNewIssue = () => {
+    const ni = this.state.newIssue;
+    if (niValidArr(ni).some(v => !v)) return;
+    const code = STATE_CODES[ni.stateName] || 'GEN';
+    const id = code + '-HLT-2026-' + pad(this.state.nextSeq);
+    const issue = {
+      id, state: ni.stateName, lga: ni.lga, ward: ni.ward, settlement: ni.settlement, site: ni.site, category: ni.category, severity: ni.severity,
+      description: ni.description, reporter: FM_USER.name, dateReported: ni.date,
+      gpsIssue: ni.gps, status: 'New', driResponse: null, verification: null,
+      history: [{ event: 'Issue Registered', user: FM_USER.name, date: ni.date, time: new Date().toTimeString().slice(0, 5), location: ni.site }],
+    };
+    const offline = this.state.offlineMode;
+    this.setState(s => ({
+      issues: [issue, ...s.issues], nextSeq: s.nextSeq + 1,
+      syncQueue: [{ localId: 'sq-' + Date.now(), issueId: id, type: 'New Issue', time: 'just now', status: offline ? 'pending' : 'synced' }, ...s.syncQueue],
+      newIssue: emptyNewIssue(), selectedIssueId: id, navHistory: [], screen: 'issueDetail',
+    }));
+    this.showToast('Issue ' + id + ' registered' + (offline ? ' — saved offline, pending sync.' : '.'));
+  };
+
+  onDriLookupChange = e => this.updateDraft('dri', { lookupId: e.target.value });
+  driSearch(idRaw) {
+    const id = (idRaw !== undefined ? idRaw : this.state.dri.lookupId).trim().toUpperCase();
+    const issue = this.state.issues.find(i => i.id.toUpperCase() === id);
+    if (!issue) { this.updateDraft('dri', { lookupError: 'No issue found with that ID.', foundIssue: null }); return; }
+    if (issue.status === 'Verified / Closed') { this.updateDraft('dri', { lookupError: 'This issue is already closed.', foundIssue: null }); return; }
+    this.updateDraft('dri', { lookupError: '', foundIssue: issue, lookupId: issue.id });
+  }
+  onDriSearch = () => this.driSearch();
+  pickDriIssue = id => { this.driSearch(id); this.setState(s => ({ dri: { ...s.dri, step: 2 } })); };
+  respondToIssue = id => { this.setState({ dri: emptyDri() }); this.driSearch(id); this.setState(s => ({ dri: { ...s.dri, step: 2 } })); this.navigate('driRespond'); };
+
+  onDriDesignationChange = e => this.updateDraft('dri', { designation: e.target.value });
+  onDriActionChange = e => this.updateDraft('dri', { action: e.target.value });
+  onDriDateChange = e => this.updateDraft('dri', { date: e.target.value });
+  onDriStatusOngoing = () => this.updateDraft('dri', { status: 'Ongoing' });
+  onDriStatusResolved = () => this.updateDraft('dri', { status: 'Resolved' });
+  driNext = () => {
+    if (!driValidArr(this.state.dri)[this.state.dri.step - 1]) return;
+    this.setState(s => ({ dri: { ...s.dri, step: Math.min(6, s.dri.step + 1) } }));
+  };
+  driBack = () => {
+    if (this.state.dri.step === 1) { this.goBack(); return; }
+    this.setState(s => ({ dri: { ...s.dri, step: s.dri.step - 1 } }));
+  };
+  submitDriResponse = () => {
+    const dri = this.state.dri;
+    if (driValidArr(dri).some(v => !v)) return;
+    const resolved = dri.status === 'Resolved';
+    const events = [{ event: 'DRI Response Logged', user: DRI_USER.name, date: dri.date, time: new Date().toTimeString().slice(0, 5), location: dri.foundIssue.site }];
+    if (resolved) events.push({ event: 'DRI Marked Resolved', user: DRI_USER.name, date: dri.date, time: new Date().toTimeString().slice(0, 5), location: dri.foundIssue.site });
+    const offline = this.state.offlineMode;
+    this.setState(s => ({
+      issues: s.issues.map(i => i.id !== dri.foundIssue.id ? i : {
+        ...i, status: resolved ? 'Resolved — Pending Verification' : 'Ongoing',
+        driResponse: { name: DRI_USER.name, designation: dri.designation, action: dri.action, date: dri.date, gps: dri.gps, status: dri.status },
+        history: [...i.history, ...events],
+      }),
+      notifications: resolved ? [{ id: Date.now(), role: 'fieldMonitor', issueId: dri.foundIssue.id, title: 'Issue awaiting your verification', body: 'DRI marked ' + dri.foundIssue.id + ' as resolved.', time: 'just now', unread: true }, ...s.notifications] : s.notifications,
+      syncQueue: [{ localId: 'sq-' + Date.now(), issueId: dri.foundIssue.id, type: 'DRI Response', time: 'just now', status: offline ? 'pending' : 'synced' }, ...s.syncQueue],
+      selectedIssueId: dri.foundIssue.id, dri: emptyDri(), navHistory: [], screen: 'issueDetail',
+    }));
+    this.showToast(resolved ? 'Response submitted — Field Monitor notified for verification.' : 'Response submitted.');
+  };
+
+  onFvLookupChange = e => this.updateDraft('verify', { lookupId: e.target.value });
+  fvSearch(idRaw) {
+    const id = (idRaw !== undefined ? idRaw : this.state.verify.lookupId).trim().toUpperCase();
+    const issue = this.state.issues.find(i => i.id.toUpperCase() === id);
+    if (!issue) { this.updateDraft('verify', { lookupError: 'No issue found with that ID.', foundIssue: null }); return; }
+    if (issue.status !== 'Resolved — Pending Verification') { this.updateDraft('verify', { lookupError: 'This issue is not awaiting verification.', foundIssue: null }); return; }
+    this.updateDraft('verify', { lookupError: '', foundIssue: issue, lookupId: issue.id });
+  }
+  onFvSearch = () => this.fvSearch();
+  pickFvIssue = id => { this.fvSearch(id); this.setState(s => ({ verify: { ...s.verify, step: 2 } })); };
+  startVerify = id => { this.setState({ verify: emptyVerify() }); this.fvSearch(id); this.setState(s => ({ verify: { ...s.verify, step: 2 } })); this.navigate('finalVerify'); };
+
+  onFvYes = () => this.updateDraft('verify', { confirmed: true });
+  onFvNo = () => this.updateDraft('verify', { confirmed: false });
+  onFvCommentChange = e => this.updateDraft('verify', { comment: e.target.value });
+  onFvDateChange = e => this.updateDraft('verify', { date: e.target.value });
+  fvNext = () => {
+    if (!fvValidArr(this.state.verify)[this.state.verify.step - 1]) return;
+    this.setState(s => ({ verify: { ...s.verify, step: Math.min(5, s.verify.step + 1) } }));
+  };
+  fvBack = () => {
+    if (this.state.verify.step === 1) { this.goBack(); return; }
+    this.setState(s => ({ verify: { ...s.verify, step: s.verify.step - 1 } }));
+  };
+  submitVerification = () => {
+    const v = this.state.verify;
+    if (fvValidArr(v).some(x => !x)) return;
+    const confirmed = v.confirmed === true;
+    const events = confirmed
+      ? [{ event: 'Final Verification — Confirmed Resolved', user: FM_USER.name, date: v.date, time: new Date().toTimeString().slice(0, 5), location: v.foundIssue.site }]
+      : [{ event: 'Final Verification — Not Resolved', user: FM_USER.name, date: v.date, time: new Date().toTimeString().slice(0, 5), location: v.foundIssue.site },
+         { event: 'Issue Reopened', user: 'System', date: v.date, time: new Date().toTimeString().slice(0, 5), location: '—' }];
+    const offline = this.state.offlineMode;
+    this.setState(s => ({
+      issues: s.issues.map(i => i.id !== v.foundIssue.id ? i : {
+        ...i, status: confirmed ? 'Verified / Closed' : 'Reopened',
+        verification: { confirmed, comment: v.comment, date: v.date, gps: v.gps },
+        history: [...i.history, ...events],
+      }),
+      notifications: !confirmed ? [{ id: Date.now(), role: 'dri', issueId: v.foundIssue.id, title: 'Additional action required', body: 'Field Monitor rejected your resolution on ' + v.foundIssue.id + '.', time: 'just now', unread: true }, ...s.notifications] : s.notifications,
+      syncQueue: [{ localId: 'sq-' + Date.now(), issueId: v.foundIssue.id, type: 'Final Verification', time: 'just now', status: offline ? 'pending' : 'synced' }, ...s.syncQueue],
+      selectedIssueId: v.foundIssue.id, verify: emptyVerify(), navHistory: [], screen: 'issueDetail',
+    }));
+    this.showToast(confirmed ? 'Issue verified and closed.' : 'Issue reopened — DRI notified.');
+  };
+
+  selectIssue = id => { this.setState({ selectedIssueId: id }); this.navigate('issueDetail'); };
+  goHome = () => this.tabNavigate('home');
+  setFilter = f => this.setState({ issueFilter: f });
+
+  onSyncNow = () => {
+    this.setState(s => ({ syncQueue: s.syncQueue.map(q => ({ ...q, status: 'synced' })) }));
+    this.showToast('All items synced.');
+  };
+
+  openGps(ctx) {
+    this.setState({ gpsModal: { open: true, ctx, phase: 'acquiring', lat: 0, lng: 0, acc: 0 } });
+    this.runGpsCapture(ctx);
+  }
+  runGpsCapture(ctx) {
+    let base = { lat: 9.0820, lng: 8.6753 };
+    const issue = ctx === 'dri' ? this.state.dri.foundIssue : ctx === 'verify' ? this.state.verify.foundIssue : null;
+    if (issue) base = { lat: issue.gpsIssue.lat, lng: issue.gpsIssue.lng };
+    clearTimeout(this._gpsT);
+    this._gpsT = setTimeout(() => {
+      this.setState(s => ({ gpsModal: { ...s.gpsModal, phase: 'done', lat: jitter(base.lat, 0.001), lng: jitter(base.lng, 0.001), acc: Math.round(3 + Math.random() * 11) } }));
+    }, 1100);
+  }
+  recaptureGps = () => { this.setState(s => ({ gpsModal: { ...s.gpsModal, phase: 'acquiring' } })); this.runGpsCapture(this.state.gpsModal.ctx); };
+  confirmGps = () => {
+    const g = this.state.gpsModal;
+    this.updateDraft(g.ctx, { gps: { lat: g.lat, lng: g.lng, acc: g.acc } });
+    this.setState({ gpsModal: { open: false, ctx: null, phase: 'idle', lat: 0, lng: 0, acc: 0 } });
+  };
+  closeGps = () => this.setState({ gpsModal: { open: false, ctx: null, phase: 'idle', lat: 0, lng: 0, acc: 0 } });
+
+  openCamera(ctx, kind) { this.setState({ cameraModal: { open: true, ctx, kind, phase: 'viewfinder', timestamp: '' } }); }
+  captureShot = () => this.setState(s => ({ cameraModal: { ...s.cameraModal, phase: 'captured', timestamp: new Date().toTimeString().slice(0, 5) } }));
+  retakeShot = () => this.setState(s => ({ cameraModal: { ...s.cameraModal, phase: 'viewfinder' } }));
+  usePhoto = () => {
+    const c = this.state.cameraModal;
+    this.updateDraft(c.ctx, { [c.kind + 'Captured']: true });
+    this.setState({ cameraModal: { open: false, ctx: null, kind: null, phase: 'viewfinder', timestamp: '' } });
+  };
+  closeCamera = () => this.setState({ cameraModal: { open: false, ctx: null, kind: null, phase: 'viewfinder', timestamp: '' } });
+
+  openVoice(ctx, field) { this.setState({ voiceModal: { open: true, ctx, field, phase: 'idle', transcript: '' } }); }
+  startListening = () => {
+    this.setState(s => ({ voiceModal: { ...s.voiceModal, phase: 'listening' } }));
+    clearTimeout(this._voiceT);
+    this._voiceT = setTimeout(() => {
+      const opts = VOICE_TRANSCRIPTS[this.state.voiceModal.field] || VOICE_TRANSCRIPTS.description;
+      const text = opts[Math.floor(Math.random() * opts.length)];
+      this.setState(s => ({ voiceModal: { ...s.voiceModal, phase: 'done', transcript: text } }));
+    }, 1500);
+  };
+  onEditTranscript = e => this.setState(s => ({ voiceModal: { ...s.voiceModal, transcript: e.target.value } }));
+  useTranscript = () => {
+    const v = this.state.voiceModal;
+    this.updateDraft(v.ctx, { [v.field]: v.transcript });
+    this.setState({ voiceModal: { open: false, ctx: null, field: null, phase: 'idle', transcript: '' } });
+  };
+  cancelVoice = () => this.setState({ voiceModal: { open: false, ctx: null, field: null, phase: 'idle', transcript: '' } });
+
+  buildGpsField(ctx, title, draft) {
+    const gps = draft.gps;
+    return {
+      title, gps, noGps: !gps,
+      coords: gps ? fmtCoords(gps.lat, gps.lng) : '', acc: gps ? gps.acc : 0,
+      accTagClass: gps ? ('tag ' + (gps.acc > 10 ? 'tag-outline' : 'tag-accent')) : '',
+      btnClass: gps ? 'btn-secondary' : 'btn-primary', btnLabel: gps ? 'Recapture Location' : 'Capture Location',
+      onCapture: () => this.openGps(ctx),
+    };
+  }
+
+  buildSlot(ctx, kind, label, hint, captured) {
+    return {
+      label, hint, captured, notCaptured: !captured,
+      thumbBg: captured ? 'var(--color-neutral-300)' : 'var(--color-neutral-200)',
+      btnClass: captured ? 'btn-secondary' : 'btn-primary', btnLabel: captured ? 'Retake' : 'Open Camera',
+      onCapture: () => this.openCamera(ctx, kind),
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const isFM = s.role === 'fieldMonitor';
+    const isDri = s.role === 'dri';
+    const user = isFM ? FM_USER : DRI_USER;
+    const initials = user.name.split(' ').map(w => w[0]).join('');
+
+    const statusMeta = st => ({
+      'New': { label: 'New', cls: 'tag tag-outline' },
+      'Ongoing': { label: 'Ongoing', cls: 'tag tag-accent' },
+      'Resolved — Pending Verification': { label: 'Resolved · Pending', cls: 'tag tag-accent' },
+      'Verified / Closed': { label: 'Verified', cls: 'tag tag-neutral' },
+      'Reopened': { label: 'Reopened', cls: 'tag tag-outline' },
+    }[st] || { label: st, cls: 'tag tag-neutral' });
+
+    const listRowStyle = { display: 'flex', alignItems: 'center', gap: 10, width: '100%', textAlign: 'left', padding: '12px 16px', border: 'none', borderBottom: '1px solid var(--color-divider)', background: 'transparent', cursor: 'pointer', font: 'inherit', color: 'inherit' };
+
+    const kpis = isFM ? [
+      { label: 'Registered', count: s.issues.length, f: 'all' },
+      { label: 'Ongoing', count: s.issues.filter(i => i.status === 'Ongoing').length, f: 'Ongoing' },
+      { label: 'Resolved — Awaiting Verification', count: s.issues.filter(i => i.status === 'Resolved — Pending Verification').length, f: 'Resolved — Pending Verification' },
+      { label: 'Verified / Closed', count: s.issues.filter(i => i.status === 'Verified / Closed').length, f: 'Verified / Closed' },
+      { label: 'Reopened', count: s.issues.filter(i => i.status === 'Reopened').length, f: 'Reopened' },
+      { label: 'Overdue (SLA)', count: s.issues.filter(i => computeSla(i).overdue).length, f: 'overdue' },
+      { label: 'Pending Sync', count: s.syncQueue.filter(q => q.status === 'pending').length, f: null, sync: true },
+    ] : [
+      { label: 'Assigned', count: s.issues.filter(i => i.status !== 'Verified / Closed').length, f: 'all' },
+      { label: 'New Assignments', count: s.issues.filter(i => i.status === 'New').length, f: 'New' },
+      { label: 'Ongoing', count: s.issues.filter(i => i.status === 'Ongoing').length, f: 'Ongoing' },
+      { label: 'Resolved', count: s.issues.filter(i => i.status === 'Resolved — Pending Verification').length, f: 'Resolved — Pending Verification' },
+      { label: 'Returned for Action', count: s.issues.filter(i => i.status === 'Reopened').length, f: 'Reopened' },
+      { label: 'Overdue (SLA)', count: s.issues.filter(i => computeSla(i).overdue).length, f: 'overdue' },
+      { label: 'Pending Sync', count: s.syncQueue.filter(q => q.status === 'pending').length, f: null, sync: true },
+    ];
+    kpis.forEach(k => { k.onClick = () => { if (k.sync) { this.tabNavigate('syncQueue'); } else { this.setFilter(k.f); this.tabNavigate('issueList'); } }; });
+
+    const recentIssues = s.issues.slice(0, 3).map(i => {
+      const m = statusMeta(i.status);
+      const sla = computeSla(i);
+      return { id: i.id, site: i.site, dateReported: i.dateReported, statusLabel: m.label, tagClass: m.cls, slaOverdue: sla.overdue, slaLabel: sla.label, rowStyle: listRowStyle, onClick: () => this.selectIssue(i.id) };
+    });
+
+    const FILTERS = ['all', 'overdue', 'New', 'Ongoing', 'Resolved — Pending Verification', 'Verified / Closed', 'Reopened'];
+    const filterChips = FILTERS.map(f => ({ label: f === 'all' ? 'All' : f === 'overdue' ? 'Overdue' : statusMeta(f).label, onClick: () => this.setFilter(f), tagClass: 'tag ' + (s.issueFilter === f ? 'tag-accent' : 'tag-outline') }));
+    const filteredIssuesArr = s.issues.filter(i => s.issueFilter === 'all' || (s.issueFilter === 'overdue' ? computeSla(i).overdue : i.status === s.issueFilter));
+    const filteredIssues = filteredIssuesArr.map(i => {
+      const m = statusMeta(i.status);
+      const sla = computeSla(i);
+      return { id: i.id, category: i.category, site: i.site, dateReported: i.dateReported, statusLabel: m.label, tagClass: m.cls, slaOverdue: sla.overdue, slaLabel: sla.label, rowStyle: listRowStyle, onClick: () => this.selectIssue(i.id) };
+    });
+
+    const selected = s.issues.find(i => i.id === s.selectedIssueId);
+    let det = {};
+    if (selected) {
+      const m = statusMeta(selected.status);
+      const locations = [{ label: 'Issue Discovery Location', coords: fmtCoords(selected.gpsIssue.lat, selected.gpsIssue.lng), acc: selected.gpsIssue.acc }];
+      if (selected.driResponse) locations.push({ label: 'DRI Action / Resolution Location', coords: fmtCoords(selected.driResponse.gps.lat, selected.driResponse.gps.lng), acc: selected.driResponse.gps.acc });
+      if (selected.verification) locations.push({ label: 'Final Verification Location', coords: fmtCoords(selected.verification.gps.lat, selected.verification.gps.lng), acc: selected.verification.gps.acc });
+      const history = selected.history.map((h, idx) => ({ ...h, showLine: idx < selected.history.length - 1 }));
+      let ctaLabel = '', ctaAction = () => {}, ctaVisible = false;
+      if (isDri && (selected.status === 'New' || selected.status === 'Ongoing' || selected.status === 'Reopened')) {
+        ctaLabel = selected.status === 'New' ? 'Respond to Issue' : 'Update Response'; ctaAction = () => this.respondToIssue(selected.id); ctaVisible = true;
+      } else if (isFM && selected.status === 'Resolved — Pending Verification') {
+        ctaLabel = 'Start Final Verification'; ctaAction = () => this.startVerify(selected.id); ctaVisible = true;
+      }
+      const sla = computeSla(selected);
+      det = { id: selected.id, category: selected.category, statusLabel: m.label, tagClass: m.cls, severityLabel: selected.severity + ' Priority', severityClass: severityCls(selected.severity), hasSla: sla.hasSla, slaLabel: sla.label, slaClass: sla.cls, site: selected.site, ward: selected.ward, lga: selected.lga, state: selected.state, description: selected.description, reporter: selected.reporter, dateReported: selected.dateReported, locations, history, ctaLabel, ctaAction, ctaVisible, showHomeCta: !ctaVisible && s.navHistory.length === 0 };
+    }
+
+    const ni = s.newIssue;
+    const lgaOptions = ni.stateName ? Object.keys(STATE_DATA[ni.stateName]) : [];
+    const wardOptions = ni.stateName && ni.lga ? STATE_DATA[ni.stateName][ni.lga] : [];
+    const settlementOptions = ni.ward ? [ni.ward + ' Central', ni.ward + ' North', ni.ward + ' South'] : [];
+    const siteOptions = ni.settlement ? [ni.settlement + ' PHC', ni.settlement + ' Outreach Post'] : [];
+    const NI_LABELS = ['Location', 'Issue Details', 'GPS Capture', 'MOV Photo', 'Selfie', 'Review'];
+    const NI_WARNINGS = ['Select state, LGA, ward, settlement and site to continue.', 'Select category, severity and enter a description.', 'Capture GPS location for an accurate record.', 'Capture the MOV photo as evidence.', 'Capture your selfie to confirm your presence.', ''];
+    const niValid = niValidArr(ni);
+    Object.assign(ni, {
+      stepLabel: NI_LABELS[ni.step - 1], progressBarStyle: { position: 'absolute', inset: 0, width: (ni.step / 6 * 100) + '%', background: 'var(--color-accent)' },
+      onStep1: ni.step === 1, onStep2: ni.step === 2, onStep3: ni.step === 3, onStep4: ni.step === 4, onStep5: ni.step === 5, onStep6: ni.step === 6,
+      lgaOptions, wardOptions, settlementOptions, siteOptions, lgaDisabled: !ni.stateName, wardDisabled: !ni.lga, settlementDisabled: !ni.ward, siteDisabled: !ni.settlement,
+      onStateChange: this.onNewIssueStateChange, onLgaChange: this.onNewIssueLgaChange, onWardChange: this.onNewIssueWardChange, onSettlementChange: this.onNewIssueSettlementChange, onSiteChange: this.onNewIssueSiteChange,
+      onCategoryChange: this.onNewIssueCategoryChange, onDescriptionChange: this.onNewIssueDescriptionChange, onDateChange: this.onNewIssueDateChange,
+      sevHigh: ni.severity === 'High', sevMedium: ni.severity === 'Medium', sevLow: ni.severity === 'Low',
+      onSeverityHigh: this.onNewIssueSeverityHigh, onSeverityMedium: this.onNewIssueSeverityMedium, onSeverityLow: this.onNewIssueSeverityLow,
+      onVoice: () => this.openVoice('newIssue', 'description'),
+      gpsField: this.buildGpsField('newIssue', 'Issue Discovery Location', ni),
+      movSlot: this.buildSlot('newIssue', 'mov', 'MOV Photo', 'Camera capture required · on-site evidence', ni.movCaptured),
+      selfieSlot: this.buildSlot('newIssue', 'selfie', 'Field Monitor Selfie', 'Confirms your presence on site', ni.selfieCaptured),
+      gpsSummary: ni.gps ? fmtCoords(ni.gps.lat, ni.gps.lng) + ' (±' + ni.gps.acc + 'm)' : '—',
+      isLastStep: ni.step === 6, stepWarning: niValid[ni.step - 1] ? '' : NI_WARNINGS[ni.step - 1], stepBlocked: !niValid[ni.step - 1],
+      onNext: this.newIssueNext, onBack: this.newIssueBack, onSubmit: this.submitNewIssue,
+    });
+
+    const dri = s.dri;
+    const DRI_LABELS = ['Look Up Issue', 'Response', 'Date & Location', 'Status', 'Evidence', 'Review'];
+    const DRI_WARNINGS = ['Look up or select an issue to respond to.', 'Select your designation and describe the action taken.', 'Set the date and capture your location.', '', 'Capture MOV and selfie evidence.', ''];
+    const driValid = driValidArr(dri);
+    Object.assign(dri, {
+      stepLabel: DRI_LABELS[dri.step - 1], progressBarStyle: { position: 'absolute', inset: 0, width: (dri.step / 6 * 100) + '%', background: 'var(--color-accent)' },
+      onStep1: dri.step === 1, onStep2: dri.step === 2, onStep3: dri.step === 3, onStep4: dri.step === 4, onStep5: dri.step === 5, onStep6: dri.step === 6,
+      onLookupChange: this.onDriLookupChange, onSearch: this.onDriSearch,
+      onDesignationChange: this.onDriDesignationChange, onActionChange: this.onDriActionChange, onDateChange: this.onDriDateChange,
+      onVoice: () => this.openVoice('dri', 'action'),
+      statusOngoing: dri.status === 'Ongoing', statusResolved: dri.status === 'Resolved', onStatusOngoing: this.onDriStatusOngoing, onStatusResolved: this.onDriStatusResolved,
+      statusHint: dri.status === 'Resolved' ? 'Marking Resolved sends the issue to the Field Monitor for final verification. It will not close automatically.' : 'The issue stays open and visible to the Field Monitor as unresolved.',
+      gpsField: dri.foundIssue ? this.buildGpsField('dri', 'DRI Action / Resolution Location', dri) : null,
+      movSlot: this.buildSlot('dri', 'mov', 'DRI Action/Resolution MOV', 'Photo evidence of the action taken', dri.movCaptured),
+      selfieSlot: this.buildSlot('dri', 'selfie', 'DRI Selfie', 'Confirms your presence at the location', dri.selfieCaptured),
+      gpsSummary: dri.gps ? fmtCoords(dri.gps.lat, dri.gps.lng) + ' (±' + dri.gps.acc + 'm)' : '—',
+      isLastStep: dri.step === 6, stepWarning: driValid[dri.step - 1] ? '' : DRI_WARNINGS[dri.step - 1], stepBlocked: !driValid[dri.step - 1],
+      onNext: this.driNext, onBack: this.driBack, onSubmit: this.submitDriResponse,
+    });
+    const driAssignable = s.issues.filter(i => i.status === 'New' || i.status === 'Ongoing' || i.status === 'Reopened').map(i => {
+      const m = statusMeta(i.status);
+      return { id: i.id, category: i.category, statusLabel: m.label, tagClass: m.cls, rowStyle: listRowStyle, onClick: () => this.pickDriIssue(i.id) };
+    });
+
+    const fv = s.verify;
+    const FV_LABELS = ['Look Up Issue', 'Confirm Resolution', 'Date & Location', 'Evidence', 'Review'];
+    const FV_WARNINGS = ['Look up or select an issue awaiting verification.', 'Choose Yes or No — if No, explain what remains unresolved.', 'Set the date and capture your location.', 'Capture your selfie to confirm the verification.', ''];
+    const fvValid = fvValidArr(fv);
+    Object.assign(fv, {
+      stepLabel: FV_LABELS[fv.step - 1], progressBarStyle: { position: 'absolute', inset: 0, width: (fv.step / 5 * 100) + '%', background: 'var(--color-accent)' },
+      onStep1: fv.step === 1, onStep2: fv.step === 2, onStep3: fv.step === 3, onStep4: fv.step === 4, onStep5: fv.step === 5,
+      onLookupChange: this.onFvLookupChange, onSearch: this.onFvSearch,
+      isYes: fv.confirmed === true, isNo: fv.confirmed === false, onYes: this.onFvYes, onNo: this.onFvNo,
+      onCommentChange: this.onFvCommentChange, onDateChange: this.onFvDateChange,
+      onVoice: () => this.openVoice('verify', 'comment'),
+      gpsField: fv.foundIssue ? this.buildGpsField('verify', 'Final Verification Location', fv) : null,
+      selfieSlot: this.buildSlot('verify', 'selfie', 'Final Verification Selfie', 'Required — confirms your presence', fv.selfieCaptured),
+      movSlot: this.buildSlot('verify', 'mov', 'Final Verification MOV', 'Optional — photo of the resolved condition', fv.movCaptured),
+      gpsSummary: fv.gps ? fmtCoords(fv.gps.lat, fv.gps.lng) + ' (±' + fv.gps.acc + 'm)' : '—',
+      confirmedLabel: fv.confirmed === true ? 'Yes — Verified / Closed' : fv.confirmed === false ? 'No — Reopened' : '—',
+      isLastStep: fv.step === 5, stepWarning: fvValid[fv.step - 1] ? '' : FV_WARNINGS[fv.step - 1], stepBlocked: !fvValid[fv.step - 1],
+      onNext: this.fvNext, onBack: this.fvBack, onSubmit: this.submitVerification,
+    });
+    const fvAssignable = s.issues.filter(i => i.status === 'Resolved — Pending Verification').map(i => ({ id: i.id, category: i.category, rowStyle: listRowStyle, onClick: () => this.pickFvIssue(i.id) }));
+
+    const notifList = s.notifications.filter(n => n.role === s.role).map(n => ({ ...n, rowStyle: { ...listRowStyle, alignItems: 'flex-start' }, onClick: () => { this.setState(st => ({ notifications: st.notifications.map(x => x.id === n.id ? { ...x, unread: false } : x) })); this.selectIssue(n.issueId); } }));
+
+    const syncList = s.syncQueue.map(q => ({ ...q, issueId: q.issueId, tagClass: 'tag ' + (q.status === 'synced' ? 'tag-neutral' : 'tag-accent'), statusLabel: q.status === 'synced' ? '✓ Synced' : '⟳ Pending Sync' }));
+    const pendingCount = s.syncQueue.filter(q => q.status === 'pending').length;
+
+    const navFM = [
+      { key: 'home', label: 'Home', icon: 'home' },
+      { key: 'issueList', label: 'My Issues', icon: 'list' },
+      { key: 'map', label: 'Map', icon: 'map' },
+      { key: 'syncQueue', label: 'Sync', icon: 'cloud', badge: pendingCount > 0 },
+      { key: 'notifications', label: 'Alerts', icon: 'bell', badge: s.notifications.filter(n => n.role === 'fieldMonitor' && n.unread).length > 0 },
+    ];
+    const navDri = [
+      { key: 'home', label: 'Home', icon: 'home' },
+      { key: 'issueList', label: 'Assigned', icon: 'list' },
+      { key: 'map', label: 'Map', icon: 'map' },
+      { key: 'syncQueue', label: 'Sync', icon: 'cloud', badge: pendingCount > 0 },
+      { key: 'notifications', label: 'Alerts', icon: 'bell', badge: s.notifications.filter(n => n.role === 'dri' && n.unread).length > 0 },
+    ];
+    const ICONS = {
+      home: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }, React.createElement('path', { d: 'm3 9 9-7 9 7' }), React.createElement('path', { d: 'M9 22V12h6v10' })),
+      list: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }, React.createElement('path', { d: 'M8 6h13' }), React.createElement('path', { d: 'M8 12h13' }), React.createElement('path', { d: 'M8 18h13' }), React.createElement('path', { d: 'M3 6h.01' }), React.createElement('path', { d: 'M3 12h.01' }), React.createElement('path', { d: 'M3 18h.01' })),
+      cloud: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }, React.createElement('path', { d: 'M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A4 4 0 0 0 6.5 19h11z' })),
+      bell: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }, React.createElement('path', { d: 'M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9' }), React.createElement('path', { d: 'M10.3 21a1.94 1.94 0 0 0 3.4 0' })),
+      map: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.6 }, React.createElement('path', { d: 'M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z' }), React.createElement('circle', { cx: 12, cy: 10, r: 3 })),
+    };
+    const navItems = (isFM ? navFM : navDri).map(n => ({
+      label: n.label, icon: ICONS[n.icon], badge: n.badge,
+      style: { flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '8px 0 6px', background: 'transparent', border: 'none', cursor: 'pointer', color: s.screen === n.key ? 'var(--color-accent-800)' : 'var(--color-text)', opacity: s.screen === n.key ? 1 : 0.62 },
+      iconWrapStyle: { position: 'relative', display: 'flex' },
+      onClick: () => this.tabNavigate(n.key),
+    }));
+
+    const TOP_TABS = ['home', 'issueList', 'map', 'notifications', 'syncQueue'];
+    const TITLES = { home: 'TPM Monitoring', issueList: isFM ? 'My Registered Issues' : 'Assigned Issues', map: 'Issue Map', issueDetail: selected ? selected.id : 'Issue', newIssue: 'Register Issue', driRespond: 'DRI Response', finalVerify: 'Final Verification', notifications: 'Notifications', syncQueue: 'Sync Queue' };
+    const mapIssues = s.issues.map(i => ({ id: i.id, lat: i.gpsIssue.lat, lng: i.gpsIssue.lng, status: i.status, severity: i.severity, overdue: computeSla(i).overdue }));
+
+    const gm = s.gpsModal;
+    const gpsModal = { open: gm.open, ctx: gm.ctx, acquiring: gm.phase === 'acquiring', done: gm.phase === 'done', title: gm.ctx === 'newIssue' ? 'Issue Discovery Location' : gm.ctx === 'dri' ? 'DRI Action Location' : 'Final Verification Location', coords: gm.phase === 'done' ? fmtCoords(gm.lat, gm.lng) : '', acc: gm.acc, poor: gm.acc > 10, accTagClass: 'tag ' + (gm.acc > 10 ? 'tag-outline' : 'tag-accent') };
+    const gpsPulseStyle = { position: 'absolute', width: 60, height: 60, borderRadius: '50%', border: '1.5px solid var(--color-accent)', animation: 'tpmPulse 1.4s ease-out infinite' };
+
+    const cm = s.cameraModal;
+    const cameraModal = { open: cm.open, viewfinder: cm.phase === 'viewfinder', captured: cm.phase === 'captured', timestamp: cm.timestamp, title: cm.kind === 'selfie' ? 'Selfie Capture' : 'MOV Photo Capture', frameStyle: { aspectRatio: cm.kind === 'selfie' ? '3/4' : '4/3', background: 'var(--color-neutral-200)', border: '1px dashed var(--color-neutral-400)', display: 'flex', alignItems: 'center', justifyContent: 'center', maxHeight: 220 } };
+
+    const vm = s.voiceModal;
+    const voiceModal = { open: vm.open, idle: vm.phase === 'idle', listening: vm.phase === 'listening', done: vm.phase === 'done', transcript: vm.transcript };
+    const waveformBars = Array.from({ length: 9 }).map((_, i) => ({ style: { width: 4, height: 28, borderRadius: 2, background: 'var(--color-accent)', animation: 'tpmBar ' + (0.6 + (i % 4) * 0.12) + 's ease-in-out infinite', animationDelay: (i * 0.05) + 's' } }));
+
+    return {
+      deviceWrapStyle: { position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'repeating-linear-gradient(0deg,transparent,transparent 23px,rgba(29,31,32,0.05) 24px),repeating-linear-gradient(90deg,transparent,transparent 23px,rgba(29,31,32,0.05) 24px),#dcdcdc' },
+      shellStyle: { display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', fontFamily: 'var(--font-body)', color: 'var(--color-text)', background: 'var(--color-bg)', overflow: 'hidden' },
+      isLogin: !s.loggedIn, loggedIn: s.loggedIn,
+      loginWrapStyle: { display: 'flex', flexDirection: 'column', flex: 1, padding: '0 24px 24px' },
+      username: s.username, password: s.password, loginError: s.loginError,
+      onUsernameChange: this.onUsernameChange, onPasswordChange: this.onPasswordChange, onLogin: this.onLogin, onForgotPassword: this.onForgotPassword,
+
+      headerStyle: { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 10px 10px 6px', borderBottom: '1px solid var(--color-divider)', flex: 'none' },
+      backBtnStyle: { visibility: s.navHistory.length > 0 || s.screen === 'issueDetail' || (s.screen === 'newIssue' && ni.step > 1) || (s.screen === 'driRespond' && dri.step > 1) || (s.screen === 'finalVerify' && fv.step > 1) ? 'visible' : 'hidden' },
+      onHeaderBack: this.onHeaderBack, headerTitle: TITLES[s.screen], onOpenProfile: this.onOpenProfile, userInitials: initials,
+      isHome: s.screen === 'home', roleLabel: isFM ? 'Field Monitor' : 'DRI',
+
+      showSyncBanner: s.offlineMode || pendingCount > 0,
+      syncBannerStyle: { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '9px 16px', background: 'var(--color-accent-100)', color: 'var(--color-accent-800)', border: 'none', borderBottom: '1px solid var(--color-divider)', fontSize: 12, cursor: 'pointer', flex: 'none' },
+      syncBannerText: s.offlineMode ? 'Offline — submissions will sync when connected' : pendingCount + ' item' + (pendingCount === 1 ? '' : 's') + ' pending sync',
+      goToSyncQueue: this.goToSyncQueue,
+
+      contentStyle: { flex: 1, overflowY: 'auto', position: 'relative' },
+      isFM, isDri, userName: user.name, userSub: user.org, isHome2: s.screen === 'home',
+      startNewIssue: this.startNewIssue, startDriLookup: this.startDriLookup,
+      kpis, recentIssues,
+
+      isIssueList: s.screen === 'issueList', filterChips, filteredIssues, issueListEmpty: filteredIssuesArr.length === 0,
+      isIssueDetail: s.screen === 'issueDetail', det, goHome: this.goHome, stickyFooterStyle: { position: 'sticky', bottom: 0, padding: '12px 16px', background: 'var(--color-bg)', borderTop: '1px solid var(--color-divider)' },
+
+      isNewIssue: s.screen === 'newIssue', ni, stateOptions: Object.keys(STATE_DATA), categoryOptions: CATEGORY_OPTIONS, today: todayStr(),
+      isDriRespond: s.screen === 'driRespond', dri, driAssignable, designationOptions: DESIGNATION_OPTIONS,
+      isFinalVerify: s.screen === 'finalVerify', fv, fvAssignable,
+
+      isMap: s.screen === 'map', mapIssues, onMapSelect: (id) => this.selectIssue(id),
+      isNotifications: s.screen === 'notifications', notifList, notifEmpty: notifList.length === 0,
+      isSyncQueue: s.screen === 'syncQueue', syncList, syncEmpty: syncList.length === 0, onSyncNow: this.onSyncNow,
+
+      progressWrapStyle: { padding: '14px 16px 0' },
+      stickyFooterWrapStyle: { position: 'sticky', bottom: 0, background: 'var(--color-bg)', borderTop: '1px solid var(--color-divider)' },
+      stickyFooterRowStyle: { display: 'flex', gap: 8, padding: '10px 16px 14px' },
+      warningTextStyle: { fontSize: 11.5, color: 'var(--color-accent-800)', padding: '8px 16px 0' },
+
+      showBottomNav: TOP_TABS.includes(s.screen), navItems, bottomNavStyle: { display: 'flex', borderTop: '1px solid var(--color-divider)', background: 'var(--color-bg)', flex: 'none' },
+      badgeDotStyle: { position: 'absolute', top: -2, right: -4, width: 6, height: 6, borderRadius: '50%', background: 'var(--color-accent)' },
+
+      toast: s.toast, toastStyle: { position: 'absolute', left: 16, right: 16, bottom: s.loggedIn && TOP_TABS.includes(s.screen) ? 76 : 20, background: 'var(--color-accent-900)', color: 'var(--color-bg)', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, zIndex: 50, animation: 'tpmRise .25s ease-out' },
+
+      profileSheetOpen: s.profileSheetOpen, onOpenProfile2: this.onOpenProfile, onCloseProfile: this.onCloseProfile, stopProp: this.stopProp,
+      sheetBackdropStyle: { position: 'absolute', inset: 0, background: 'rgba(29,31,32,0.45)', zIndex: 60, display: 'flex', alignItems: 'flex-end' },
+      sheetStyle: { width: '100%', background: 'var(--color-bg)', padding: '14px 18px 22px', borderTop: '1px solid var(--color-divider)', animation: 'tpmSheet .22s ease-out' },
+      onSetRoleFM: this.onSetRoleFM, onSetRoleDri: this.onSetRoleDri, isOnline: !s.offlineMode, offlineMode: s.offlineMode, onSetOnline: this.onSetOnline, onSetOffline: this.onSetOffline, onLogout: this.onLogout,
+
+      modalBackdropStyle: { position: 'absolute', inset: 0, background: 'rgba(29,31,32,0.5)', zIndex: 70, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 },
+      modalCardStyle: { width: '100%', background: 'var(--color-bg)', border: '1px solid var(--color-divider)', padding: 16 },
+      gpsModal, gpsPulseStyle, recaptureGps: this.recaptureGps, confirmGps: this.confirmGps, closeGps: this.closeGps,
+      cameraModal, captureShot: this.captureShot, retakeShot: this.retakeShot, usePhoto: this.usePhoto, closeCamera: this.closeCamera,
+      voiceModal, waveformBars, startListening: this.startListening, onEditTranscript: this.onEditTranscript, useTranscript: this.useTranscript, cancelVoice: this.cancelVoice,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Secrets — never commit real values (copy the *.example files instead)
+.env
+.env.*
+!.env.example
+!.env.local.example
+local.properties
+*.jks
+*.keystore
+google-services.json
+
+# Dependencies / build output
+node_modules/
+.next/
+out/
+build/
+.gradle/
+.kotlin/
+.cxx/
+*.apk
+*.aab
+*.tsbuildinfo
+
+# Local agent / editor state
+.claude/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.log

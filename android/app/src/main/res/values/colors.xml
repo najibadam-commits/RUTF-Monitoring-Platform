@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mirrors the design token "color-bg" (#f2f2f3) from _ds_styles.css. Used only for the
+         pre-Compose window/status-bar background — the source of truth for all in-app color is
+         ui/theme/Color.kt. -->
+    <color name="window_background">#F2F2F3</color>
+    <color name="app_mark_accent">#5980A6</color>
+</resources>

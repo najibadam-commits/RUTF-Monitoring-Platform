@@ -1,0 +1,15 @@
+key,value
+variance_pct_max,5
+variance_pct_max_remote,10
+vf_min,0.9
+vf_max,1.1
+geofence_m,150
+short_dispense_pct,5
+receipt_confirm_days,7
+reporting_gap_days,7
+adjustment_pct_max,2
+month_end_count_due_day,5
+routine_visit_interval_days,90
+high_risk_visit_interval_days,30
+supervisor_facilities_per_month,8
+min_cell_size,5

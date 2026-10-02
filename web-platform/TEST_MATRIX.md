@@ -1,0 +1,113 @@
+# TPM Monitoring Platform — Test Matrix
+
+Covers the "Consolidated Updates, Workflow Changes, Rebranding & Attendance Module" master prompt
+(Items 1-20). Status reflects what has actually been exercised, not what "should" work.
+
+Legend: ✅ verified (says how) · ⏳ needs manual click-through · 🔧 needs Android rebuild first
+
+---
+
+## Item 1 — Dynamic landing page stats
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Load `/login` with no auth | States/LGAs/Settlements/Health Facilities counts come from `getPlatformStats()` (live DB counts), not the old baked-in image numbers | ✅ verified via local dev server + browser preview |
+| DB has 0 approved settlements | Stat shows `0`, not a crash or `NaN` | ✅ `getPlatformStats()` wraps in `.catch(() => null)`; falls back gracefully |
+
+## Items 2-4 — State Coordinator review workflow, DRI sector scoping, Category→Sector
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Field Monitor submits a new Finding | Status = `Pending Review` (not `New`) | ✅ DB default confirmed (migration 0032); Android `submitNewIssue` sets `PendingReview` locally |
+| State Coordinator opens a `Pending Review` Finding in their managed state | Sees Approve & Assign / Return for Correction buttons | ⏳ needs a real State Coordinator login click-through |
+| State Coordinator opens a Finding **outside** their managed state | RLS denies — Finding doesn't appear in their list at all | ✅ verified via `issues_select` policy text (state_id = managed_state_id) |
+| State Coordinator clicks Approve & Assign, picks a DRI | Finding status → `Assigned`, DRI notified, DRI-picker only shows DRIs in the Finding's sector | ⏳ needs click-through (DRI-picker sector filter is `getDris(supabase, categoryId)`) |
+| State Coordinator clicks Return for Correction with a comment | Status → `Returned for Correction`, Field Monitor notified, comment visible in history | ⏳ needs click-through |
+| DRI logs in, views their Findings list | Only sees Findings where `assigned_dri = self` AND `category_id = their assigned sector` | ✅ verified live: `naisresources@gmail.com` DRI login + Response wizard tested this session; RLS text double-checked in security audit (§25) |
+| DRI account's `assigned_category_id` is `null` (unassigned) | Sees 0 Findings, not an error | ✅ RLS clause requires exact match; null never matches |
+| A `dri` account attempts to `PATCH` its own `assigned_category_id` via raw REST | Rejected — pinned back to old value by `enforce_profile_update_rules()` | ✅ fixed & verified live this session (migration 0038, §25) — **this was a real bug before the fix** |
+| Sector picker in New Finding wizard (mobile) | Shows the 7 new sectors (Protection & AAP, Nutrition (OTP), Health Services, WASH, MHPSS Services, Food Assistance, Fraud) | 🔧 needs Android rebuild + manual check |
+| Historical Finding with a legacy (now-inactive) category | Still displays its original category name everywhere (detail page, CSV export, filters) | ✅ `getAllCategories()` (unfiltered) used for filter dropdowns/exports; `is_active=false` only hides from *new*-submission pickers |
+
+## Item 5 — Roles: add State Coordinator, rename TPM Supervisor → TPM Field Monitor
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Users page → Add User → role dropdown | Shows "State Coordinator" as a selectable role, with a Managed State field appearing when selected | ⏳ needs click-through |
+| Existing `tpm_supervisor` accounts | Still log in and work identically — only the *label* changed, not the DB enum value or route | ✅ confirmed: `ROLE_LABELS.tpm_supervisor` renamed in place, no new role/duplicate created, no DB enum change needed |
+| Mobile field monitor role pill on Home screen | Reads "TPM Field Monitor", not "Field Monitor" or "TPM Supervisor" | 🔧 needs Android rebuild |
+
+## Item 6 — "Issues" → "Findings" terminology sweep
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Web: nav label, page titles, table headers, CSV export header, empty-states | All read "Finding(s)", not "Issue(s)" | ✅ verified via `tsc`/lint clean + manual grep of changed files |
+| Old `issue_history` rows (pre-rename) | Still display correctly; reporter-name extraction still works | ✅ Android's dual-match (`"Finding reported" || "Issue reported"`) confirmed; web renders `h.action` raw, no matching needed |
+| Mobile: every wizard step label, toast, status name | Reads "Finding", not "Issue" | 🔧 needs Android rebuild — full terminology sweep done in source, unverified on-device |
+| Route `/issues`, DB table `issues`, API/JSON field names | Unchanged — only user-facing text changed | ✅ deliberate, confirmed via review |
+
+## Item 7 — Download approval: add Project Admin
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Project Admin opens Download Requests page | Sees the review table (not just "my requests"), scoped to their own project's requests only | ⏳ needs click-through with a Project Admin account |
+| Project Admin approves a request from a different project | Rejected — `in_scope(project_id)` denies | ✅ verified via RLS policy text (`download_requests_update_project_admin`) |
+| Super Admin still approves any request | Unaffected — original `is_super_admin()` policy untouched (additive change) | ✅ confirmed additive-only migration |
+| Requester gets notified when a Project Admin (not just Super Admin) decides | Notification created | ⏳ needs a live end-to-end request→decide cycle |
+
+## Item 8 — DRI terminology (full term on first reference)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Role-selection dropdown (Add/Edit User) | Shows "Direct Responsible Individual (DRI)" | ✅ `roleOptionLabel()` verified in source |
+| Role badge in Users table, header role pill | Shows compact "DRI" | ✅ deliberate — `ROLE_LABELS.dri` left as "DRI" for space-limited contexts |
+| GIS map DRI label | Shows full term once | ✅ verified in `GisMapInner.tsx` |
+
+## Items 9-15 — Field Monitor Daily Attendance
+
+| Test case | Expected result | Status |
+|---|---|---|
+| `field_monitor_attendance` table, RLS, storage bucket, trigger exist | All confirmed live via direct Postgres queries | ✅ done last checkpoint |
+| `resolve_administrative_location()` on a real Abuja coordinate | Returns correct state/LGA | ✅ tested live this session (Fct / Municipal Area Council / Gwarinpa) |
+| Web `/attendance` page, non-admin role | Redirects to `/dashboard` | ✅ `canAccessAttendance()` gate confirmed in code; `tsc`/lint clean |
+| Web `/attendance` page, Super Admin/Project Admin/State Coordinator | Sees table with signed photo thumbnails, device-reuse banner when applicable | ⏳ needs click-through (no records exist yet — needs a real mobile submission first) |
+| Mobile: Field Monitor taps "Daily Attendance" from Home | Selfie step (front camera only, no gallery) → Location photo (back camera, no gallery) → GPS → Review → Submit | 🔧 needs Android rebuild — **not yet exercised on-device at all** |
+| Mobile: attempt a 2nd attendance same day | "Already recorded for today" screen, no capture wizard shown | 🔧 needs Android rebuild |
+| Mobile: submit while offline | Queues in Sync Queue as "Daily Attendance", pushes once connectivity returns | 🔧 needs Android rebuild |
+| Mobile: retry a push that partially succeeded (photos uploaded, insert response lost) | Treated as success on retry (23505 unique-violation path), not stuck retrying forever | 🔧 needs Android rebuild — logic reviewed but not exercised |
+| Two different Field Monitor accounts submit from the same physical device | Web admin table flags the shared `device_id` with a warning banner, does **not** block either submission | ⏳ needs two real mobile submissions to observe |
+
+## Item 16 — Role & data security (backend/DB-enforced)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Full RLS/SECURITY DEFINER/storage-policy audit | See DECISIONS.md §25 for the complete findings list | ✅ done this session |
+| `dri`/`state_coordinator` self-PATCH of `assigned_category_id`/`managed_state_id` | Blocked (was previously exploitable — see §25) | ✅ fixed & verified live (migration 0038) |
+| Every RLS policy scoped to `authenticated`, none to `anon`/`public` | Confirmed — `anon`'s default Supabase grants are inert | ✅ verified via `pg_policies` |
+| Every `SECURITY DEFINER` function sets `search_path = public` | Confirmed — no search-path injection surface | ✅ verified via `pg_proc.proconfig` |
+| Base `issues_update`/`issues_insert` policies allow direct-REST bypass of RPC business logic for `project_admin`/`tpm_supervisor`/`dri` | **Known, pre-existing, not fixed** — flagged for a decision, not silently changed (see §25) | ⏳ awaiting your decision on whether to harden |
+
+## Item 17 — Database & migration requirements
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Every migration this project applied is additive (no `DROP TABLE`/destructive rewrite of populated data) | Confirmed by review of migrations 0031-0038 | ✅ |
+| Category→Sector data swap preserves FK integrity for historical Findings | Legacy categories marked `is_active=false`, not deleted while referenced | ✅ confirmed live (0 orphaned `category_id` references) |
+| `full_migration.sql` matches the live DB migration history | Regenerated after every migration this session | ✅ current as of migration 0038 |
+
+## Item 18 — UI/UX simplicity
+
+Guiding principle applied throughout rather than a standalone test — every new screen/flow reuses
+existing components (`WizardScaffold`, `PhotoCaptureStep`, `GpsCaptureStep`, `TpmCard`/`TpmButton`,
+existing RBAC helpers) rather than introducing new patterns.
+
+## Item 19 — This document.
+
+## Item 20 — Final system-wide quality check
+
+| Check | Result |
+|---|---|
+| `npx tsc --noEmit` (web) | Clean |
+| `npm run lint` (web) | 6 pre-existing issues, unrelated to any change this project made across the whole session — 0 new |
+| Android: Gradle CLI build | Not runnable in this environment (sandboxed loopback socket) — **you must rebuild in Android Studio** to get real compiler verification |
+| Security audit | Complete — 1 real finding, fixed (§25); 1 pre-existing architectural note flagged, not changed; 1 harmless cleanup item spun off separately |

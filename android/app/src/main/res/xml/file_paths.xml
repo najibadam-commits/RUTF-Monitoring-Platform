@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Captured MOV/selfie evidence photos live in app-private external files storage
+         (see CameraCapture.kt) — exposed here only in case a future feature needs to hand a
+         photo URI to another app (e.g. share/export). Not used by the in-app camera flow itself. -->
+    <external-files-path name="evidence_photos" path="evidence" />
+</paths>

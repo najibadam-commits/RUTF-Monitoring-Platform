@@ -1,0 +1,104 @@
+import "server-only";
+import { cache } from "react";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database, IssuePriority, IssueStatus } from "@/lib/types/database";
+
+export const ISSUE_SELECT = `
+  *,
+  category:categories(id, name),
+  state:states(id, name),
+  lga:lgas(id, name),
+  ward_ref:wards(id, name),
+  reporter:profiles!issues_reported_by_fkey(id, name),
+  dri:profiles!issues_assigned_dri_fkey(id, name, phone, email),
+  verifier:profiles!issues_verified_by_fkey(id, name)
+`;
+
+// Scoped to exactly what the Issues LIST table renders (code/category/description/state/lga/
+// priority/status/DRI name/reported date — see issues/page.tsx) — no reporter/verifier/DRI
+// contact info/ward, unlike ISSUE_SELECT above, which stays the full relation set for the Issue
+// Detail page.
+export const ISSUE_LIST_SELECT = `
+  id, code, description, priority, status, reported_at,
+  category:categories(name),
+  state:states(name),
+  lga:lgas(name),
+  dri:profiles!issues_assigned_dri_fkey(name)
+`;
+
+type IssueRow = Database["public"]["Tables"]["issues"]["Row"];
+
+export type IssueWithRelations = IssueRow & {
+  category: { id: string; name: string } | null;
+  state: { id: string; name: string } | null;
+  lga: { id: string; name: string } | null;
+  ward_ref: { id: string; name: string } | null;
+  reporter: { id: string; name: string } | null;
+  dri: { id: string; name: string; phone: string | null; email: string } | null;
+  verifier: { id: string; name: string } | null;
+};
+
+export type IssueListRow = Pick<IssueRow, "id" | "code" | "description" | "priority" | "status" | "reported_at"> & {
+  category: { name: string } | null;
+  state: { name: string } | null;
+  lga: { name: string } | null;
+  dri: { name: string } | null;
+};
+
+export const getIssueByCode = cache(async (client: SupabaseClient<Database>, code: string) => {
+  const { data } = await client.from("issues").select(ISSUE_SELECT).eq("code", code).maybeSingle();
+  return data as unknown as IssueWithRelations | null;
+});
+
+// cache()-wrapped: the Issue Detail page fetches this issue once for its own data and again
+// implicitly whenever a sibling component on the same render needs it — memoizing per
+// (client, id) means that costs one round trip, not one per call site.
+export const getIssueById = cache(async (client: SupabaseClient<Database>, id: string) => {
+  const { data } = await client.from("issues").select(ISSUE_SELECT).eq("id", id).maybeSingle();
+  return data as unknown as IssueWithRelations | null;
+});
+
+export const getIssueHistory = cache(async (client: SupabaseClient<Database>, issueId: string) => {
+  const { data } = await client
+    .from("issue_history")
+    .select("*")
+    .eq("issue_id", issueId)
+    .order("occurred_at", { ascending: true });
+  return data ?? [];
+});
+
+export const getIssuePhotos = cache(async (client: SupabaseClient<Database>, issueId: string) => {
+  const { data } = await client.from("issue_photos").select("*").eq("issue_id", issueId).order("uploaded_at");
+  return data ?? [];
+});
+
+export interface IssueFilters {
+  status?: string;
+  category?: string;
+  state?: string;
+  priority?: string;
+  search?: string;
+}
+
+export async function getFilteredIssues(client: SupabaseClient<Database>, filters: IssueFilters) {
+  let query = client.from("issues").select(ISSUE_SELECT).order("reported_at", { ascending: false });
+
+  if (filters.status) query = query.eq("status", filters.status as IssueStatus);
+  if (filters.priority) query = query.eq("priority", filters.priority as IssuePriority);
+  if (filters.category) query = query.eq("category_id", filters.category);
+  if (filters.state) query = query.eq("state_id", filters.state);
+  if (filters.search) {
+    const q = filters.search.trim();
+    query = query.or(`description.ilike.%${q}%,code.ilike.%${q}%`);
+  }
+
+  const { data, error } = await query;
+  return { data: (data ?? []) as unknown as IssueWithRelations[], error };
+}
+
+export async function getAllIssuesForScope(client: SupabaseClient<Database>) {
+  // RLS already scopes this to the caller's project (or everything for
+  // Super Admin / a global-scope profile) — no manual project filter needed.
+  const { data } = await client.from("issues").select(ISSUE_SELECT).order("reported_at", { ascending: false });
+  return (data ?? []) as unknown as IssueWithRelations[];
+}

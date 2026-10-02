@@ -1,0 +1,34 @@
+package org.tpmnigeria.tpm.ui.navigation
+
+/**
+ * Route constants for Navigation Compose. Top-level routes show the bottom nav bar; everything
+ * else is a pushed screen with a back arrow (see topLevelKeyOf in AppNavHost.kt).
+ *
+ * No URL-encoding on issueId/filter here: Issue IDs are always `LGA3-WARD3-CAT3-YY-INITIALS###`
+ * (letters/digits/hyphens only, see IssueIdGenerator.kt) and filter names are our own enum-like
+ * strings — neither ever contains characters that need escaping as a path/query segment.
+ */
+object Routes {
+    const val Login = "login"
+    const val Home = "home"
+    const val Map = "map"
+    const val Notifications = "notifications"
+    const val SyncQueue = "syncQueue"
+
+    const val IssueListPattern = "issueList?filter={filter}"
+    const val IssueList = "issueList" // top-level key used for bottom-nav matching
+    fun issueList(filter: String? = null) = if (filter != null) "issueList?filter=$filter" else "issueList"
+
+    const val IssueDetailPattern = "issueDetail/{issueId}?justRegistered={justRegistered}"
+    fun issueDetail(issueId: String, justRegistered: Boolean = false) =
+        "issueDetail/$issueId?justRegistered=$justRegistered"
+
+    const val NewIssueWizard = "newIssueWizard"
+    const val DailyAttendance = "dailyAttendance"
+
+    const val DriRespondWizardPattern = "driRespondWizard?issueId={issueId}"
+    fun driRespondWizard(issueId: String? = null) = if (issueId != null) "driRespondWizard?issueId=$issueId" else "driRespondWizard"
+
+    const val FinalVerifyWizardPattern = "finalVerifyWizard?issueId={issueId}"
+    fun finalVerifyWizard(issueId: String? = null) = if (issueId != null) "finalVerifyWizard?issueId=$issueId" else "finalVerifyWizard"
+}

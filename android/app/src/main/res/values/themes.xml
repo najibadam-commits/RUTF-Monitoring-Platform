@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Minimal system theme — all real theming (colors, type, blueprint styling) lives in the
+         Compose theme (ui/theme/Theme.kt). This just sets the window background before Compose
+         takes over, and disables the legacy ActionBar since the app draws its own header. -->
+    <style name="Theme.TpmApp" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/window_background</item>
+        <item name="android:statusBarColor">@color/window_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- System splash screen (androidx.core.splashscreen — works down to API 21, uses the
+         platform SplashScreen API natively on 31+). MainActivity is the launcher activity's
+         theme; postSplashScreenTheme swaps back to Theme.TpmApp automatically once
+         installSplashScreen() detects the app is ready, so this only ever applies for that
+         brief instant. Same TPM logo mark as the launcher icon/app header, no extra
+         animation — a clean, quick flash of the brand mark per the branding spec. -->
+    <style name="Theme.TpmApp.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/window_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="postSplashScreenTheme">@style/Theme.TpmApp</item>
+    </style>
+</resources>

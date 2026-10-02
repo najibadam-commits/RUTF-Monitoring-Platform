@@ -1,0 +1,11 @@
+protocol_version,weight_min_kg,weight_max_kg,sachets_per_week,effective_from,effective_to
+CMAM-175kcal-generic,3.5,3.9,10,2026-01-01,
+CMAM-175kcal-generic,4.0,4.4,11,2026-01-01,
+CMAM-175kcal-generic,4.5,4.9,12,2026-01-01,
+CMAM-175kcal-generic,5.0,5.9,14,2026-01-01,
+CMAM-175kcal-generic,6.0,6.9,17,2026-01-01,
+CMAM-175kcal-generic,7.0,7.9,20,2026-01-01,
+CMAM-175kcal-generic,8.0,8.9,23,2026-01-01,
+CMAM-175kcal-generic,9.0,9.9,26,2026-01-01,
+CMAM-175kcal-generic,10.0,11.9,28,2026-01-01,
+CMAM-175kcal-generic,12.0,99,35,2026-01-01,
