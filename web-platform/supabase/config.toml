@@ -1,0 +1,3 @@
+# Minimal Supabase CLI / GitHub-integration config. Point the integration's
+# "Supabase directory" at `web-platform` so it finds supabase/migrations.
+project_id = "rutf-monitoring-platform"
