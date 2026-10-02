@@ -18,12 +18,15 @@ def load(name):
 fac = {f["id"]: f for f in load("facilities.csv")}
 th = {r["key"]: float(r["value"]) for r in load("rutf_thresholds.csv")}
 lots = {l["id"]: date.fromisoformat(l["expiry_date"]) for l in load("product_lots.csv")}
-txns = load("stock_transactions.csv")
+# Replayed in date order (file order within a day) — the generator writes a transfer's receipt row
+# when the transfer is issued but dates it days later, and the ledger counts it from its date
+# (RUTF DECISIONS R30).
+txns = sorted(load("stock_transactions.csv"), key=lambda t: t["txn_date"])
 MOVE = {"receipt": 1, "issue": -1, "dispensed": -1, "loss_damaged": -1, "loss_expired": -1,
         "loss_other": -1, "adjustment": 1}
 END = date(2026, 9, 30)
 
-# ---- ledger replay (file order = recording order)
+# ---- ledger replay (by date)
 bal = defaultdict(int)
 lot_bal = defaultdict(lambda: defaultdict(int))
 variance, stockout_days = [], defaultdict(set)

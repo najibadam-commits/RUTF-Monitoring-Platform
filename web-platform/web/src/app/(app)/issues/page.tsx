@@ -30,6 +30,10 @@ export default async function IssuesPage({
   if (sp.category) query = query.eq("category_id", sp.category);
   if (sp.state) query = query.eq("state_id", sp.state);
   if (sp.search) query = query.or(`description.ilike.%${sp.search}%,code.ilike.%${sp.search}%`);
+  // RUTF auto-Findings (migration 0102): automatic vs registered by a person, and the rule.
+  if (sp.source === "auto") query = query.eq("auto_generated", true);
+  else if (sp.source === "manual") query = query.eq("auto_generated", false);
+  if (sp.type) query = query.eq("finding_type", sp.type);
 
   const from = (page - 1) * PAGE_SIZE;
   // The paginated issues query, the two independent lookup queries (categories/states), and the
@@ -40,23 +44,24 @@ export default async function IssuesPage({
   // (every sector, active or legacy — so the filter can still find an old Finding under a
   // category that's since been retired) are deliberately different queries — see getCategories'
   // kdoc.
-  const [profile, { data, count }, [categories, filterCategories, states]] = await Promise.all([
+  const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }] = await Promise.all([
     getCurrentProfile(),
     query.range(from, from + PAGE_SIZE - 1),
     Promise.all([getCategories(supabase), getAllCategories(supabase), getStates(supabase)]),
+    supabase.from("finding_types").select("key, label").order("label"),
   ]);
   const issues = (data ?? []) as unknown as IssueListRow[];
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const exportParams = new URLSearchParams();
-  for (const key of ["status", "priority", "category", "state", "search"] as const) {
+  for (const key of ["status", "priority", "category", "state", "search", "source", "type"] as const) {
     if (sp[key]) exportParams.set(key, sp[key]!);
   }
 
   function pageHref(p: number) {
     const params = new URLSearchParams();
-    for (const key of ["status", "priority", "category", "state", "search"] as const) {
+    for (const key of ["status", "priority", "category", "state", "search", "source", "type"] as const) {
       if (sp[key]) params.set(key, sp[key]!);
     }
     params.set("page", String(p));
@@ -91,6 +96,7 @@ export default async function IssuesPage({
         priorities={PRIORITY_ORDER.map((p) => ({ value: p, label: PRIORITY_LABEL[p] }))}
         categories={filterCategories}
         states={states}
+        findingTypes={(findingTypes ?? []).map((t) => ({ value: t.key, label: t.label }))}
       />
 
       <div className="card elev-sm" style={{ padding: 0 }}>
@@ -110,7 +116,14 @@ export default async function IssuesPage({
           <tbody>
             {issues.map((i) => (
               <ClickableRow key={i.id} href={`/issues/${i.id}`}>
-                <td style={{ fontFamily: "var(--font-heading)" }}>{i.code}</td>
+                <td style={{ fontFamily: "var(--font-heading)" }}>
+                  {i.code}
+                  {i.auto_generated && (
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-accent-700)" }}>
+                      <i className="ph ph-robot" /> Auto · {i.finding?.label ?? "check"}
+                    </div>
+                  )}
+                </td>
                 <td>{i.category?.name ?? "—"}</td>
                 <td
                   title={i.description ?? undefined}

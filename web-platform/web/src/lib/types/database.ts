@@ -136,6 +136,15 @@ export interface Database {
           photo_count: number;
           created_at: string;
           updated_at: string;
+          // Auto-Findings (migration 0102) — null/false for a Finding a person registered.
+          finding_type: string | null;
+          facility_id: string | null;
+          transfer_id: string | null;
+          auto_generated: boolean;
+          metric: Json | null;
+          period_start: string | null;
+          period_end: string | null;
+          dedupe_key: string | null;
         };
         Insert: {
           id?: string;
@@ -386,6 +395,12 @@ export interface Database {
         Row: { project_id: string; key: string; value: number; note: string | null; updated_at: string };
         Insert: { project_id: string; key: string; value: number; note?: string | null };
         Update: Partial<Database["public"]["Tables"]["rutf_thresholds"]["Row"]>;
+        Relationships: [];
+      };
+      finding_types: {
+        Row: { key: string; label: string; default_priority: IssuePriority; source: "ledger" | "visit"; description: string };
+        Insert: Database["public"]["Tables"]["finding_types"]["Row"];
+        Update: Partial<Database["public"]["Tables"]["finding_types"]["Row"]>;
         Relationships: [];
       };
       transfers: {

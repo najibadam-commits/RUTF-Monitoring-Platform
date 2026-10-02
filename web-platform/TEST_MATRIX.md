@@ -154,3 +154,17 @@ existing RBAC helpers) rather than introducing new patterns.
 | Android: offline projection, cartons → sachets, record_* parameters, queue JSON round trip | As migration 0101 expects | ✅ `StockProjectionTest` (7) — Android unit tests 29/29 |
 | Android Room v10 → v11 | Six stock cache tables; SQL identical to the exported `11.json` | ✅ schema compared; 🔧 `MigrationTest.migrate10To11_createsStockCacheTables` compiles, run on a device |
 | Android: Receive / Issue / Daily Dispensing / Stock Count / Loss / My Stock end to end, offline then online | Queued, synced once, balances refresh | 🔧 `assembleDebug` builds; no emulator or device here — needs a device run with a demo facility user |
+
+# RUTF M3 — Auto-Findings (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Month-end count 7% below the ledger, synced through `record_stock_count` | Exactly one `stock_variance` Finding, `pending_review`, auto-generated, metric 7% / limit 5%, filed under OTP, structured ID | ✅ `node tools/db/test-findings.js` (13/13) |
+| Short receipt (490 of 500) | Exactly one `transfer_mismatch`, linked to the transfer, gap 10 | ✅ test-findings.js |
+| Re-run checks (single facility, all facilities) and a retried sync | No duplicates | ✅ test-findings.js |
+| Count 3% off (under the 5% limit) | No Finding | ✅ test-findings.js |
+| State Coordinator sees the Findings in review; facility user can't run checks | As stated | ✅ test-findings.js |
+| Rules over the dummy ledger Apr–Sep vs `check.py` | stock_variance 137, transfer_mismatch 68, receipt_not_confirmed 12, stockout 8 facilities, expired_stock 13, short_dispensing 108, late_reporting 13 OTPs — all equal | ✅ evaluated live (424 Findings); `python tools/dummy-data/check.py` |
+| Nightly job | `cron.job` row `rutf-nightly-findings`, 01:30 UTC, active | ✅ queried |
+| Earlier suites after 0102 | test-ledger 26/26, role access 137/137 | ✅ |
+| Findings list (Auto tag, source/type filters) and detail (Automatic check card) | Query shapes return facility, type, metric, transfer for a reviewer | ✅ via the API as the demo State Coordinator; ⏳ browser click-through |

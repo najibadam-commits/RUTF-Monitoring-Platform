@@ -180,6 +180,7 @@ export function IssueDetailClient({
 
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 16 }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {issue.auto_generated && <AutoCheckCard issue={issue} />}
           <div className="card elev-sm">
             <div className="card-title">Description</div>
             <p className="card-body">{issue.description}</p>
@@ -439,6 +440,81 @@ export function IssueDetailClient({
           </div>
         </Modal>
       )}
+    </div>
+  );
+}
+
+/** Labels for the measurements an automatic check stores in `issues.metric` (migration 0102). */
+const METRIC_LABEL: Record<string, string> = {
+  variance_pct: "Variance %",
+  threshold: "Limit",
+  counted: "Counted (sachets)",
+  ledger_balance: "Ledger balance (sachets)",
+  count_date: "Count date",
+  sachets_issued: "Issued (sachets)",
+  sachets_received: "Received (sachets)",
+  gap: "Gap (sachets)",
+  transfer_code: "Transfer",
+  days_in_transit: "Days in transit",
+  threshold_days: "Limit (days)",
+  stockout_days: "Days out of stock",
+  first_day: "First day",
+  lot_no: "Lot",
+  expiry_date: "Expired on",
+  balance: "Balance (sachets)",
+  short_pct: "Short %",
+  sachets_prescribed: "Prescribed (sachets)",
+  sachets_dispensed: "Dispensed (sachets)",
+  longest_gap_days: "Longest gap (days)",
+  gap_limit_days: "Gap limit (days)",
+  month_end_count: "Month-end count done",
+  adjustment: "Adjustment (sachets)",
+  balance_before: "Balance before (sachets)",
+  pct: "% of balance",
+};
+
+function formatMetric(v: unknown): string {
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (typeof v === "number") return v.toLocaleString("en-GB");
+  return String(v);
+}
+
+/** What the automatic check measured — RUTF auto-Findings are for review, not accusation. */
+function AutoCheckCard({ issue }: { issue: IssueWithRelations }) {
+  const metric = (issue.metric ?? {}) as Record<string, unknown>;
+  const rows = Object.entries(metric).filter(([k, v]) => k in METRIC_LABEL && v !== null && typeof v !== "object");
+  return (
+    <div className="card elev-sm" style={{ borderLeft: "3px solid var(--color-accent-600)" }}>
+      <div className="card-kicker">
+        <i className="ph ph-robot" /> Automatic check · {issue.finding?.label ?? issue.finding_type}
+      </div>
+      <p className="card-body" style={{ marginTop: 4 }}>
+        Raised from the stock ledger for review
+        {issue.period_start && issue.period_end ? ` (period ${issue.period_start} to ${issue.period_end})` : ""}.
+      </p>
+      {rows.length > 0 && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10, fontSize: 13, marginTop: 8 }}>
+          {rows.map(([k, v]) => (
+            <div key={k}>
+              <span className="text-muted">{METRIC_LABEL[k]}</span>
+              <br />
+              <strong>{formatMetric(v)}</strong>
+            </div>
+          ))}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: 14, marginTop: 10, fontSize: 13 }}>
+        {issue.facility && (
+          <a href={`/stock-ledger?facility=${issue.facility.id}`}>
+            <i className="ph ph-book-open-text" /> {issue.facility.name} — stock ledger
+          </a>
+        )}
+        {issue.transfer_id && (
+          <a href={`/transfers?transfer=${issue.transfer_id}`}>
+            <i className="ph ph-truck" /> Transfer
+          </a>
+        )}
+      </div>
     </div>
   );
 }

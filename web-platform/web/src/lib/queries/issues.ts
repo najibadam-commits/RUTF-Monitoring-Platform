@@ -11,7 +11,9 @@ export const ISSUE_SELECT = `
   ward_ref:wards(id, name),
   reporter:profiles!issues_reported_by_fkey(id, name),
   dri:profiles!issues_assigned_dri_fkey(id, name, phone, email),
-  verifier:profiles!issues_verified_by_fkey(id, name)
+  verifier:profiles!issues_verified_by_fkey(id, name),
+  facility:facilities(id, name),
+  finding:finding_types(key, label)
 `;
 
 // Scoped to exactly what the Issues LIST table renders (code/category/description/state/lga/
@@ -19,7 +21,8 @@ export const ISSUE_SELECT = `
 // contact info/ward, unlike ISSUE_SELECT above, which stays the full relation set for the Issue
 // Detail page.
 export const ISSUE_LIST_SELECT = `
-  id, code, description, priority, status, reported_at,
+  id, code, description, priority, status, reported_at, auto_generated,
+  finding:finding_types(label),
   category:categories(name),
   state:states(name),
   lga:lgas(name),
@@ -36,9 +39,12 @@ export type IssueWithRelations = IssueRow & {
   reporter: { id: string; name: string } | null;
   dri: { id: string; name: string; phone: string | null; email: string } | null;
   verifier: { id: string; name: string } | null;
+  facility: { id: string; name: string } | null;
+  finding: { key: string; label: string } | null;
 };
 
-export type IssueListRow = Pick<IssueRow, "id" | "code" | "description" | "priority" | "status" | "reported_at"> & {
+export type IssueListRow = Pick<IssueRow, "id" | "code" | "description" | "priority" | "status" | "reported_at" | "auto_generated"> & {
+  finding: { label: string } | null;
   category: { name: string } | null;
   state: { name: string } | null;
   lga: { name: string } | null;

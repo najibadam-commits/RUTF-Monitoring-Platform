@@ -98,7 +98,7 @@ node seed-demo-accounts.js                # demo sign-ins from people.csv (share
 node import-ledger.js                     # dummy transfers, ledger and OTP dispensing (needs the demo accounts)
 ```
 
-Ledger tests: `node test-ledger.js` (M2 acceptance) and `node test-mobile-role-access.js`.
+Tests: `node test-ledger.js` (M2), `node test-findings.js` (M3) and `node test-mobile-role-access.js`.
 
 ### 4. Seed demo accounts + sample issues (optional, for local testing)
 

@@ -8,11 +8,14 @@ export function IssuesFilterBar({
   categories,
   states,
   priorities,
+  findingTypes,
 }: {
   statuses: { value: string; label: string }[];
   categories: { id: string; name: string }[];
   states: { id: string; name: string }[];
   priorities: { value: string; label: string }[];
+  /** RUTF Finding types (migration 0102) — filters by the rule that raised a Finding. */
+  findingTypes: { value: string; label: string }[];
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,7 +29,7 @@ export function IssuesFilterBar({
     router.push(`/issues?${params.toString()}`);
   }
 
-  const hasActiveFilters = ["search", "status", "category", "state", "priority"].some((k) => searchParams.get(k));
+  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type"].some((k) => searchParams.get(k));
   // Keys the uncontrolled search input + selects to the active filter set, so they properly
   // remount (and re-apply their defaultValue) whenever filters change via something other than
   // typing/selecting directly in them — e.g. "Clear Filters" below, or browser back/forward.
@@ -74,6 +77,19 @@ export function IssuesFilterBar({
         {priorities.map((p) => (
           <option key={p.value} value={p.value}>
             {p.label}
+          </option>
+        ))}
+      </select>
+      <select className="input" style={{ maxWidth: 170 }} defaultValue={searchParams.get("source") ?? "All"} onChange={(e) => update("source", e.target.value)}>
+        <option value="All">Any source</option>
+        <option value="auto">Automatic checks</option>
+        <option value="manual">Registered by a person</option>
+      </select>
+      <select className="input" style={{ maxWidth: 200 }} defaultValue={searchParams.get("type") ?? "All"} onChange={(e) => update("type", e.target.value)}>
+        <option value="All">All Finding types</option>
+        {findingTypes.map((t) => (
+          <option key={t.value} value={t.value}>
+            {t.label}
           </option>
         ))}
       </select>

@@ -52,6 +52,9 @@ function check(what, expected, actual) {
     for (const [u, f] of [[U.sst, SST], [U.lst, LST], [U.otp, OTP1]]) await pg.query(`update profiles set facility_id = $2 where id = $1`, [u, f]);
 
     const day = (n) => (n === 0 ? "current_date" : `current_date - ${n}`);
+    // JWT claims set with set_config(..., true) last until the transaction ends — cleared after
+    // every call so later direct-connection queries don't act as that user.
+    const clearIdentity = () => pg.query(`select set_config('request.jwt.claims', '', true), set_config('request.jwt.claim.sub', '', true)`);
     // Runs fn under a user's identity; a statement error is caught and returned as { error }.
     async function as(userId, sql, params = []) {
       await pg.query("savepoint s");
@@ -62,10 +65,12 @@ function check(what, expected, actual) {
         const r = await pg.query(sql, params);
         await pg.query("reset role");
         await pg.query("release savepoint s");
+        await clearIdentity();
         return { rows: r.rows };
       } catch (e) {
         await pg.query("rollback to savepoint s");
         await pg.query("reset role");
+        await clearIdentity();
         return { error: e.message };
       }
     }
