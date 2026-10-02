@@ -85,4 +85,18 @@ val MIGRATION_8_9 = object : Migration(8, 9) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+/** New `ref_facilities` cache (RUTF facility registry, web migration 0100 — see
+ *  FacilityRefEntity). A server-derived cache like the other ref_* tables: brand-new and purely
+ *  additive, ReferenceRepository fills it on the next refresh. */
+val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            """CREATE TABLE IF NOT EXISTS ref_facilities (
+                `id` TEXT NOT NULL, `name` TEXT NOT NULL, `facilityType` TEXT NOT NULL,
+                `lgaId` TEXT NOT NULL, `wardId` TEXT, `lat` REAL, `lng` REAL,
+                `isOtpSite` INTEGER NOT NULL, `suppliedById` TEXT, PRIMARY KEY(`id`))""",
+        )
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)

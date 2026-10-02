@@ -5,17 +5,20 @@ import Papa from "papaparse";
 import { ROLE_LABELS, assignableRolesFor } from "@/lib/rbac";
 import type { Database, UserRole } from "@/lib/types/database";
 import { bulkAddUsersAction } from "@/lib/actions/users";
+import type { FacilityOption } from "./FacilityPicker";
 
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 
 const MAX_ROWS = 25;
 
-type TargetField = "name" | "email" | "phone" | "role";
+type TargetField = "name" | "email" | "phone" | "role" | "facility";
 const TARGET_FIELDS: { key: TargetField; label: string; required: boolean }[] = [
   { key: "name", label: "Full Name", required: true },
   { key: "email", label: "Email", required: true },
   { key: "phone", label: "Phone Number", required: false },
   { key: "role", label: "Role", required: true },
+  // Required per row only for facility users (dri) — name or national code of a store / OTP site.
+  { key: "facility", label: "Facility (facility users)", required: false },
 ];
 
 const GUESS_KEYWORDS: Record<TargetField, string[]> = {
@@ -23,6 +26,7 @@ const GUESS_KEYWORDS: Record<TargetField, string[]> = {
   email: ["email", "e-mail", "mail"],
   phone: ["phone", "mobile", "tel"],
   role: ["role"],
+  facility: ["facility", "store", "otp"],
 };
 
 function guessMapping(headers: string[]): Record<TargetField, string | null> {
@@ -55,23 +59,27 @@ interface PreviewRow {
   phone: string;
   roleRaw: string;
   role: UserRole | null;
+  facilityRaw: string;
+  facilityId: string | null;
   error: string | null;
 }
 
 export function BulkImportUsersModal({
   users,
   callerRole,
+  facilities,
   onClose,
 }: {
   users: Profile[];
   callerRole: UserRole;
+  facilities: FacilityOption[];
   onClose: () => void;
 }) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileName, setFileName] = useState("");
   const [headers, setHeaders] = useState<string[] | null>(null);
   const [rawRows, setRawRows] = useState<Record<string, string>[] | null>(null);
-  const [mapping, setMapping] = useState<Record<TargetField, string | null>>({ name: null, email: null, phone: null, role: null });
+  const [mapping, setMapping] = useState<Record<TargetField, string | null>>({ name: null, email: null, phone: null, role: null, facility: null });
   const [parseError, setParseError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -79,6 +87,15 @@ export function BulkImportUsersModal({
 
   const existingEmails = useMemo(() => new Set(users.map((u) => u.email.trim().toLowerCase())), [users]);
   const assignable = assignableRolesFor(callerRole);
+  // Facility by exact name or national code, case-insensitive.
+  const facilityIndex = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const f of facilities) {
+      m.set(f.name.trim().toLowerCase(), f.id);
+      if (f.national_code) m.set(f.national_code.trim().toLowerCase(), f.id);
+    }
+    return m;
+  }, [facilities]);
 
   const preview = useMemo<PreviewRow[] | null>(() => {
     if (!rawRows) return null;
@@ -90,6 +107,8 @@ export function BulkImportUsersModal({
       const phone = (mapping.phone ? raw[mapping.phone] : "")?.trim() ?? "";
       const roleRaw = (mapping.role ? raw[mapping.role] : "")?.trim() ?? "";
       const role = resolveRole(roleRaw);
+      const facilityRaw = (mapping.facility ? raw[mapping.facility] : "")?.trim() ?? "";
+      const facilityId = facilityRaw ? (facilityIndex.get(facilityRaw.toLowerCase()) ?? null) : null;
       const emailLower = email.toLowerCase();
 
       let error: string | null = null;
@@ -101,17 +120,19 @@ export function BulkImportUsersModal({
       else if (!roleRaw) error = "Missing role";
       else if (!role) error = `Unrecognized role "${roleRaw}"`;
       else if (!assignable.includes(role)) error = `You cannot assign the ${ROLE_LABELS[role]} role`;
+      else if (role === "dri" && !facilityRaw) error = "Facility users need a facility";
+      else if (role === "dri" && !facilityId) error = `Unknown facility "${facilityRaw}" (use a store or OTP site name, or its national code)`;
 
       if (!error) seenInFile.add(emailLower);
-      return { line, name, email, phone, roleRaw, role, error };
+      return { line, name, email, phone, roleRaw, role, facilityRaw, facilityId, error };
     });
-  }, [rawRows, mapping, existingEmails, assignable]);
+  }, [rawRows, mapping, existingEmails, assignable, facilityIndex]);
 
   const validRows = preview?.filter((r) => !r.error && r.role) ?? [];
   const invalidRows = preview?.filter((r) => r.error) ?? [];
 
   function downloadTemplate() {
-    const csv = "name,email,phone,role\nJane Doe,jane@example.org,+234 800 000 0000,DRI\n";
+    const csv = "name,email,phone,role,facility\nJane Doe,jane@example.org,+234 800 000 0000,DRI,Bakori LGA Nutrition Store (DUMMY)\n";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -149,7 +170,7 @@ export function BulkImportUsersModal({
     setUploading(true);
     setSubmitError(null);
     const res = await bulkAddUsersAction(
-      validRows.map((r) => ({ name: r.name, email: r.email, phone: r.phone, role: r.role! })),
+      validRows.map((r) => ({ name: r.name, email: r.email, phone: r.phone, role: r.role!, facilityId: r.role === "dri" ? r.facilityId : null })),
     );
     setUploading(false);
     if (res.error) setSubmitError(res.error);
@@ -193,7 +214,7 @@ export function BulkImportUsersModal({
           )}
 
           {headers && (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10 }}>
               {TARGET_FIELDS.map((field) => (
                 <div className="field" key={field.key}>
                   <label>
@@ -236,6 +257,7 @@ export function BulkImportUsersModal({
                       <th>Email</th>
                       <th>Phone</th>
                       <th>Role</th>
+                      <th>Facility</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -247,6 +269,7 @@ export function BulkImportUsersModal({
                         <td>{r.email}</td>
                         <td>{r.phone || "—"}</td>
                         <td>{r.roleRaw}</td>
+                        <td>{r.facilityRaw || "—"}</td>
                         <td style={{ color: r.error ? "var(--priority-critical)" : "var(--status-resolved)" }}>{r.error ?? "OK"}</td>
                       </tr>
                     ))}

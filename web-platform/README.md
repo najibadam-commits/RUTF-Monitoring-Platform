@@ -86,7 +86,14 @@ Adding a migration later (after the first apply)? Use `node apply-one.js <path-t
 ```bash
 cd tools/gis-import && npm install
 # edit the SRC paths in import.js to point at your state.sqlite/LGA.sqlite/Ward.sqlite
-node import.js
+node import.js --states KT   # RUTF pilot: Katsina only (omit the flag for all of Nigeria)
+```
+
+Then load the RUTF reference data (facility registry + lots; migration 0100 seeds the product,
+dosing rules and thresholds):
+
+```bash
+cd tools/db && node import-reference.js   # reads ../../../data/dummy/facilities.csv, product_lots.csv
 ```
 
 ### 4. Seed demo accounts + sample issues (optional, for local testing)

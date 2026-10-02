@@ -69,6 +69,25 @@ data class ActivitySiteRefEntity(
 )
 
 /**
+ * RUTF facility registry (web migration 0100), cached for offline use. The server's RLS decides
+ * what lands here: a facility user (`dri`) gets only their own facility, the store that supplies
+ * it and the facilities it supplies; supervisors and other roles get their project's facilities.
+ * Replaced in full on every refresh — see ReferenceRepository.refreshFacilities.
+ */
+@Entity(tableName = "ref_facilities")
+data class FacilityRefEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val facilityType: String, // facility_type enum: state_store | lga_store | health_facility
+    val lgaId: String,
+    val wardId: String?,
+    val lat: Double?,
+    val lng: Double?,
+    val isOtpSite: Boolean,
+    val suppliedById: String?,
+)
+
+/**
  * Tracks which scopes' wards/settlements/activity_sites have already been fetched and cached, so
  * ensureXLoaded() doesn't re-hit the network every time the same Ward is picked. [scopeKey] is the
  * LGA id for wards, or the Ward id for settlements/activity_sites — all real FKs now (see

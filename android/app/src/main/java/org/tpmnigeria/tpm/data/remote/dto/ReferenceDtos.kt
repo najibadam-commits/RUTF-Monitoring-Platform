@@ -24,3 +24,17 @@ data class SettlementDto(val id: String, val ward_id: String, val settlementname
 
 @Serializable
 data class ActivitySiteDto(val id: String, val ward_id: String, val activitysitename: String)
+
+/** `facilities` (web migration 0100) — only the columns the app caches. */
+@Serializable
+data class FacilityDto(
+    val id: String,
+    val name: String,
+    val facility_type: String,
+    val lga_id: String,
+    val ward_id: String? = null,
+    val lat: Double? = null,
+    val lng: Double? = null,
+    val is_otp_site: Boolean = false,
+    val supplied_by_facility_id: String? = null,
+)

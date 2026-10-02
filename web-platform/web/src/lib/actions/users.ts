@@ -10,6 +10,29 @@ import type { UserRole } from "@/lib/types/database";
 type ActionResult = { error?: string };
 
 /**
+ * Profile columns that follow from the role. A facility user (`dri`) is tied to one facility
+ * (RUTF brief §4, migration 0100); its level (assigned_category_id) is then set by the database
+ * from the facility type, so it is left out here for a dri and cleared for every other role.
+ * A dri also takes the facility's project, so a Super Admin assignment lands in the right scope.
+ */
+async function roleScopedColumns(
+  client: ReturnType<typeof createAdminClient> | Awaited<ReturnType<typeof createClient>>,
+  input: { role: UserRole; managedStateId?: string | null; facilityId?: string | null },
+): Promise<{ error?: string; columns?: Record<string, string | null> }> {
+  const columns: Record<string, string | null> = {
+    managed_state_id: input.role === "state_coordinator" ? (input.managedStateId ?? null) : null,
+    facility_id: input.role === "dri" ? (input.facilityId ?? null) : null,
+  };
+  if (input.role !== "dri") columns.assigned_category_id = null;
+  if (input.role === "dri" && input.facilityId) {
+    const { data: facility, error } = await client.from("facilities").select("project_id").eq("id", input.facilityId).single();
+    if (error || !facility) return { error: "That facility wasn't found." };
+    if (facility.project_id) columns.project_id = facility.project_id;
+  }
+  return { columns };
+}
+
+/**
  * Shared by addUserAction and bulkAddUsersAction: invites one account via the
  * service-role Admin API (inviteUserByEmail — a real email with a link to set
  * their own password) then corrects role/project_id with the same admin
@@ -28,9 +51,9 @@ async function inviteAndSetupUser(
     phone: string;
     role: UserRole;
     // Only meaningful for role = state_coordinator / role = dri respectively — see
-    // DECISIONS.md #22. Undefined/omitted for every other role.
+    // DECISIONS.md #22 and RUTF DECISIONS R15. Undefined/omitted for every other role.
     managedStateId?: string | null;
-    assignedCategoryId?: string | null;
+    facilityId?: string | null;
   },
   // Explicit override for callers that already know the target project (e.g. the Project
   // Admin bulk import, which just created/resolved one). Omit to fall back to the normal
@@ -40,7 +63,9 @@ async function inviteAndSetupUser(
   if (!assignableRolesFor(caller.role).includes(input.role)) return { error: `You cannot assign the ${input.role} role.` };
   if (!input.name.trim() || !input.email.trim()) return { error: "Name and email are required." };
   if (input.role === "state_coordinator" && !input.managedStateId) return { error: "Select the State this coordinator will manage." };
-  if (input.role === "dri" && !input.assignedCategoryId) return { error: "Select the sector this DRI will be assigned to." };
+  if (input.role === "dri" && !input.facilityId) return { error: "Select the facility this facility user records for." };
+  const scoped = await roleScopedColumns(admin, input);
+  if (scoped.error) return { error: scoped.error };
 
   // redirectTo must point at /auth/confirm (not Supabase's default Site URL redirect, which never
   // hits our own token_hash-exchange route) — without it the invite link lands the user back on
@@ -60,8 +85,7 @@ async function inviteAndSetupUser(
       phone: input.phone || null,
       role: input.role,
       project_id: projectId,
-      managed_state_id: input.role === "state_coordinator" ? input.managedStateId : null,
-      assigned_category_id: input.role === "dri" ? input.assignedCategoryId : null,
+      ...scoped.columns,
     })
     .eq("id", data.user.id);
   if (profileError) return { error: profileError.message };
@@ -76,7 +100,7 @@ export async function addUserAction(input: {
   phone: string;
   role: UserRole;
   managedStateId?: string | null;
-  assignedCategoryId?: string | null;
+  facilityId?: string | null;
 }): Promise<ActionResult> {
   const caller = await getCurrentProfile();
   if (!canAccessUsersScreen(caller.role)) return { error: "Not authorized." };
@@ -101,7 +125,7 @@ const BULK_INVITE_DELAY_MS = 400;
  * rate limit from repeated invites (see tools/db/add-user-no-email.js's own comment about it).
  */
 export async function bulkAddUsersAction(
-  rows: { name: string; email: string; phone: string; role: UserRole }[],
+  rows: { name: string; email: string; phone: string; role: UserRole; facilityId?: string | null }[],
 ): Promise<{ error?: string; results?: { email: string; success: boolean; error?: string }[] }> {
   const caller = await getCurrentProfile();
   if (!canAccessUsersScreen(caller.role)) return { error: "Not authorized." };
@@ -140,16 +164,19 @@ export async function editUserAction(input: {
   role: UserRole;
   status: "active" | "inactive";
   managedStateId?: string | null;
-  assignedCategoryId?: string | null;
+  facilityId?: string | null;
 }): Promise<ActionResult> {
   const caller = await getCurrentProfile();
   if (!canAccessUsersScreen(caller.role)) return { error: "Not authorized." };
   if (input.role === "state_coordinator" && !input.managedStateId) return { error: "Select the State this coordinator will manage." };
-  if (input.role === "dri" && !input.assignedCategoryId) return { error: "Select the sector this DRI will be assigned to." };
+  if (input.role === "dri" && !input.facilityId) return { error: "Select the facility this facility user records for." };
 
   // Regular (RLS-respecting) client: the enforce_profile_update_rules
-  // trigger is the real boundary here (project scope, role-escalation guard).
+  // trigger is the real boundary here (project scope, role-escalation guard,
+  // and a Project Admin may only assign a facility in their own project).
   const supabase = await createClient();
+  const scoped = await roleScopedColumns(supabase, input);
+  if (scoped.error) return { error: scoped.error };
   const { error } = await supabase
     .from("profiles")
     .update({
@@ -158,8 +185,7 @@ export async function editUserAction(input: {
       phone: input.phone || null,
       role: input.role,
       status: input.status,
-      managed_state_id: input.role === "state_coordinator" ? input.managedStateId : null,
-      assigned_category_id: input.role === "dri" ? input.assignedCategoryId : null,
+      ...scoped.columns,
     })
     .eq("id", input.userId);
   if (error) return { error: error.message };

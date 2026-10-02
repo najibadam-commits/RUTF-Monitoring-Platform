@@ -31,6 +31,7 @@ import org.tpmnigeria.tpm.domain.model.locationLabel
 import org.tpmnigeria.tpm.domain.statusMeta
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.LocalAppSession
+import org.tpmnigeria.tpm.ui.LocalReferenceRepository
 import org.tpmnigeria.tpm.ui.components.IssueRow
 import org.tpmnigeria.tpm.ui.components.TpmButton
 import org.tpmnigeria.tpm.ui.components.TpmButtonVariant
@@ -86,6 +87,10 @@ fun HomeScreen(
                 )
             }
             Spacer(Modifier.height(TpmSpacing.space3))
+            if (role == UserRole.Dri) {
+                MyFacilityCard(user.facilityId)
+                Spacer(Modifier.height(TpmSpacing.space2))
+            }
             // Each action shows only for a role the server would actually let perform it — see
             // MobileAccess. A role with none of these (State Coordinator) gets a pure oversight Home.
             var anyAction = false
@@ -212,5 +217,46 @@ private fun buildKpis(issues: List<Issue>, pendingSync: Int, role: UserRole): Li
             Kpi("Overdue (SLA)", overdueCount, "overdue"),
             Kpi("Pending Sync", pendingSync, null, toSyncQueue = true),
         )
+    }
+}
+
+private val FACILITY_TYPE_LABEL = mapOf(
+    "state_store" to "State store",
+    "lga_store" to "LGA store",
+    "health_facility" to "Health facility",
+)
+
+/**
+ * The one facility a facility user records for (web migration 0100), read from the offline
+ * cache. What the cache holds is already server-scoped to this facility, its supplier and the
+ * facilities it supplies (ReferenceRepository.refreshFacilities), so this works offline too.
+ */
+@Composable
+private fun MyFacilityCard(facilityId: String?) {
+    val references = LocalReferenceRepository.current
+    TpmCard(modifier = Modifier.fillMaxWidth()) {
+        Text("My facility", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        if (facilityId == null) {
+            Text("No facility assigned — ask your administrator to assign one.", style = MaterialTheme.typography.bodyMedium)
+            return@TpmCard
+        }
+        val facility by remember(facilityId) { references.observeFacility(facilityId) }.collectAsState(initial = null)
+        val current = facility
+        if (current == null) {
+            Text("Facility details download the next time you are online.", style = MaterialTheme.typography.bodyMedium)
+            return@TpmCard
+        }
+        val supplier by remember(current.suppliedById) {
+            current.suppliedById?.let { references.observeFacility(it) } ?: kotlinx.coroutines.flow.flowOf(null)
+        }.collectAsState(initial = null)
+        val supplied by remember(current.id) { references.observeFacilitiesSuppliedBy(current.id) }.collectAsState(initial = emptyList())
+
+        Text(current.name, style = MaterialTheme.typography.titleMedium)
+        val type = FACILITY_TYPE_LABEL[current.facilityType] ?: current.facilityType
+        Text(if (current.isOtpSite) "$type · OTP site" else type, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        supplier?.let { Text("Supplied by ${it.name}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted) }
+        if (supplied.isNotEmpty()) {
+            Text("Supplies ${supplied.size} facilit${if (supplied.size == 1) "y" else "ies"}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        }
     }
 }

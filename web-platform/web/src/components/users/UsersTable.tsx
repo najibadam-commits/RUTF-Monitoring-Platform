@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { ActiveStatusTag } from "@/components/ui/Tags";
 import { BulkImportUsersModal } from "./BulkImportUsersModal";
+import { FacilityPicker, type FacilityOption } from "./FacilityPicker";
 import { ASSIGNABLE_ROLES_BY_PROJECT_ADMIN, ASSIGNABLE_ROLES_BY_SUPER_ADMIN, ROLE_LABELS, assignableRolesFor, roleOptionLabel } from "@/lib/rbac";
 import type { Database, UserRole } from "@/lib/types/database";
 import { addUserAction, editUserAction, removeUserAction, resetUserPasswordAction } from "@/lib/actions/users";
@@ -16,14 +17,19 @@ export function UsersTable({
   callerRole,
   callerId,
   states,
-  sectors,
+  facilities,
+  facilityNames,
+  lgas,
 }: {
   users: Profile[];
   callerRole: UserRole;
   callerId: string;
   states: { id: string; name: string }[];
-  /** Active sectors only — see getCategories' kdoc. */
-  sectors: { id: string; name: string }[];
+  /** Assignable facilities (stores + OTP sites) for the facility-user picker. */
+  facilities: FacilityOption[];
+  /** Names of every facility a listed user is assigned to (may include ones not assignable now). */
+  facilityNames: Record<string, string>;
+  lgas: { id: string; name: string }[];
 }) {
   const [modal, setModal] = useState<ModalKind>(null);
   const [target, setTarget] = useState<Profile | null>(null);
@@ -34,7 +40,7 @@ export function UsersTable({
     phone: "",
     role: assignableRolesFor(callerRole)[0] ?? "viewer",
     managedStateId: "",
-    assignedCategoryId: "",
+    facilityId: "",
   });
   const [editForm, setEditForm] = useState({
     name: "",
@@ -43,7 +49,7 @@ export function UsersTable({
     role: "viewer" as UserRole,
     status: "active" as "active" | "inactive",
     managedStateId: "",
-    assignedCategoryId: "",
+    facilityId: "",
   });
   const [resetState, setResetState] = useState<{ id: string; status: "pending" | "success" | "error"; message?: string } | null>(null);
 
@@ -71,7 +77,7 @@ export function UsersTable({
       role: u.role,
       status: u.status,
       managedStateId: u.managed_state_id ?? "",
-      assignedCategoryId: u.assigned_category_id ?? "",
+      facilityId: u.facility_id ?? "",
     });
     setModal("edit");
   }
@@ -79,7 +85,7 @@ export function UsersTable({
   function closeModal() {
     setModal(null);
     setTarget(null);
-    setAddForm({ name: "", email: "", phone: "", role: assignable[0] ?? "viewer", managedStateId: "", assignedCategoryId: "" });
+    setAddForm({ name: "", email: "", phone: "", role: assignable[0] ?? "viewer", managedStateId: "", facilityId: "" });
   }
 
   return (
@@ -123,6 +129,11 @@ export function UsersTable({
                 <td className="text-muted">{u.phone || "—"}</td>
                 <td>
                   <span className="tag tag-accent">{ROLE_LABELS[u.role]}</span>
+                  {u.role === "dri" && (
+                    <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
+                      {u.facility_id ? (facilityNames[u.facility_id] ?? "Facility") : "No facility assigned"}
+                    </div>
+                  )}
                 </td>
                 <td>
                   <ActiveStatusTag status={u.status === "active" ? "active" : "inactive"} />
@@ -186,7 +197,7 @@ export function UsersTable({
             addUserAction({
               ...addForm,
               managedStateId: addForm.role === "state_coordinator" ? addForm.managedStateId : null,
-              assignedCategoryId: addForm.role === "dri" ? addForm.assignedCategoryId : null,
+              facilityId: addForm.role === "dri" ? addForm.facilityId : null,
             })
           }
         >
@@ -227,20 +238,7 @@ export function UsersTable({
               </div>
             )}
             {addForm.role === "dri" && (
-              <div className="field">
-                <label>Assigned Sector</label>
-                <select className="input" value={addForm.assignedCategoryId} onChange={(e) => setAddForm((f) => ({ ...f, assignedCategoryId: e.target.value }))}>
-                  <option value="">Select a Sector…</option>
-                  {sectors.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  This DRI will only see Findings in this sector.
-                </div>
-              </div>
+              <FacilityPicker value={addForm.facilityId} onChange={(id) => setAddForm((f) => ({ ...f, facilityId: id }))} facilities={facilities} lgas={lgas} />
             )}
           </div>
         </Modal>
@@ -255,7 +253,7 @@ export function UsersTable({
               userId: target.id,
               ...editForm,
               managedStateId: editForm.role === "state_coordinator" ? editForm.managedStateId : null,
-              assignedCategoryId: editForm.role === "dri" ? editForm.assignedCategoryId : null,
+              facilityId: editForm.role === "dri" ? editForm.facilityId : null,
             })
           }
         >
@@ -296,20 +294,7 @@ export function UsersTable({
               </div>
             )}
             {editForm.role === "dri" && (
-              <div className="field">
-                <label>Assigned Sector</label>
-                <select className="input" value={editForm.assignedCategoryId} onChange={(e) => setEditForm((f) => ({ ...f, assignedCategoryId: e.target.value }))}>
-                  <option value="">Select a Sector…</option>
-                  {sectors.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  This DRI will only see Findings in this sector.
-                </div>
-              </div>
+              <FacilityPicker value={editForm.facilityId} onChange={(id) => setEditForm((f) => ({ ...f, facilityId: id }))} facilities={facilities} lgas={lgas} />
             )}
             <div className="field">
               <label>Status</label>
@@ -358,7 +343,7 @@ export function UsersTable({
         </Modal>
       )}
 
-      {modal === "bulkImport" && <BulkImportUsersModal users={users} callerRole={callerRole} onClose={closeModal} />}
+      {modal === "bulkImport" && <BulkImportUsersModal users={users} callerRole={callerRole} facilities={facilities} onClose={closeModal} />}
     </div>
   );
 }

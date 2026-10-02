@@ -161,4 +161,34 @@ class MigrationTest {
             db.close()
         }
     }
+
+    /** v9→v10 creates `ref_facilities` (RUTF facility registry cache — see FacilityRefEntity,
+     *  web migration 0100). Brand-new table; confirms the CREATE TABLE matches what Room expects
+     *  and round-trips through the DAO, including the whole-table replace. */
+    @Test
+    fun migrate9To10_createsFacilitiesTable() {
+        helper.createDatabase(testDb, 9).apply { close() }
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.databaseBuilder(context, TpmDatabase::class.java, testDb)
+            .addMigrations(MIGRATION_9_10)
+            .build()
+        try {
+            val otp = FacilityRefEntity(
+                id = "f-otp", name = "Bakori PHC", facilityType = "health_facility", lgaId = "lga-1",
+                wardId = "ward-1", lat = 11.55, lng = 7.42, isOtpSite = true, suppliedById = "f-lst",
+            )
+            val store = FacilityRefEntity(
+                id = "f-lst", name = "Bakori LGA Store", facilityType = "lga_store", lgaId = "lga-1",
+                wardId = null, lat = null, lng = null, isOtpSite = false, suppliedById = null,
+            )
+            runBlocking { db.referenceDao().replaceFacilities(listOf(otp, store)) }
+            assertEquals(otp, runBlocking { db.referenceDao().getFacility("f-otp") })
+
+            runBlocking { db.referenceDao().replaceFacilities(listOf(store)) }
+            assertEquals("Replace must drop facilities the user no longer sees", 1, runBlocking { db.referenceDao().countFacilities() })
+        } finally {
+            db.close()
+        }
+    }
 }

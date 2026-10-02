@@ -11,9 +11,9 @@ import androidx.room.TypeConverters
         IssueEntity::class, NotificationEntity::class, SyncQueueEntity::class,
         StateRefEntity::class, LgaRefEntity::class, WardRefEntity::class, CategoryRefEntity::class,
         SettlementRefEntity::class, ActivitySiteRefEntity::class, LoadedScopeEntity::class,
-        IssueIdCounterEntity::class, AttendanceEntity::class,
+        IssueIdCounterEntity::class, AttendanceEntity::class, FacilityRefEntity::class,
     ],
-    version = 9,
+    version = 10,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

@@ -55,7 +55,7 @@ class IssueIdGeneratorTest {
     @Test
     fun `derives initials the same way the server does`() {
         assertEquals("NI", deriveInitials("Najib Isah"))
-        assertEquals("NA", deriveInitials("Najib Abdullahi Isah")) // first + last token only
+        assertEquals("NI", deriveInitials("Najib Abdullahi Isah")) // first + last token only (web 0042)
         assertEquals("JJ", deriveInitials("Jide")) // single word doubles its first letter
         assertEquals("XX", deriveInitials(""))
         assertEquals("XX", deriveInitials("   "))

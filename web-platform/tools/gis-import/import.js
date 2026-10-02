@@ -2,8 +2,11 @@
 // Ward.sqlite — SpatiaLite, EPSG:4326) into the states/lgas/wards tables
 // created by supabase/migrations/0002_lookup_tables.sql.
 //
-// Usage: node import.js
+// Usage: node import.js [--states KT,KN]
 // Reads DATABASE_URL from ../db/.env (same connection used for migrations).
+// --states limits the import to those state codes (and their LGAs/wards); the full
+// all-Nigeria import dropped its connection part-way, and the RUTF pilot is Katsina only.
+// Inserts use ON CONFLICT DO NOTHING, so a later run without the flag adds the rest.
 
 require("dotenv").config({ path: require("path").join(__dirname, "..", "db", ".env"), quiet: true });
 const gdal = require("gdal-async");
@@ -14,6 +17,9 @@ const SRC = {
   lga: "C:/Users/najib.adam/Desktop/App/LGA.sqlite",
   ward: "C:/Users/najib.adam/Desktop/App/Ward.sqlite",
 };
+
+const statesArg = process.argv.indexOf("--states");
+const STATE_FILTER = statesArg > -1 ? new Set(process.argv[statesArg + 1].split(",").map((s) => s.trim())) : null;
 
 function readLayer(path) {
   const ds = gdal.open(path);
@@ -63,9 +69,12 @@ async function importWithGeom(client, table, rows, mapRow, batchSize = 200) {
 
 (async () => {
   console.log("Reading SpatiaLite layers...");
-  const states = readLayer(SRC.state);
-  const lgas = readLayer(SRC.lga);
-  const wards = readLayer(SRC.ward);
+  // Ward rows carry no state code, so the filter follows the chain: states -> their LGAs -> those LGAs' wards.
+  const inStates = (r) => !STATE_FILTER || STATE_FILTER.has(r.fields.statecode);
+  const states = readLayer(SRC.state).filter(inStates);
+  const lgas = readLayer(SRC.lga).filter(inStates);
+  const keptLgaCodes = new Set(lgas.map((r) => r.fields.lgacode));
+  const wards = readLayer(SRC.ward).filter((r) => !STATE_FILTER || keptLgaCodes.has(r.fields.lgacode));
   console.log(`states=${states.length} lgas=${lgas.length} wards=${wards.length}`);
 
   const client = new Client({ connectionString: process.env.DATABASE_URL });

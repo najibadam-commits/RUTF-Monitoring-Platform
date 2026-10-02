@@ -30,7 +30,7 @@ class MobileAccessTest {
         assertEquals("Super Admin", UserRole.SuperAdmin.label)
         assertEquals("Project Admin", UserRole.ProjectAdmin.label)
         assertEquals("State Coordinator", UserRole.StateCoordinator.label)
-        assertEquals("TPM Field Monitor", UserRole.FieldMonitor.label)
+        assertEquals("Supervisor", UserRole.FieldMonitor.label) // relabelled for RUTF (DECISIONS R5)
         assertEquals("DRI", UserRole.Dri.label)
     }
 

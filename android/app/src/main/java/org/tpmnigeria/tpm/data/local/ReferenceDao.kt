@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -64,6 +65,32 @@ interface ReferenceDao {
 
     @Query("DELETE FROM ref_categories")
     suspend fun clearCategories()
+
+    @Query("SELECT * FROM ref_facilities WHERE id = :id")
+    fun observeFacility(id: String): Flow<FacilityRefEntity?>
+
+    @Query("SELECT * FROM ref_facilities WHERE id = :id")
+    suspend fun getFacility(id: String): FacilityRefEntity?
+
+    @Query("SELECT * FROM ref_facilities WHERE suppliedById = :facilityId ORDER BY name")
+    fun observeFacilitiesSuppliedBy(facilityId: String): Flow<List<FacilityRefEntity>>
+
+    @Query("SELECT COUNT(*) FROM ref_facilities")
+    suspend fun countFacilities(): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertFacilities(v: List<FacilityRefEntity>)
+
+    @Query("DELETE FROM ref_facilities")
+    suspend fun clearFacilities()
+
+    /** Whole-table swap in one transaction, so a reader never sees a half-refreshed list and a
+     *  facility the user lost access to doesn't linger on the device. */
+    @Transaction
+    suspend fun replaceFacilities(v: List<FacilityRefEntity>) {
+        clearFacilities()
+        insertFacilities(v)
+    }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun markScopeLoaded(scope: LoadedScopeEntity)

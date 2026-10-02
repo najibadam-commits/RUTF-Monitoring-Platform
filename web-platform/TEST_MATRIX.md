@@ -111,3 +111,29 @@ existing RBAC helpers) rather than introducing new patterns.
 | `npm run lint` (web) | 6 pre-existing issues, unrelated to any change this project made across the whole session — 0 new |
 | Android: Gradle CLI build | Not runnable in this environment (sandboxed loopback socket) — **you must rebuild in Android Studio** to get real compiler verification |
 | Security audit | Complete — 1 real finding, fixed (§25); 1 pre-existing architectural note flagged, not changed; 1 harmless cleanup item spun off separately |
+
+---
+
+# RUTF M1 — Reference data & users (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Katsina boundaries loaded | 1 state, 34 LGAs, 361 wards, every LGA/ward has an `abbr` | ✅ `gis-import/import.js --states KT` + `check-counts.js` |
+| Facility import | 2,455 facilities (1 State store, 34 LGA stores, 2,420 health facilities, 272 OTP sites), every one inside an LGA and a ward; 6 lots | ✅ `import-reference.js` summary; 69 wards resolved from coordinates, 12 location flags |
+| Ward left blank, coordinates given | Ward filled from the boundary polygon | ✅ `test-mobile-role-access.js` §C |
+| Health facility pointed at the State store as supplier | Rejected (supply chain one level at a time) | ✅ §C |
+| Facility visibility per role | SA/PA/State Coordinator/Supervisor see all 6 test facilities; a DRI on OTP1 sees OTP1 + its LGA store only | ✅ §C |
+| Add a facility | SA → live; PA → `pending_create`; others denied | ✅ §C |
+| PA edits a live facility | Live row unchanged, status `pending_update` until approved | ✅ §C |
+| `approve_facility` | SA only | ✅ §C |
+| Add a lot / edit a dosing band / edit a threshold | Lot: SA + PA. Dosing band, threshold: SA only | ✅ §C |
+| Assign a DRI to a facility | Level (`assigned_category_id`) becomes the facility's level (OTP) | ✅ §C |
+| PA assigns a user to a facility in another project | Rejected | ✅ §C |
+| DRI PATCHes own `facility_id` | Pinned back | ✅ §C |
+| Whole role-access suite | 137/137 pass | ✅ `node tools/db/test-mobile-role-access.js` |
+| Data Sets page queries (search, OTP filter, flagged filter, store list, thresholds) | Return the expected rows | ✅ run against Supabase with the service key; web `tsc` + `eslint` clean |
+| Data Sets: add/edit facility, CSV upload (update OTP flags by code), lots, dosing rules, thresholds | Work end-to-end in the browser | ⏳ needs a Super Admin click-through (sign-in not possible from this session) |
+| Users & Roles: assign a DRI to a store / OTP site, bulk import with a facility column | Facility shown under the role; DRI scoped | ⏳ needs click-through |
+| Android Room v9 → v10 | `ref_facilities` created; `replaceFacilities` drops rows the user no longer sees | 🔧 `MigrationTest.migrate9To10_createsFacilitiesTable` compiles; run on a device/emulator. Migration SQL matches the exported `10.json` exactly |
+| Android: DRI Home shows "My facility" offline | Facility name, type, supplier from the local cache | 🔧 `assembleDebug` builds; needs a device check with a real DRI account |
+| Android unit tests | 22/22 pass | ✅ `gradlew testDebugUnitTest` (JDK 21, see DECISIONS R20) |

@@ -3,6 +3,7 @@ package org.tpmnigeria.tpm.data
 import android.content.Context
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import org.tpmnigeria.tpm.data.local.ActivitySiteRefEntity
 import org.tpmnigeria.tpm.data.local.CategoryRefEntity
+import org.tpmnigeria.tpm.data.local.FacilityRefEntity
 import org.tpmnigeria.tpm.data.local.LgaRefEntity
 import org.tpmnigeria.tpm.data.local.LoadedScopeEntity
 import org.tpmnigeria.tpm.data.local.ReferenceDao
@@ -19,6 +21,7 @@ import org.tpmnigeria.tpm.data.local.WardRefEntity
 import org.tpmnigeria.tpm.data.remote.Supabase
 import org.tpmnigeria.tpm.data.remote.dto.ActivitySiteDto
 import org.tpmnigeria.tpm.data.remote.dto.CategoryDto
+import org.tpmnigeria.tpm.data.remote.dto.FacilityDto
 import org.tpmnigeria.tpm.data.remote.dto.LgaDto
 import org.tpmnigeria.tpm.data.remote.dto.SettlementDto
 import org.tpmnigeria.tpm.data.remote.dto.StateDto
@@ -32,6 +35,20 @@ import org.tpmnigeria.tpm.domain.isSupabaseUuid
  * LGA, and settlements/activity_sites lazily per Ward, the first time they're actually needed,
  * via [ensureWardsLoaded]/[ensureSettlementsLoaded]/[ensureActivitySitesLoaded].
  */
+private const val FACILITY_PAGE_SIZE = 1000L
+
+internal fun FacilityDto.toEntity() = FacilityRefEntity(
+    id = id,
+    name = name,
+    facilityType = facility_type,
+    lgaId = lga_id,
+    wardId = ward_id,
+    lat = lat,
+    lng = lng,
+    isOtpSite = is_otp_site,
+    suppliedById = supplied_by_facility_id,
+)
+
 class ReferenceRepository(private val dao: ReferenceDao, context: Context) {
     private val postgrest get() = Supabase.client.postgrest
     private val assetHelper = AssetDatabaseHelper(context)
@@ -46,6 +63,8 @@ class ReferenceRepository(private val dao: ReferenceDao, context: Context) {
     suspend fun getState(id: String) = dao.getState(id)
     suspend fun getLga(id: String) = dao.getLga(id)
     suspend fun getCategory(id: String) = dao.getCategory(id)
+    fun observeFacility(id: String): Flow<FacilityRefEntity?> = dao.observeFacility(id)
+    fun observeFacilitiesSuppliedBy(facilityId: String): Flow<List<FacilityRefEntity>> = dao.observeFacilitiesSuppliedBy(facilityId)
 
     /** Call once after login (and periodically) — states/categories/lgas are small enough to
      *  always fetch in full rather than track partial-load state for them. */
@@ -109,6 +128,35 @@ class ReferenceRepository(private val dao: ReferenceDao, context: Context) {
             dao.clearCategories()
             dao.insertCategories(categories.map { CategoryRefEntity(it.id, it.name, it.sort_order, it.abbr) })
         }
+
+        runCatching { refreshFacilities() }
+    }
+
+    /**
+     * Pulls every facility the signed-in user may see and replaces the local cache with it. The
+     * server's RLS does the scoping (a facility user gets ~2–40 rows, a supervisor the project's
+     * ~2,500), so there is no client-side filter to get wrong. PostgREST caps one response at
+     * 1,000 rows, hence the paging. Any failure leaves the previous cache untouched.
+     */
+    suspend fun refreshFacilities() {
+        val all = mutableListOf<FacilityDto>()
+        var from = 0L
+        while (true) {
+            val page = postgrest.from("facilities")
+                .select(columns = Columns.list("id", "name", "facility_type", "lga_id", "ward_id", "lat", "lng", "is_otp_site", "supplied_by_facility_id")) {
+                    filter {
+                        eq("status", "approved")
+                        eq("is_active", true)
+                    }
+                    order("id", Order.ASCENDING)
+                    range(from, from + FACILITY_PAGE_SIZE - 1)
+                }
+                .decodeList<FacilityDto>()
+            all += page
+            if (page.size < FACILITY_PAGE_SIZE) break
+            from += FACILITY_PAGE_SIZE
+        }
+        dao.replaceFacilities(all.map(FacilityDto::toEntity))
     }
 
     suspend fun ensureWardsLoaded(lgaId: String) {

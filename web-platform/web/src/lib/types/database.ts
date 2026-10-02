@@ -18,6 +18,7 @@ export type IssueStatus =
 export type IssuePriority = "critical" | "high" | "medium" | "low";
 export type DatasetStatus = "approved" | "pending_create" | "pending_update" | "pending_delete" | "rejected";
 export type DownloadRequestStatus = "pending" | "approved" | "rejected" | "fulfilled";
+export type FacilityType = "state_store" | "lga_store" | "health_facility";
 
 export interface Database {
   public: {
@@ -38,6 +39,8 @@ export interface Database {
           managed_state_id: string | null;
           // Only meaningful for role = dri — see migration 0031/DECISIONS.md #22.
           assigned_category_id: string | null;
+          // The one facility a dri records for (migration 0100); sets assigned_category_id to its level.
+          facility_id: string | null;
         };
         Insert: Partial<Database["public"]["Tables"]["profiles"]["Row"]> & { id: string; name: string; email: string };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Row"]>;
@@ -292,6 +295,89 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["activity_sites"]["Row"]>;
         Relationships: [];
       };
+      facilities: {
+        // state_id, ward_id (when blank) and location_flag are derived server-side by
+        // derive_facility_location() (migration 0100) — never trusted from the client.
+        Row: {
+          id: string;
+          project_id: string | null;
+          facility_type: FacilityType;
+          name: string;
+          national_code: string | null;
+          state_id: string;
+          lga_id: string;
+          ward_id: string | null;
+          ward_name_source: string | null;
+          lat: number | null;
+          lng: number | null;
+          geocode_accuracy_m: number | null;
+          geocode_source: "field_gps" | "registry" | "manual" | null;
+          location_flag: string | null;
+          is_otp_site: boolean;
+          supplied_by_facility_id: string | null;
+          is_hard_to_reach: boolean;
+          is_active: boolean;
+          functional_status: string | null;
+          registry_category: string | null;
+          dummy_fields: string | null;
+          status: DatasetStatus;
+          pending_data: Json | null;
+          submitted_by: string | null;
+          reviewed_by: string | null;
+          review_note: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Omit<Database["public"]["Tables"]["facilities"]["Row"], "state_id">> & {
+          facility_type: FacilityType;
+          name: string;
+          lga_id: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["facilities"]["Row"]>;
+        Relationships: [];
+      };
+      products: {
+        Row: { id: string; name: string; unit: string; units_per_carton: number; shelf_life_months: number | null; created_at: string; updated_at: string };
+        Insert: { id?: string; name: string; unit?: string; units_per_carton: number; shelf_life_months?: number | null };
+        Update: Partial<Database["public"]["Tables"]["products"]["Row"]>;
+        Relationships: [];
+      };
+      product_lots: {
+        Row: { id: string; product_id: string; lot_no: string; expiry_date: string; created_by: string | null; created_at: string; updated_at: string };
+        Insert: { id?: string; product_id: string; lot_no: string; expiry_date: string };
+        Update: Partial<Database["public"]["Tables"]["product_lots"]["Row"]>;
+        Relationships: [];
+      };
+      protocol_rules: {
+        Row: {
+          id: string;
+          protocol_version: string;
+          weight_min_kg: number;
+          weight_max_kg: number;
+          sachets_per_week: number;
+          effective_from: string;
+          effective_to: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          protocol_version: string;
+          weight_min_kg: number;
+          weight_max_kg: number;
+          sachets_per_week: number;
+          effective_from: string;
+          effective_to?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["protocol_rules"]["Row"]>;
+        Relationships: [];
+      };
+      rutf_thresholds: {
+        Row: { project_id: string; key: string; value: number; note: string | null; updated_at: string };
+        Insert: { project_id: string; key: string; value: number; note?: string | null };
+        Update: Partial<Database["public"]["Tables"]["rutf_thresholds"]["Row"]>;
+        Relationships: [];
+      };
       settings: {
         Row: {
           id: number;
@@ -416,6 +502,14 @@ export interface Database {
         Args: { p_id: string; p_note: string };
         Returns: Database["public"]["Tables"]["activity_sites"]["Row"];
       };
+      approve_facility: {
+        Args: { p_id: string; p_note?: string | null };
+        Returns: Database["public"]["Tables"]["facilities"]["Row"];
+      };
+      reject_facility: {
+        Args: { p_id: string; p_note: string };
+        Returns: Database["public"]["Tables"]["facilities"]["Row"];
+      };
       resolve_administrative_location: {
         Args: { p_lat: number; p_lng: number };
         Returns: {
@@ -447,6 +541,7 @@ export interface Database {
       issue_priority: IssuePriority;
       dataset_status: DatasetStatus;
       download_request_status: DownloadRequestStatus;
+      facility_type: FacilityType;
     };
   };
 }
