@@ -171,7 +171,7 @@ export default async function LandingPage() {
 
       <footer className={s.footer}>
         <div className={s.footerInner}>
-          <span className={s.footerBrand}><RutfMark size={28} /> RUTF Monitoring Platform · Katsina State</span>
+          <span className={s.footerBrand}><RutfMark size={28} /> {BRAND.name} · Katsina State</span>
           <Link href={cta.href} className={s.footerLink}>{cta.label}</Link>
         </div>
       </footer>

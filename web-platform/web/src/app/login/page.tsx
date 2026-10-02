@@ -64,6 +64,8 @@ export default async function LoginPage({
   return (
     <div className={s.page}>
       <FragmentAuthHandler />
+      {/* Full-screen documentary photo, softened — fixed, so it stays put behind everything. */}
+      <div className={s.backdrop} role="img" aria-label="Children holding RUTF sachets handed out by a community health worker" />
 
       <header className={s.header}>
         <Link href="/" className={s.brand}>
@@ -78,66 +80,55 @@ export default async function LoginPage({
         </Link>
       </header>
 
+      {/* The card sits where the photo's centre is, between the children on either side. */}
       <main className={s.main}>
-        {/* ── Left: photo + why it matters ─────────────────────────────── */}
-        <section className={s.story}>
-          <div className={s.photo} role="img" aria-label="A health worker hands an RUTF sachet to a child at a facility">
-            <div className={s.photoText}>
-              <div className={s.kicker}>{TAGLINE}</div>
-              <h1 className={s.title}>Transparency today.<br />Healthier tomorrows.</h1>
-              <p className={s.lead}>
-                Every packet of RUTF tracked, verified and accounted for — from the State store to the LGA store to
-                the OTP — so malnourished children get the right nutrition, at the right time, in the right place.
-              </p>
+        <h1 className={s.srOnly}>{TAGLINE}</h1>
+        {/* Floating sign-in card — the form and its behaviour are unchanged. */}
+        <section className={s.card}>
+          <div className={s.cardHead}>
+            <RutfMark size={52} />
+            <div>
+              <div className={s.cardKicker}>Sign in to your account</div>
+              <p className={s.cardSub}>Use the email and password your administrator set up for you.</p>
             </div>
           </div>
 
-          <ul className={s.why}>
-            {WHY.map((w) => (
-              <li key={w.title} className={s.whyItem}>
-                <span className={`${s.whyIcon} ${s[w.tone]}`}><i className={`ph-fill ${w.icon}`} aria-hidden="true" /></span>
-                <span>
-                  <span className={s.whyTitle}>{w.title}</span>
-                  <span className={s.whyBody}>{w.body}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
+          <LoginForm next={next} linkError={linkError} linkMessage={linkMessage} />
 
-          {stats && (
-            <div className={s.stats}>
-              {stats.map((stat) => (
-                <div key={stat.label}>
-                  <div className={s.statValue}>{stat.value.toLocaleString()}</div>
-                  <div className={s.statLabel}>{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* ── Right: sign-in card ──────────────────────────────────────── */}
-        <section className={s.panel}>
-          <div className={`card ${s.card}`}>
-            <div className={s.cardHead}>
-              <RutfMark size={56} />
-              <div>
-                <div className={s.cardKicker}>Sign in to your account</div>
-                <p className={s.cardSub}>Use the email and password your administrator set up for you.</p>
-              </div>
-            </div>
-
-            <LoginForm next={next} linkError={linkError} linkMessage={linkMessage} />
-
-            <div className={s.assurances}>
-              <span><i className="ph-fill ph-shield-check" aria-hidden="true" /> Role-based access</span>
-              <span><i className="ph-fill ph-clock-counter-clockwise" aria-hidden="true" /> Audit trail</span>
-              <span><i className="ph-fill ph-lock-key" aria-hidden="true" /> No child-level data</span>
-            </div>
+          <div className={s.assurances}>
+            <span><i className="ph-fill ph-shield-check" aria-hidden="true" /> Role-based access</span>
+            <span><i className="ph-fill ph-clock-counter-clockwise" aria-hidden="true" /> Audit trail</span>
+            <span><i className="ph-fill ph-lock-key" aria-hidden="true" /> No child-level data</span>
           </div>
-          <p className={s.quote}>{QUOTE}</p>
         </section>
       </main>
+
+      {/* KPI statements floating over the photo — one row on desktop. */}
+      <footer className={s.kpis}>
+        <ul className={s.kpiRow}>
+          {WHY.map((w) => (
+            <li key={w.title} className={s.kpi}>
+              <i className={`ph ${w.icon} ${s.kpiIcon}`} aria-hidden="true" />
+              <span>
+                <span className={s.kpiTitle}>{w.title}</span>
+                <span className={s.kpiBody}>{w.body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className={s.quote}>
+          {QUOTE}
+          {stats && (
+            <span className={s.stats}>
+              {stats.map((stat) => (
+                <span key={stat.label}>
+                  <strong>{stat.value.toLocaleString()}</strong> {stat.label}
+                </span>
+              ))}
+            </span>
+          )}
+        </p>
+      </footer>
     </div>
   );
 }

@@ -5,7 +5,7 @@
  */
 
 export const BRAND = {
-  name: "RUTF Monitoring",
+  name: "RUTF-DTAP Monitoring Platform",
   line1: "Ready-to-Use Therapeutic Food",
   line2: "Digital Traceability & Accountability Platform",
 };
@@ -16,7 +16,7 @@ export const QUOTE = "Nutrition with integrity, a healthier future for my child.
 
 export const WHY = [
   { icon: "ph-shield-check", tone: "blue", title: "Prevents diversion", body: "Tracking and verification at every step, by lot and level." },
-  { icon: "ph-magnifying-glass", tone: "green", title: "Builds accountability", body: "Up-to-date data and a full audit trail." },
-  { icon: "ph-users-three", tone: "purple", title: "Strengthens supply chains", body: "Better coordination and planning between levels." },
-  { icon: "ph-heart", tone: "orange", title: "Saves lives", body: "More children recover and thrive." },
+  { icon: "ph-seal-check", tone: "green", title: "Builds accountability", body: "Up-to-date data and a full audit trail." },
+  { icon: "ph-tree-structure", tone: "purple", title: "Strengthens supply chains", body: "Better coordination and planning between levels." },
+  { icon: "ph-heartbeat", tone: "orange", title: "Saves lives", body: "More children recover and thrive." },
 ] as const;
