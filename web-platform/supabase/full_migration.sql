@@ -31,6 +31,7 @@ create type issue_status as enum (
 -- PRIORITY_COLOR keys in mock-data.js.
 create type issue_priority as enum ('critical', 'high', 'medium', 'low');
 
+
 -- ===== 0002_lookup_tables.sql =====
 -- TPM Monitoring Platform — schema migration 2/11
 -- Lookup/reference data: states, LGAs, wards, categories. Read by everyone
@@ -92,6 +93,7 @@ create table categories (
   sort_order int not null default 0
 );
 
+
 -- ===== 0003_projects_profiles.sql =====
 -- TPM Monitoring Platform — schema migration 3/11
 -- Projects (the scoping unit a Project Admin and their team belong to) and
@@ -123,6 +125,7 @@ comment on table profiles is
   'Extends auth.users. Rows are created by handle_new_auth_user() as a safety '
   'net (role=viewer) and immediately corrected by the admin-creation server '
   'action, which uses the service-role client to set the real role/project.';
+
 
 -- ===== 0004_issues.sql =====
 -- TPM Monitoring Platform — schema migration 4/11
@@ -175,6 +178,7 @@ create index issues_assigned_dri_idx on issues(assigned_dri);
 create index issues_reported_by_idx on issues(reported_by);
 create index issues_reported_at_idx on issues(reported_at desc);
 
+
 -- ===== 0005_issue_history_and_photos.sql =====
 -- TPM Monitoring Platform — schema migration 5/11
 -- issue_history: append-only audit trail (README: "backs the Edit/Delete
@@ -206,6 +210,7 @@ create table issue_photos (
   uploaded_at timestamptz not null default now()
 );
 create index issue_photos_issue_id_idx on issue_photos(issue_id);
+
 
 -- ===== 0006_notifications_and_settings.sql =====
 -- TPM Monitoring Platform — schema migration 6/11
@@ -239,6 +244,7 @@ create table settings (
   updated_at timestamptz not null default now()
 );
 insert into settings (id) values (1);
+
 
 -- ===== 0007_functions_and_triggers.sql =====
 -- TPM Monitoring Platform — schema migration 7/11
@@ -548,6 +554,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0008_rls_profiles_projects_lookups.sql =====
 -- TPM Monitoring Platform — schema migration 8/11
 -- RLS: profiles, projects, states, lgas, categories, settings.
@@ -633,6 +640,7 @@ create policy categories_write_del on categories for delete to authenticated usi
 create policy settings_select on settings for select to authenticated using (true);
 create policy settings_update on settings for update to authenticated
   using (is_super_admin()) with check (is_super_admin());
+
 
 -- ===== 0009_rls_issues.sql =====
 -- TPM Monitoring Platform — schema migration 9/11
@@ -721,6 +729,7 @@ create policy notifications_delete on notifications for delete to authenticated
 -- No client INSERT policy: rows are only created by create_notification(),
 -- a security-definer function invoked from the workflow RPCs above.
 
+
 -- ===== 0010_storage.sql =====
 -- TPM Monitoring Platform — schema migration 10/11
 -- Storage: one private bucket for issue evidence photos, one folder per
@@ -774,6 +783,7 @@ create policy "issue-evidence delete" on storage.objects for delete to authentic
     )
   );
 
+
 -- ===== 0011_realtime.sql =====
 -- TPM Monitoring Platform — schema migration 11/11
 -- Realtime: publish the tables the Dashboard, GIS Map, Issues list, and
@@ -787,6 +797,7 @@ alter publication supabase_realtime add table notifications;
 -- Full row images on UPDATE (not just changed columns/PK) so the client can
 -- reconcile issue state without an extra round-trip.
 alter table issues replica identity full;
+
 
 -- ===== 0012_spatial_lookup.sql =====
 -- TPM Monitoring Platform — schema migration 12/12
@@ -815,6 +826,7 @@ comment on function resolve_administrative_location(numeric, numeric) is
   'geometry. Called from the issue-report form to auto-fill location fields; '
   'a null result (point outside all known boundaries, or off Nigeria) falls '
   'back to manual dropdown selection.';
+
 
 -- ===== 0013_boundary_geojson_rpcs.sql =====
 -- TPM Monitoring Platform — schema migration 13
@@ -856,6 +868,7 @@ comment on function get_lga_boundaries(uuid) is
   'Returns LGA boundaries as GeoJSON, optionally filtered to one state — call when a state is selected/zoomed into.';
 comment on function get_ward_boundaries(uuid) is
   'Returns ward boundaries as GeoJSON for one LGA — call on further zoom/selection, never for the whole country at once.';
+
 
 -- ===== 0014_fix_profile_trigger_service_bypass.sql =====
 -- TPM Monitoring Platform — schema migration 14
@@ -904,6 +917,7 @@ begin
   return new;
 end;
 $$;
+
 
 -- ===== 0015_datasets_settlements_activity_sites.sql =====
 -- TPM Monitoring Platform — schema migration 15
@@ -1210,6 +1224,7 @@ create policy activity_sites_delete on activity_sites for delete to authenticate
 alter publication supabase_realtime add table settlements;
 alter publication supabase_realtime add table activity_sites;
 
+
 -- ===== 0016_mobile_app_integration.sql =====
 -- TPM Monitoring Platform — schema migration 16
 -- Field-mobile-app integration (Android "TPM Process Monitoring App").
@@ -1366,6 +1381,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0018_fix_dataset_trigger_service_bypass.sql =====
 -- TPM Monitoring Platform — schema migration 18
 -- Same fix as 0014 (enforce_profile_update_rules), applied to
@@ -1458,6 +1474,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0019_ward_linked_settlements_activity_sites.sql =====
 -- TPM Monitoring Platform — schema migration 19
 -- Administrative hierarchy for the Android field app's cascading dropdowns:
@@ -1530,6 +1547,7 @@ create trigger activity_sites_derive_location_names before insert or update on a
 alter table issues add column settlement_id uuid references settlements(id);
 alter table issues add column activity_site_id uuid references activity_sites(id);
 
+
 -- ===== 0020_issue_location_other.sql =====
 -- Free-text fallback for the mobile app's merged Settlement/Activity Site picker.
 --
@@ -1548,6 +1566,7 @@ alter table issues add column location_other text;
 
 comment on column issues.location_other is
   'Free-text location name captured on the mobile app when the field-reported Settlement/Activity Site was not found in the preloaded reference list. Null whenever settlement_id or activity_site_id is set.';
+
 
 -- ===== 0021_email_notifications.sql =====
 -- Real email delivery for issue notifications (assignment / resolved / reopened), on top of the
@@ -1629,6 +1648,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0022_issue_photos_unique.sql =====
 -- One MOV + one selfie per (issue, stage) is the actual usage pattern (see PhotoInsertDto /
 -- uploadPhoto in the Android app — storage path is always "<issue_id>/<stage>_<kind>.jpg", so the
@@ -1638,6 +1658,7 @@ $$;
 -- plain insert, same change made to issue_gps_captures' existing unique(issue_id, stage) handling)
 -- has something to target. No existing duplicates as of this migration (checked before applying).
 alter table issue_photos add constraint issue_photos_issue_id_stage_kind_key unique (issue_id, stage, kind);
+
 
 -- ===== 0023_gps_photos_update_policy.sql =====
 -- The Android app now upserts (not plain-inserts) issue_gps_captures/issue_photos so a sync retry
@@ -1654,6 +1675,7 @@ create policy issue_gps_captures_update on issue_gps_captures for update to auth
 create policy issue_photos_update on issue_photos for update to authenticated
   using (current_user_role() <> 'viewer' and exists (select 1 from issues i where i.id = issue_photos.issue_id))
   with check (current_user_role() <> 'viewer' and exists (select 1 from issues i where i.id = issue_photos.issue_id));
+
 
 -- ===== 0024_verification_rpcs_idempotent.sql =====
 -- reject_and_reopen_issue/verify_and_close_issue push from the mobile app's sync queue, which
@@ -1725,6 +1747,7 @@ begin
   return v_issue;
 end;
 $$;
+
 
 -- ===== 0025_dri_response_rpcs_idempotent.sql =====
 -- Same class of bug as migration 0024, on the DRI-response side: SupabaseSyncApiService.
@@ -1802,6 +1825,7 @@ begin
   return v_issue;
 end;
 $$;
+
 
 -- ===== 0026_structured_issue_id.sql =====
 -- Structured Issue ID: LGA3-WARD3-CAT3-YY-INITIALS### (e.g. KMC-NAS-ROA-26-NI001).
@@ -2197,6 +2221,7 @@ comment on column issues.code is
   'value permanently -- only new inserts use the new format. Distinct from issues.mobile_code '
   '(Android offline placeholder, unrelated, unchanged). See migration 0026 and DECISIONS.md #11.';
 
+
 -- ===== 0027_dashboard_stats_rpc.sql =====
 -- Dashboard performance: replace "fetch every issue row, aggregate in JS" with one SQL
 -- aggregate RPC, plus two indexes justified by real, currently-unindexed query patterns.
@@ -2276,6 +2301,7 @@ create extension if not exists pg_trgm;
 create index if not exists issues_description_trgm_idx on issues using gin (description gin_trgm_ops);
 create index if not exists issues_code_trgm_idx on issues using gin (code gin_trgm_ops);
 
+
 -- ===== 0028_time_efficiency_stats_rpc.sql =====
 -- Time Efficiency Analysis: a stage-by-stage breakdown of the issue workflow, computed from the
 -- real, already-written issue_history timestamps (no new instrumentation, no mock data). See the
@@ -2337,6 +2363,7 @@ $$;
 
 grant execute on function get_time_efficiency_stats() to authenticated;
 
+
 -- ===== 0029_data_sets_search_indexes.sql =====
 -- TPM Monitoring Platform — schema migration 29
 -- Supports the Data Sets screen's move to real server-side pagination/search
@@ -2370,6 +2397,7 @@ create index settlements_lganame_trgm_idx on settlements using gin (lganame gin_
 create index activity_sites_activitysitename_trgm_idx on activity_sites using gin (activitysitename gin_trgm_ops);
 create index activity_sites_statename_trgm_idx on activity_sites using gin (statename gin_trgm_ops);
 create index activity_sites_lganame_trgm_idx on activity_sites using gin (lganame gin_trgm_ops);
+
 
 -- ===== 0030_download_requests.sql =====
 -- TPM Monitoring Platform — schema migration 30
@@ -2486,6 +2514,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0031_profile_fk_set_null_on_delete.sql =====
 -- TPM Monitoring Platform — schema migration 31
 -- Fixes "Database error deleting user" on permanent user removal.
@@ -2559,6 +2588,7 @@ alter table download_requests drop constraint download_requests_reviewed_by_fkey
 alter table download_requests add constraint download_requests_reviewed_by_fkey
   foreign key (reviewed_by) references profiles(id) on delete set null;
 
+
 -- ===== 0031_state_coordinator_sector_schema.sql =====
 -- State Coordinator review/approval workflow + DRI sector scoping — schema primitives only.
 -- See DECISIONS.md #22.
@@ -2610,6 +2640,7 @@ comment on column categories.is_active is
   'False for a legacy category kept only because existing Findings still reference it (see the '
   'category→sector migration 0032) — excluded from any "pick a sector" list for new Findings, '
   'still resolves correctly wherever an existing Finding displays its historical category/sector.';
+
 
 -- ===== 0032_state_coordinator_sector_rls_rpcs.sql =====
 -- State Coordinator review/approval workflow + DRI sector scoping — RLS, RPCs, and the
@@ -2866,6 +2897,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0033_state_coordinator_super_admin_override.sql =====
 -- Fix: approve_and_assign_finding / return_finding_for_correction (migration 0032) rejected
 -- Super Admin outright — every other workflow RPC in this codebase (dri_self_assign aside, which
@@ -2943,6 +2975,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0034_findings_terminology_notification_text.sql =====
 -- Item 6 (Issues → Findings terminology): the legacy assign_issue RPC's notification text still
 -- said "issue" — the only remaining backend-generated user-facing string using the old wording
@@ -2980,6 +3013,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0035_finding_reported_terminology.sql =====
 -- Item 5/6 terminology: the auto-log trigger (migration 0007) writes 'Issue reported' as the
 -- issue_history.action text for every new Finding, and 'Field Monitor' as its actor_label
@@ -3005,6 +3039,7 @@ begin
   return new;
 end;
 $$;
+
 
 -- ===== 0036_download_approval_project_admin.sql =====
 -- Item 7: download approval was Super Admin-only at the actual RLS/RPC level (decide_download_
@@ -3053,6 +3088,7 @@ begin
   return v_request;
 end;
 $$;
+
 
 -- ===== 0037_field_monitor_attendance.sql =====
 -- Field Monitor Daily Attendance (Items 9-15). See DECISIONS.md #24.
@@ -3153,6 +3189,7 @@ create policy "attendance-evidence select" on storage.objects for select to auth
     )
   );
 
+
 -- ===== 0038_pin_back_managed_state_and_sector_self_edit.sql =====
 -- Security audit finding (Item 16 — "role & data security enforced at the backend/DB level, not
 -- just the frontend UI") — see DECISIONS.md #25.
@@ -3214,6 +3251,7 @@ begin
 end;
 $$;
 
+
 -- ===== 0039_add_warehouse_sector.sql =====
 -- Add "Warehouse" to the Sector list (Item 4 follow-up — user-requested addition after the
 -- original 7-sector rollout in migration 0032). Sectors are pure reference data — both the web
@@ -3227,6 +3265,7 @@ $$;
 
 insert into categories (name, sort_order, abbr, is_active) values
   ('Warehouse', 7, 'WAR', true);
+
 
 -- ===== 0040_expand_issue_review_to_project_admin.sql =====
 -- Item: "Issue Review & Approval Privileges" — expand review/edit/approve/return-for-correction
@@ -3375,4 +3414,163 @@ begin
   return v_issue;
 end;
 $$;
+
+
+-- ===== 0041_fix_review_dri_visibility_and_verify_role_guard.sql =====
+-- Two pre-existing role gaps found while testing mobile access for senior roles (DECISIONS.md #31).
+-- Neither is caused by that change; both are fixed here, additively, without touching any other
+-- policy or function.
+
+-- ─── 1. State Coordinator / Project Admin could not see any DRI, so could not assign one ────────
+-- profiles_select (0008) is: own row, or Super Admin, or a Project Admin whose project_id equals
+-- the row's. So:
+--   * a State Coordinator saw only their own profile, and
+--   * a Project Admin with no project_id (all real ones today — in_scope() treats that as "sees
+--     everything" everywhere else) matched nothing either, because `null = null` is not true.
+-- approve_and_assign_finding is SECURITY INVOKER and validates the chosen DRI with
+-- `select ... from profiles where id = p_dri_id and role = 'dri'` — under those policies that
+-- found nobody, so approve+assign raised "Selected user is not a DRI" for a State Coordinator
+-- (and for a project-less Project Admin). The web's DRI picker (getDris) queries profiles as the
+-- caller too, so it was empty for the same reason.
+--
+-- Fix: one narrow, additive SELECT policy — these two reviewing roles may read ACTIVE DRI
+-- profiles, nothing else. Choosing a DRI to assign is inherent to the review action they already
+-- have (0032/0040), so this exposes no more than the action itself needs. A Project Admin is still
+-- limited by in_scope() (same null-passthrough rule as every other Project Admin capability); a
+-- State Coordinator sees DRIs across projects, matching how they already see Findings by state
+-- rather than by project. Permissive policies OR together, so nothing existing is narrowed.
+
+create policy profiles_select_dris_for_reviewers on profiles for select to authenticated
+  using (
+    role = 'dri'
+    and status = 'active'
+    and (
+      current_user_role() = 'state_coordinator'
+      or (current_user_role() = 'project_admin' and in_scope(project_id))
+    )
+  );
+
+-- ─── 2. A DRI could verify/close or reject/reopen their own Finding through the API ─────────────
+-- verify_and_close_issue and reject_and_reopen_issue (0024) have no role check of their own and
+-- rely on issues_update RLS, which lets the assigned DRI update their row — so a DRI calling the
+-- RPC directly could close (or reopen) their own work, defeating "no Finding closes on
+-- self-reporting alone". The web and mobile UIs never offer it; the API did.
+--
+-- Fix: the same roles the web's canVerify grants — Super Admin, Project Admin, TPM Field Monitor
+-- — checked up front. Bodies are otherwise exactly 0024's (idempotent-retry behaviour included).
+-- coalesce() because current_user_role() is null for a caller with no profile, and
+-- `null not in (...)` is null, which would let the guard fall through.
+
+create or replace function reject_and_reopen_issue(p_issue_id uuid, p_comment text)
+returns issues language plpgsql as $$
+declare
+  v_issue issues;
+  v_already_reopened boolean;
+begin
+  if coalesce(current_user_role()::text, '') not in ('super_admin', 'project_admin', 'tpm_supervisor') then
+    raise exception 'Only a Super Admin, Project Admin, or TPM Field Monitor may reopen a finding after verification';
+  end if;
+
+  if coalesce(trim(p_comment), '') = '' then
+    raise exception 'A comment explaining why the issue remains unresolved is required';
+  end if;
+
+  select (status = 'reopened') into v_already_reopened from issues where id = p_issue_id;
+
+  update issues set status = 'reopened'
+    where id = p_issue_id and status in ('resolved', 'reopened')
+    returning * into v_issue;
+  if not found then
+    raise exception 'Issue not found, not awaiting verification, or not permitted';
+  end if;
+
+  if not coalesce(v_already_reopened, false) then
+    insert into issue_history (issue_id, actor_id, actor_label, action, note) values
+      (p_issue_id, auth.uid(), my_name(), 'Final Verification — Not Resolved', p_comment),
+      (p_issue_id, auth.uid(), my_name(), 'Issue Reopened', 'Routed back to ' ||
+        coalesce((select name from profiles where id = v_issue.assigned_dri), 'the assigned DRI') || '.');
+
+    if v_issue.assigned_dri is not null then
+      perform create_notification(v_issue.assigned_dri, 'reopened',
+        v_issue.code || ' was reopened — additional action required', '/issues/' || v_issue.id, v_issue.id);
+    end if;
+  end if;
+
+  return v_issue;
+end;
+$$;
+
+create or replace function verify_and_close_issue(p_issue_id uuid, p_note text default null)
+returns issues language plpgsql as $$
+declare
+  v_issue issues;
+  v_already_closed boolean;
+begin
+  if coalesce(current_user_role()::text, '') not in ('super_admin', 'project_admin', 'tpm_supervisor') then
+    raise exception 'Only a Super Admin, Project Admin, or TPM Field Monitor may verify and close a finding';
+  end if;
+
+  select (status = 'verified_closed') into v_already_closed from issues where id = p_issue_id;
+
+  update issues set status = 'verified_closed', verified_by = auth.uid(), resolution_date = now()
+    where id = p_issue_id
+    returning * into v_issue;
+  if not found then raise exception 'Issue not found or not permitted'; end if;
+
+  if not coalesce(v_already_closed, false) then
+    insert into issue_history (issue_id, actor_id, actor_label, action, note)
+    values (p_issue_id, auth.uid(), my_name(), 'Verified and closed',
+      coalesce(p_note, 'Confirmed resolution during follow-up visit.'));
+  end if;
+
+  return v_issue;
+end;
+$$;
+
+
+-- ===== 0042_robust_derive_initials.sql =====
+-- derive_initials() (0026) took the first character of the first and last whitespace-separated
+-- words verbatim, but profiles.initials has CHECK (initials ~ '^[A-Z]{2}$'). Any name whose first
+-- or last word does not start with a plain A-Z letter therefore made the profile insert fail,
+-- which surfaced in the Add User form only as "Database error creating new user":
+--   "Demo DRI (Health)"  -> last word "(Health)" starts with "("   -> "D("
+--   "Ọlá Ṣola"           -> accented/dotted first letters           -> "Ọṣ"
+--   "John (Lagos)", "Amina 2", a trailing "-" ... same failure.
+-- Yoruba/Igbo diacritics are common in this program's staff names, so this was a real trap, not a
+-- corner case.
+--
+-- New rule, identical for every name that already worked: decompose accents (NFD), keep only the
+-- A-Z letters of each word, drop words left with no letters (brackets, digits, dashes), then take
+-- the first letter of the first remaining word and of the last (a single word doubles its first
+-- letter, as before). Nothing left at all (empty / no Latin letters) still falls back to 'XX'.
+-- Existing profiles keep their stored initials — this only affects newly derived ones.
+
+create or replace function derive_initials(p_name text)
+returns text
+language plpgsql
+immutable
+as $$
+declare
+  words text[];
+begin
+  select array_agg(w) into words
+  from (
+    select upper(regexp_replace(normalize(t, NFD), '[^A-Za-z]', '', 'g')) as w
+    from regexp_split_to_table(trim(coalesce(p_name, '')), '\s+') as t
+  ) s
+  where w <> '';
+
+  if words is null then
+    return 'XX';
+  end if;
+
+  return substr(words[1], 1, 1) || substr(words[array_length(words, 1)], 1, 1);
+end;
+$$;
+
+comment on function derive_initials(text) is
+  'First A-Z letter of the first + last name-word, accents stripped, words with no letters ignored '
+  '(e.g. "Najib Isah" -> NI, "Ọlá Ṣola" -> OS, "John (Lagos)" -> JL). Single-word names double '
+  'their first letter; fallback XX. Always matches profiles_initials_format. See DECISIONS.md #34.';
+
 
