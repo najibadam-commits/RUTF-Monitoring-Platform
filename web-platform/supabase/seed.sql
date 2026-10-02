@@ -1,22 +1,10 @@
--- TPM Monitoring Platform — reference/lookup seed data.
---
--- states/lgas/wards are NOT seeded here — they're loaded from real Nigeria
--- administrative boundary data (37 states / 774 LGAs / 9,411 wards) via
--- tools/gis-import/import.js, which reads the user-supplied SpatiaLite
--- layers and bulk-inserts geometry rows directly over a DB connection
--- (too much data — ~10k polygon rows — to run through this file/SQL Editor).
--- Run that script once after this migration, before anything that expects
--- states/lgas/wards to be populated (issue creation, the GIS map, etc.).
+-- RUTF seed: supply-chain levels shown as "Sector" (brief §4).
+-- TPM sectors from 0032/0039 are deactivated, never deleted (Finding IDs may reference them).
 
-insert into categories (name, sort_order) values
-  ('Water & Sanitation Failure', 0),
-  ('Supply Chain / Stockout', 1),
-  ('Infrastructure Damage', 2),
-  ('Safety Incident', 3),
-  ('Service Quality Complaint', 4),
-  ('Data Discrepancy', 5),
-  ('Staff Absenteeism', 6),
-  ('Equipment Malfunction', 7),
-  ('Environmental Hazard', 8),
-  ('Community Grievance', 9)
-on conflict (name) do nothing;
+update categories set is_active = false where abbr not in ('SST', 'LST', 'OTP');
+
+insert into categories (name, sort_order, abbr, is_active) values
+  ('State Store', 0, 'SST', true),
+  ('LGA Store', 1, 'LST', true),
+  ('OTP Site', 2, 'OTP', true)
+on conflict (abbr) do update set name = excluded.name, sort_order = excluded.sort_order, is_active = true;

@@ -11,3 +11,6 @@ TPM-era decisions are in `web-platform/DECISIONS.md` and still apply unless over
 | R5 | 2026-10-02 | `tpm_supervisor` label is now "Supervisor"; enum values unchanged. | Brief §4; enum names are stored on device (Room), so values are never renamed. |
 | R6 | 2026-10-02 | Supabase publishable key used as the anon key in untracked `web/.env.local` and `android/local.properties`. | Publishable keys are client-safe; RLS is the boundary. |
 | R7 | 2026-10-02 | Signed adjustments allowed only for `txn_type = 'adjustment'`; month-end count shortfalls are recorded as adjustments pending supervisor confirmation. | Keeps the ledger replayable; corrections are visible, never silent. |
+| R8 | 2026-10-02 | Migrations applied with `tools/db/migrate.js` (direct DB connection) and recorded in `supabase_migrations.schema_migrations`, so the GitHub integration treats them as applied. | Integration did not fire after two pushes. |
+| R9 | 2026-10-02 | Duplicate version `0031` split: `0031_state_coordinator_sector_schema.sql` → `00311_…`. | The Supabase CLI/integration requires unique versions; the two 0031 files are independent. |
+| R10 | 2026-10-02 | `seed.sql` replaced: TPM sectors deactivated (kept), RUTF levels SST / LST / OTP inserted. | Old seed predated the `abbr` column and failed; brief §4. |
