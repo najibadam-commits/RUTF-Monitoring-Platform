@@ -94,7 +94,11 @@ dosing rules and thresholds):
 
 ```bash
 cd tools/db && node import-reference.js   # reads ../../../data/dummy/facilities.csv, product_lots.csv
+node seed-demo-accounts.js                # demo sign-ins from people.csv (shared password in .env.demo)
+node import-ledger.js                     # dummy transfers, ledger and OTP dispensing (needs the demo accounts)
 ```
+
+Ledger tests: `node test-ledger.js` (M2 acceptance) and `node test-mobile-role-access.js`.
 
 ### 4. Seed demo accounts + sample issues (optional, for local testing)
 

@@ -64,6 +64,7 @@ class ReferenceRepository(private val dao: ReferenceDao, context: Context) {
     suspend fun getLga(id: String) = dao.getLga(id)
     suspend fun getCategory(id: String) = dao.getCategory(id)
     fun observeFacility(id: String): Flow<FacilityRefEntity?> = dao.observeFacility(id)
+    suspend fun getFacility(id: String): FacilityRefEntity? = dao.getFacility(id)
     fun observeFacilitiesSuppliedBy(facilityId: String): Flow<List<FacilityRefEntity>> = dao.observeFacilitiesSuppliedBy(facilityId)
 
     /** Call once after login (and periodically) — states/categories/lgas are small enough to

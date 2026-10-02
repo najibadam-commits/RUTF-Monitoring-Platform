@@ -68,7 +68,7 @@ def month_end(d):
 def write(name, rows):
     OUT.mkdir(parents=True, exist_ok=True)
     with open(OUT / name, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()), lineterminator="\n")
         w.writeheader()
         w.writerows(rows)
     print(f"{name:32s} {len(rows):6d} rows")
@@ -294,19 +294,22 @@ for i in (0, 1):
     txn(state_store_id, "receipt", START, i, q, doc=f"SUPPLIER-GRN-{i + 1:03d}", reason="opening delivery")
 supplier = {date(2026, 4, 25): 2, date(2026, 5, 25): 2, date(2026, 6, 25): 3, date(2026, 7, 25): 3,
             date(2026, 8, 25): 4}
+# Opening stock goes into the ledger as one receipt per lot (a physical_count moves no stock, so
+# recording it that way left every store and OTP short in the ledger — RUTF DECISIONS R23).
+def opening(fid, q):
+    for i, qi in ((0, q // 2 if fid in lga_store_ids else q // 3), (1, q - (q // 2 if fid in lga_store_ids else q // 3))):
+        bal[fid][i] += qi
+        txn(fid, "receipt", START - timedelta(days=1), i, qi, doc="OPENING-BALANCE", reason="opening balance")
+
+
+lga_store_ids = {s["id"] for s in lga_store.values()}
 for s in lga_store.values():
-    q = rng.randint(250, 400) * UNITS_PER_CARTON
-    bal[s["id"]][0] += q // 2
-    bal[s["id"]][1] += q - q // 2
-    txn(s["id"], "physical_count", START - timedelta(days=1), None, q, reason="opening balance")
+    opening(s["id"], rng.randint(250, 400) * UNITS_PER_CARTON)
 
 caseload = {o: rng.randint(15, 70) for o in otp_ids}
 otp_day = {o: rng.randint(0, 4) for o in otp_ids}       # weekday the OTP runs (Mon–Fri)
 for o in otp_ids:
-    q = rng.randint(8, 16) * UNITS_PER_CARTON
-    bal[o][0] += q // 3
-    bal[o][1] += q - q // 3
-    txn(o, "physical_count", START - timedelta(days=1), None, q, reason="opening balance")
+    opening(o, rng.randint(8, 16) * UNITS_PER_CARTON)
 
 lga_otps = defaultdict(list)
 for o in otps:

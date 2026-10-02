@@ -3,6 +3,7 @@ package org.tpmnigeria.tpm.ui
 import androidx.compose.runtime.staticCompositionLocalOf
 import org.tpmnigeria.tpm.data.AppRepository
 import org.tpmnigeria.tpm.data.ReferenceRepository
+import org.tpmnigeria.tpm.data.StockRepository
 import org.tpmnigeria.tpm.session.AppSession
 
 /**
@@ -17,6 +18,10 @@ val LocalAppRepository = staticCompositionLocalOf<AppRepository> {
 
 val LocalAppSession = staticCompositionLocalOf<AppSession> {
     error("LocalAppSession not provided — wrap the app in AppProviders")
+}
+
+val LocalStockRepository = staticCompositionLocalOf<StockRepository> {
+    error("LocalStockRepository not provided — wrap the app in AppProviders")
 }
 
 val LocalReferenceRepository = staticCompositionLocalOf<ReferenceRepository> {

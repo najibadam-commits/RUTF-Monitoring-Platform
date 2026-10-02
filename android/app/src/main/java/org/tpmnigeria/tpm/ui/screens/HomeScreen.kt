@@ -32,6 +32,7 @@ import org.tpmnigeria.tpm.domain.statusMeta
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.LocalAppSession
 import org.tpmnigeria.tpm.ui.LocalReferenceRepository
+import org.tpmnigeria.tpm.ui.navigation.Routes
 import org.tpmnigeria.tpm.ui.components.IssueRow
 import org.tpmnigeria.tpm.ui.components.TpmButton
 import org.tpmnigeria.tpm.ui.components.TpmButtonVariant
@@ -52,6 +53,7 @@ fun HomeScreen(
     onStartNewIssue: () -> Unit,
     onStartDriLookup: () -> Unit,
     onStartAttendance: () -> Unit,
+    onStartStock: (route: String) -> Unit,
     onNavigateToSyncQueue: () -> Unit,
     onLogout: () -> Unit,
 ) {
@@ -90,6 +92,9 @@ fun HomeScreen(
             if (role == UserRole.Dri) {
                 MyFacilityCard(user.facilityId)
                 Spacer(Modifier.height(TpmSpacing.space2))
+                if (MobileAccess.canRecordStock(role) && user.facilityId != null) {
+                    StockActions(user.facilityId, onStartStock)
+                }
             }
             // Each action shows only for a role the server would actually let perform it — see
             // MobileAccess. A role with none of these (State Coordinator) gets a pure oversight Home.
@@ -258,5 +263,35 @@ private fun MyFacilityCard(facilityId: String?) {
         if (supplied.isNotEmpty()) {
             Text("Supplies ${supplied.size} facilit${if (supplied.size == 1) "y" else "ies"}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
         }
+    }
+}
+
+/**
+ * The facility user's recording actions (brief §8), by facility: Issue Stock for stores only,
+ * Daily Dispensing for OTP sites only. Each works offline through the sync queue.
+ */
+@Composable
+private fun StockActions(facilityId: String, onStart: (String) -> Unit) {
+    val references = LocalReferenceRepository.current
+    val facility by remember(facilityId) { references.observeFacility(facilityId) }.collectAsState(initial = null)
+    val isStore = facility?.facilityType == "state_store" || facility?.facilityType == "lga_store"
+    val isOtp = facility?.isOtpSite == true
+    val actions = buildList {
+        add("My Stock" to Routes.MyStock)
+        add("Receive Stock" to Routes.ReceiveStock)
+        if (isStore) add("Issue Stock" to Routes.IssueStock)
+        if (isOtp) add("Daily Dispensing" to Routes.DailyDispensing)
+        add("Stock Count" to Routes.StockCount)
+        add("Record Loss / Adjustment" to Routes.LossAdjustment)
+    }
+    actions.forEachIndexed { i, (label, route) ->
+        TpmButton(
+            text = label,
+            onClick = { onStart(route) },
+            variant = if (i == 0) TpmButtonVariant.Primary else TpmButtonVariant.Secondary,
+            blueprint = true,
+            fullWidth = true,
+        )
+        Spacer(Modifier.height(TpmSpacing.space2))
     }
 }

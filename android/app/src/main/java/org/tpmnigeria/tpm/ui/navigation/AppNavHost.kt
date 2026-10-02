@@ -54,6 +54,12 @@ import org.tpmnigeria.tpm.ui.screens.MapScreen
 import org.tpmnigeria.tpm.ui.screens.NotificationsScreen
 import org.tpmnigeria.tpm.ui.screens.SyncQueueScreen
 import org.tpmnigeria.tpm.ui.wizard.attendance.DailyAttendanceScreen
+import org.tpmnigeria.tpm.ui.stock.DailyDispensingScreen
+import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
+import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
+import org.tpmnigeria.tpm.ui.stock.MyStockScreen
+import org.tpmnigeria.tpm.ui.stock.ReceiveStockScreen
+import org.tpmnigeria.tpm.ui.stock.StockCountScreen
 import org.tpmnigeria.tpm.ui.wizard.driresponse.DriRespondWizardScreen
 import org.tpmnigeria.tpm.ui.wizard.newissue.NewIssueWizardScreen
 import org.tpmnigeria.tpm.ui.wizard.verification.FinalVerifyWizardScreen
@@ -162,6 +168,7 @@ fun AppNavHost(session: AppSession) {
                             onStartNewIssue = { navController.navigate(Routes.NewIssueWizard) },
                             onStartDriLookup = { navController.navigate(Routes.driRespondWizard()) },
                             onStartAttendance = { navController.navigate(Routes.DailyAttendance) },
+                            onStartStock = { route -> navController.navigate(route) },
                             onNavigateToSyncQueue = { navController.navigate(Routes.SyncQueue) },
                             onLogout = { scope.launch { session.logout() } }
                         )
@@ -259,6 +266,41 @@ fun AppNavHost(session: AppSession) {
                                 },
                                 onExit = { navController.popBackStack() },
                             )
+                        }
+                    }
+                    // Facility stock — every screen needs the user's facility (DECISIONS R15).
+                    val facilityId = currentUser.facilityId
+                    val stockAllowed = MobileAccess.canRecordStock(currentUser.role) && facilityId != null
+                    val backHome: () -> Unit = {
+                        SyncScheduler.syncNow(context)
+                        navController.popBackStack(Routes.Home, inclusive = false)
+                    }
+                    composable(Routes.MyStock) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) { MyStockScreen(facilityId!!) }
+                    }
+                    composable(Routes.ReceiveStock) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) {
+                            ReceiveStockScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.IssueStock) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) {
+                            IssueStockScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.DailyDispensing) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) {
+                            DailyDispensingScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.StockCount) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) {
+                            StockCountScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.LossAdjustment) {
+                        RequireAccess(stockAllowed, { navController.popBackStack() }) {
+                            LossAdjustmentScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
                         }
                     }
                 }

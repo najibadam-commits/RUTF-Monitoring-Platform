@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.LocalAppSession
 import org.tpmnigeria.tpm.ui.LocalReferenceRepository
+import org.tpmnigeria.tpm.ui.LocalStockRepository
 import org.tpmnigeria.tpm.ui.navigation.AppNavHost
 import org.tpmnigeria.tpm.ui.screens.LoginScreen
 import org.tpmnigeria.tpm.ui.screens.SetPasswordScreen
@@ -48,6 +49,7 @@ class MainActivity : ComponentActivity() {
                 LocalAppRepository provides app.repository,
                 LocalAppSession provides app.session,
                 LocalReferenceRepository provides app.referenceRepository,
+                LocalStockRepository provides app.stockRepository,
             ) {
                 TpmTheme {
                     Surface(modifier = Modifier.fillMaxSize()) {

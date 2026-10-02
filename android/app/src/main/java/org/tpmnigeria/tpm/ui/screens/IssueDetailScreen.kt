@@ -54,6 +54,7 @@ import org.tpmnigeria.tpm.domain.severityTagVariant
 import org.tpmnigeria.tpm.domain.statusMeta
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.LocalAppSession
+import org.tpmnigeria.tpm.ui.LocalStockRepository
 import org.tpmnigeria.tpm.ui.components.TpmButton
 import org.tpmnigeria.tpm.ui.components.TpmButtonVariant
 import org.tpmnigeria.tpm.ui.components.TpmCard
@@ -75,10 +76,11 @@ fun IssueDetailScreen(
 ) {
     val repository = LocalAppRepository.current
     val session = LocalAppSession.current
+    val stockRepository = LocalStockRepository.current
     val user = session.currentUser.collectAsState().value ?: return
     val issue by repository.observeIssue(issueId).collectAsState(initial = null)
 
-    val apiService = remember { SupabaseSyncApiService(repository, session) }
+    val apiService = remember { SupabaseSyncApiService(repository, session, stockRepository) }
     LaunchedEffect(issueId) {
         val current = repository.getIssue(issueId)
         if (current?.remoteId != null) {

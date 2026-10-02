@@ -99,4 +99,18 @@ val MIGRATION_9_10 = object : Migration(9, 10) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+/** Stock recording caches (web migration 0101 — see StockEntities.kt): products, lots, the
+ *  facility's balances, incoming transfers + their lines, recorded dispensing days. All new,
+ *  server-derived tables that StockRepository.refresh fills — purely additive. */
+val MIGRATION_10_11 = object : Migration(10, 11) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_products` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `unitsPerCarton` INTEGER NOT NULL, PRIMARY KEY(`id`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_lots` (`id` TEXT NOT NULL, `productId` TEXT NOT NULL, `lotNo` TEXT NOT NULL, `expiryDate` TEXT NOT NULL, PRIMARY KEY(`id`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_stock_balances` (`facilityId` TEXT NOT NULL, `lotKey` TEXT NOT NULL, `lotId` TEXT, `balance` INTEGER NOT NULL, `refreshedAtMillis` INTEGER NOT NULL, PRIMARY KEY(`facilityId`, `lotKey`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_incoming_transfers` (`id` TEXT NOT NULL, `code` TEXT, `fromFacilityId` TEXT NOT NULL, `toFacilityId` TEXT NOT NULL, `issuedDate` TEXT NOT NULL, `sachetsIssued` INTEGER NOT NULL, `documentNo` TEXT, PRIMARY KEY(`id`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_incoming_transfer_lines` (`transferId` TEXT NOT NULL, `lineNo` INTEGER NOT NULL, `lotId` TEXT, `quantity` INTEGER NOT NULL, PRIMARY KEY(`transferId`, `lineNo`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_dispensing_days` (`facilityId` TEXT NOT NULL, `dispenseDate` TEXT NOT NULL, PRIMARY KEY(`facilityId`, `dispenseDate`))")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)

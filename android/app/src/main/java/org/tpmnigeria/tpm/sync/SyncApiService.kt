@@ -20,6 +20,10 @@ interface SyncApiService {
 
     /** Refreshes the full detail (history, GPS, photos) for a single issue. */
     suspend fun pullIssueDetail(remoteId: String) {}
+
+    /** Best-effort refresh after each sync run (e.g. the facility's stock cache once its
+     *  submissions have landed) — no-op by default. */
+    suspend fun afterSync() {}
 }
 
 /** Always-succeeds, no-network stand-in — see the interface kdoc above for when to use this

@@ -26,6 +26,14 @@ object Routes {
     const val NewIssueWizard = "newIssueWizard"
     const val DailyAttendance = "dailyAttendance"
 
+    // Facility stock recording (facility users — brief §8).
+    const val MyStock = "myStock"
+    const val ReceiveStock = "receiveStock"
+    const val IssueStock = "issueStock"
+    const val DailyDispensing = "dailyDispensing"
+    const val StockCount = "stockCount"
+    const val LossAdjustment = "lossAdjustment"
+
     const val DriRespondWizardPattern = "driRespondWizard?issueId={issueId}"
     fun driRespondWizard(issueId: String? = null) = if (issueId != null) "driRespondWizard?issueId=$issueId" else "driRespondWizard"
 

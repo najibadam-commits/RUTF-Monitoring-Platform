@@ -19,6 +19,16 @@ export type IssuePriority = "critical" | "high" | "medium" | "low";
 export type DatasetStatus = "approved" | "pending_create" | "pending_update" | "pending_delete" | "rejected";
 export type DownloadRequestStatus = "pending" | "approved" | "rejected" | "fulfilled";
 export type FacilityType = "state_store" | "lga_store" | "health_facility";
+export type TxnType =
+  | "receipt"
+  | "issue"
+  | "dispensed"
+  | "loss_damaged"
+  | "loss_expired"
+  | "loss_other"
+  | "adjustment"
+  | "physical_count";
+export type TransferStatus = "in_transit" | "received" | "discrepancy";
 
 export interface Database {
   public: {
@@ -378,6 +388,101 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["rutf_thresholds"]["Row"]>;
         Relationships: [];
       };
+      transfers: {
+        // Written only by record_issue / record_receipt (migration 0101).
+        Row: {
+          id: string;
+          project_id: string | null;
+          code: string | null;
+          from_facility_id: string;
+          to_facility_id: string;
+          issued_date: string;
+          received_date: string | null;
+          sachets_issued: number;
+          sachets_received: number | null;
+          status: TransferStatus;
+          document_no: string | null;
+          issued_by: string | null;
+          received_by: string | null;
+          local_id: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      stock_transactions: {
+        // Written only by the record_* functions (migration 0101); never updated or deleted.
+        Row: {
+          id: string;
+          project_id: string | null;
+          facility_id: string;
+          txn_type: TxnType;
+          txn_date: string;
+          lot_id: string | null;
+          lot_no_seen: string | null;
+          expiry_seen: string | null;
+          quantity_sachets: number;
+          counterparty_facility_id: string | null;
+          transfer_id: string | null;
+          document_no: string | null;
+          reason: string | null;
+          recorded_by: string;
+          device_id: string | null;
+          local_id: string | null;
+          submission_local_id: string | null;
+          status: "recorded" | "confirmed" | "voided";
+          confirmed_by: string | null;
+          confirmed_at: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      otp_daily_dispensing: {
+        Row: {
+          id: string;
+          project_id: string | null;
+          facility_id: string;
+          dispense_date: string;
+          new_admissions: number;
+          children_seen: number;
+          sachets_prescribed: number;
+          sachets_dispensed: number;
+          recorded_by: string;
+          device_id: string | null;
+          local_id: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      ledger_photos: {
+        Row: {
+          id: string;
+          submission_local_id: string;
+          facility_id: string;
+          storage_path: string;
+          kind: "waybill" | "stock_card" | "register_page" | "loss_evidence" | "other";
+          mime_type: string | null;
+          size_bytes: number | null;
+          uploaded_by: string | null;
+          uploaded_at: string;
+        };
+        Insert: {
+          submission_local_id: string;
+          facility_id: string;
+          storage_path: string;
+          kind: Database["public"]["Tables"]["ledger_photos"]["Row"]["kind"];
+          mime_type?: string | null;
+          size_bytes?: number | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
       settings: {
         Row: {
           id: number;
@@ -432,7 +537,24 @@ export interface Database {
         Relationships: [];
       };
     };
-    Views: { [_ in never]: never };
+    Views: {
+      // Migration 0101 — security_invoker views, so the caller's RLS applies.
+      stock_balances: {
+        Row: {
+          facility_id: string;
+          lot_id: string | null;
+          lot_no: string | null;
+          expiry_date: string | null;
+          balance: number;
+          last_txn_date: string;
+        };
+        Relationships: [];
+      };
+      transfer_overview: {
+        Row: Database["public"]["Tables"]["transfers"]["Row"] & { gap: number; days_in_transit: number | null };
+        Relationships: [];
+      };
+    };
     Functions: {
       get_dashboard_stats: {
         Args: Record<string, never>;
@@ -542,6 +664,7 @@ export interface Database {
       dataset_status: DatasetStatus;
       download_request_status: DownloadRequestStatus;
       facility_type: FacilityType;
+      txn_type: TxnType;
     };
   };
 }

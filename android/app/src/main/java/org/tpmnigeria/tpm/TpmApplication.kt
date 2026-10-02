@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.work.Configuration
 import org.tpmnigeria.tpm.data.AppRepository
 import org.tpmnigeria.tpm.data.ReferenceRepository
+import org.tpmnigeria.tpm.data.StockRepository
 import org.tpmnigeria.tpm.data.local.TpmDatabase
 import org.tpmnigeria.tpm.session.AppSession
 import org.tpmnigeria.tpm.sync.SyncScheduler
@@ -26,6 +27,7 @@ class TpmApplication : Application(), Configuration.Provider {
     }
     val referenceRepository: ReferenceRepository by lazy { ReferenceRepository(database.referenceDao(), this) }
     val session: AppSession by lazy { AppSession(this, referenceRepository) }
+    val stockRepository: StockRepository by lazy { StockRepository(database.stockDao(), database.syncQueueDao(), this) }
 
     override fun onCreate() {
         super.onCreate()
@@ -46,6 +48,6 @@ class TpmApplication : Application(), Configuration.Provider {
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setWorkerFactory(SyncWorkerFactory(repository, session))
+            .setWorkerFactory(SyncWorkerFactory(repository, session, stockRepository))
             .build()
 }

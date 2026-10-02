@@ -33,6 +33,11 @@ object MobileAccess {
      *  and only for their own id. */
     fun canCaptureAttendance(role: UserRole): Boolean = role == UserRole.FieldMonitor
 
+    /** Facility stock recording (receive / issue / dispense / count / loss) — web migration
+     *  0101's record_* functions: the facility's own user (dri) only. Issue Stock additionally
+     *  needs a store, Daily Dispensing an OTP site (checked against the facility). */
+    fun canRecordStock(role: UserRole): Boolean = role == UserRole.Dri
+
     /** Senior roles use the app to oversee/support field work rather than to be the field
      *  worker — they get the oversight Home and see all in-scope Findings, not "my" Findings. */
     fun isOversightRole(role: UserRole): Boolean =

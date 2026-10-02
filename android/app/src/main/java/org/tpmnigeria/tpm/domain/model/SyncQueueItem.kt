@@ -24,5 +24,7 @@ data class SyncQueueItem(
     val retryCount: Int = 0,
 )
 
-enum class SubmissionType { NewIssue, DriResponse, FinalVerification, Attendance }
+/** Stored by name (Converters), so new values need no Room migration. The Stock* / Dispensing
+ *  types carry a LedgerSubmission as payloadJson; [SyncQueueItem.issueId] is its localId. */
+enum class SubmissionType { NewIssue, DriResponse, FinalVerification, Attendance, StockReceipt, StockIssue, Dispensing, StockCount, StockLoss }
 enum class SyncStatus { Pending, Synced, Failed }

@@ -191,4 +191,36 @@ class MigrationTest {
             db.close()
         }
     }
+
+    /** v10→v11 adds the stock caches (StockEntities.kt, web migration 0101). Brand-new,
+     *  server-derived tables; checks they round-trip through StockDao, including the
+     *  facility-stock swap that must drop what the server no longer returns. */
+    @Test
+    fun migrate10To11_createsStockCacheTables() {
+        helper.createDatabase(testDb, 10).apply { close() }
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.databaseBuilder(context, TpmDatabase::class.java, testDb)
+            .addMigrations(MIGRATION_10_11)
+            .build()
+        try {
+            val dao = db.stockDao()
+            runBlocking {
+                dao.replaceCatalogue(listOf(ProductRefEntity("p1", "RUTF 92 g", 150)), listOf(LotRefEntity("l1", "p1", "A-1", "2027-01-31")))
+                dao.replaceFacilityStock(
+                    balances = listOf(StockBalanceEntity("f1", "l1", "l1", 300, 1L)),
+                    transfers = listOf(IncomingTransferEntity("t1", "TRF-1", "f0", "f1", "2026-10-01", 300, null)),
+                    lines = listOf(IncomingTransferLineEntity("t1", 1, "l1", 300)),
+                    dispensingDays = listOf(DispensingDayEntity("f1", "2026-10-01")),
+                )
+            }
+            assertEquals(1, runBlocking { dao.getTransferLines("t1") }.size)
+            assertEquals(true, runBlocking { dao.isDispensingDayRecorded("f1", "2026-10-01") })
+
+            runBlocking { dao.replaceFacilityStock(emptyList(), emptyList(), emptyList(), emptyList()) }
+            assertEquals("Swap must drop transfers no longer in transit", 0, runBlocking { dao.getTransferLines("t1") }.size)
+        } finally {
+            db.close()
+        }
+    }
 }

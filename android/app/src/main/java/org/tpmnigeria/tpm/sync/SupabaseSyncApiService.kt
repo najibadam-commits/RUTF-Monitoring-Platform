@@ -10,6 +10,11 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import org.tpmnigeria.tpm.data.AppRepository
+import org.tpmnigeria.tpm.data.LEDGER_SUBMISSION_TYPES
+import org.tpmnigeria.tpm.data.StockRepository
+import org.tpmnigeria.tpm.data.remote.LEDGER_EVIDENCE_BUCKET
+import org.tpmnigeria.tpm.data.remote.dto.LedgerPhotoInsertDto
+import org.tpmnigeria.tpm.domain.LedgerSubmission
 import org.tpmnigeria.tpm.data.remote.ATTENDANCE_EVIDENCE_BUCKET
 import org.tpmnigeria.tpm.data.remote.EvidenceStorage
 import org.tpmnigeria.tpm.data.remote.ISSUE_EVIDENCE_BUCKET
@@ -60,7 +65,9 @@ import java.time.Instant
 class SupabaseSyncApiService(
     private val repository: AppRepository,
     private val session: AppSession,
+    private val stockRepository: StockRepository,
 ) : SyncApiService {
+    private val ledgerJson = Json { ignoreUnknownKeys = true }
     private val postgrest get() = Supabase.client.postgrest
     private val storage get() = Supabase.client.storage
 
@@ -300,7 +307,58 @@ class SupabaseSyncApiService(
         )
     }
 
+    override suspend fun afterSync() {
+        val user = session.currentUser.value ?: return
+        stockRepository.refresh(user.facilityId)
+    }
+
+    /**
+     * Facility stock: one call to the submission's record_* function (web migration 0101), then
+     * its photos. The server is idempotent on the submission's localId — a retry after a lost
+     * response, or after only the photos failed, gets "duplicate" back and simply carries on — so
+     * this never records anything twice (M2 acceptance: no duplicates after forced retries).
+     */
+    private suspend fun pushLedger(item: SyncQueueItem): Boolean {
+        if (session.currentUser.value == null) return false
+        return try {
+            val submission = ledgerJson.decodeFromString(LedgerSubmission.serializer(), item.payloadJson)
+            postgrest.rpc(submission.rpc, submission.params)
+            for (photo in submission.photos) uploadLedgerPhoto(submission, photo.localPath, photo.kind)
+            true
+        } catch (e: Exception) {
+            android.util.Log.e("SupabaseSyncApiService", "Ledger push failed for ${item.issueId}: ${e.message}", e)
+            false
+        }
+    }
+
+    /** Path {facility_id}/{submission local_id}/{kind}.jpg — the bucket's insert policy requires the
+     *  first segment to be the user's own facility (DECISIONS R25). */
+    private suspend fun uploadLedgerPhoto(submission: LedgerSubmission, localPath: String, kind: String) {
+        val storagePath = "${submission.facilityId}/${submission.localId}/$kind.jpg"
+        val already = postgrest.from("ledger_photos").select(columns = Columns.list("id")) {
+            filter { eq("storage_path", storagePath) }
+        }.decodeList<IssueIdDto>().isNotEmpty()
+        if (already) return
+        val file = File(localPath)
+        if (!file.exists()) return // nothing left to send (e.g. app data cleared) — don't block the queue
+        try {
+            storage.from(LEDGER_EVIDENCE_BUCKET).upload(storagePath, file.readBytes()) { upsert = false }
+        } catch (e: Exception) {
+            // An earlier attempt uploaded the object but didn't get to the table row.
+            if (e.message?.contains("exists", ignoreCase = true) != true && e.message?.contains("Duplicate", ignoreCase = true) != true) throw e
+        }
+        try {
+            postgrest.from("ledger_photos").insert(
+                LedgerPhotoInsertDto(submission.localId, submission.facilityId, storagePath, kind, size_bytes = file.length()),
+            )
+        } catch (e: PostgrestRestException) {
+            if (e.code != "23505") throw e
+        }
+    }
+
     override suspend fun pushSubmission(item: SyncQueueItem): Boolean {
+        if (item.submissionType in LEDGER_SUBMISSION_TYPES.values) return pushLedger(item)
+
         // Attendance isn't a Finding at all — item.issueId holds an AttendanceEntity.localId for
         // this submission type (see SyncQueueItem's kdoc), so this must branch before the
         // getIssue() lookup below: that lookup would simply find nothing for an attendance id and
@@ -324,6 +382,8 @@ class SupabaseSyncApiService(
                 SubmissionType.DriResponse -> pushDriResponse(issue, user)
                 SubmissionType.FinalVerification -> pushFinalVerification(issue, user)
                 SubmissionType.Attendance -> Unit // handled above
+                SubmissionType.StockReceipt, SubmissionType.StockIssue, SubmissionType.Dispensing,
+                SubmissionType.StockCount, SubmissionType.StockLoss -> Unit // pushLedger, above
             }
             true
         } catch (e: Exception) {

@@ -151,12 +151,15 @@ export type NavKey =
   | "projectadmins"
   | "settings"
   | "downloadRequests"
-  | "attendance";
+  | "attendance"
+  | "stockLedger"
+  | "transfers";
 
-export type NavSection = "overview" | "analytics" | "reporting" | "administration";
+export type NavSection = "overview" | "stock" | "analytics" | "reporting" | "administration";
 
 export const NAV_SECTION_LABELS: Record<NavSection, string> = {
   overview: "Overview",
+  stock: "Stock",
   analytics: "Analytics",
   reporting: "Reporting",
   administration: "Administration",
@@ -173,6 +176,10 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "subpanel", label: "TPM Sub-Panel", href: "/subpanel", icon: "ph-kanban", section: "overview" },
   { key: "implementationMonitoring", label: "Implementation Monitoring", href: "/implementation-monitoring", icon: "ph-clipboard-text", section: "overview" },
   { key: "coverageAnalysis", label: "Coverage Analysis", href: "/coverage-analysis", icon: "ph-map-pin-area", section: "overview" },
+  // RUTF stock (brief §9). Every role sees these; RLS scopes the rows (a facility user: their own
+  // facility only).
+  { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
+  { key: "transfers", label: "Transfers", href: "/transfers", icon: "ph-truck", section: "stock" },
   { key: "analytics", label: "Analytics", href: "/analytics", icon: "ph-chart-line", section: "analytics" },
   { key: "timeEfficiency", label: "Time Efficiency Analysis", href: "/time-efficiency", icon: "ph-gauge", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },

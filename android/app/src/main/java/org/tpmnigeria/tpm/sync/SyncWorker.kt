@@ -27,7 +27,10 @@ class SyncWorker(
             runCatching { api.pullIssues() } // best-effort
 
             val items = repository.pendingSyncItemsOldestFirst()
-            if (items.isEmpty()) return Result.success()
+            if (items.isEmpty()) {
+                runCatching { api.afterSync() }
+                return Result.success()
+            }
 
             val blockedIssueIds = mutableSetOf<String>()
             var anyFailed = false
@@ -54,6 +57,7 @@ class SyncWorker(
                     repository.recordFailedSyncAttempt(item.localId)
                 }
             }
+            runCatching { api.afterSync() }
             return if (anyFailed) Result.retry() else Result.success()
         } catch (e: Exception) {
             android.util.Log.e("SyncWorker", "Worker failed", e)

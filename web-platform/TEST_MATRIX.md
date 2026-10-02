@@ -137,3 +137,20 @@ existing RBAC helpers) rather than introducing new patterns.
 | Android Room v9 → v10 | `ref_facilities` created; `replaceFacilities` drops rows the user no longer sees | 🔧 `MigrationTest.migrate9To10_createsFacilitiesTable` compiles; run on a device/emulator. Migration SQL matches the exported `10.json` exactly |
 | Android: DRI Home shows "My facility" offline | Facility name, type, supplier from the local cache | 🔧 `assembleDebug` builds; needs a device check with a real DRI account |
 | Android unit tests | 22/22 pass | ✅ `gradlew testDebugUnitTest` (JDK 21, see DECISIONS R20) |
+
+# RUTF M2 — Ledger & facility recording (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| State → LGA → OTP transfers and a week of dispensing reconcile | SST 1,500 / LST 900 / OTP 160 after receipt, issue, short receipt (2 damaged), 7 × 60 dispensed, a count 3 short and a 5-sachet loss | ✅ `node tools/db/test-ledger.js` (26/26) |
+| Forced retries (3 × 3 submissions) | All answered `duplicate`; no new ledger rows, transfers or dispensing days | ✅ test-ledger.js |
+| Short receipt | Transfer `discrepancy`, gap 10 | ✅ test-ledger.js |
+| Count differs from the ledger | Adjustment for the difference; count result returns the ledger balance | ✅ test-ledger.js |
+| Recording outside your own facility / OTP issuing / issuing to an unsupplied facility / supervisor recording / second entry for a day / direct insert / future date | All refused | ✅ test-ledger.js |
+| Read scope | OTP user can't read the State store ledger; reads its own and the issue lines addressed to it; supervisor reads all | ✅ test-ledger.js |
+| Dummy ledger load | 3,364 transfers, 17,380 rows, 6,998 dispensing days; no negative lot balance | ✅ `import-ledger.js` summary |
+| Stock Ledger / Transfers page queries as an OTP user and as a supervisor | OTP user: own facility's 61 ledger rows, 12 transfers; supervisor: all 17,380 rows, 3,364 transfers, 12 overdue | ✅ run through the real API with demo sign-ins; web `tsc` clean, `eslint` clean for the new files |
+| Stock Ledger / Transfers pages in the browser | KPIs, filters, running balance, links | ⏳ needs a click-through (sign in as `hadiza.danjuma@…` or `safiya.isa@…`) |
+| Android: offline projection, cartons → sachets, record_* parameters, queue JSON round trip | As migration 0101 expects | ✅ `StockProjectionTest` (7) — Android unit tests 29/29 |
+| Android Room v10 → v11 | Six stock cache tables; SQL identical to the exported `11.json` | ✅ schema compared; 🔧 `MigrationTest.migrate10To11_createsStockCacheTables` compiles, run on a device |
+| Android: Receive / Issue / Daily Dispensing / Stock Count / Loss / My Stock end to end, offline then online | Queued, synced once, balances refresh | 🔧 `assembleDebug` builds; no emulator or device here — needs a device run with a demo facility user |

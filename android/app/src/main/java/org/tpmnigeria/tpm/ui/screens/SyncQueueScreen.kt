@@ -131,5 +131,10 @@ private fun submissionTypeLabel(name: String): String = when (name) {
     "DriResponse" -> "DRI Response"
     "FinalVerification" -> "Final Verification"
     "Attendance" -> "Daily Attendance"
+    "StockReceipt" -> "Receive Stock"
+    "StockIssue" -> "Issue Stock"
+    "Dispensing" -> "Daily Dispensing"
+    "StockCount" -> "Stock Count"
+    "StockLoss" -> "Loss / Adjustment"
     else -> name
 }

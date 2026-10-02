@@ -12,8 +12,10 @@ import androidx.room.TypeConverters
         StateRefEntity::class, LgaRefEntity::class, WardRefEntity::class, CategoryRefEntity::class,
         SettlementRefEntity::class, ActivitySiteRefEntity::class, LoadedScopeEntity::class,
         IssueIdCounterEntity::class, AttendanceEntity::class, FacilityRefEntity::class,
+        ProductRefEntity::class, LotRefEntity::class, StockBalanceEntity::class,
+        IncomingTransferEntity::class, IncomingTransferLineEntity::class, DispensingDayEntity::class,
     ],
-    version = 10,
+    version = 11,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -24,6 +26,7 @@ abstract class TpmDatabase : RoomDatabase() {
     abstract fun referenceDao(): ReferenceDao
     abstract fun issueIdCounterDao(): IssueIdCounterDao
     abstract fun attendanceDao(): AttendanceDao
+    abstract fun stockDao(): StockDao
 
     companion object {
         @Volatile private var INSTANCE: TpmDatabase? = null
