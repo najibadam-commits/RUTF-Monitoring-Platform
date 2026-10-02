@@ -15,6 +15,17 @@ const files = fs
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   await client.connect();
 
+  // Fresh-database bootstrap only: it drops tables. Refuse once migrations are recorded
+  // (RUTF DECISIONS.md R8) — after that, new migrations go through the GitHub integration.
+  const applied = await client.query(
+    "select to_regclass('supabase_migrations.schema_migrations') is not null as present"
+  );
+  if (applied.rows[0].present) {
+    console.error("Refusing: this database already has recorded migrations. Not dropping anything.");
+    await client.end();
+    process.exit(1);
+  }
+
   try {
     await client.query("begin");
 
