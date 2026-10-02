@@ -1,0 +1,104 @@
+/* Login page (login/page.tsx) — same look as the landing page (../landing.module.css). */
+
+.page {
+  --navy: var(--color-accent-800);
+  --blue: var(--color-accent-600);
+  --gutter: clamp(16px, 3vw, 40px);
+  min-height: 100%;
+  display: flex; flex-direction: column;
+  background: linear-gradient(180deg, var(--color-accent-100) 0%, var(--color-bg) 60%);
+  color: var(--color-text);
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.header {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 12px var(--gutter);
+  background: var(--color-surface); border-bottom: 1px solid var(--color-divider);
+}
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+.brandName { display: block; font-weight: 700; font-size: 20px; color: var(--navy); line-height: 1.1; }
+.brandSub { display: block; font-size: 11.5px; line-height: 1.3; color: var(--navy); opacity: 0.8; }
+.back { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 600; color: var(--blue); text-decoration: none; }
+.back:hover { text-decoration: underline; }
+
+/* ── Layout ─────────────────────────────────────────── */
+.main {
+  flex: 1; width: 100%; max-width: 1320px; margin: 0 auto; padding: 32px var(--gutter) 40px;
+  display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr); gap: 36px; align-items: start;
+}
+
+/* ── Left: story ────────────────────────────────────── */
+.story { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.photo {
+  position: relative; min-height: 400px; border-radius: var(--radius-lg); overflow: hidden;
+  background: url(/landing/hero-facility.webp) 30% center / cover no-repeat;
+  display: flex; align-items: flex-end;
+  box-shadow: var(--shadow-md);
+}
+.photo::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(12, 40, 80, 0.94) 0%, rgba(12, 40, 80, 0.75) 45%, rgba(12, 40, 80, 0) 80%);
+}
+.photoText { position: relative; padding: 28px 32px; color: #fff; }
+.kicker { font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-accent-200); margin-bottom: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.title { font-size: clamp(28px, 2.8vw, 38px); font-weight: 700; color: #fff; line-height: 1.12; margin-bottom: 10px; }
+.lead { max-width: 560px; font-size: 15px; line-height: 1.6; color: rgba(255, 255, 255, 0.9); margin: 0; }
+
+.why { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.whyItem {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+  background: var(--color-surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+}
+.whyIcon { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; flex: none; color: #fff; font-size: 20px; }
+.whyTitle { display: block; font-size: 14.5px; font-weight: 700; color: var(--navy); }
+.whyBody { display: block; font-size: 13.5px; color: var(--color-neutral-700); }
+.blue { background: #1677d2; }
+.green { background: #2e9b62; }
+.purple { background: #7c4dcc; }
+.orange { background: #ef7d22; }
+
+.stats {
+  display: flex; justify-content: space-around; gap: 12px; padding: 16px 20px;
+  background: var(--navy); border-radius: var(--radius-lg); color: #fff; text-align: center;
+}
+.statValue { font-weight: 700; font-size: 24px; line-height: 1.2; }
+.statLabel { font-size: 12px; letter-spacing: 0.06em; color: rgba(255, 255, 255, 0.8); }
+
+/* ── Right: sign-in card ────────────────────────────── */
+.panel { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 24px; }
+.card { padding: 36px; gap: 0; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); background: var(--color-surface); }
+.cardHead { display: flex; gap: 14px; align-items: center; margin-bottom: 24px; }
+.cardKicker { font-size: 13.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
+.cardSub { font-size: 14.5px; color: var(--color-neutral-700); margin: 0; }
+
+/* Filled pill submit button, like the landing page's primary buttons. */
+.card :global(.btn-primary) {
+  background: var(--blue); color: #fff; border-color: var(--blue); border-radius: 999px;
+  height: 46px; font-weight: 600; box-shadow: 0 4px 14px rgba(22, 119, 210, 0.28);
+}
+.card :global(.btn-primary:hover:not(:disabled)) { background: var(--color-accent-700); }
+
+.assurances {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px;
+  margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--color-divider);
+  font-size: 13px; color: var(--color-neutral-700);
+}
+.assurances span { display: inline-flex; align-items: center; gap: 6px; }
+.assurances i { color: var(--status-resolved); font-size: 16px; }
+.quote { text-align: center; font-size: 14px; font-style: italic; color: var(--navy); margin: 0; }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 960px) {
+  .main { grid-template-columns: 1fr; }
+  .panel { position: static; order: -1; }
+  .photo { min-height: 300px; }
+}
+@media (max-width: 560px) {
+  .brandSub { display: none; }
+  .back span, .back { font-size: 13px; }
+  .card { padding: 24px 20px; }
+  .why { grid-template-columns: 1fr; }
+  .photoText { padding: 20px; }
+  .photo::before { background: linear-gradient(0deg, rgba(12, 40, 80, 0.95) 0%, rgba(12, 40, 80, 0.82) 60%, rgba(12, 40, 80, 0.55) 100%); }
+}

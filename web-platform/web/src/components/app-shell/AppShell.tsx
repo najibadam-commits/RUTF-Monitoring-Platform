@@ -8,6 +8,7 @@ import { ROLE_LABELS, NAV_SECTION_LABELS, visibleNavItemsFor, type NavSection } 
 import type { Profile } from "@/lib/supabase/dal";
 import { NotificationsBell } from "./NotificationsBell";
 import { TopSearch } from "./TopSearch";
+import { RutfMark } from "@/components/RutfMark";
 
 const VIEW_TITLES: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -99,9 +100,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
         style={{ flex: "none", display: "flex", flexDirection: "column", background: "var(--color-sidebar)" }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: collapsed ? 6 : 10, padding: collapsed ? "18px 10px 16px" : "18px 16px 16px" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element -- a fixed local brand asset, not
-              a content image; Next's <Image> optimization pipeline buys nothing here. */}
-          <img src="/tpm-logo-mark.png" alt="TPM" style={{ width: 26, height: 26, flex: "none" }} />
+          <span style={{ flex: "none", lineHeight: 0 }}><RutfMark size={28} /></span>
           <span className="app-brand-label" style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 14, lineHeight: 1.25, color: "#fff", whiteSpace: "nowrap", overflow: "hidden" }}>
             RUTF Monitoring
             <br />
