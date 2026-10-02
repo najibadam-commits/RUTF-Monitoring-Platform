@@ -27,3 +27,4 @@ build/
 .DS_Store
 Thumbs.db
 *.log
+web-platform/tools/gis-import/import.log

@@ -15,7 +15,8 @@ if (!email || !name) {
   process.exit(1);
 }
 
-const SITE_URL = "https://tpm-monitoring-platform.vercel.app";
+// Where the invite link lands. Defaults to the local web app until RUTF has a deployed URL.
+const SITE_URL = process.env.SITE_URL || "http://localhost:3000";
 
 (async () => {
   const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
