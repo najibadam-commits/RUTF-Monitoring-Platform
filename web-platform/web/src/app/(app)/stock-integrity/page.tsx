@@ -36,7 +36,7 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
 
   return (
     <ReportShell
-      title="Stock Integrity"
+      title="Stock Reconciliation"
       intro={<>Last physical count against the ledger, months of stock, stockout days and expired stock for each store and OTP site — {month.label}. Variance limit {limit}% (10% for hard-to-reach facilities).</>}
       monthKey={month.key} lgas={lgas} sp={sp}
     >

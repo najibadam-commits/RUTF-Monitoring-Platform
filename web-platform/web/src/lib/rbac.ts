@@ -179,7 +179,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
   { key: "transfers", label: "Transfers", href: "/transfers", icon: "ph-truck", section: "stock" },
   // Analysis pages (brief §9, M5) — facility_metrics() is security invoker, so RLS scopes them too.
-  { key: "stockIntegrity", label: "Stock Integrity", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
+  { key: "stockIntegrity", label: "Stock Reconciliation", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
   { key: "reportingCompleteness", label: "Reporting Completeness", href: "/reporting-completeness", icon: "ph-check-square-offset", section: "stock" },
   { key: "otpDispensing", label: "OTP Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
   { key: "supervision", label: "Visits & Planner", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
