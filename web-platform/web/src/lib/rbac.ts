@@ -135,8 +135,7 @@ export type NavKey =
   | "gis"
   | "issues"
   | "findingsFollowUp"
-  | "analytics"
-  | "timeEfficiency"
+  | "accountability"
   | "reportingCentre"
   | "devices"
   | "users"
@@ -173,6 +172,8 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // and the operational terminology inside it are deliberately different, not a naming mistake.
   { key: "issues", label: "Findings", href: "/issues", icon: "ph-list-bullets", section: "overview" },
   { key: "findingsFollowUp", label: "Findings Follow-up", href: "/findings-follow-up", icon: "ph-kanban", section: "overview" },
+  // Findings Analytics + Time Efficiency merged (DECISIONS R57).
+  { key: "accountability", label: "Accountability Scorecard", href: "/accountability", icon: "ph-seal-check", section: "overview" },
   // RUTF stock (brief §9). Every role sees these; RLS scopes the rows (a facility user: their own
   // facility only).
   { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
@@ -183,8 +184,6 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "otpDispensing", label: "OTP Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
   { key: "supervision", label: "Visits & Planner", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
-  { key: "analytics", label: "Findings Analytics", href: "/analytics", icon: "ph-chart-line", section: "analytics" },
-  { key: "timeEfficiency", label: "Time Efficiency Analysis", href: "/time-efficiency", icon: "ph-gauge", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },
   { key: "devices", label: "Devices & Sync", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },

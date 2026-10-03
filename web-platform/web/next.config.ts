@@ -3,7 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // TPM Sub-Panel was renamed Findings Follow-up (DECISIONS R56); keep old links and bookmarks working.
   async redirects() {
-    return [{ source: "/subpanel", destination: "/findings-follow-up", permanent: true }];
+    return [
+      { source: "/subpanel", destination: "/findings-follow-up", permanent: true },
+      // Findings Analytics and Time Efficiency Analysis became the Accountability Scorecard (R57).
+      { source: "/analytics", destination: "/accountability", permanent: true },
+      { source: "/time-efficiency", destination: "/accountability", permanent: true },
+    ];
   },
   experimental: {
     // Every route under (app)/ reads cookies (Supabase session), so Next treats all of them as

@@ -1,6 +1,6 @@
 import { Skeleton, SkeletonKpiCard, SkeletonCard, SkeletonTable } from "@/components/ui/Skeleton";
 
-export default function AnalyticsLoading() {
+export default function AccountabilityLoading() {
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>

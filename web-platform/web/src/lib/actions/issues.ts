@@ -13,7 +13,7 @@ async function afterMutation(issueId: string) {
   revalidatePath("/dashboard");
   revalidatePath("/gis");
   revalidatePath("/findings-follow-up");
-  revalidatePath("/analytics");
+  revalidatePath("/accountability");
 }
 
 export async function assignIssueAction(issueId: string, driId: string, note: string): Promise<ActionResult> {

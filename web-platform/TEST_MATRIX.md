@@ -282,3 +282,12 @@ existing RBAC helpers) rather than introducing new patterns.
 | Menu, page heading, browser title | "Findings Follow-up" at `/findings-follow-up` | ✅ typecheck; ⏳ browser check (restart the dev server — next.config changed) |
 | Old address `/subpanel` | Redirects permanently to `/findings-follow-up` | ⏳ browser check |
 | Assign a Finding to a DRI | History entry actor "Findings Follow-up" | ✅ role access 202/202 with 0112; applied, live function checked, permissions audit clean |
+
+# Accountability Scorecard (R57)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Scorecard with live demo data | 585 raised · 50% verified & closed · median 11.4 d · 75 open past 30 days; funnel 585 → 435 → 351 → 327 → 291; trend May–Oct; stage times 47.9 h / 3.2 d / 6.1 d / 8.9 d; tables capped at 10 with "Show all" | ✅ rendered and checked (temporary local preview, removed); no console errors |
+| `/analytics`, `/time-efficiency` | Redirect to `/accountability` | ⏳ browser check (restart dev server — next.config changed) |
+| `simulate-review.js` | Dry run then commit; deterministic; DUMMY Findings only; no notifications sent | ✅ |
+| KPIs after the simulation | test-kpis 26/26 | ✅ |

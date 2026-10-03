@@ -98,6 +98,7 @@ node seed-demo-accounts.js                # demo sign-ins from people.csv (share
 node import-ledger.js                     # dummy transfers, ledger and OTP dispensing (needs the demo accounts)
 node import-visits.js                     # dummy supervision visits + their Findings (add --dry-run to preview)
 node import-dhis2.js                      # dummy DHIS2 monthly extract for triangulation (or a real CSV path)
+node simulate-review.js                   # demo only: realistic review history on the DUMMY Findings (--dry-run to preview)
 ```
 
 Tests: `node test-ledger.js` (M2), `node test-findings.js` (M3), `node test-visits.js` (M4), `node test-kpis.js [YYYY-MM]` (M5 — compares `rutf_kpis` with `python tools/dummy-data/kpis.py`) and `node test-mobile-role-access.js` (every role against every rule, including the M6 checks).

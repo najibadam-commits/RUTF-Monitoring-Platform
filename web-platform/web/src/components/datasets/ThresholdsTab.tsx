@@ -14,6 +14,7 @@ const LABEL: Record<string, string> = {
   vf_max: "OTP verification factor — maximum",
   geofence_m: "Supervision visit geofence (m)",
   short_dispense_pct: "Short-dispensing limit (%)",
+  finding_target_days: "Finding target — days to verified & closed",
 };
 
 export function ThresholdsTab({ thresholds, projectName, isSuperAdmin }: { thresholds: Threshold[]; projectName: Record<string, string>; isSuperAdmin: boolean }) {
