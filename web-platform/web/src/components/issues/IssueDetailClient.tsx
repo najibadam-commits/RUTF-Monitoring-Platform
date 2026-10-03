@@ -329,7 +329,7 @@ export function IssueDetailClient({
               </select>
               {sectorDris.length === 0 && (
                 <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  No DRI is currently assigned this issue&apos;s sector — assign one a sector under Users &amp; Roles first.
+                  No DRI is currently assigned this issue&apos;s sector — assign one a sector under Users &amp; Access first.
                 </div>
               )}
             </div>

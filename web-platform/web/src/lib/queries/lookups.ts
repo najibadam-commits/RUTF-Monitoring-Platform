@@ -79,7 +79,7 @@ export const getAllWards = cache(async (client: SupabaseClient<Database>) => {
 /** [categoryId] narrows to DRIs assigned that sector — used by the State Coordinator's
  *  approve-and-assign picker, since a Finding may only go to a DRI whose sector matches it (see
  *  DECISIONS.md #22). Omit it for callers that need every active DRI regardless of sector (e.g.
- *  Users & Roles' listing, or the legacy assign_issue path for a pre-migration 'new' Finding). */
+ *  Users & Access' listing, or the legacy assign_issue path for a pre-migration 'new' Finding). */
 export const getDris = cache(async (client: SupabaseClient<Database>, categoryId?: string) => {
   let query = client.from("profiles").select("id, name, phone, email").eq("role", "dri").eq("status", "active").order("name");
   if (categoryId) query = query.eq("assigned_category_id", categoryId);

@@ -23,7 +23,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/reporting": "Programme Reporting",
   "/download-requests": "Data Access Requests",
   "/devices": "Offline Sync Health",
-  "/users": "Users & Role Management",
+  "/users": "Users & Access",
   "/data-sets": "Data Sets",
   "/project-admins": "Project Admin Panel",
   "/settings": "System Settings",

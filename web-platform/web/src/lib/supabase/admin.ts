@@ -10,7 +10,7 @@ import type { Database } from "@/lib/types/database";
  * have already verified the *caller's* role via a normal (RLS-respecting)
  * client — this key must never reach the browser.
  *
- * Used for: creating/removing Supabase Auth users (Users & Roles, Project
+ * Used for: creating/removing Supabase Auth users (Users & Access, Project
  * Admin Panel), and generating password reset links — operations the
  * `auth.users` table itself requires admin privileges for, which plain RLS
  * on `profiles` cannot express.

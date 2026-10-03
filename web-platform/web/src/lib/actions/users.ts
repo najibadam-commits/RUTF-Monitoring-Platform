@@ -126,7 +126,7 @@ async function inviteAndSetupUser(
   return {};
 }
 
-/** Add a user (Users & Roles screen) — single-account path, see inviteAndSetupUser above. */
+/** Add a user (Users & Access screen) — single-account path, see inviteAndSetupUser above. */
 export async function addUserAction(input: {
   name: string;
   email: string;
@@ -152,7 +152,7 @@ const BULK_INVITE_MAX_ROWS = 25;
 const BULK_INVITE_DELAY_MS = 400;
 
 /**
- * Bulk Import (Users & Roles screen) — generic, column-mapped CSV import. Each row is its own
+ * Bulk Import (Users & Access screen) — generic, column-mapped CSV import. Each row is its own
  * Supabase Auth Admin API call (inviteUserByEmail), not a batchable table insert like the
  * Data Sets bulk actions, so this processes rows sequentially with a small delay between them
  * and reports a per-row result rather than failing the whole batch on one row's error. The row

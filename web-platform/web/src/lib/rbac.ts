@@ -187,7 +187,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },
   { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
-  { key: "users", label: "Users & Roles", href: "/users", icon: "ph-users-three", section: "administration" },
+  { key: "users", label: "Users & Access", href: "/users", icon: "ph-users-three", section: "administration" },
   { key: "datasets", label: "Data Sets", href: "/data-sets", icon: "ph-database", section: "administration" },
   { key: "projectadmins", label: "Project Admin Panel", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
   { key: "settings", label: "Settings", href: "/settings", icon: "ph-gear-six", section: "administration" },

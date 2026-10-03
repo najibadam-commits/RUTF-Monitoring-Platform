@@ -72,7 +72,7 @@ purpose, so live figures aren't touched. Remove them afterwards.
 | # | Who | Steps | Expected | Result | Note |
 | --- | --- | --- | --- | --- | --- |
 | E1 | OTP user | On the web, open Stock Ledger | Only their own facility | | |
-| E2 | Viewer | Try Users & Roles, Data Sets, Offline Sync Health, Audit Trail | Not in the menu; direct links redirect to the dashboard | | |
+| E2 | Viewer | Try Users & Access, Data Sets, Offline Sync Health, Audit Trail | Not in the menu; direct links redirect to the dashboard | | |
 | E3 | Project Admin | Change a threshold or a facility name, then open Audit Trail | The change is listed with their name, old and new value | | |
 | E4 | Project Admin | Deactivate a test account; that user tries to sync | Sign-in refused; records stay on the phone (not lost) until reactivated | | |
 | E5 | Any | Look through every OTP screen and export | No field for child or caregiver names, phones or IDs | | |

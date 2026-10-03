@@ -102,7 +102,7 @@ export function UsersTable({
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>Users &amp; Role Management</h2>
+          <h2 style={{ marginBottom: 2 }}>Users &amp; Access</h2>
           <p className="text-muted" style={{ fontSize: 13 }}>
             {users.length} account{users.length === 1 ? "" : "s"}
             {callerRole === "project_admin" ? " in your project." : " across the platform."}
