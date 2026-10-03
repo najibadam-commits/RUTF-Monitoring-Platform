@@ -45,7 +45,7 @@ export const getLgas = cache(async (client: SupabaseClient<Database>, stateId?: 
 });
 
 /**
- * All wards nationally (id/lga_id/name only — no geometry). Used by the Data Sets screen so
+ * All wards nationally (id/lga_id/name only — no geometry). Used by the Master Data screen so
  * Settlement/Activity Site forms and CSV upload can resolve a typed-in Ward name to a real
  * ward_id without a round trip per row. A one-time payload for an admin screen is fine; lazy
  * per-LGA loading isn't worth the complexity here (contrast with the Android app, which does

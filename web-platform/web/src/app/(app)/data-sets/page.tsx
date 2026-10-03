@@ -99,7 +99,7 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h2 style={{ marginBottom: 2 }}>Data Sets</h2>
+        <h2 style={{ marginBottom: 2 }}>Master Data</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
           Reference data for RUTF tracking: the facility registry and supply chain, product lots, dosing rules and thresholds.
           {pendingCount > 0 && ` ${pendingCount} facility change${pendingCount === 1 ? " needs" : "s need"} your review.`}

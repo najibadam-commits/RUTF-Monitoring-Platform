@@ -154,7 +154,7 @@ const BULK_INVITE_DELAY_MS = 400;
 /**
  * Bulk Import (Users & Access screen) — generic, column-mapped CSV import. Each row is its own
  * Supabase Auth Admin API call (inviteUserByEmail), not a batchable table insert like the
- * Data Sets bulk actions, so this processes rows sequentially with a small delay between them
+ * Master Data bulk actions, so this processes rows sequentially with a small delay between them
  * and reports a per-row result rather than failing the whole batch on one row's error. The row
  * cap and delay are deliberately conservative: this project has previously hit Supabase's email
  * rate limit from repeated invites (see tools/db/add-user-no-email.js's own comment about it).

@@ -199,7 +199,7 @@ export function IssueDetailClient({
                     .filter(Boolean)
                     .join(" / ")
                 ) : issue.location_other ? (
-                  <span style={{ color: "var(--status-reopened)" }} title="Typed manually in the field — not yet in the reference list. Add it via Data Sets if it should be tracked going forward.">
+                  <span style={{ color: "var(--status-reopened)" }} title="Typed manually in the field — not yet in the reference list. Add it via Master Data if it should be tracked going forward.">
                     {issue.location_other} (not in reference list)
                   </span>
                 ) : (

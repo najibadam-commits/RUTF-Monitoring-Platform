@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { tagBg } from "@/lib/constants";
 
-// Pieces shared by the Data Sets tabs (same look as the original Settlements/Activity Sites screen).
+// Pieces shared by the Master Data tabs (same look as the original Settlements/Activity Sites screen).
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
   approved: { label: "Approved", color: "var(--status-resolved)" },

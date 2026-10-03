@@ -6,7 +6,7 @@ import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canManageDatasets } from "@/lib/rbac";
 import type { Database, FacilityType } from "@/lib/types/database";
 
-// RUTF reference data (migration 0100) behind the Data Sets screen. RLS and the 0015 workflow
+// RUTF reference data (migration 0100) behind the Master Data screen. RLS and the 0015 workflow
 // trigger are the real guards: a Project Admin's facility add/edit/delete becomes a pending
 // proposal server-side, and products/protocol rules/thresholds reject anyone but Super Admin.
 // The role checks here only return a clear message before the round trip.

@@ -182,7 +182,7 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
         <h2 style={{ marginBottom: 2 }}>Accountability Scorecard</h2>
         <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 860 }}>
           Every Finding from the moment it is raised to verified closure — how many, how far along, how fast, and where follow-up is
-          waiting. Findings are for review, not accusation. Target: verified and closed within {targetDays} days (Data Sets → Thresholds).
+          waiting. Findings are for review, not accusation. Target: verified and closed within {targetDays} days (Master Data → Thresholds).
         </p>
       </div>
 

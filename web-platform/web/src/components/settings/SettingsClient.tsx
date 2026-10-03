@@ -43,7 +43,7 @@ export function SettingsClient({ settings }: { settings: Settings }) {
       <div>
         <h2 style={{ marginBottom: 2 }}>System Settings</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
-          Platform-wide settings. Thresholds, dosing rules and lots are under Data Sets.
+          Platform-wide settings. Facilities, lots, dosing rules and thresholds are under Master Data.
         </p>
       </div>
 
