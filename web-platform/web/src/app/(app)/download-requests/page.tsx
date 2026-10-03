@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -5,6 +6,8 @@ import { canAccessDownloadRequests, canReviewDownloadRequests } from "@/lib/rbac
 import { getDownloadRequests, getMyDownloadRequests } from "@/lib/queries/downloadRequests";
 import { DownloadRequestsTable } from "@/components/downloadRequests/DownloadRequestsTable";
 import { MyDownloadRequests } from "@/components/downloadRequests/MyDownloadRequests";
+
+export const metadata: Metadata = { title: "Data Access Requests" };
 
 export default async function DownloadRequestsPage() {
   const profile = await getCurrentProfile();

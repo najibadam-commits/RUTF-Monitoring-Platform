@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 import { Meter } from "@/components/dashboard/Kpi";
 import { FacilityLink, Flag, LEVEL_LABEL, ReportShell, fmt, type SP } from "@/components/reports/ReportShell";
+
+export const metadata: Metadata = { title: "Completeness & Timeliness" };
 
 // Reporting Completeness (brief §9): which OTP sites recorded daily dispensing every week, and
 // which stores and OTP sites counted at month end on time. Same definitions as rutf_kpis()

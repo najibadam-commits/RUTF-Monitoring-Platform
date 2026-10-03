@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { STATUS_LABEL, STATUS_COLOR, STATUS_ORDER } from "@/lib/constants";
@@ -7,6 +8,8 @@ import { DashboardMap } from "@/components/gis/DashboardMap";
 import { KpiSections } from "@/components/dashboard/KpiSections";
 import { getKpis, latestLedgerMonth, monthOf, previousMonth } from "@/lib/queries/kpis";
 import type { IssueStatus } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Command Centre" };
 
 // RUTF dashboard (brief §9): the headline KPIs for a month from rutf_kpis() (migrations
 // 0105/0106 — the same definitions test-kpis.js checks against hand-calculated values), then the

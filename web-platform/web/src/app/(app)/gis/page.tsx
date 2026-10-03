@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCategories, getDris, getLgas, getStates, getTpms } from "@/lib/queries/lookups";
 import { STATUS_LABEL, STATUS_FILTER_OPTIONS, STATUS_COLOR } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { GisMap, type GisFacility } from "@/components/gis/GisMap";
 import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
+
+export const metadata: Metadata = { title: "Situation Map" };
 
 export default async function GisPage() {
   const supabase = await createClient();

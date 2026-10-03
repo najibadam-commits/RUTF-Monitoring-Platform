@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -8,6 +9,8 @@ import { tagBg } from "@/lib/constants";
 import { canVoidLedger } from "@/lib/rbac";
 import { VoidEntryButton } from "@/components/stock/VoidEntryButton";
 import type { FacilityType, TxnType } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Stock Ledger" };
 
 // Stock Ledger (brief §9): stores and OTP sites with their stock position, and per facility the
 // balance by lot plus every transaction with its running balance. RLS scopes everything — a

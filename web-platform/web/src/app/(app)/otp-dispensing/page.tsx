@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 import { FacilityLink, Flag, ReportShell, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
+
+export const metadata: Metadata = { title: "Last-Mile Dispensing" };
 
 // OTP Dispensing (brief §9): dispensed against prescribed (short-dispensing), children seen and
 // admissions from the daily register tallies, and the verification factor from the latest

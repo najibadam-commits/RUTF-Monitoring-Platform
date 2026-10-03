@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 import { FacilityLink, Flag, LEVEL_LABEL, ReportShell, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
+
+export const metadata: Metadata = { title: "Stock Reconciliation" };
 
 // Stock Integrity (brief §9): variance by facility (last count against the ledger), months of
 // stock, stockout days, expired stock — plus the expiry watchlist. From facility_metrics()

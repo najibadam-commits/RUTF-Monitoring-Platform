@@ -4,7 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { logout } from "@/lib/actions/auth";
-import { ROLE_LABELS, NAV_SECTION_LABELS, visibleNavItemsFor, type NavSection } from "@/lib/rbac";
+import { NAV_ITEMS, ROLE_LABELS, NAV_SECTION_LABELS, visibleNavItemsFor, type NavSection } from "@/lib/rbac";
 import type { Profile } from "@/lib/supabase/dal";
 import { NotificationsBell } from "./NotificationsBell";
 import { TopSearch } from "./TopSearch";
@@ -42,14 +42,29 @@ function initials(name: string) {
     .join("");
 }
 
+/** Top-bar title. Detail pages get their own name; anything else falls back to the menu label of
+ *  the section it sits under. (Browser-tab titles: each page's metadata, with the root layout's template.) */
+const PLATFORM = "RUTF-DTAP Monitoring Platform";
+const DETAIL_TITLES: [prefix: string, title: string][] = [
+  ["/issues/", "Finding detail"],
+  ["/supervision/", "Supervision visit"],
+];
+
 function viewTitleFor(pathname: string) {
-  if (pathname.startsWith("/issues/")) return "Issue Detail";
-  return VIEW_TITLES[pathname] ?? "RUTF Monitoring Platform";
+  if (VIEW_TITLES[pathname]) return VIEW_TITLES[pathname];
+  const detail = DETAIL_TITLES.find(([prefix]) => pathname.startsWith(prefix));
+  if (detail) return detail[1];
+  const section = [...NAV_ITEMS]
+    .sort((a, b) => b.href.length - a.href.length)
+    .find((i) => pathname === i.href || pathname.startsWith(`${i.href}/`));
+  return section?.label ?? PLATFORM;
 }
 
 export function AppShell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const title = viewTitleFor(pathname);
+
   const navItems = visibleNavItemsFor(profile.role);
   const [signingOut, setSigningOut] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
@@ -202,7 +217,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
           >
             <i className="ph ph-list" style={{ fontSize: 20 }} />
           </button>
-          <h4 style={{ margin: 0, whiteSpace: "nowrap" }}>{viewTitleFor(pathname)}</h4>
+          <h4 style={{ margin: 0, whiteSpace: "nowrap" }}>{title}</h4>
           <TopSearch onSubmit={(q) => router.push(`/issues?search=${encodeURIComponent(q)}`)} />
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
             <NotificationsBell userId={profile.id} />

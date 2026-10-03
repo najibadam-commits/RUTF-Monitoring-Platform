@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { facilityNames } from "@/lib/queries/stock";
 import { tagBg } from "@/lib/constants";
 import type { TransferStatus } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Transfers" };
 
 // Transfers (brief §9): every shipment State store -> LGA store -> OTP site, in transit,
 // received, or received with a discrepancy. RLS scopes the rows (a facility user: transfers to

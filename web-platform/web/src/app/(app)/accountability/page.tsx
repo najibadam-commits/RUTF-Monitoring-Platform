@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { AccountabilityScorecard, type ScorecardRow, type TimeEfficiencyStats } from "@/components/accountability/AccountabilityScorecard";
+
+export const metadata: Metadata = { title: "Accountability Scorecard" };
 
 // Accountability Scorecard (DECISIONS R57) — loads the caller's Findings (RLS-scoped), the stage
 // timings and the target; the view is components/accountability/AccountabilityScorecard.tsx.

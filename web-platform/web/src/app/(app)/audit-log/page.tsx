@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canAccessAuditLog } from "@/lib/rbac";
 import type { SP } from "@/components/reports/ReportShell";
+
+export const metadata: Metadata = { title: "Audit Trail" };
 
 // Audit Trail (brief §10, migration 0108): who changed reference data, user access, DHIS2 uploads
 // and ledger / transfer status, with the old and new values. Ledger entries themselves are

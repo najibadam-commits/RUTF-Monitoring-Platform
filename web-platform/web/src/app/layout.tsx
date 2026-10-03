@@ -10,8 +10,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RUTF Monitoring Platform",
-  description: "Third-Party Monitoring & live GIS oversight for field-reported findings across Nigeria.",
+  // Each page sets its own title (export const metadata); the tab then reads "<page> · RUTF-DTAP".
+  title: { default: "RUTF-DTAP Monitoring Platform", template: "%s · RUTF-DTAP" },
+  description:
+    "RUTF tracking and accountability for Katsina State: stock from the State store to OTP sites, supervision, Findings and corrective action.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

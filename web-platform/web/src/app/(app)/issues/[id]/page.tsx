@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -6,6 +7,8 @@ import { getCategories, getDris } from "@/lib/queries/lookups";
 import { canAssign, canEditOrDeleteIssue, canRecordCorrective, canRespond, canReviewFinding, canVerify, isViewer } from "@/lib/rbac";
 import { IssueDetailClient } from "@/components/issues/IssueDetailClient";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
+
+export const metadata: Metadata = { title: "Finding detail" };
 
 export default async function IssueDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

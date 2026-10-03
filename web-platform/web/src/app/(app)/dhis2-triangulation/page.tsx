@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { reportMonth } from "@/lib/queries/metrics";
 import { FacilityLink, Flag, ReportShell, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
 import { Dhis2Upload } from "@/components/dhis2/Dhis2Upload";
+
+export const metadata: Metadata = { title: "DHIS2 Triangulation" };
 
 // DHIS2 Triangulation (brief §9): each facility's DHIS2 monthly report against the ledger for the
 // same month — received, distributed (dispensed + issued), wasted (losses) and stockout days.

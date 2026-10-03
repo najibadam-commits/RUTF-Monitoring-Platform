@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -6,6 +7,8 @@ import { StatusTag } from "@/components/ui/Tags";
 import { ClickableRow } from "@/components/ui/ClickableRow";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import type { IssueStatus } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Corrective Action Tracker" };
 
 export default async function ActionTrackerPage() {
   const profile = await getCurrentProfile();

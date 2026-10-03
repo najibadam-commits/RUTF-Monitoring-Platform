@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { latestLedgerMonth } from "@/lib/queries/kpis";
 import { RUTF_EXPORTS, type RutfExportKind } from "@/lib/exports/rutfExports";
 import { monthChoices } from "@/components/reports/ReportShell";
 import { RutfExportPanel } from "@/components/reports/RutfExportPanel";
+
+export const metadata: Metadata = { title: "Programme Reporting" };
 
 interface ReportCard {
   icon: string;

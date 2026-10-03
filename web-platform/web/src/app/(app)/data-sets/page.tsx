@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -9,6 +10,8 @@ import { LotsTab } from "@/components/datasets/LotsTab";
 import { ProtocolTab } from "@/components/datasets/ProtocolTab";
 import { ThresholdsTab } from "@/components/datasets/ThresholdsTab";
 import type { DatasetStatus, FacilityType } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Master Data" };
 
 // RUTF reference data (brief §9, migration 0100). The TPM Settlements / Activity Sites sets are
 // no longer shown; their tables are kept (DECISIONS R14).

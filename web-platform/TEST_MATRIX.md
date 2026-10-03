@@ -305,3 +305,11 @@ existing RBAC helpers) rather than introducing new patterns.
 |---|---|---|
 | Finding detail page and not-found page | No user-facing "issue" / "TPM"; "Reported by", "Facility level" | ✅ typecheck + lint; ⏳ browser check |
 | Review functions (0116) | Same behaviour, Finding wording in history and messages | ✅ role access 202/202 with 0116; applied; `role_label` → "Supervisor" (0117); no live function uses the old wording; permissions audit clean |
+
+# Browser-tab titles (R73)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Page with its own title | Tab reads "<page> · RUTF-DTAP", set server-side | ✅ checked in the browser on a temporary page rendering the real shell (removed) |
+| All 22 `(app)` pages | `metadata.title` matches the menu name; detail pages "Finding detail", "Supervision visit" | ✅ typecheck + lint |
+| Site description | RUTF-DTAP wording | ✅ |

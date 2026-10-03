@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -6,6 +7,8 @@ import { canAccessDevices, ROLE_LABELS } from "@/lib/rbac";
 import { getLgas } from "@/lib/queries/lookups";
 import { Flag, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
 import type { Database } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Offline Sync Health" };
 
 // Offline Sync Health (brief M6, sync-failure monitoring): every facility user and supervisor with the
 // latest report from their phone — sync_health() (migration 0108). Each sync run reports what is

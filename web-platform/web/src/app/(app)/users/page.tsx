@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -5,6 +6,8 @@ import { canAccessUsersScreen } from "@/lib/rbac";
 import { getLgas, getStates } from "@/lib/queries/lookups";
 import { UsersTable } from "@/components/users/UsersTable";
 import type { FacilityOption } from "@/components/users/FacilityPicker";
+
+export const metadata: Metadata = { title: "Users & Access" };
 
 export default async function UsersPage() {
   const profile = await getCurrentProfile();

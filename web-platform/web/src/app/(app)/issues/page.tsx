@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
@@ -12,6 +13,8 @@ import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { ClickableRow } from "@/components/ui/ClickableRow";
 import { ReportIssueButton } from "@/components/issues/ReportIssueButton";
 import { RequestDownloadButton } from "@/components/issues/RequestDownloadButton";
+
+export const metadata: Metadata = { title: "Findings Register" };
 
 const PAGE_SIZE = 10;
 

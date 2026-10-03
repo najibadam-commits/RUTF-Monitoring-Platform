@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
@@ -5,6 +6,8 @@ import { getCurrentProfile } from "@/lib/supabase/dal";
 import { Flag, fmt } from "@/components/reports/ReportShell";
 import { StatusTag, PriorityTag } from "@/components/ui/Tags";
 import type { IssuePriority, IssueStatus } from "@/lib/types/database";
+
+export const metadata: Metadata = { title: "Supervision visit" };
 
 // One supervision visit (brief §9): the supervisor's count against the ledger, the checklist or
 // register recount, evidence photos (signed links to the private visit-evidence bucket) and the

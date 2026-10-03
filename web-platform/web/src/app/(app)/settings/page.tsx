@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canAccessSettings } from "@/lib/rbac";
 import { SettingsClient } from "@/components/settings/SettingsClient";
+
+export const metadata: Metadata = { title: "Settings" };
 
 export default async function SettingsPage() {
   const profile = await getCurrentProfile();

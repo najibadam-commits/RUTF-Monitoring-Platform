@@ -1,9 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { reportMonth } from "@/lib/queries/metrics";
 import { Flag, LEVEL_LABEL, ReportShell, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
+
+export const metadata: Metadata = { title: "Risk-Based Supervision" };
 
 // Supervision (brief §9): the month's visits (Store Checks and OTP Verifications) with the
 // Findings each raised, and the Supervision Planner — supervision_plan() (migration 0105):
