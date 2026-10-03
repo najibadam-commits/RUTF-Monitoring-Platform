@@ -42,9 +42,10 @@ export default async function ReportingPage() {
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h2 style={{ marginBottom: 2 }}>Reporting &amp; Export Centre</h2>
+        <h2 style={{ marginBottom: 2 }}>Programme Reporting</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
-          Generate and download reports across the platform.
+          Monthly evidence for the State, LGAs and partners, built straight from the ledger, visits and Findings. Every export is
+          scoped to what you may see; Viewers&apos; downloads need approval.
         </p>
       </div>
 

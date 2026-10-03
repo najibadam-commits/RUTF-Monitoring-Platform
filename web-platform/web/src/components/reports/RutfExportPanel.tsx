@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { requestRutfDownloadAction } from "@/lib/actions/downloadRequests";
 
-// Reporting Centre: the month's RUTF exports. Admins and reviewers download directly; a Viewer
+// Programme Reporting: the month's RUTF exports. Admins and reviewers download directly; a Viewer
 // asks for approval (Download Requests), as for the Findings export.
 
 type Kind = "kpis" | "facility_metrics" | "ledger" | "transfers";

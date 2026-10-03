@@ -26,7 +26,7 @@ export async function requestDownloadAction(format: string, filters: IssuesExpor
   return {};
 }
 
-/** Viewer requests a RUTF export (Reporting Centre) — same approval flow as the Findings export;
+/** Viewer requests a RUTF export (Programme Reporting) — same approval flow as the Findings export;
  *  built on approval by fetchApprovedDownloadAction below. */
 export async function requestRutfDownloadAction(kind: RutfExportKind, month: string, reason: string): Promise<ActionResult> {
   await getCurrentProfile();

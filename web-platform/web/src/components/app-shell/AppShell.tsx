@@ -20,7 +20,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/reporting-completeness": "Completeness & Timeliness",
   "/otp-dispensing": "Last-Mile Dispensing",
   "/supervision": "Risk-Based Supervision",
-  "/reporting": "Reporting & Export Centre",
+  "/reporting": "Programme Reporting",
   "/devices": "Offline Sync Health",
   "/users": "Users & Role Management",
   "/data-sets": "Data Sets",

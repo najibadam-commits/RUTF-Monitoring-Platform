@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/types/database";
 import { monthOf } from "@/lib/queries/kpis";
 
-// RUTF exports for the Reporting Centre (brief §9–§10). One month at a time, CSV, built with the
+// RUTF exports for Programme Reporting (brief §9–§10). One month at a time, CSV, built with the
 // caller's own client — RLS scopes every row, exactly as on screen. Admins and reviewers download
 // directly; a Viewer's request goes through Download Requests and is built here on approval.
 //

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { buildRutfExport, RUTF_EXPORTS, type RutfExportKind } from "@/lib/exports/rutfExports";
 
-// Direct RUTF export (Reporting Centre). Viewers go through Download Requests instead — refused
+// Direct RUTF export (Programme Reporting). Viewers go through Download Requests instead — refused
 // here even if the URL is typed, as /issues/export does.
 
 export async function GET(request: NextRequest) {

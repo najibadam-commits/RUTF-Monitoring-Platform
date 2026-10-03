@@ -184,7 +184,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "otpDispensing", label: "Last-Mile Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
   { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
-  { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },
+  { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },
   { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Roles", href: "/users", icon: "ph-users-three", section: "administration" },
