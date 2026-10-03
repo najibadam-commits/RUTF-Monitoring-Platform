@@ -79,7 +79,7 @@ export function SettingsClient({ settings }: { settings: Settings }) {
         <div className="card-title">Data</div>
         <p className="card-body" style={{ margin: 0 }}>
           Retention periods for photos, sync errors and records are set by the Data Protection Officer (DPIA §6) and
-          aren&apos;t applied automatically yet. Exports for other users go through Download Requests.
+          aren&apos;t applied automatically yet. Exports for other users go through Data Access Requests.
         </p>
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- a download route, not a page */}
         <a className="btn btn-secondary" style={{ width: "fit-content" }} href="/issues/export">

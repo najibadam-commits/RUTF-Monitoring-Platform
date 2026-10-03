@@ -5,7 +5,7 @@ import { monthOf } from "@/lib/queries/kpis";
 
 // RUTF exports for Programme Reporting (brief §9–§10). One month at a time, CSV, built with the
 // caller's own client — RLS scopes every row, exactly as on screen. Admins and reviewers download
-// directly; a Viewer's request goes through Download Requests and is built here on approval.
+// directly; a Viewer's request goes through Data Access Requests and is built here on approval.
 //
 // Privacy: no person-level data about children or caregivers exists to export. Child counts per
 // OTP-month (children seen, new admissions) below 5 are written as "<5" (brief §10 small cells).

@@ -27,7 +27,7 @@ export function DownloadRequestsTable({ requests }: { requests: DownloadRequestR
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h2 style={{ marginBottom: 2 }}>Download Requests</h2>
+        <h2 style={{ marginBottom: 2 }}>Data Access Requests</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
           {pending.length} pending, {requests.length} total — every Viewer download requires approval here before it can be fetched.
         </p>

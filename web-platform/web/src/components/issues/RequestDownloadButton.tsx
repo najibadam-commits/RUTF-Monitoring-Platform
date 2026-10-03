@@ -46,7 +46,7 @@ export function RequestDownloadButton({ filters }: { filters: Record<string, str
           <div className="dialog-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <p className="text-muted" style={{ marginTop: 0, fontSize: 13 }}>
               Viewer downloads require Super Admin approval. This captures the current filters as
-              the scope — track its status under Download Requests.
+              the scope — track its status under Data Access Requests.
             </p>
             <div className="field">
               <label>Format</label>

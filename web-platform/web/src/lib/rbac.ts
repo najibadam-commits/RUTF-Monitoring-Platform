@@ -193,7 +193,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "settings", label: "Settings", href: "/settings", icon: "ph-gear-six", section: "administration" },
   // "reporting", not "administration" — Viewer must have zero Administration-section access, and
   // Viewer is exactly the role that needs this item (to track their own requests).
-  { key: "downloadRequests", label: "Download Requests", href: "/download-requests", icon: "ph-download-simple", section: "reporting" },
+  { key: "downloadRequests", label: "Data Access Requests", href: "/download-requests", icon: "ph-download-simple", section: "reporting" },
 ];
 
 export function visibleNavItemsFor(role: UserRole) {

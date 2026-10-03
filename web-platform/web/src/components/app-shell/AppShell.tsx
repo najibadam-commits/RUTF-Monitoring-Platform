@@ -21,6 +21,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/otp-dispensing": "Last-Mile Dispensing",
   "/supervision": "Risk-Based Supervision",
   "/reporting": "Programme Reporting",
+  "/download-requests": "Data Access Requests",
   "/devices": "Offline Sync Health",
   "/users": "Users & Role Management",
   "/data-sets": "Data Sets",

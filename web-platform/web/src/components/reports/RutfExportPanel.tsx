@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { requestRutfDownloadAction } from "@/lib/actions/downloadRequests";
 
 // Programme Reporting: the month's RUTF exports. Admins and reviewers download directly; a Viewer
-// asks for approval (Download Requests), as for the Findings export.
+// asks for approval (Data Access Requests), as for the Findings export.
 
 type Kind = "kpis" | "facility_metrics" | "ledger" | "transfers";
 
@@ -33,7 +33,7 @@ export function RutfExportPanel({
           <div className="card-title" style={{ fontSize: 15 }}>Stock &amp; KPI exports</div>
           <div className="text-muted" style={{ fontSize: 12.5 }}>
             CSV for one month, scoped to what you can see.{" "}
-            {isViewer ? "Each download needs approval — you'll be notified, then download it once from Download Requests." : "Child counts under 5 are shown as \"<5\"."}
+            {isViewer ? "Each download needs approval — you'll be notified, then download it once from Data Access Requests." : "Child counts under 5 are shown as \"<5\"."}
           </div>
         </div>
         <select className="input" value={month} onChange={(e) => { setMonth(e.target.value); setMsg(null); }} aria-label="Month" style={{ maxWidth: 180 }}>
