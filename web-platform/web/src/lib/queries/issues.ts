@@ -6,9 +6,9 @@ import type { Database, IssuePriority, IssueStatus } from "@/lib/types/database"
 export const ISSUE_SELECT = `
   *,
   category:categories(id, name),
-  state:states(id, name),
-  lga:lgas(id, name),
-  ward_ref:wards(id, name),
+  state:states(id, name, code),
+  lga:lgas(id, name, abbr),
+  ward_ref:wards(id, name, abbr),
   reporter:profiles!issues_reported_by_fkey(id, name),
   dri:profiles!issues_assigned_dri_fkey(id, name, phone, email),
   verifier:profiles!issues_verified_by_fkey(id, name),
@@ -33,9 +33,9 @@ type IssueRow = Database["public"]["Tables"]["issues"]["Row"];
 
 export type IssueWithRelations = IssueRow & {
   category: { id: string; name: string } | null;
-  state: { id: string; name: string } | null;
-  lga: { id: string; name: string } | null;
-  ward_ref: { id: string; name: string } | null;
+  state: { id: string; name: string; code?: string | null } | null;
+  lga: { id: string; name: string; abbr?: string | null } | null;
+  ward_ref: { id: string; name: string; abbr?: string | null } | null;
   reporter: { id: string; name: string } | null;
   dri: { id: string; name: string; phone: string | null; email: string } | null;
   verifier: { id: string; name: string } | null;

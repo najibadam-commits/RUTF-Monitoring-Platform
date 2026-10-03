@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canManageDatasets } from "@/lib/rbac";
-import { getLgas, getAllWards } from "@/lib/queries/lookups";
+import { getLgas, getAllWards, getStates } from "@/lib/queries/lookups";
+import { wardId } from "@/lib/wardId";
 import { DataSetsTabs, type DataSetTab } from "@/components/datasets/DataSetsTabs";
 import { FacilitiesTab, type Store } from "@/components/datasets/FacilitiesTab";
 import { LotsTab } from "@/components/datasets/LotsTab";
@@ -49,15 +50,22 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
     if (sp.otp === "1") q = q.eq("is_otp_site", true);
     if (sp.flagged === "1") q = q.not("location_flag", "is", null);
 
-    const [{ data, count }, lgas, wards, { data: stores }] = await Promise.all([
+    const [{ data, count }, lgas, wards, { data: stores }, states] = await Promise.all([
       q.range(from, from + PAGE_SIZE - 1),
       getLgas(supabase),
       getAllWards(supabase),
       supabase.from("facilities").select("id, name, facility_type, lga_id").in("facility_type", ["state_store", "lga_store"]).eq("status", "approved").order("name"),
+      getStates(supabase),
     ]);
 
-    const wardsByLga: Record<string, { id: string; name: string }[]> = {};
-    for (const w of wards) (wardsByLga[w.lga_id] ??= []).push({ id: w.id, name: w.name });
+    // Ward ID (KT-DAU-MAJ) shown next to each ward name — DECISIONS R79.
+    const stateCode = Object.fromEntries(states.map((s) => [s.id, s.code]));
+    const lgaById = Object.fromEntries(lgas.map((l) => [l.id, l]));
+    const wardsByLga: Record<string, { id: string; name: string; wardId?: string | null }[]> = {};
+    for (const w of wards) {
+      const l = lgaById[w.lga_id];
+      (wardsByLga[w.lga_id] ??= []).push({ id: w.id, name: w.name, wardId: wardId(l ? stateCode[l.state_id] : null, l?.abbr, w.abbr) });
+    }
     const total = count ?? 0;
 
     body = (

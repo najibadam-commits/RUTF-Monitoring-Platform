@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PRIORITY_COLOR, PRIORITY_LABEL, STATUS_COLOR, STATUS_LABEL, STATUS_ORDER, tagBg } from "@/lib/constants";
+import { wardId } from "@/lib/wardId";
 import { ROLE_LABELS } from "@/lib/rbac";
 import type { IssuePriority, IssueStatus, UserRole } from "@/lib/types/database";
 import type { IssueWithRelations } from "@/lib/queries/issues";
@@ -190,6 +191,9 @@ export function IssueDetailClient({
                 <span className="text-muted">State / LGA / Ward</span>
                 <br />
                 {issue.state?.name} / {issue.lga?.name} / {issue.ward_ref?.name ?? issue.ward ?? "—"}
+                {wardId(issue.state?.code, issue.lga?.abbr, issue.ward_ref?.abbr) && (
+                  <div className="text-muted" style={{ fontSize: 11.5 }}>Ward ID {wardId(issue.state?.code, issue.lga?.abbr, issue.ward_ref?.abbr)}</div>
+                )}
               </div>
               <div>
                 <span className="text-muted">Settlement / Activity Site</span>

@@ -354,3 +354,10 @@ existing RBAC helpers) rather than introducing new patterns.
 | New facility | Ward derived from GPS first, then the next code (e.g. KT-BAA-AJI-OTP-002); code can't be edited | ✅ dry run |
 | Role access with 0121 | 202/202 | ✅ |
 | Master Data / Stock Ledger / facility-metrics export show it; search finds it | — | ✅ typecheck + lint; ⏳ browser check |
+
+# Ward ID (R79)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Ward ID from stored codes, readable by any signed-in role | Mazoji A, Daura → KT-DAU-MAJ; Mazoji B → KT-DAU-MAZ | ✅ queried as the demo Viewer |
+| Master Data facility list, Finding detail | Ward name followed by its Ward ID | ✅ typecheck + lint; ⏳ browser check |

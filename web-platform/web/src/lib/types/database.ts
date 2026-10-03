@@ -80,7 +80,7 @@ export interface Database {
         Relationships: [];
       };
       lgas: {
-        Row: { id: string; state_id: string; code: string | null; name: string; created_at: string };
+        Row: { id: string; state_id: string; code: string | null; abbr: string | null; name: string; created_at: string };
         Insert: { id?: string; state_id: string; code?: string | null; name: string };
         Update: Partial<Database["public"]["Tables"]["lgas"]["Row"]>;
         Relationships: [];
@@ -90,6 +90,7 @@ export interface Database {
           id: string;
           lga_id: string;
           code: string | null;
+          abbr: string | null;
           name: string;
           urban: boolean | null;
           created_at: string;

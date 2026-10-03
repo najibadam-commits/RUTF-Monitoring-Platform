@@ -19,7 +19,7 @@ import { CsvImportModal, type CsvField, type CsvRowResult } from "./CsvImportMod
 import { StatusBadge, STATUS_FILTER_OPTIONS, Pager } from "./shared";
 
 type Facility = Database["public"]["Tables"]["facilities"]["Row"];
-type NamedRef = { id: string; name: string };
+type NamedRef = { id: string; name: string; wardId?: string | null };
 export type Store = { id: string; name: string; facility_type: FacilityType; lga_id: string };
 export type FacilityFilters = { search: string; status: string; lga: string; type: string; otp: string; flagged: string };
 
@@ -103,7 +103,7 @@ export function FacilitiesTab({
   const lgaName = useMemo(() => Object.fromEntries(lgas.map((l) => [l.id, l.name])), [lgas]);
   const wardName = useMemo(() => {
     const m: Record<string, string> = {};
-    for (const wards of Object.values(wardsByLga)) for (const w of wards) m[w.id] = w.name;
+    for (const wards of Object.values(wardsByLga)) for (const w of wards) m[w.id] = w.wardId ? `${w.name} · ${w.wardId}` : w.name;
     return m;
   }, [wardsByLga]);
   const storeName = useMemo(() => Object.fromEntries(stores.map((s) => [s.id, s.name])), [stores]);

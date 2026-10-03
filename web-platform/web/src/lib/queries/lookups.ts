@@ -38,7 +38,7 @@ export const getStates = cache(async (client: SupabaseClient<Database>) => {
 });
 
 export const getLgas = cache(async (client: SupabaseClient<Database>, stateId?: string) => {
-  let query = client.from("lgas").select("id, state_id, code, name").order("name");
+  let query = client.from("lgas").select("id, state_id, code, abbr, name").order("name");
   if (stateId) query = query.eq("state_id", stateId);
   const { data } = await query;
   return data ?? [];
@@ -59,13 +59,13 @@ export const getLgas = cache(async (client: SupabaseClient<Database>, stateId?: 
  * only 1,000 were ever reaching the client before this fix.
  */
 export const getAllWards = cache(async (client: SupabaseClient<Database>) => {
-  type WardRow = { id: string; lga_id: string; code: string | null; name: string };
+  type WardRow = { id: string; lga_id: string; code: string | null; abbr: string | null; name: string };
   const PAGE_SIZE = 1000;
   const all: WardRow[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data } = await client
       .from("wards")
-      .select("id, lga_id, code, name")
+      .select("id, lga_id, code, abbr, name")
       .order("name")
       .order("id")
       .range(from, from + PAGE_SIZE - 1);
