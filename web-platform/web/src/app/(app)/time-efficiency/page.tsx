@@ -41,7 +41,7 @@ export default async function TimeEfficiencyPage() {
       <div>
         <h2 style={{ marginBottom: 2 }}>Time Efficiency Analysis</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
-          Average time spent at each stage of the issue resolution workflow.
+          Average time a Finding spends at each stage, from being raised to being verified and closed.
         </p>
       </div>
 

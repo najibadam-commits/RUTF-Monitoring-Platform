@@ -71,12 +71,6 @@ export function canAccessSubPanel(role: UserRole) {
   return role === "tpm_supervisor" || role === "super_admin";
 }
 
-/** Teams and Devices carry no restriction of their own today — every role but Viewer keeps
- * today's access; Viewer is excluded per the "no Administration access" requirement. */
-export function canAccessTeams(role: UserRole) {
-  return role !== "viewer";
-}
-
 /** Devices & Sync (migration 0108): sync_health() returns rows to these roles only. */
 export function canAccessDevices(role: UserRole) {
   return role === "super_admin" || role === "project_admin" || role === "state_coordinator";
@@ -141,14 +135,9 @@ export type NavKey =
   | "gis"
   | "issues"
   | "subpanel"
-  | "implementationMonitoring"
-  | "coverageAnalysis"
   | "analytics"
   | "timeEfficiency"
   | "reportingCentre"
-  | "postImplementationReport"
-  | "teamPerformance"
-  | "teams"
   | "devices"
   | "users"
   | "datasets"
@@ -183,9 +172,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // reached by clicking in revert to "Issue" terminology (see DECISIONS.md #29) — the module name
   // and the operational terminology inside it are deliberately different, not a naming mistake.
   { key: "issues", label: "Findings", href: "/issues", icon: "ph-list-bullets", section: "overview" },
-  { key: "subpanel", label: "TPM Sub-Panel", href: "/subpanel", icon: "ph-kanban", section: "overview" },
-  { key: "implementationMonitoring", label: "Implementation Monitoring", href: "/implementation-monitoring", icon: "ph-clipboard-text", section: "overview" },
-  { key: "coverageAnalysis", label: "Coverage Analysis", href: "/coverage-analysis", icon: "ph-map-pin-area", section: "overview" },
+  { key: "subpanel", label: "Findings Follow-up", href: "/subpanel", icon: "ph-kanban", section: "overview" },
   // RUTF stock (brief §9). Every role sees these; RLS scopes the rows (a facility user: their own
   // facility only).
   { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
@@ -196,12 +183,9 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "otpDispensing", label: "OTP Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
   { key: "supervision", label: "Visits & Planner", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
-  { key: "analytics", label: "Analytics", href: "/analytics", icon: "ph-chart-line", section: "analytics" },
+  { key: "analytics", label: "Findings Analytics", href: "/analytics", icon: "ph-chart-line", section: "analytics" },
   { key: "timeEfficiency", label: "Time Efficiency Analysis", href: "/time-efficiency", icon: "ph-gauge", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },
-  { key: "postImplementationReport", label: "Post Implementation Report", href: "/post-implementation-report", icon: "ph-file-text", section: "reporting" },
-  { key: "teamPerformance", label: "Team Performance Report", href: "/team-performance", icon: "ph-chart-bar", section: "reporting" },
-  { key: "teams", label: "Teams", href: "/teams", icon: "ph-users", section: "administration" },
   { key: "devices", label: "Devices & Sync", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Roles", href: "/users", icon: "ph-users-three", section: "administration" },
@@ -220,7 +204,6 @@ export function visibleNavItemsFor(role: UserRole) {
     if (item.key === "datasets") return canManageDatasets(role);
     if (item.key === "projectadmins") return canAccessProjectAdminPanel(role);
     if (item.key === "settings") return canAccessSettings(role);
-    if (item.key === "teams") return canAccessTeams(role);
     if (item.key === "devices") return canAccessDevices(role);
     if (item.key === "auditLog") return canAccessAuditLog(role);
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);

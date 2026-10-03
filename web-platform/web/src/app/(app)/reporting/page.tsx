@@ -10,8 +10,8 @@ interface ReportCard {
 const REPORT_CARDS: ReportCard[] = [
   {
     icon: "ph-list-bullets",
-    title: "Issue Data Export",
-    description: "Export every tracked issue — status, priority, location, and full workflow history — as CSV or JSON.",
+    title: "Findings Export",
+    description: "Every Finding — status, priority, facility, location and full review history — as CSV or JSON.",
     actions: {
       kind: "links",
       items: [
@@ -21,33 +21,15 @@ const REPORT_CARDS: ReportCard[] = [
     },
   },
   {
-    icon: "ph-file-text",
-    title: "Post Implementation Report",
-    description: "Completed-project outcome summaries and their generated report history.",
-    actions: { kind: "links", items: [{ label: "View Reports", href: "/post-implementation-report" }] },
+    icon: "ph-download-simple",
+    title: "Supervision Plan",
+    description: "Suggested supervision visits per supervisor for the month, ranked by facility risk.",
+    actions: { kind: "links", items: [{ label: "Export CSV", href: "/supervision/plan.csv" }] },
   },
   {
-    icon: "ph-map-pin-area",
-    title: "Coverage Analysis Report",
-    description: "A printable summary of geographic coverage across states, LGAs, and wards.",
-    actions: { kind: "comingSoon" },
-  },
-  {
-    icon: "ph-chart-bar",
-    title: "Team Performance Report",
-    description: "Per-team response times, resolution rates, and device utilization.",
-    actions: { kind: "links", items: [{ label: "View Report", href: "/team-performance" }] },
-  },
-  {
-    icon: "ph-clipboard-text",
-    title: "Implementation Monitoring Report",
-    description: "A state-by-state implementation progress summary, exportable for stakeholders.",
-    actions: { kind: "comingSoon" },
-  },
-  {
-    icon: "ph-database",
-    title: "Data Sets Export",
-    description: "Export the full Settlement and Activity Site lists synced to the field app.",
+    icon: "ph-book-open-text",
+    title: "Stock & KPI Exports",
+    description: "Ledger, monthly KPIs and facility metrics — through the download-approval flow.",
     actions: { kind: "comingSoon" },
   },
 ];

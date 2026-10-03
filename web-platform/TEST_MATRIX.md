@@ -256,3 +256,12 @@ existing RBAC helpers) rather than introducing new patterns.
 | `email_from_address` format check | Accepts `noreply@ehealthnigeria.org`, `rutf.alerts@health.kt.gov.ng`; rejects `not-an-email`, `a@b`, two addresses, `Name <x@y.org>` | ✅ dry run (rolled back) |
 | `create_notification` | Uses the setting, falls back to `onboarding@resend.dev`; guard and grants unchanged; no TPM link | ✅ role access 202/202 with 0111; applied, permissions audit clean |
 | Settings → Notifications sender field | Saves for Super Admin; invalid address refused in the form | ✅ typecheck; ⏳ browser check |
+
+# TPM-era tabs cleanup (R54)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Removed tabs | Gone from the menu; their URLs return not found; no `lib/mock` left | ✅ files removed, typecheck + lint clean; ⏳ browser check |
+| Renames | Findings Follow-up, Findings Analytics (Reporter column), Devices & Sync title | ✅ |
+| Reporting Centre | Findings export, Supervision Plan CSV, Stock & KPI placeholder | ✅ |
+| Settings | Sender field + Findings export only | ✅ |

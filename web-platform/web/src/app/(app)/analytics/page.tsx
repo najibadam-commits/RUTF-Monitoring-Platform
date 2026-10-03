@@ -71,7 +71,7 @@ export default async function AnalyticsPage() {
   const activeDris = driMap.size;
 
   const kpiCards = [
-    { label: "Total Issues", value: totalIssues, sub: "All time", icon: "ph-list-bullets" },
+    { label: "Total Findings", value: totalIssues, sub: "All time", icon: "ph-list-bullets" },
     { label: "Overall Close Rate", value: `${overallCloseRate}%`, sub: "Verified & closed", icon: "ph-check-circle" },
     { label: "Avg Resolution Time", value: avgResolutionDays === "—" ? "—" : `${avgResolutionDays}d`, sub: "Discovery to closure", icon: "ph-timer" },
     { label: "Active DRIs", value: activeDris, sub: "With at least one assignment", icon: "ph-users-three" },
@@ -81,9 +81,9 @@ export default async function AnalyticsPage() {
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
       <div>
-        <h2 style={{ marginBottom: 2 }}>Analytics &amp; KPI Dashboard</h2>
+        <h2 style={{ marginBottom: 2 }}>Findings Analytics</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
-          Aggregated performance across all monitored issues — {totalIssues} issue{totalIssues === 1 ? "" : "s"} tracked.
+          How Findings are raised, assigned and closed — {totalIssues} Finding{totalIssues === 1 ? "" : "s"} so far. Stock and supervision figures are on the Dashboard.
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export default async function AnalyticsPage() {
 
       <div style={{ display: "grid", gridTemplateColumns: "1.3fr 1fr", gap: 14 }}>
         <div className="card elev-sm">
-          <div className="card-title">Issues Reported — Last 30 Days</div>
+          <div className="card-title">Findings Raised — Last 30 Days</div>
           <div className="text-muted" style={{ fontSize: 10.5, marginTop: 2 }}>
             Number of Issues
           </div>
@@ -116,7 +116,7 @@ export default async function AnalyticsPage() {
           </div>
         </div>
         <div className="card elev-sm">
-          <div className="card-title">Issues by Sector</div>
+          <div className="card-title">Findings by Facility Level</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 7, marginTop: 8 }}>
             {categoryBreakdown.map(([name, count]) => (
               <div key={name}>
@@ -167,12 +167,12 @@ export default async function AnalyticsPage() {
         </div>
         <div className="card elev-sm" style={{ padding: 0 }}>
           <div className="card-title" style={{ padding: "14px 16px 0" }}>
-            RUTF Monitoring Performance
+            Reported by
           </div>
           <table className="table" style={{ marginTop: 6 }}>
             <thead>
               <tr>
-                <th>TPM</th>
+                <th>Reporter</th>
                 <th style={{ textAlign: "right" }}>Reported</th>
                 <th style={{ textAlign: "right" }}>Verified</th>
                 <th style={{ textAlign: "right" }}>Close Rate</th>

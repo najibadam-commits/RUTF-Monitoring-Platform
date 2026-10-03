@@ -25,9 +25,9 @@ export default async function SubPanelPage() {
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
       <div>
-        <h2 style={{ marginBottom: 2 }}>TPM Sub-Panel</h2>
+        <h2 style={{ marginBottom: 2 }}>Findings Follow-up</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
-          Assigned monitoring activity awaiting supervisor review, DRI response, or final verification.
+          Approved Findings that are still open: waiting for the responsible person (DRI) to respond, being worked on, or waiting for a supervisor to verify and close.
         </p>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
