@@ -77,11 +77,11 @@ export function ReportIssueButton({ categories, states }: { categories: Lookup[]
   return (
     <>
       <button className="btn btn-primary" onClick={() => setOpen(true)}>
-        <i className="ph ph-plus" /> Report Issue
+        <i className="ph ph-plus" /> Register a Finding
       </button>
       {open && (
         <Modal
-          title="Report New Issue"
+          title="Register a Finding"
           confirmLabel="Submit"
           confirmDisabled={!form.categoryId || !form.description.trim() || !form.stateId || !form.lgaId}
           onClose={() => setOpen(false)}
@@ -160,7 +160,7 @@ export function ReportIssueButton({ categories, states }: { categories: Lookup[]
             </div>
             <div className="field">
               <label>Description</label>
-              <textarea className="input" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Describe the issue…" />
+              <textarea className="input" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} placeholder="Describe what was found…" />
             </div>
           </div>
         </Modal>

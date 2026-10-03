@@ -170,7 +170,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // stays the sidebar/dashboard-level module name (Item 6); the detailed management screens
   // reached by clicking in revert to "Issue" terminology (see DECISIONS.md #29) — the module name
   // and the operational terminology inside it are deliberately different, not a naming mistake.
-  { key: "issues", label: "Findings", href: "/issues", icon: "ph-list-bullets", section: "overview" },
+  { key: "issues", label: "Findings Register", href: "/issues", icon: "ph-list-bullets", section: "overview" },
   { key: "findingsFollowUp", label: "Findings Follow-up", href: "/findings-follow-up", icon: "ph-kanban", section: "overview" },
   // Findings Analytics + Time Efficiency merged (DECISIONS R57).
   { key: "accountability", label: "Accountability Scorecard", href: "/accountability", icon: "ph-seal-check", section: "overview" },

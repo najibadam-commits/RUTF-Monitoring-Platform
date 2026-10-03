@@ -13,7 +13,7 @@ import { RutfMark } from "@/components/RutfMark";
 const VIEW_TITLES: Record<string, string> = {
   "/dashboard": "Command Centre",
   "/gis": "Situation Map",
-  "/issues": "Issue Management",
+  "/issues": "Findings Register",
   "/findings-follow-up": "Findings Follow-up",
   "/accountability": "Accountability Scorecard",
   "/reporting": "Reporting & Export Centre",

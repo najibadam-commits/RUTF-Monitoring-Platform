@@ -73,9 +73,9 @@ export default async function IssuesPage({
       <RealtimeRefresher table="issues" />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>Issue Management</h2>
+          <h2 style={{ marginBottom: 2 }}>Findings Register</h2>
           <p className="text-muted" style={{ fontSize: 13 }}>
-            {total} matching issue{total === 1 ? "" : "s"}
+            Every Finding — raised automatically from the ledger and visits, or registered by a person · {total} matching
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -103,9 +103,9 @@ export default async function IssuesPage({
         <table className="table">
           <thead>
             <tr>
-              <th>Issue ID</th>
-              <th>Sector</th>
-              <th>Issue Description</th>
+              <th>Finding ID</th>
+              <th>Facility level</th>
+              <th>Description</th>
               <th>Location</th>
               <th>Priority</th>
               <th>Status</th>
