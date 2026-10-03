@@ -164,7 +164,7 @@ export const NAV_SECTION_LABELS: Record<NavSection, string> = {
 };
 
 export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string; section: NavSection }[] = [
-  { key: "dashboard", label: "Dashboard", href: "/dashboard", icon: "ph-squares-four", section: "overview" },
+  { key: "dashboard", label: "Command Centre", href: "/dashboard", icon: "ph-squares-four", section: "overview" },
   { key: "gis", label: "Live GIS Map", href: "/gis", icon: "ph-map-trifold", section: "overview" },
   // key/href intentionally stay "issues"/"/issues" (route, not user-facing text). "Findings"
   // stays the sidebar/dashboard-level module name (Item 6); the detailed management screens

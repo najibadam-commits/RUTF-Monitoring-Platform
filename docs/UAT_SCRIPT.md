@@ -62,7 +62,7 @@ purpose, so live figures aren't touched. Remove them afterwards.
 | --- | --- | --- | --- | --- | --- |
 | D1 | State Coordinator | Findings → Automatic checks: open the transfer mismatch from A3 | Shows the measurement (issued vs received) and links to the transfer; wording is neutral | | |
 | D2 | State Coordinator | Approve and assign the Finding to the LGA store's user | The user is notified | | |
-| D3 | Project Admin | Dashboard for the current month | Stock on hand by level matches the Stock Ledger totals for the training facilities | | |
+| D3 | Project Admin | Command Centre (dashboard) for the current month | Stock on hand by level matches the Stock Ledger totals for the training facilities | | |
 | D4 | Project Admin | Stock Integrity, Reporting Completeness, OTP Dispensing | The training OTP shows its count variance, dispensing weeks and short-dispensing as tested above | | |
 | D5 | Supervisor | Supervision → Planner | Their facilities ranked by risk; the visited ones not "due"; CSV export opens | | |
 | D6 | Project Admin | DHIS2 Triangulation: upload a small CSV (2 rows) | "2 facility-months loaded"; a wrong period (2026-13) is refused with the line number | | |

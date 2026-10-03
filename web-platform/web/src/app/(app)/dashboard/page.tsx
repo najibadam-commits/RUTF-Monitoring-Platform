@@ -49,9 +49,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <RealtimeRefresher table="issues" />
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>RUTF dashboard</h2>
+          <h2 style={{ marginBottom: 2 }}>Command Centre</h2>
           <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
-            {month.label} · {k ? `${k.active_facilities} stores and OTP sites reporting` : "No data for this month"}
+            The RUTF pipeline at a glance — State store → LGA stores → OTP sites · {month.label} ·{" "}
+            {k ? `${k.active_facilities} stores and OTP sites reporting` : "No data for this month"}
           </p>
         </div>
         <form method="get" style={{ display: "flex", gap: 8 }}>
