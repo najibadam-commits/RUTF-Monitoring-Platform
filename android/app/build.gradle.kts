@@ -27,8 +27,10 @@ android {
         applicationId = "org.tpmnigeria.rutf"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        // 1.1 = M6 pilot build (sync status reporting, Daily Attendance removed, Receive Stock
+        // pre-fill via incoming_transfer_lines) — shown per phone on Offline Sync Health.
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables { useSupportLibrary = true }
