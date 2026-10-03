@@ -6,6 +6,8 @@
 //   data/dummy/otp_verifications.csv -> otp_verifications
 // Needs the demo accounts (seed-demo-accounts.js) for supervisor_id. Re-runnable: rows keep their
 // CSV ids (ON CONFLICT DO NOTHING) and the rules never raise the same Finding twice.
+// Visit IDs: the CSV's VIS-DUMMY-… codes are replaced in the same transaction by the
+// VIS-STATE-LGA-WARD-LEVEL-YYNNN format (migration 0120, DECISIONS R77), in visit order.
 //
 // Usage: node import-visits.js [--dry-run] [--with-migration <file.sql>]
 //   --dry-run          everything in one transaction that is rolled back; prints what it would raise
@@ -18,6 +20,8 @@ const { parse } = require("csv-parse/sync");
 
 const DATA_DIR = path.join(__dirname, "..", "..", "..", "data", "dummy");
 const read = (f) => parse(fs.readFileSync(path.join(DATA_DIR, f)), { columns: true, skip_empty_lines: true });
+// A visit ID in the migration-0120 format, e.g. VIS-KT-DAU-MAJ-OTP-26001.
+const NEW_VISIT_ID = "^VIS-[A-Z]{2,3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[0-9]{5,}$";
 const blank = (s) => ((s ?? "").trim() === "" ? null : s.trim());
 const bool = (s) => (blank(s) === null ? null : /^true$/i.test(s));
 const int = (s) => (blank(s) === null ? null : Number(s));
@@ -80,8 +84,24 @@ async function insertAll(client, table, rows, conflict = "id") {
       sachets_dispensed_counted: int(o.sachets_dispensed_counted), admissions_recorded: int(o.admissions_recorded),
       sachets_dispensed_recorded: int(o.sachets_dispensed_recorded), notes: blank(o.notes),
     })), "visit_id");
-    // Keep generated codes clear of the dummy ones' numbers.
-    await client.query("select setval('visit_code_seq', greatest((select count(*) from monitoring_visits), 1))");
+    // Same IDs record_visit gives (migration 0120): any visit not yet in the new format is
+    // re-numbered in visit order.
+    const { n: toNumber } = (await client.query(`select count(*)::int n from monitoring_visits where code !~ $1`, [NEW_VISIT_ID])).rows[0];
+    if (toNumber) {
+      if (!(await client.query(`select 1 from pg_proc where proname = 'next_visit_code'`)).rowCount) {
+        throw new Error("next_visit_code() not found — apply migration 0120 first");
+      }
+      await client.query(`
+        do $$
+        declare r record;
+        begin
+          for r in select id, facility_id, visit_date from monitoring_visits where code !~ '${NEW_VISIT_ID}'
+                   order by visit_date, created_at, id loop
+            update monitoring_visits set code = next_visit_code(r.facility_id, r.visit_date) where id = r.id;
+          end loop;
+        end $$`);
+      console.log(`Visits given VIS-STATE-LGA-WARD-LEVEL-YYNNN IDs: ${toNumber}`);
+    }
 
     let raised = 0;
     for (const v of visits) raised += (await client.query("select evaluate_visit_internal($1) n", [v.id])).rows[0].n;

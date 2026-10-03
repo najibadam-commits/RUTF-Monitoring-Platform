@@ -337,3 +337,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | New transfer | `TRF-KT-…-26NNN` for the receiving facility, continuing its sequence | ✅ dry run; test-ledger 44/44 with 0119 |
 | Existing DUMMY transfers | 3,364 re-numbered, unique; Findings quoting them updated (0 old IDs left); no audit flood | ✅ applied and checked live |
 | `import-ledger.js` on a fresh load | Old CSV IDs replaced by the new format in issue order | ✅ re-numbering tested on 5 transfers reset to old IDs (rolled back); live re-run is a no-op (0 inserted, 0 re-numbered) |
+
+# Visit ID format (R77)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| New visit | `VIS-KT-…-26NNN` for the visited facility, continuing its sequence | ✅ dry run; test-visits 21/21 with 0120 |
+| Existing DUMMY visits | 306 re-numbered, unique | ✅ applied and checked live |
+| `import-visits.js` on a fresh load | Old CSV IDs replaced in visit order | ✅ re-numbering tested on 5 visits reset to old IDs (rolled back) |
