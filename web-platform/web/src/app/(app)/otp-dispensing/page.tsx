@@ -30,7 +30,7 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
 
   return (
     <ReportShell
-      title="OTP Dispensing"
+      title="Last-Mile Dispensing"
       intro={<>From the OTP registers&apos; daily totals, {month.label}. Short-dispensing limit {shortLimit}%; a negative figure means more was dispensed than prescribed. VF = supervisor&apos;s register count ÷ app-recorded dispensing at the latest visit (range {vfMin.toFixed(2)}–{vfMax.toFixed(2)}).</>}
       monthKey={month.key} lgas={lgas} sp={sp} showLevel={false}
     >
