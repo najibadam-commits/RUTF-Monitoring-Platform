@@ -39,7 +39,7 @@ function readLayer(path) {
  * object, or null) that's inserted via a bound-parameter ST_GeomFromGeoJSON
  * call — never string-interpolated into the SQL text.
  */
-async function importWithGeom(client, table, rows, mapRow, batchSize = 200) {
+async function importWithGeom(client, table, rows, mapRow, batchSize = 50) {
   for (let i = 0; i < rows.length; i += batchSize) {
     const batch = rows.slice(i, i + batchSize).map(mapRow);
     if (batch.length === 0) continue;
@@ -77,11 +77,12 @@ async function importWithGeom(client, table, rows, mapRow, batchSize = 200) {
   const wards = readLayer(SRC.ward).filter((r) => !STATE_FILTER || keptLgaCodes.has(r.fields.lgacode));
   console.log(`states=${states.length} lgas=${lgas.length} wards=${wards.length}`);
 
-  const client = new Client({ connectionString: process.env.DATABASE_URL });
+  const client = new Client({ connectionString: process.env.DATABASE_URL, keepAlive: true });
   await client.connect();
 
   try {
-    await client.query("begin");
+    // No wrapping transaction: each batch commits on its own, and every insert is
+    // `on conflict do nothing`, so a dropped connection can simply be re-run to resume.
 
     console.log("Importing states...");
     await importWithGeom(client, "states", states, (r) => ({
@@ -145,7 +146,6 @@ async function importWithGeom(client, table, rows, mapRow, batchSize = 200) {
       `update wards set geom_simplified = coalesce(ST_Multi(ST_SimplifyPreserveTopology(geom, 0.001)), geom) where geom is not null;`,
     );
 
-    await client.query("commit");
     console.log("\n✅ Boundary import complete.");
 
     const counts = await client.query(
