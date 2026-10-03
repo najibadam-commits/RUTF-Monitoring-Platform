@@ -14,7 +14,7 @@ register. Findings your visit raises go to the State reviewer **for review, not 
 - Your account says which level you supervise — **stores** (LGA stores + the State store) or
   **OTP sites** — and in which LGAs. You can only record visits there.
 - Home shows: **Store Check** (store supervisors) or **OTP Verification** (OTP supervisors),
-  **Confirm Adjustments**, and Daily Attendance.
+  and **Confirm Adjustments**.
 - Sync before you set out: the app downloads the facilities you cover, their ledger balances and
   recent dispensing. Visits then work fully offline.
 

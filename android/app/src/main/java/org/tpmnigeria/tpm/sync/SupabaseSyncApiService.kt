@@ -19,12 +19,9 @@ import org.tpmnigeria.tpm.domain.LedgerKind
 import kotlinx.serialization.json.jsonPrimitive
 import org.tpmnigeria.tpm.data.remote.dto.LedgerPhotoInsertDto
 import org.tpmnigeria.tpm.domain.LedgerSubmission
-import org.tpmnigeria.tpm.data.remote.ATTENDANCE_EVIDENCE_BUCKET
 import org.tpmnigeria.tpm.data.remote.EvidenceStorage
 import org.tpmnigeria.tpm.data.remote.ISSUE_EVIDENCE_BUCKET
 import org.tpmnigeria.tpm.data.remote.Supabase
-import org.tpmnigeria.tpm.data.remote.dto.AttendanceInsertDto
-import org.tpmnigeria.tpm.data.remote.dto.AttendanceRemoteDto
 import org.tpmnigeria.tpm.data.remote.dto.CategoryDto
 import org.tpmnigeria.tpm.data.remote.dto.DriSelfAssignParams
 import org.tpmnigeria.tpm.data.remote.dto.GpsCaptureInsertDto
@@ -423,22 +420,6 @@ class SupabaseSyncApiService(
     override suspend fun pushSubmission(item: SyncQueueItem): Boolean {
         if (item.submissionType in LEDGER_SUBMISSION_TYPES.values) return pushLedger(item)
 
-        // Attendance isn't a Finding at all — item.issueId holds an AttendanceEntity.localId for
-        // this submission type (see SyncQueueItem's kdoc), so this must branch before the
-        // getIssue() lookup below: that lookup would simply find nothing for an attendance id and
-        // return true, silently marking the row "synced" without ever pushing it.
-        if (item.submissionType == SubmissionType.Attendance) {
-            if (session.currentUser.value == null) return false
-            return try {
-                pushAttendance(item.issueId)
-                true
-            } catch (e: Exception) {
-                android.util.Log.e("SupabaseSyncApiService", "Attendance push failed for ${item.issueId}: ${e.message}", e)
-                lastErrors[item.localId] = e.message ?: e::class.simpleName
-                false
-            }
-        }
-
         val issue = repository.getIssue(item.issueId) ?: return true
         val user = session.currentUser.value ?: return false
         return try {
@@ -446,7 +427,6 @@ class SupabaseSyncApiService(
                 SubmissionType.NewIssue -> pushNewIssue(issue, user)
                 SubmissionType.DriResponse -> pushDriResponse(issue, user)
                 SubmissionType.FinalVerification -> pushFinalVerification(issue, user)
-                SubmissionType.Attendance -> Unit // handled above
                 SubmissionType.StockReceipt, SubmissionType.StockIssue, SubmissionType.Dispensing,
                 SubmissionType.StockCount, SubmissionType.StockLoss, SubmissionType.StoreCheck,
                 SubmissionType.OtpVerification, SubmissionType.AdjustmentConfirmation -> Unit // pushLedger, above
@@ -457,65 +437,6 @@ class SupabaseSyncApiService(
             lastErrors[item.localId] = e.message ?: e::class.simpleName
             false
         }
-    }
-
-    /**
-     * Pushes one local AttendanceEntity. The row's own `id` is server-generated
-     * (`default gen_random_uuid()`) and doesn't exist yet at upload time — so, like
-     * [uploadPhoto]'s issue-scoped paths, the storage path here is keyed by
-     * (`field_monitor_id`, `attendance_date`) instead: the same natural key the table itself is
-     * unique on, fully known before either the upload or the DB write happen.
-     *
-     * A plain `insert`, not `upsert` — the table deliberately has no UPDATE policy at all
-     * (immutable by design, see DECISIONS.md #24), so `ON CONFLICT DO UPDATE` would itself be
-     * rejected by RLS on a genuine conflict. Idempotency across retries instead comes from
-     * treating a 23505 (unique_violation on `unique(field_monitor_id, attendance_date)`) as
-     * success: it means an earlier attempt already landed server-side even though this device
-     * never got to record that locally (e.g. the response was lost to a dropped connection) —
-     * there's nothing to reconcile against an immutable row, just look it up and stop retrying.
-     */
-    private suspend fun pushAttendance(localId: String) {
-        val record = repository.getAttendance(localId) ?: return
-        if (record.remoteId != null) return // already pushed — a retry landed after success
-
-        val selfiePath = uploadAttendancePhoto(record.fieldMonitorId, record.attendanceDate, record.selfiePhotoPath, "selfie")
-        val locationPath = uploadAttendancePhoto(record.fieldMonitorId, record.attendanceDate, record.assignmentLocationPhotoPath, "location")
-
-        val dto = AttendanceInsertDto(
-            field_monitor_id = record.fieldMonitorId,
-            attendance_date = record.attendanceDate,
-            captured_at = Instant.ofEpochMilli(record.capturedAtMillis).toString(),
-            lat = record.lat,
-            lng = record.lng,
-            gps_accuracy_m = record.gpsAccuracyM.toDouble(),
-            selfie_storage_path = selfiePath,
-            assignment_location_storage_path = locationPath,
-            device_id = record.deviceId,
-        )
-
-        val remoteId = try {
-            postgrest.from("field_monitor_attendance").insert(dto) { select() }
-                .decodeList<AttendanceRemoteDto>().firstOrNull()?.id
-                ?: error("Attendance insert failed (no row returned)")
-        } catch (e: PostgrestRestException) {
-            if (e.code != "23505") throw e
-            postgrest.from("field_monitor_attendance").select {
-                filter { eq("field_monitor_id", record.fieldMonitorId); eq("attendance_date", record.attendanceDate) }
-            }.decodeSingle<AttendanceRemoteDto>().id
-        }
-
-        repository.markAttendanceRemoteId(localId, remoteId)
-    }
-
-    /** Path's first segment must be the field monitor's own auth uid — see migration 0037's
-     *  "attendance-evidence insert" policy's `(storage.foldername(name))[1] = auth.uid()::text`. */
-    private suspend fun uploadAttendancePhoto(fieldMonitorId: String, attendanceDate: String, localPath: String, kind: String): String {
-        val file = File(localPath)
-        val storagePath = "$fieldMonitorId/$attendanceDate/$kind.jpg"
-        if (file.exists()) {
-            storage.from(ATTENDANCE_EVIDENCE_BUCKET).upload(storagePath, file.readBytes()) { upsert = true }
-        }
-        return storagePath
     }
 
     private suspend fun pushNewIssue(issue: Issue, user: CurrentUser) {

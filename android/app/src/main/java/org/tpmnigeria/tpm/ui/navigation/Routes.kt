@@ -24,7 +24,6 @@ object Routes {
         "issueDetail/$issueId?justRegistered=$justRegistered"
 
     const val NewIssueWizard = "newIssueWizard"
-    const val DailyAttendance = "dailyAttendance"
 
     // Facility stock recording (facility users — brief §8).
     const val MyStock = "myStock"

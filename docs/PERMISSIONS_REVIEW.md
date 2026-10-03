@@ -58,6 +58,6 @@ All current accounts pass; real pilot accounts must be created in the pilot proj
   an Adjustment.
 - **Supervision Planner CSV** is downloaded directly (admins and supervisors), not through the
   download-request approval. It holds facility names, risk scores and supervisor names, no child data.
-- **Daily Attendance** (TPM feature: selfie + GPS) is still in the supervisor app — keep or remove (DPIA §3).
+- **Daily Attendance** — removed from the supervisor app (DECISIONS R50). The web Field Monitor Attendance page and the server table/bucket remain for records already captured.
 - **Email links** still point at the TPM deployment URL and the Resend test sender — set the RUTF
   domain before go-live.

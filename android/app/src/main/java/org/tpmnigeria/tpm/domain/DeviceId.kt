@@ -4,8 +4,8 @@ import android.content.Context
 import android.provider.Settings
 
 /**
- * Legally/technically available device identifier for Daily Attendance's device-reuse signal
- * (see DECISIONS.md #24 in the web project) — the master prompt explicitly forbids reading a
+ * Device identifier recorded with ledger entries and visits, and sent with sync status reports
+ * (web migrations 0101, 0103, 0108) — the master prompt explicitly forbids reading a
  * true hardware IMEI (READ_PHONE_STATE + a privileged/carrier-signed permission on modern
  * Android, and blocked outright for regular apps since Android 10) and requires "the approved
  * persistent device identifier already supported by the application's architecture" instead.

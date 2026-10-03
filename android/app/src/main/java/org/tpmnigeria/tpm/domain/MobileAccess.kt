@@ -29,10 +29,6 @@ object MobileAccess {
      *  field evidence, which would misrepresent who was actually on site — so it stays DRI-only. */
     fun canRespondToFinding(role: UserRole): Boolean = role == UserRole.Dri
 
-    /** Daily Attendance capture — `field_monitor_attendance_insert` RLS: tpm_supervisor only,
-     *  and only for their own id. */
-    fun canCaptureAttendance(role: UserRole): Boolean = role == UserRole.FieldMonitor
-
     /** Facility stock recording (receive / issue / dispense / count / loss) — web migration
      *  0101's record_* functions: the facility's own user (dri) only. Issue Stock additionally
      *  needs a store, Daily Dispensing an OTP site (checked against the facility). */

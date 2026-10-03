@@ -124,42 +124,44 @@ class MigrationTest {
         }
     }
 
-    /** v8→v9 creates `attendance_records` (Daily Attendance — see AttendanceEntity,
-     *  DECISIONS.md #24 in the web project). Brand-new table, nothing from v8 to preserve; this
-     *  just confirms the CREATE TABLE actually round-trips through Room's own DAO, not just that
-     *  it didn't throw. */
+    /** v8→v9 creates `attendance_records` (Daily Attendance, removed again in v13). Validated
+     *  against the exported 9.json schema. */
     @Test
     fun migrate8To9_createsAttendanceRecordsTable() {
         helper.createDatabase(testDb, 8).apply { close() }
+        helper.runMigrationsAndValidate(testDb, 9, true, MIGRATION_8_9).close()
+    }
 
+    /** v12→v13 removes Daily Attendance: the table goes, queued attendance submissions go, the
+     *  photos on the phone are deleted — and every other queued submission stays. */
+    @Test
+    fun migrate12To13_removesAttendanceButKeepsOtherQueuedWork() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val db = Room.databaseBuilder(context, TpmDatabase::class.java, testDb)
-            .addMigrations(MIGRATION_8_9)
-            .build()
-        try {
-            runBlocking {
-                db.attendanceDao().insert(
-                    AttendanceEntity(
-                        localId = "att-fm-1-2026-09-12",
-                        remoteId = null,
-                        fieldMonitorId = "fm-1",
-                        attendanceDate = "2026-09-12",
-                        capturedAtMillis = 1_700_000_000_000L,
-                        lat = 9.0765,
-                        lng = 7.3986,
-                        gpsAccuracyM = 8,
-                        selfiePhotoPath = "/data/evidence/selfie.jpg",
-                        assignmentLocationPhotoPath = "/data/evidence/location.jpg",
-                        deviceId = "abc123",
-                    ),
-                )
-            }
-            val stored = runBlocking { db.attendanceDao().findForFieldMonitorAndDate("fm-1", "2026-09-12") }
-            assertEquals("att-fm-1-2026-09-12", stored?.localId)
-            assertEquals(null, stored?.remoteId)
-        } finally {
-            db.close()
+        val selfie = java.io.File(context.cacheDir, "att-selfie.jpg").apply { writeText("x") }
+        helper.createDatabase(testDb, 12).apply {
+            execSQL(
+                """INSERT INTO attendance_records (localId, remoteId, fieldMonitorId, attendanceDate, capturedAtMillis,
+                   lat, lng, gpsAccuracyM, selfiePhotoPath, assignmentLocationPhotoPath, deviceId)
+                   VALUES ('att-fm-1-2026-09-12', NULL, 'fm-1', '2026-09-12', 1700000000000, 9.07, 7.39, 8,
+                   '${selfie.absolutePath}', '/nonexistent/location.jpg', 'abc123')""",
+            )
+            execSQL("""INSERT INTO sync_queue (localId, issueId, submissionType, status, timestampMillis, payloadJson, retryCount)
+                       VALUES ('sq-att', 'att-fm-1-2026-09-12', 'Attendance', 'Pending', 1700000000000, '{}', 0)""")
+            execSQL("""INSERT INTO sync_queue (localId, issueId, submissionType, status, timestampMillis, payloadJson, retryCount)
+                       VALUES ('sq-disp', 'disp-1', 'Dispensing', 'Pending', 1700000000001, '{}', 0)""")
+            close()
         }
+
+        val migrated = helper.runMigrationsAndValidate(testDb, 13, true, MIGRATION_12_13)
+        migrated.query("SELECT localId FROM sync_queue ORDER BY localId").use { c ->
+            val ids = buildList { while (c.moveToNext()) add(c.getString(0)) }
+            assertEquals(listOf("sq-disp"), ids)
+        }
+        migrated.query("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'attendance_records'").use { c ->
+            assertTrue("attendance_records must be gone", !c.moveToFirst())
+        }
+        assertTrue("the selfie on the phone must be deleted", !selfie.exists())
+        migrated.close()
     }
 
     /** v9→v10 creates `ref_facilities` (RUTF facility registry cache — see FacilityRefEntity,

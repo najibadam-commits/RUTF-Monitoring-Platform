@@ -11,12 +11,12 @@ import androidx.room.TypeConverters
         IssueEntity::class, NotificationEntity::class, SyncQueueEntity::class,
         StateRefEntity::class, LgaRefEntity::class, WardRefEntity::class, CategoryRefEntity::class,
         SettlementRefEntity::class, ActivitySiteRefEntity::class, LoadedScopeEntity::class,
-        IssueIdCounterEntity::class, AttendanceEntity::class, FacilityRefEntity::class,
+        IssueIdCounterEntity::class, FacilityRefEntity::class,
         ProductRefEntity::class, LotRefEntity::class, StockBalanceEntity::class,
         IncomingTransferEntity::class, IncomingTransferLineEntity::class, DispensingDayEntity::class,
         SupervisorLgaEntity::class, OtpDispensingEntity::class, PendingAdjustmentEntity::class,
     ],
-    version = 12,
+    version = 13,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)
@@ -26,7 +26,6 @@ abstract class TpmDatabase : RoomDatabase() {
     abstract fun syncQueueDao(): SyncQueueDao
     abstract fun referenceDao(): ReferenceDao
     abstract fun issueIdCounterDao(): IssueIdCounterDao
-    abstract fun attendanceDao(): AttendanceDao
     abstract fun stockDao(): StockDao
 
     companion object {

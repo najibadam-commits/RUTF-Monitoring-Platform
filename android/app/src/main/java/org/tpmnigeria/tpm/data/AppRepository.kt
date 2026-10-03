@@ -6,8 +6,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import org.tpmnigeria.tpm.data.local.AttendanceDao
-import org.tpmnigeria.tpm.data.local.AttendanceEntity
 import org.tpmnigeria.tpm.data.local.IssueDao
 import org.tpmnigeria.tpm.data.local.IssueEntity
 import org.tpmnigeria.tpm.data.local.IssueIdCounterDao
@@ -49,7 +47,6 @@ class AppRepository(
     private val notificationDao: NotificationDao,
     private val syncQueueDao: SyncQueueDao,
     private val issueIdCounterDao: IssueIdCounterDao,
-    private val attendanceDao: AttendanceDao,
     private val appContext: Context,
 ) {
     private val json = Json { ignoreUnknownKeys = true }
@@ -297,41 +294,6 @@ class AppRepository(
         return updated
     }
 
-    // ---- Writes: Daily Attendance (Field Monitor) ----------------------------------------------
-
-    /** Fast, offline-capable duplicate check for the capture screen — see AttendanceEntity's
-     *  kdoc; the server's own `unique(field_monitor_id, attendance_date)` constraint is the real
-     *  boundary this only mirrors locally. */
-    suspend fun findTodaysAttendance(fieldMonitorId: String, attendanceDate: LocalDate) =
-        attendanceDao.findForFieldMonitorAndDate(fieldMonitorId, attendanceDate.toString())
-
-    suspend fun submitAttendance(
-        fieldMonitorId: String, attendanceDate: LocalDate,
-        gps: GpsCapture, selfiePhotoPath: String, assignmentLocationPhotoPath: String, deviceId: String,
-    ): AttendanceEntity {
-        val localId = "att-$fieldMonitorId-$attendanceDate"
-        val entity = AttendanceEntity(
-            localId = localId,
-            remoteId = null,
-            fieldMonitorId = fieldMonitorId,
-            attendanceDate = attendanceDate.toString(),
-            capturedAtMillis = System.currentTimeMillis(),
-            lat = gps.lat,
-            lng = gps.lng,
-            gpsAccuracyM = gps.accuracyMeters,
-            selfiePhotoPath = selfiePhotoPath,
-            assignmentLocationPhotoPath = assignmentLocationPhotoPath,
-            deviceId = deviceId,
-        )
-        attendanceDao.insert(entity)
-        enqueueAttendanceSync(localId)
-        return entity
-    }
-
-    suspend fun getAttendance(localId: String): AttendanceEntity? = attendanceDao.getById(localId)
-
-    suspend fun markAttendanceRemoteId(localId: String, remoteId: String) = attendanceDao.setRemoteId(localId, remoteId)
-
     // ---- Helpers ---------------------------------------------------------------------------------
 
     /**
@@ -355,23 +317,6 @@ class AppRepository(
         // safety net happened to fire, the user logged in/out, or they manually tapped Sync Now.
         // enqueueUniqueWork's NETWORK_CONSTRAINTS still gate the real run (offline = no-op until
         // connectivity returns, exactly per README), so this is safe to call unconditionally.
-        SyncScheduler.syncNow(appContext)
-    }
-
-    /** Same shape as [enqueueSync] but there is no Issue to snapshot into payloadJson — the
-     *  Attendance record's own localId doubles as the Sync Queue screen's display label (see
-     *  SyncQueueItem's kdoc) and as [SupabaseSyncApiService][org.tpmnigeria.tpm.sync.SupabaseSyncApiService]'s
-     *  lookup key for the row it needs to push. */
-    private suspend fun enqueueAttendanceSync(attendanceLocalId: String) {
-        val entity = SyncQueueEntity(
-            localId = "sq-${System.currentTimeMillis()}-$attendanceLocalId",
-            issueId = attendanceLocalId,
-            submissionType = SubmissionType.Attendance,
-            status = SyncStatus.Pending,
-            timestampMillis = System.currentTimeMillis(),
-            payloadJson = json.encodeToString(SyncPayloadSummary(attendanceLocalId, SubmissionType.Attendance.name, "n/a")),
-        )
-        syncQueueDao.insert(entity)
         SyncScheduler.syncNow(appContext)
     }
 

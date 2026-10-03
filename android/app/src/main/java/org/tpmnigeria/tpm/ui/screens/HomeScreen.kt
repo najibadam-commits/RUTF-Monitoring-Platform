@@ -52,7 +52,6 @@ fun HomeScreen(
     onIssueClick: (String) -> Unit,
     onStartNewIssue: () -> Unit,
     onStartDriLookup: () -> Unit,
-    onStartAttendance: () -> Unit,
     onStartStock: (route: String) -> Unit,
     onNavigateToSyncQueue: () -> Unit,
     onLogout: () -> Unit,
@@ -108,18 +107,6 @@ fun HomeScreen(
                     text = "Register New Finding",
                     icon = Icons.Filled.Add,
                     onClick = onStartNewIssue,
-                    blueprint = true,
-                    fullWidth = true,
-                )
-                Spacer(Modifier.height(TpmSpacing.space2))
-            }
-            if (MobileAccess.canCaptureAttendance(role)) {
-                anyAction = true
-                TpmButton(
-                    text = "Daily Attendance",
-                    icon = Icons.Filled.CalendarMonth,
-                    onClick = onStartAttendance,
-                    variant = TpmButtonVariant.Secondary,
                     blueprint = true,
                     fullWidth = true,
                 )

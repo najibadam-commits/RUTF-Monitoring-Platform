@@ -232,3 +232,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | Unchanged results elsewhere | findings 13/13, visits 21/21, KPIs Aug + Sep 26/26 with 0109 | ✅ |
 | Dummy importer through the view | `on conflict (id) do nothing` still works | ✅ (rolled back) |
 | Stock Ledger Void button (admins only) | Opens inline, asks the reason, shows the outcome | ✅ typecheck + lint; ⏳ browser click-through |
+
+# Daily Attendance removed from the app (R50)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Supervisor Home | No Daily Attendance action; route gone | ✅ code removed; `assembleDebug` builds |
+| Room v12 → v13 with an attendance record, a queued attendance and a queued dispensing | Table dropped, attendance queue row and selfie file deleted, dispensing row kept; schema equals `13.json` | 🔧 `MigrationTest.migrate12To13…` compiles — run on a device |
+| Unit tests | MobileAccessTest without the attendance capability | ✅ 41/41 |

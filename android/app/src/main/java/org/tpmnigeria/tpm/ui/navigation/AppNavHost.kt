@@ -53,7 +53,6 @@ import org.tpmnigeria.tpm.ui.screens.IssueListScreen
 import org.tpmnigeria.tpm.ui.screens.MapScreen
 import org.tpmnigeria.tpm.ui.screens.NotificationsScreen
 import org.tpmnigeria.tpm.ui.screens.SyncQueueScreen
-import org.tpmnigeria.tpm.ui.wizard.attendance.DailyAttendanceScreen
 import org.tpmnigeria.tpm.ui.stock.DailyDispensingScreen
 import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
 import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
@@ -170,7 +169,6 @@ fun AppNavHost(session: AppSession) {
                             onIssueClick = { id -> navController.navigate(Routes.issueDetail(id)) },
                             onStartNewIssue = { navController.navigate(Routes.NewIssueWizard) },
                             onStartDriLookup = { navController.navigate(Routes.driRespondWizard()) },
-                            onStartAttendance = { navController.navigate(Routes.DailyAttendance) },
                             onStartStock = { route -> navController.navigate(route) },
                             onNavigateToSyncQueue = { navController.navigate(Routes.SyncQueue) },
                             onLogout = { scope.launch { session.logout() } }
@@ -255,17 +253,6 @@ fun AppNavHost(session: AppSession) {
                                     navController.navigate(Routes.issueDetail(id)) {
                                         popUpTo(Routes.FinalVerifyWizardPattern) { inclusive = true }
                                     }
-                                },
-                                onExit = { navController.popBackStack() },
-                            )
-                        }
-                    }
-                    composable(Routes.DailyAttendance) {
-                        RequireAccess(MobileAccess.canCaptureAttendance(currentUser.role), { navController.popBackStack() }) {
-                            DailyAttendanceScreen(
-                                onDone = {
-                                    SyncScheduler.syncNow(context)
-                                    navController.popBackStack(Routes.Home, inclusive = false)
                                 },
                                 onExit = { navController.popBackStack() },
                             )
@@ -384,7 +371,6 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.NewIssueWizard -> "Register Finding"
     route.startsWith("driRespondWizard") -> "DRI Response"
     route.startsWith("finalVerifyWizard") -> "Final Verification"
-    route == Routes.DailyAttendance -> "Daily Attendance"
     else -> ""
 }
 

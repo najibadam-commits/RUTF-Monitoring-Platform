@@ -4,11 +4,8 @@ package org.tpmnigeria.tpm.domain.model
  * One row per offline-queued submission — README "State & Data Notes": "a separate sync-queue
  * table (localId, issueId, submission type, status: pending/synced, timestamp)".
  *
- * [issueId] holds a Finding's id for the three Finding-workflow [SubmissionType]s. For
- * [SubmissionType.Attendance] there is no Finding involved at all — it holds the local
- * AttendanceEntity's `localId` instead (only ever used here as a queue key + the Sync Queue
- * screen's display label, e.g. "att-<uid>-2026-09-12"; see SupabaseSyncApiService.pushSubmission,
- * which branches on submissionType before doing anything Finding-specific with this field).
+ * [issueId] holds a Finding's id for the three Finding-workflow [SubmissionType]s, and the
+ * submission's localId for the stock and supervision types (see the enum below).
  */
 data class SyncQueueItem(
     val localId: String,
@@ -27,7 +24,7 @@ data class SyncQueueItem(
 /** Stored by name (Converters), so new values need no Room migration. The Stock* / Dispensing
  *  types carry a LedgerSubmission as payloadJson; [SyncQueueItem.issueId] is its localId. */
 enum class SubmissionType {
-    NewIssue, DriResponse, FinalVerification, Attendance,
+    NewIssue, DriResponse, FinalVerification,
     StockReceipt, StockIssue, Dispensing, StockCount, StockLoss,
     StoreCheck, OtpVerification, AdjustmentConfirmation,
 }

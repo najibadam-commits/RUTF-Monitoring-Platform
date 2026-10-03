@@ -130,7 +130,6 @@ private fun submissionTypeLabel(name: String): String = when (name) {
     "NewIssue" -> "New Finding"
     "DriResponse" -> "DRI Response"
     "FinalVerification" -> "Final Verification"
-    "Attendance" -> "Daily Attendance"
     "StockReceipt" -> "Receive Stock"
     "StockIssue" -> "Issue Stock"
     "Dispensing" -> "Daily Dispensing"

@@ -40,7 +40,7 @@ children and to detect loss and diversion early.
 | Initials | `issue_id_counters`, Finding IDs | Users who register Findings | Finding reference numbers |
 | GPS location of a supervision visit (lat/lng, accuracy, distance from facility) | `monitoring_visits` | Supervisors | Evidence the visit took place at the facility |
 | **Selfie at the facility** | `visit-evidence` bucket | Supervisors | Evidence of presence (brief §8) — **[DPO]: facial image; assess whether a selfie is necessary or whether GPS + stock photos suffice** |
-| Attendance selfie, GPS, device id (legacy TPM feature, still in the app for supervisors) | `field_monitor_attendance`, `attendance-evidence` bucket | Supervisors | Daily attendance — **[PROG] confirm it is wanted for RUTF; if not, switch it off** |
+| ~~Attendance selfie, GPS, device id~~ — **removed from the app** (DECISIONS R50); earlier records stay in `field_monitor_attendance` / `attendance-evidence` until the retention decision | `field_monitor_attendance`, `attendance-evidence` bucket | Supervisors | No new data |
 | Device identifier (Android ID), device model, OS and app version | `stock_transactions`, `otp_daily_dispensing`, `monitoring_visits`, `device_sync_status` | All device users | Idempotent sync, sync-failure monitoring |
 | Sync error messages (first line only, ≤ 300 characters, tokens stripped) | `sync_failures` | Device users | Support when records don't sync |
 | Who did what, when (actor id, old/new values) | `audit_log`, `issue_history`, ledger `recorded_by` | All users | Accountability, audit trail (brief §10) |
@@ -85,7 +85,7 @@ Nothing is deleted automatically today. Proposed:
 | --- | --- |
 | Ledger, transfers, dispensing totals, visits, Findings, audit trail | Life of the programme + 5 years (financial / supply audit) |
 | Evidence photos (waybills, stock cards, register pages, stock) | 2 years after the visit/record, then delete |
-| Selfies (visit and attendance) | 90 days, then delete |
+| Selfies (visit, and attendance records captured before removal) | 90 days, then delete |
 | Sync error messages | 180 days after resolution |
 | Accounts of people who leave | Deactivate on departure (they can no longer sign in); names stay on the records they made |
 

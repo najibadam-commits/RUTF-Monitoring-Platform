@@ -33,9 +33,6 @@ object Supabase {
 /** The evidence-photo storage bucket — see supabase/migrations/0010_storage.sql. */
 const val ISSUE_EVIDENCE_BUCKET = "issue-evidence"
 
-/** Daily Attendance's selfie + assignment-location-photo bucket — see
- *  supabase/migrations/0037_field_monitor_attendance.sql. */
-const val ATTENDANCE_EVIDENCE_BUCKET = "attendance-evidence"
 
 /** Private bucket for stock evidence (waybills, stock cards, register pages) — web migration 0101. */
 const val LEDGER_EVIDENCE_BUCKET = "ledger-evidence"

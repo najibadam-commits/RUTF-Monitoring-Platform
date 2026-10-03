@@ -69,9 +69,8 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
     }
 }
 
-/** New `attendance_records` table backing Daily Attendance (Items 9-15 — see AttendanceEntity,
- *  DECISIONS.md #24 in the web project). Brand-new table, nothing to preserve from a prior
- *  version — purely additive. */
+/** New `attendance_records` table backing Daily Attendance (TPM DECISIONS.md #24). Purely
+ *  additive. The feature was removed in v13 — see MIGRATION_12_13. */
 val MIGRATION_8_9 = object : Migration(8, 9) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL(
@@ -123,4 +122,18 @@ val MIGRATION_11_12 = object : Migration(11, 12) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
+/** Daily Attendance removed (DECISIONS R50): its local records, any submissions still queued and
+ *  the selfie / location photos left on the phone are deleted — nothing more is sent. */
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.query("SELECT selfiePhotoPath, assignmentLocationPhotoPath FROM attendance_records").use { c ->
+            while (c.moveToNext()) {
+                for (i in 0..1) c.getString(i)?.let { path -> runCatching { java.io.File(path).delete() } }
+            }
+        }
+        db.execSQL("DELETE FROM sync_queue WHERE submissionType = 'Attendance'")
+        db.execSQL("DROP TABLE IF EXISTS `attendance_records`")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13)

@@ -22,7 +22,7 @@ class TpmApplication : Application(), Configuration.Provider {
     val repository: AppRepository by lazy {
         AppRepository(
             database.issueDao(), database.notificationDao(), database.syncQueueDao(),
-            database.issueIdCounterDao(), database.attendanceDao(), this,
+            database.issueIdCounterDao(), this,
         )
     }
     val referenceRepository: ReferenceRepository by lazy { ReferenceRepository(database.referenceDao(), this) }
