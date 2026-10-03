@@ -28,7 +28,7 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
 
   return (
     <ReportShell
-      title="Reporting Completeness"
+      title="Completeness & Timeliness"
       intro={<>Daily dispensing is counted in full weeks of the month ({otps[0]?.expected_weeks ?? 4} for {month.label}); the month-end count is on time when dated in the last days of the month or by the due day of the next.</>}
       monthKey={month.key} lgas={lgas} sp={sp}
       extraFilters={

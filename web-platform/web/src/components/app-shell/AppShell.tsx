@@ -17,6 +17,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/action-tracker": "Corrective Action Tracker",
   "/accountability": "Accountability Scorecard",
   "/stock-integrity": "Stock Reconciliation",
+  "/reporting-completeness": "Completeness & Timeliness",
   "/reporting": "Reporting & Export Centre",
   "/devices": "Devices & Sync",
   "/users": "Users & Role Management",
