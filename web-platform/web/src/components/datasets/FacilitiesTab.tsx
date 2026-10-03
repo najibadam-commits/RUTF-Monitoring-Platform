@@ -19,7 +19,8 @@ import { CsvImportModal, type CsvField, type CsvRowResult } from "./CsvImportMod
 import { StatusBadge, STATUS_FILTER_OPTIONS, Pager } from "./shared";
 
 type Facility = Database["public"]["Tables"]["facilities"]["Row"];
-type NamedRef = { id: string; name: string; wardId?: string | null };
+/** `code`: the LGA ID (KT-DAU) or Ward ID (KT-DAU-MAJ) — DECISIONS R79, R80. */
+type NamedRef = { id: string; name: string; code?: string | null };
 export type Store = { id: string; name: string; facility_type: FacilityType; lga_id: string };
 export type FacilityFilters = { search: string; status: string; lga: string; type: string; otp: string; flagged: string };
 
@@ -101,9 +102,10 @@ export function FacilitiesTab({
   const [form, setForm] = useState<Form>(EMPTY_FORM);
 
   const lgaName = useMemo(() => Object.fromEntries(lgas.map((l) => [l.id, l.name])), [lgas]);
+  const lgaCode = useMemo(() => Object.fromEntries(lgas.map((l) => [l.id, l.code ?? null])), [lgas]);
   const wardName = useMemo(() => {
     const m: Record<string, string> = {};
-    for (const wards of Object.values(wardsByLga)) for (const w of wards) m[w.id] = w.wardId ? `${w.name} · ${w.wardId}` : w.name;
+    for (const wards of Object.values(wardsByLga)) for (const w of wards) m[w.id] = w.code ? `${w.name} · ${w.code}` : w.name;
     return m;
   }, [wardsByLga]);
   const storeName = useMemo(() => Object.fromEntries(stores.map((s) => [s.id, s.name])), [stores]);
@@ -391,6 +393,7 @@ export function FacilitiesTab({
                   </td>
                   <td>
                     {lgaName[row.lga_id] ?? "—"}
+                    {lgaCode[row.lga_id] && <span className="text-muted" style={{ fontSize: 11 }}> · {lgaCode[row.lga_id]}</span>}
                     <div className="text-muted" style={{ fontSize: 11 }}>
                       {row.ward_id ? wardName[row.ward_id] : "No ward"}
                       {row.location_flag && (

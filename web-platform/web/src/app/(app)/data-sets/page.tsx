@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canManageDatasets } from "@/lib/rbac";
 import { getLgas, getAllWards, getStates } from "@/lib/queries/lookups";
-import { wardId } from "@/lib/wardId";
+import { lgaId, wardId } from "@/lib/wardId";
 import { DataSetsTabs, type DataSetTab } from "@/components/datasets/DataSetsTabs";
 import { FacilitiesTab, type Store } from "@/components/datasets/FacilitiesTab";
 import { LotsTab } from "@/components/datasets/LotsTab";
@@ -58,13 +58,13 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
       getStates(supabase),
     ]);
 
-    // Ward ID (KT-DAU-MAJ) shown next to each ward name — DECISIONS R79.
+    // LGA ID (KT-DAU) and Ward ID (KT-DAU-MAJ) shown next to the names — DECISIONS R79, R80.
     const stateCode = Object.fromEntries(states.map((s) => [s.id, s.code]));
     const lgaById = Object.fromEntries(lgas.map((l) => [l.id, l]));
-    const wardsByLga: Record<string, { id: string; name: string; wardId?: string | null }[]> = {};
+    const wardsByLga: Record<string, { id: string; name: string; code?: string | null }[]> = {};
     for (const w of wards) {
       const l = lgaById[w.lga_id];
-      (wardsByLga[w.lga_id] ??= []).push({ id: w.id, name: w.name, wardId: wardId(l ? stateCode[l.state_id] : null, l?.abbr, w.abbr) });
+      (wardsByLga[w.lga_id] ??= []).push({ id: w.id, name: w.name, code: wardId(l ? stateCode[l.state_id] : null, l?.abbr, w.abbr) });
     }
     const total = count ?? 0;
 
@@ -75,7 +75,7 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
         page={page}
         totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
         filters={{ search: sp.search ?? "", status: sp.status ?? "", lga: sp.lga ?? "", type: sp.type ?? "", otp: sp.otp ?? "", flagged: sp.flagged ?? "" }}
-        lgas={lgas.map((l) => ({ id: l.id, name: l.name }))}
+        lgas={lgas.map((l) => ({ id: l.id, name: l.name, code: lgaId(stateCode[l.state_id], l.abbr) }))}
         wardsByLga={wardsByLga}
         stores={(stores ?? []) as Store[]}
         isSuperAdmin={isSuperAdmin}
