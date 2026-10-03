@@ -11,7 +11,8 @@ if (!email) {
   process.exit(1);
 }
 
-const SITE_URL = "https://tpm-monitoring-platform.vercel.app";
+// The deployment the invite / recovery link lands on — set SITE_URL in tools/db/.env (as invite-super-admin.js).
+const SITE_URL = process.env.SITE_URL || "http://localhost:3000";
 
 (async () => {
   const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {

@@ -59,5 +59,4 @@ All current accounts pass; real pilot accounts must be created in the pilot proj
 - **Supervision Planner CSV** is downloaded directly (admins and supervisors), not through the
   download-request approval. It holds facility names, risk scores and supervisor names, no child data.
 - **Daily Attendance** — removed from the supervisor app (R50) and the web (R51). The server table and bucket still hold records captured earlier, readable only through the API by the roles RLS allows, until the DPO decides on retention.
-- **Email links** still point at the TPM deployment URL and the Resend test sender — set the RUTF
-  domain before go-live.
+- **Email links** — removed (migration 0110): notification emails carry the text and ask the reader to sign in; no link to the TPM deployment. The sender is still the Resend test address — set the programme's own domain before go-live.

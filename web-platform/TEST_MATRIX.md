@@ -241,3 +241,10 @@ existing RBAC helpers) rather than introducing new patterns.
 | Room v12 → v13 with an attendance record, a queued attendance and a queued dispensing | Table dropped, attendance queue row and selfie file deleted, dispensing row kept; schema equals `13.json` | 🔧 `MigrationTest.migrate12To13…` compiles — run on a device |
 | Unit tests | MobileAccessTest without the attendance capability | ✅ 41/41 |
 | Web: Field Monitor Attendance page | Gone from the Administration menu; `/attendance` returns not found | ✅ files removed, typecheck clean; ⏳ browser check |
+
+# Email links (migration 0110)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| `create_notification` body | No vercel.app / TPM link; platform-only guard and grants unchanged | ✅ dry run (rolled back) |
+| Review actions that notify | Still allowed for the right roles | ✅ role access 202/202 with 0110; applied, permissions audit clean |
