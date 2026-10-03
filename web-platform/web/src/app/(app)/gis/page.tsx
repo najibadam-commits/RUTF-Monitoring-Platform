@@ -2,7 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { getCategories, getDris, getLgas, getStates, getTpms } from "@/lib/queries/lookups";
 import { STATUS_LABEL, STATUS_FILTER_OPTIONS, STATUS_COLOR } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
-import { GisMap } from "@/components/gis/GisMap";
+import { GisMap, type GisFacility } from "@/components/gis/GisMap";
+import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 
 export default async function GisPage() {
   const supabase = await createClient();
@@ -28,6 +29,29 @@ export default async function GisPage() {
     getDris(supabase),
     getLgas(supabase),
   ]);
+
+  // Facility layer (brief §9 map): stores and OTP sites coloured by risk score or months of stock,
+  // for the latest month in the ledger — facility_metrics / facility_risk (migration 0105).
+  const month = await reportMonth(supabase, undefined);
+  const [metrics, { data: risk }, { data: points }, { data: riskHigh }] = await Promise.all([
+    getFacilityMetrics(supabase, month, {}),
+    supabase.rpc("facility_risk", { p_as_of: month.end }),
+    supabase.from("facilities").select("id, lat, lng").eq("status", "approved")
+      .or("facility_type.neq.health_facility,is_otp_site.eq.true").not("lat", "is", null).not("lng", "is", null),
+    supabase.from("rutf_thresholds").select("value").eq("key", "risk_high").limit(1).maybeSingle(),
+  ]);
+  const riskById = new Map((risk ?? []).map((r) => [r.facility_id, r.risk_score]));
+  const pointById = new Map((points ?? []).map((p) => [p.id, p]));
+  const facilities: GisFacility[] = metrics.flatMap((m) => {
+    const p = pointById.get(m.facility_id);
+    if (!p) return [];
+    return [{
+      id: m.facility_id, name: m.facility_name, type: m.facility_type, lgaId: m.lga_id,
+      lat: Number(p.lat), lng: Number(p.lng), balance: m.balance,
+      monthsOfStock: m.months_of_stock === null ? null : Number(m.months_of_stock),
+      risk: riskById.get(m.facility_id) ?? null,
+    }];
+  });
 
   const issues = (issuesRaw ?? []).map((i) => ({
     id: i.id as string,
@@ -59,6 +83,9 @@ export default async function GisPage() {
         statuses={STATUS_FILTER_OPTIONS.map((s) => ({ value: s, label: STATUS_LABEL[s], color: STATUS_COLOR[s] }))}
         tpmNames={tpms.map((t) => t.name)}
         driNames={dris.map((d) => d.name)}
+        facilities={facilities}
+        facilityMonth={month.label}
+        riskHigh={Number(riskHigh?.value ?? 50)}
       />
     </div>
   );

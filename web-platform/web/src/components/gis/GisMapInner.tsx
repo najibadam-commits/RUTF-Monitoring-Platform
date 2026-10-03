@@ -26,8 +26,64 @@ export interface GisIssue {
   driName: string | null;
 }
 
+/** A store or OTP site for the facility layer (brief §9 map; migration 0105 metrics). */
+export interface GisFacility {
+  id: string;
+  name: string;
+  type: "state_store" | "lga_store" | "health_facility";
+  lgaId: string;
+  lat: number;
+  lng: number;
+  balance: number;
+  monthsOfStock: number | null;
+  risk: number | null;
+}
+
+type FacilityMeasure = "off" | "risk" | "mos";
+type FacilityClass = { key: string; label: string; color: string };
+
+const FACILITY_CLASSES: Record<Exclude<FacilityMeasure, "off">, FacilityClass[]> = {
+  risk: [
+    { key: "high", label: "High risk", color: "var(--priority-critical)" },
+    { key: "medium", label: "Medium risk", color: "var(--priority-high)" },
+    { key: "low", label: "Low risk", color: "var(--status-resolved)" },
+    { key: "none", label: "No score", color: "var(--color-neutral-500)" },
+  ],
+  mos: [
+    { key: "lt1", label: "Under 1 month", color: "var(--priority-critical)" },
+    { key: "lt2", label: "1–2 months", color: "var(--priority-high)" },
+    { key: "ok", label: "2–6 months", color: "var(--status-resolved)" },
+    { key: "gt6", label: "Over 6 months", color: "var(--color-accent)" },
+    { key: "none", label: "No outflow this month", color: "var(--color-neutral-500)" },
+  ],
+};
+
+function classify(f: GisFacility, measure: Exclude<FacilityMeasure, "off">, riskHigh: number): FacilityClass {
+  const c = FACILITY_CLASSES[measure];
+  const pick = (key: string) => c.find((x) => x.key === key)!;
+  if (measure === "risk") {
+    if (f.risk === null) return pick("none");
+    return pick(f.risk >= riskHigh ? "high" : f.risk >= riskHigh / 2 ? "medium" : "low");
+  }
+  if (f.monthsOfStock === null) return pick("none");
+  return pick(f.monthsOfStock < 1 ? "lt1" : f.monthsOfStock < 2 ? "lt2" : f.monthsOfStock <= 6 ? "ok" : "gt6");
+}
+
+const LEVEL_NAME: Record<GisFacility["type"], string> = { state_store: "State store", lga_store: "LGA store", health_facility: "OTP site" };
+const esc = (t: string) => t.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!);
+
+/** Store = square, OTP site = diamond — different from the round Finding pins. */
+function facilityIconHtml(f: GisFacility, color: string) {
+  const store = f.type !== "health_facility";
+  const size = store ? 14 : 11;
+  return `<div style="width:${size}px;height:${size}px;background:${color};border:2px solid #fff;border-radius:${store ? 3 : 2}px;box-shadow:0 0 0 1px rgba(0,0,0,.35);${store ? "" : "transform:rotate(45deg);"}"></div>`;
+}
+
 interface Props {
   issues: GisIssue[];
+  facilities: GisFacility[];
+  facilityMonth: string;
+  riskHigh: number;
   states: { id: string; name: string }[];
   lgas: { id: string; stateId: string; name: string }[];
   categories: string[];
@@ -40,11 +96,13 @@ const ALL = "All";
 const DEFAULT_CENTER: [number, number] = [9.08, 8.68];
 const DEFAULT_ZOOM = 6;
 
-export function GisMapInner({ issues, states, lgas, categories, statuses, tpmNames, driNames }: Props) {
+export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, states, lgas, categories, statuses, tpmNames, driNames }: Props) {
   const [filters, setFilters] = useState({ state: ALL, lga: ALL, category: ALL, status: ALL, tpm: ALL, dri: ALL });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedLga, setSelectedLga] = useState<{ id: string; name: string } | null>(null);
   const [wardsUnavailable, setWardsUnavailable] = useState(false);
+  const [facilityMeasure, setFacilityMeasure] = useState<FacilityMeasure>("risk");
+  const facilityLayerRef = useRef<L.LayerGroup | null>(null);
 
   const mapNodeRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -118,12 +176,14 @@ export function GisMapInner({ issues, states, lgas, categories, statuses, tpmNam
       },
     }).addTo(map);
     clusterGroupRef.current = clusterGroup;
+    const facilityGroup = L.layerGroup().addTo(map);
+    facilityLayerRef.current = facilityGroup;
     mapRef.current = map;
 
     const layersControl = L.control
       .layers(
         { "Topographic": openTopoMap, "Streets": streets, "Satellite": satellite },
-        { "Issue Markers": clusterGroup },
+        { "Finding markers": clusterGroup, "Facilities": facilityGroup },
         { position: "topright", collapsed: true },
       )
       .addTo(map);
@@ -270,6 +330,32 @@ export function GisMapInner({ issues, states, lgas, categories, statuses, tpmNam
     clusterGroup.addLayers(markers);
   }, [filtered, selectedId]);
 
+  const shownFacilities = useMemo(
+    () => facilities.filter((f) => filters.lga === ALL || f.lgaId === filters.lga),
+    [facilities, filters.lga],
+  );
+
+  // facility layer — one marker per store / OTP site, coloured by the chosen measure
+  useEffect(() => {
+    const group = facilityLayerRef.current;
+    if (!group) return;
+    group.clearLayers();
+    if (facilityMeasure === "off") return;
+    for (const f of shownFacilities) {
+      const cls = classify(f, facilityMeasure, riskHigh);
+      const icon = L.divIcon({ className: "", html: facilityIconHtml(f, cls.color), iconSize: [16, 16], iconAnchor: [8, 8] });
+      const mos = f.monthsOfStock === null ? "no outflow" : `${f.monthsOfStock.toFixed(1)} months of stock`;
+      L.marker([f.lat, f.lng], { icon, zIndexOffset: 500 })
+        .bindTooltip(`${esc(f.name)} — ${cls.label}`)
+        .bindPopup(
+          `<strong>${esc(f.name)}</strong><br>${LEVEL_NAME[f.type]}<br>` +
+            `Risk ${f.risk ?? "—"} · ${mos}<br>On hand ${f.balance.toLocaleString("en-GB")} sachets<br>` +
+            `<a href="/stock-ledger?facility=${encodeURIComponent(f.id)}">Open stock ledger</a>`,
+        )
+        .addTo(group);
+    }
+  }, [shownFacilities, facilityMeasure, riskHigh]);
+
   function resetFilters() {
     setFilters({ state: ALL, lga: ALL, category: ALL, status: ALL, tpm: ALL, dri: ALL });
     setSelectedLga(null);
@@ -371,7 +457,34 @@ export function GisMapInner({ issues, states, lgas, categories, statuses, tpmNam
           </div>
         )}
         <div className="hr" style={{ margin: "4px 0" }} />
-        <h6 style={{ marginBottom: 6 }}>Legend</h6>
+        <div className="field">
+          <label>Facility layer</label>
+          <select className="input" value={facilityMeasure} onChange={(e) => setFacilityMeasure(e.target.value as FacilityMeasure)}>
+            <option value="risk">Risk score</option>
+            <option value="mos">Months of stock</option>
+            <option value="off">Hidden</option>
+          </select>
+        </div>
+        {facilityMeasure !== "off" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {FACILITY_CLASSES[facilityMeasure].map((c) => {
+              const n = shownFacilities.filter((f) => classify(f, facilityMeasure, riskHigh).key === c.key).length;
+              return (
+                <div key={c.key} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+                  <span style={{ width: 10, height: 10, borderRadius: 2, background: c.color, flex: "none" }} />
+                  <span style={{ flex: 1 }}>{c.label}</span>
+                  <span className="text-muted">{n}</span>
+                </div>
+              );
+            })}
+            <div className="text-muted" style={{ fontSize: 11.5 }}>
+              {facilityMeasure === "risk" ? `High from ${riskHigh}; medium from ${Math.round(riskHigh / 2)}. ` : ""}
+              Square = store, diamond = OTP site. {facilityMonth}. Click a facility for its ledger.
+            </div>
+          </div>
+        )}
+        <div className="hr" style={{ margin: "4px 0" }} />
+        <h6 style={{ marginBottom: 6 }}>Findings</h6>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {statuses.map((s) => (
             <div key={s.value} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
@@ -382,7 +495,7 @@ export function GisMapInner({ issues, states, lgas, categories, statuses, tpmNam
         </div>
         <div className="hr" style={{ margin: "4px 0" }} />
         <div style={{ fontSize: 12 }} className="text-muted">
-          {filtered.length} of {issues.length} issues shown
+          {filtered.length} of {issues.length} Findings shown{facilityMeasure !== "off" ? ` · ${shownFacilities.length} facilities` : ""}
         </div>
       </div>
 

@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import type { ComponentProps } from "react";
 import type { GisMapInner } from "./GisMapInner";
+export type { GisFacility } from "./GisMapInner";
 
 const Inner = dynamic(() => import("./GisMapInner").then((m) => m.GisMapInner), {
   ssr: false,

@@ -4,13 +4,7 @@ import { useState } from "react";
 import { DownloadRequestStatusTag } from "@/components/ui/Tags";
 import { fetchApprovedDownloadAction } from "@/lib/actions/downloadRequests";
 import type { DownloadRequestRow } from "@/lib/queries/downloadRequests";
-
-function filtersSummary(filters: unknown): string {
-  if (!filters || typeof filters !== "object") return "—";
-  const entries = Object.entries(filters as Record<string, unknown>).filter(([, v]) => v);
-  if (entries.length === 0) return "All issues (no filters)";
-  return entries.map(([k, v]) => `${k}: ${v}`).join(", ");
-}
+import { RESOURCE_LABEL, filtersSummary } from "@/lib/downloadResources";
 
 export function MyDownloadRequests({ requests }: { requests: DownloadRequestRow[] }) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
@@ -69,7 +63,7 @@ export function MyDownloadRequests({ requests }: { requests: DownloadRequestRow[
               <tr key={r.id}>
                 <td className="text-muted">{new Date(r.created_at).toLocaleString()}</td>
                 <td className="text-muted">
-                  {r.resource_type} · {r.format.toUpperCase()}
+                  {RESOURCE_LABEL[r.resource_type] ?? r.resource_type} · {r.format.toUpperCase()}
                 </td>
                 <td className="text-muted" style={{ maxWidth: 260, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={filtersSummary(r.filters)}>
                   {filtersSummary(r.filters)}

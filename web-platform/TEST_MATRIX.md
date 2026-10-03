@@ -198,7 +198,7 @@ existing RBAC helpers) rather than introducing new patterns.
 | Earlier suites after 0105–0107 | role access 137, ledger 26, findings 13, visits 21 | ✅ |
 | Dashboard layout with real data | Hero, sections, meters, Findings panels | ✅ checked on a temporary preview page (removed) |
 | Stock Integrity / Reporting Completeness / OTP Dispensing / Supervision / DHIS2 pages, CSV export, DHIS2 upload | Render for each role; upload replaces facility-months | ✅ typecheck + lint; ⏳ browser click-through (sign-in needed) |
-| Map layers by risk / months of stock | — | ⏳ deferred (R42) |
+| Map layers by risk / months of stock | — | ✅ added later (R55) |
 
 # RUTF M6 — Pilot hardening (brief §11)
 
@@ -265,3 +265,12 @@ existing RBAC helpers) rather than introducing new patterns.
 | Renames | Findings Follow-up, Findings Analytics (Reporter column), Devices & Sync title | ✅ |
 | Reporting Centre | Findings export, Supervision Plan CSV, Stock & KPI placeholder | ✅ |
 | Settings | Sender field + Findings export only | ✅ |
+
+# Facility map layer and RUTF exports (R55)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Live GIS Map facility layer | Stores (squares) and OTP sites (diamonds) coloured by risk or months of stock for the latest ledger month; legend with counts; LGA filter applies; popup links to the Stock Ledger | ✅ typecheck + lint; ⏳ browser check |
+| Exports, Sep 2026, live data | KPIs 27 indicators (stock on hand 2,876,700 / MoS 3.22 as on the dashboard); facility metrics 307 rows with 10 child-count cells as "<5"; ledger 2,829 rows; transfers 571 rows; each ≤ 3 s | ✅ (service key, read-only) |
+| Direct export as Viewer | `/reporting/export` refuses (403) | ✅ code path; ⏳ browser check |
+| Viewer request → approval → one-time download | Request appears as e.g. "Facility metrics · CSV, month: 2026-09"; download built on approval | ⏳ click-through |

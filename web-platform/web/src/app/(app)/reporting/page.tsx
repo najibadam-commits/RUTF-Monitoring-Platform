@@ -1,3 +1,10 @@
+import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/supabase/dal";
+import { latestLedgerMonth } from "@/lib/queries/kpis";
+import { RUTF_EXPORTS, type RutfExportKind } from "@/lib/exports/rutfExports";
+import { monthChoices } from "@/components/reports/ReportShell";
+import { RutfExportPanel } from "@/components/reports/RutfExportPanel";
+
 interface ReportCard {
   icon: string;
   title: string;
@@ -26,15 +33,12 @@ const REPORT_CARDS: ReportCard[] = [
     description: "Suggested supervision visits per supervisor for the month, ranked by facility risk.",
     actions: { kind: "links", items: [{ label: "Export CSV", href: "/supervision/plan.csv" }] },
   },
-  {
-    icon: "ph-book-open-text",
-    title: "Stock & KPI Exports",
-    description: "Ledger, monthly KPIs and facility metrics — through the download-approval flow.",
-    actions: { kind: "comingSoon" },
-  },
 ];
 
-export default function ReportingPage() {
+export default async function ReportingPage() {
+  const profile = await getCurrentProfile();
+  const supabase = await createClient();
+  const latest = await latestLedgerMonth(supabase);
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
@@ -43,6 +47,13 @@ export default function ReportingPage() {
           Generate and download reports across the platform.
         </p>
       </div>
+
+      <RutfExportPanel
+        exports={(Object.keys(RUTF_EXPORTS) as RutfExportKind[]).map((kind) => ({ kind, title: RUTF_EXPORTS[kind].title, description: RUTF_EXPORTS[kind].description }))}
+        months={monthChoices(latest)}
+        defaultMonth={latest}
+        isViewer={profile.role === "viewer"}
+      />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
         {REPORT_CARDS.map((card) => (
