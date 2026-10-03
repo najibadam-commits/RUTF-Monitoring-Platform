@@ -136,13 +136,6 @@ export function assignableRolesFor(role: UserRole): UserRole[] {
   return [];
 }
 
-/** Admin → Field Monitor Attendance (Items 9/15) — Super Admin (unscoped), Project Admin (own
- *  project), State Coordinator (own state); RLS on field_monitor_attendance enforces the same
- *  three-way scoping server-side — see migration 0037/DECISIONS.md #24. */
-export function canAccessAttendance(role: UserRole) {
-  return role === "super_admin" || role === "project_admin" || role === "state_coordinator";
-}
-
 export type NavKey =
   | "dashboard"
   | "gis"
@@ -162,7 +155,6 @@ export type NavKey =
   | "projectadmins"
   | "settings"
   | "downloadRequests"
-  | "attendance"
   | "auditLog"
   | "stockLedger"
   | "transfers"
@@ -216,7 +208,6 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "datasets", label: "Data Sets", href: "/data-sets", icon: "ph-database", section: "administration" },
   { key: "projectadmins", label: "Project Admin Panel", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
   { key: "settings", label: "Settings", href: "/settings", icon: "ph-gear-six", section: "administration" },
-  { key: "attendance", label: "Field Monitor Attendance", href: "/attendance", icon: "ph-calendar-check", section: "administration" },
   // "reporting", not "administration" — Viewer must have zero Administration-section access, and
   // Viewer is exactly the role that needs this item (to track their own requests).
   { key: "downloadRequests", label: "Download Requests", href: "/download-requests", icon: "ph-download-simple", section: "reporting" },
@@ -233,7 +224,6 @@ export function visibleNavItemsFor(role: UserRole) {
     if (item.key === "devices") return canAccessDevices(role);
     if (item.key === "auditLog") return canAccessAuditLog(role);
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);
-    if (item.key === "attendance") return canAccessAttendance(role);
     return true;
   });
 }

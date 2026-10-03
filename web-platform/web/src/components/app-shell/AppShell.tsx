@@ -28,7 +28,6 @@ const VIEW_TITLES: Record<string, string> = {
   "/data-sets": "Data Sets",
   "/project-admins": "Project Admin Panel",
   "/settings": "System Settings",
-  "/attendance": "Field Monitor Attendance",
 };
 
 const SECTION_ORDER: NavSection[] = ["overview", "stock", "supervision", "analytics", "reporting", "administration"];

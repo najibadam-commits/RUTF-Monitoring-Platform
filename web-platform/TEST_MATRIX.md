@@ -240,3 +240,4 @@ existing RBAC helpers) rather than introducing new patterns.
 | Supervisor Home | No Daily Attendance action; route gone | ✅ code removed; `assembleDebug` builds |
 | Room v12 → v13 with an attendance record, a queued attendance and a queued dispensing | Table dropped, attendance queue row and selfie file deleted, dispensing row kept; schema equals `13.json` | 🔧 `MigrationTest.migrate12To13…` compiles — run on a device |
 | Unit tests | MobileAccessTest without the attendance capability | ✅ 41/41 |
+| Web: Field Monitor Attendance page | Gone from the Administration menu; `/attendance` returns not found | ✅ files removed, typecheck clean; ⏳ browser check |
