@@ -20,7 +20,9 @@ export const MIN_PASSWORD_LENGTH = 8;
 // gate/loop-back before the original 5-stage forward sequence starts, not a 6th/7th forward stage
 // — nothing renders blank for them (STATUS_LABEL/STATUS_COLOR below cover every status), they're
 // just left out of the stepper/legend/KPI cards' fixed 5 steps.
-export const STATUS_ORDER: IssueStatus[] = ["new", "assigned", "in_progress", "resolved", "verified_closed"];
+// RUTF (DECISIONS R74): every Finding starts at pending_review (migration 0032's default), so the
+// forward sequence starts there; "new" is a TPM-era status nothing in RUTF produces any more.
+export const STATUS_ORDER: IssueStatus[] = ["pending_review", "assigned", "in_progress", "resolved", "verified_closed"];
 
 /** Every real status, for the Issues list/GIS filter dropdowns — unlike STATUS_ORDER above,
  *  this must include pending_review/returned_for_correction/reopened so a State Coordinator can
@@ -28,7 +30,6 @@ export const STATUS_ORDER: IssueStatus[] = ["new", "assigned", "in_progress", "r
 export const STATUS_FILTER_OPTIONS: IssueStatus[] = [
   "pending_review",
   "returned_for_correction",
-  "new",
   "assigned",
   "in_progress",
   "resolved",
@@ -36,14 +37,15 @@ export const STATUS_FILTER_OPTIONS: IssueStatus[] = [
   "reopened",
 ];
 
+// Plain RUTF stage names — the same as the Accountability Scorecard's follow-through (R74).
 export const STATUS_LABEL: Record<IssueStatus, string> = {
   new: "New",
-  pending_review: "Pending Review",
-  returned_for_correction: "Returned for Correction",
-  assigned: "Assigned",
-  in_progress: "In Progress",
-  resolved: "Resolved",
-  verified_closed: "Verified/Closed",
+  pending_review: "Awaiting review",
+  returned_for_correction: "Returned to reporter",
+  assigned: "Assigned to facility",
+  in_progress: "Being addressed",
+  resolved: "Action recorded",
+  verified_closed: "Verified & closed",
   reopened: "Reopened",
 };
 

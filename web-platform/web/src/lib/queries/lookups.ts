@@ -87,12 +87,3 @@ export const getDris = cache(async (client: SupabaseClient<Database>, categoryId
   return data ?? [];
 });
 
-export const getTpms = cache(async (client: SupabaseClient<Database>) => {
-  const { data } = await client
-    .from("profiles")
-    .select("id, name")
-    .eq("role", "tpm_supervisor")
-    .eq("status", "active")
-    .order("name");
-  return data ?? [];
-});

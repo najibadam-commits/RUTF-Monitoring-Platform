@@ -22,7 +22,8 @@ export interface GisIssue {
   lgaId: string;
   lgaName: string;
   ward: string;
-  tpmName: string;
+  /** "Automatic checks", or the person who registered it (DECISIONS R74). */
+  reportedBy: string;
   driName: string | null;
 }
 
@@ -88,7 +89,7 @@ interface Props {
   lgas: { id: string; stateId: string; name: string }[];
   categories: string[];
   statuses: { value: string; label: string; color: string }[];
-  tpmNames: string[];
+  reporters: string[];
   driNames: string[];
 }
 
@@ -96,8 +97,8 @@ const ALL = "All";
 const DEFAULT_CENTER: [number, number] = [9.08, 8.68];
 const DEFAULT_ZOOM = 6;
 
-export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, states, lgas, categories, statuses, tpmNames, driNames }: Props) {
-  const [filters, setFilters] = useState({ state: ALL, lga: ALL, category: ALL, status: ALL, tpm: ALL, dri: ALL });
+export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, states, lgas, categories, statuses, reporters, driNames }: Props) {
+  const [filters, setFilters] = useState({ state: ALL, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedLga, setSelectedLga] = useState<{ id: string; name: string } | null>(null);
   const [wardsUnavailable, setWardsUnavailable] = useState(false);
@@ -120,7 +121,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           (filters.lga === ALL || i.lgaId === filters.lga) &&
           (filters.category === ALL || i.category === filters.category) &&
           (filters.status === ALL || i.status === filters.status) &&
-          (filters.tpm === ALL || i.tpmName === filters.tpm) &&
+          (filters.reporter === ALL || i.reportedBy === filters.reporter) &&
           (filters.dri === ALL || i.driName === filters.dri),
       ),
     [issues, filters],
@@ -130,7 +131,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
   // zooms to the whole state's (or the whole country's) extent, which reads better than fitting
   // tightly to wherever the state's issues happen to cluster. Every other filter (alone or combined
   // with State) fits to the actual matching markers instead — see the effect further down.
-  const onlyGeographicFilterActive = filters.lga === ALL && filters.category === ALL && filters.status === ALL && filters.tpm === ALL && filters.dri === ALL;
+  const onlyGeographicFilterActive = filters.lga === ALL && filters.category === ALL && filters.status === ALL && filters.reporter === ALL && filters.dri === ALL;
 
   const lgaOptions = useMemo(
     () => (filters.state === ALL ? lgas : lgas.filter((l) => l.stateId === filters.state)),
@@ -357,7 +358,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
   }, [shownFacilities, facilityMeasure, riskHigh]);
 
   function resetFilters() {
-    setFilters({ state: ALL, lga: ALL, category: ALL, status: ALL, tpm: ALL, dri: ALL });
+    setFilters({ state: ALL, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
     setSelectedLga(null);
     setSelectedId(null);
     mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
@@ -390,9 +391,9 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           </select>
         </div>
         <div className="field">
-          <label>Sector</label>
+          <label>Facility level</label>
           <select className="input" value={filters.category} onChange={(e) => setFilters((f) => ({ ...f, category: e.target.value }))}>
-            <option value={ALL}>All Sectors</option>
+            <option value={ALL}>All levels</option>
             {categories.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -412,10 +413,10 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           </select>
         </div>
         <div className="field">
-          <label>TPM / Monitor</label>
-          <select className="input" value={filters.tpm} onChange={(e) => setFilters((f) => ({ ...f, tpm: e.target.value }))}>
-            <option value={ALL}>All Monitors</option>
-            {tpmNames.map((t) => (
+          <label>Raised by</label>
+          <select className="input" value={filters.reporter} onChange={(e) => setFilters((f) => ({ ...f, reporter: e.target.value }))}>
+            <option value={ALL}>Anyone</option>
+            {reporters.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>

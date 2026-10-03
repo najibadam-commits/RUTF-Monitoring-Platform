@@ -57,7 +57,7 @@ export function IssuesFilterBar({
         ))}
       </select>
       <select className="input" style={{ maxWidth: 210 }} defaultValue={searchParams.get("category") ?? "All"} onChange={(e) => update("category", e.target.value)}>
-        <option value="All">All Sectors</option>
+        <option value="All">All facility levels</option>
         {categories.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}

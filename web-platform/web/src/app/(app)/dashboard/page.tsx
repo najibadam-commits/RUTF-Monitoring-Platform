@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { STATUS_LABEL, STATUS_COLOR, STATUS_ORDER } from "@/lib/constants";
+import { STATUS_LABEL, STATUS_COLOR, STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { StatusDot } from "@/components/ui/Tags";
 import { DashboardMap } from "@/components/gis/DashboardMap";
@@ -86,7 +86,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <div className="card elev-sm">
           <div className="card-title">Findings by status</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }}>
-            {STATUS_ORDER.map((s) => (
+            {STATUS_FILTER_OPTIONS.map((s) => (
               <a key={s} href={`/issues?status=${s}`} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, textDecoration: "none", color: "inherit" }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: STATUS_COLOR[s], flex: "none" }} />
                 <span style={{ flex: 1 }}>{STATUS_LABEL[s]}</span>

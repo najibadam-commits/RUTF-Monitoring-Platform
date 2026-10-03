@@ -313,3 +313,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | Page with its own title | Tab reads "<page> · RUTF-DTAP", set server-side | ✅ checked in the browser on a temporary page rendering the real shell (removed) |
 | All 22 `(app)` pages | `metadata.title` matches the menu name; detail pages "Finding detail", "Supervision visit" | ✅ typecheck + lint |
 | Site description | RUTF-DTAP wording | ✅ |
+
+# Finding status wording and map filters (R74)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Status filters (Findings Register, Situation Map) | Seven RUTF stages in workflow order, no "New" | ✅ typecheck + lint; ⏳ browser check |
+| Command Centre "Findings by status" | Lists all seven including Awaiting review (150 on demo data) | ⏳ browser check |
+| Situation Map filters | "Raised by" (Automatic checks + people), "Facility level" | ⏳ browser check |

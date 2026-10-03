@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getCategories, getDris, getLgas, getStates, getTpms } from "@/lib/queries/lookups";
+import { getCategories, getDris, getLgas, getStates } from "@/lib/queries/lookups";
 import { STATUS_LABEL, STATUS_FILTER_OPTIONS, STATUS_COLOR } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { GisMap, type GisFacility } from "@/components/gis/GisMap";
 import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 
 export const metadata: Metadata = { title: "Situation Map" };
+
+const AUTOMATIC = "Automatic checks";
 
 export default async function GisPage() {
   const supabase = await createClient();
@@ -18,17 +20,16 @@ export default async function GisPage() {
   // specifically by name anymore, which is the intended behavior here (unlike the Issues list
   // page's filter/export, which deliberately keeps legacy categories filterable for historical
   // lookups — see getAllCategories' kdoc).
-  const [{ data: issuesRaw }, states, categories, tpms, dris, lgas] = await Promise.all([
+  const [{ data: issuesRaw }, states, categories, dris, lgas] = await Promise.all([
     supabase
       .from("issues")
       .select(
-        "id, code, description, status, priority, lat, lng, reported_at, category:categories(name), state:states(id, name), lga:lgas(id, name), ward, reporter:profiles!issues_reported_by_fkey(name), dri:profiles!issues_assigned_dri_fkey(name)",
+        "id, code, description, status, priority, lat, lng, reported_at, auto_generated, category:categories(name), state:states(id, name), lga:lgas(id, name), ward, reporter:profiles!issues_reported_by_fkey(name), dri:profiles!issues_assigned_dri_fkey(name)",
       )
       .not("lat", "is", null)
       .not("lng", "is", null),
     getStates(supabase),
     getCategories(supabase),
-    getTpms(supabase),
     getDris(supabase),
     getLgas(supabase),
   ]);
@@ -71,7 +72,7 @@ export default async function GisPage() {
     lgaId: (i.lga as unknown as { id: string } | null)?.id ?? "",
     lgaName: (i.lga as unknown as { name: string } | null)?.name ?? "—",
     ward: (i.ward as string | null) ?? "—",
-    tpmName: (i.reporter as unknown as { name: string } | null)?.name ?? "—",
+    reportedBy: i.auto_generated ? AUTOMATIC : (i.reporter as unknown as { name: string } | null)?.name ?? "—",
     driName: (i.dri as unknown as { name: string } | null)?.name ?? null,
   }));
 
@@ -84,7 +85,7 @@ export default async function GisPage() {
         lgas={lgas.map((l) => ({ id: l.id, stateId: l.state_id, name: l.name }))}
         categories={categories.map((c) => c.name)}
         statuses={STATUS_FILTER_OPTIONS.map((s) => ({ value: s, label: STATUS_LABEL[s], color: STATUS_COLOR[s] }))}
-        tpmNames={tpms.map((t) => t.name)}
+        reporters={[AUTOMATIC, ...[...new Set(issues.map((i) => i.reportedBy))].filter((n) => n !== AUTOMATIC && n !== "—").sort()]}
         driNames={dris.map((d) => d.name)}
         facilities={facilities}
         facilityMonth={month.label}
