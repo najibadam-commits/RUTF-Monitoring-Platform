@@ -26,6 +26,9 @@ export default async function UsersPage() {
   ]);
 
   const users = data ?? [];
+  const { data: supervisorLgas } = await supabase.from("supervisor_lgas").select("profile_id, lga_id");
+  const supervisedLgas: Record<string, string[]> = {};
+  for (const r of supervisorLgas ?? []) (supervisedLgas[r.profile_id] ??= []).push(r.lga_id);
   const facilityNames: Record<string, string> = Object.fromEntries((facilities ?? []).map((f) => [f.id, f.name]));
   // A user may still point at a facility that is no longer assignable (deactivated, OTP flag off).
   const missing = [...new Set(users.map((u) => u.facility_id).filter((id): id is string => !!id && !facilityNames[id]))];
@@ -43,6 +46,7 @@ export default async function UsersPage() {
       facilities={(facilities ?? []) as FacilityOption[]}
       facilityNames={facilityNames}
       lgas={lgas.map((l) => ({ id: l.id, name: l.name }))}
+      supervisedLgas={supervisedLgas}
     />
   );
 }

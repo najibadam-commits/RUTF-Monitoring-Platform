@@ -5,6 +5,7 @@ import { Modal } from "@/components/ui/Modal";
 import { ActiveStatusTag } from "@/components/ui/Tags";
 import { BulkImportUsersModal } from "./BulkImportUsersModal";
 import { FacilityPicker, type FacilityOption } from "./FacilityPicker";
+import { SupervisorScopePicker, type SupervisionLevel } from "./SupervisorScopePicker";
 import { ASSIGNABLE_ROLES_BY_PROJECT_ADMIN, ASSIGNABLE_ROLES_BY_SUPER_ADMIN, ROLE_LABELS, assignableRolesFor, roleOptionLabel } from "@/lib/rbac";
 import type { Database, UserRole } from "@/lib/types/database";
 import { addUserAction, editUserAction, removeUserAction, resetUserPasswordAction } from "@/lib/actions/users";
@@ -20,6 +21,7 @@ export function UsersTable({
   facilities,
   facilityNames,
   lgas,
+  supervisedLgas,
 }: {
   users: Profile[];
   callerRole: UserRole;
@@ -30,6 +32,8 @@ export function UsersTable({
   /** Names of every facility a listed user is assigned to (may include ones not assignable now). */
   facilityNames: Record<string, string>;
   lgas: { id: string; name: string }[];
+  /** profile id -> the LGAs a supervisor covers (migration 0103). */
+  supervisedLgas: Record<string, string[]>;
 }) {
   const [modal, setModal] = useState<ModalKind>(null);
   const [target, setTarget] = useState<Profile | null>(null);
@@ -41,6 +45,8 @@ export function UsersTable({
     role: assignableRolesFor(callerRole)[0] ?? "viewer",
     managedStateId: "",
     facilityId: "",
+    supervisionLevel: "" as SupervisionLevel | "",
+    supervisedLgaIds: [] as string[],
   });
   const [editForm, setEditForm] = useState({
     name: "",
@@ -50,6 +56,8 @@ export function UsersTable({
     status: "active" as "active" | "inactive",
     managedStateId: "",
     facilityId: "",
+    supervisionLevel: "" as SupervisionLevel | "",
+    supervisedLgaIds: [] as string[],
   });
   const [resetState, setResetState] = useState<{ id: string; status: "pending" | "success" | "error"; message?: string } | null>(null);
 
@@ -78,6 +86,8 @@ export function UsersTable({
       status: u.status,
       managedStateId: u.managed_state_id ?? "",
       facilityId: u.facility_id ?? "",
+      supervisionLevel: u.supervision_level ?? "",
+      supervisedLgaIds: supervisedLgas[u.id] ?? [],
     });
     setModal("edit");
   }
@@ -85,7 +95,7 @@ export function UsersTable({
   function closeModal() {
     setModal(null);
     setTarget(null);
-    setAddForm({ name: "", email: "", phone: "", role: assignable[0] ?? "viewer", managedStateId: "", facilityId: "" });
+    setAddForm({ name: "", email: "", phone: "", role: assignable[0] ?? "viewer", managedStateId: "", facilityId: "", supervisionLevel: "", supervisedLgaIds: [] });
   }
 
   return (
@@ -132,6 +142,17 @@ export function UsersTable({
                   {u.role === "dri" && (
                     <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
                       {u.facility_id ? (facilityNames[u.facility_id] ?? "Facility") : "No facility assigned"}
+                    </div>
+                  )}
+                  {u.role === "tpm_supervisor" && (
+                    <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
+                      {u.supervision_level
+                        ? `${u.supervision_level === "stores" ? "Stores" : "OTP sites"} · ${
+                            (supervisedLgas[u.id] ?? []).length === 1
+                              ? (lgas.find((l) => l.id === supervisedLgas[u.id][0])?.name ?? "1 LGA")
+                              : `${(supervisedLgas[u.id] ?? []).length} LGAs`
+                          }`
+                        : "No supervision area set"}
                     </div>
                   )}
                 </td>
@@ -198,6 +219,8 @@ export function UsersTable({
               ...addForm,
               managedStateId: addForm.role === "state_coordinator" ? addForm.managedStateId : null,
               facilityId: addForm.role === "dri" ? addForm.facilityId : null,
+              supervisionLevel: addForm.role === "tpm_supervisor" ? addForm.supervisionLevel || null : null,
+              supervisedLgaIds: addForm.role === "tpm_supervisor" ? addForm.supervisedLgaIds : [],
             })
           }
         >
@@ -240,6 +263,14 @@ export function UsersTable({
             {addForm.role === "dri" && (
               <FacilityPicker value={addForm.facilityId} onChange={(id) => setAddForm((f) => ({ ...f, facilityId: id }))} facilities={facilities} lgas={lgas} />
             )}
+            {addForm.role === "tpm_supervisor" && (
+              <SupervisorScopePicker
+                level={addForm.supervisionLevel}
+                lgaIds={addForm.supervisedLgaIds}
+                lgas={lgas}
+                onChange={(n) => setAddForm((f) => ({ ...f, supervisionLevel: n.level, supervisedLgaIds: n.lgaIds }))}
+              />
+            )}
           </div>
         </Modal>
       )}
@@ -254,6 +285,8 @@ export function UsersTable({
               ...editForm,
               managedStateId: editForm.role === "state_coordinator" ? editForm.managedStateId : null,
               facilityId: editForm.role === "dri" ? editForm.facilityId : null,
+              supervisionLevel: editForm.role === "tpm_supervisor" ? editForm.supervisionLevel || null : null,
+              supervisedLgaIds: editForm.role === "tpm_supervisor" ? editForm.supervisedLgaIds : [],
             })
           }
         >
@@ -295,6 +328,14 @@ export function UsersTable({
             )}
             {editForm.role === "dri" && (
               <FacilityPicker value={editForm.facilityId} onChange={(id) => setEditForm((f) => ({ ...f, facilityId: id }))} facilities={facilities} lgas={lgas} />
+            )}
+            {editForm.role === "tpm_supervisor" && (
+              <SupervisorScopePicker
+                level={editForm.supervisionLevel}
+                lgaIds={editForm.supervisedLgaIds}
+                lgas={lgas}
+                onChange={(n) => setEditForm((f) => ({ ...f, supervisionLevel: n.level, supervisedLgaIds: n.lgaIds }))}
+              />
             )}
             <div className="field">
               <label>Status</label>

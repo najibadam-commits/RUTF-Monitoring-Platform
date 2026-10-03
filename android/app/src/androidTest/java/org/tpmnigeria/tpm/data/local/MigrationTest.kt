@@ -223,4 +223,33 @@ class MigrationTest {
             db.close()
         }
     }
+
+    /** v11→v12 adds the supervision caches (web migration 0103): LGAs, OTP dispensing, pending
+     *  adjustments — round-trips them and the swap that replaces a supervisor's whole cache. */
+    @Test
+    fun migrate11To12_createsSupervisionCacheTables() {
+        helper.createDatabase(testDb, 11).apply { close() }
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.databaseBuilder(context, TpmDatabase::class.java, testDb)
+            .addMigrations(MIGRATION_11_12)
+            .build()
+        try {
+            val dao = db.stockDao()
+            runBlocking {
+                dao.replaceSupervision(
+                    lgas = listOf(SupervisorLgaEntity("lga-1")),
+                    balances = listOf(StockBalanceEntity("f1", "l1", "l1", 500, 1L)),
+                    dispensing = listOf(OtpDispensingEntity("f1", "2026-09-01", 2, 120)),
+                    adjustments = listOf(PendingAdjustmentEntity("a1", "f1", "2026-09-30", "l1", -5, "count shortfall")),
+                )
+            }
+            assertEquals(120, runBlocking { dao.getOtpDispensing("f1", "2026-09-01", "2026-09-30") }.sumOf { it.sachetsDispensed })
+            assertEquals(500, runBlocking { dao.getBalances("f1") }.single().balance)
+            runBlocking { dao.replaceSupervision(emptyList(), emptyList(), emptyList(), emptyList()) }
+            assertEquals(0, runBlocking { dao.getBalances("f1") }.size)
+        } finally {
+            db.close()
+        }
+    }
 }

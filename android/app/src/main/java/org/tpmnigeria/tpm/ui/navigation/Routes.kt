@@ -34,6 +34,11 @@ object Routes {
     const val StockCount = "stockCount"
     const val LossAdjustment = "lossAdjustment"
 
+    // Supervision (supervisors — brief §8).
+    const val StoreCheck = "storeCheck"
+    const val OtpVerification = "otpVerification"
+    const val ConfirmAdjustments = "confirmAdjustments"
+
     const val DriRespondWizardPattern = "driRespondWizard?issueId={issueId}"
     fun driRespondWizard(issueId: String? = null) = if (issueId != null) "driRespondWizard?issueId=$issueId" else "driRespondWizard"
 

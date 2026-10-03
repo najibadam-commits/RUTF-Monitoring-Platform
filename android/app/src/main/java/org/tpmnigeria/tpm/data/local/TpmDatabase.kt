@@ -14,8 +14,9 @@ import androidx.room.TypeConverters
         IssueIdCounterEntity::class, AttendanceEntity::class, FacilityRefEntity::class,
         ProductRefEntity::class, LotRefEntity::class, StockBalanceEntity::class,
         IncomingTransferEntity::class, IncomingTransferLineEntity::class, DispensingDayEntity::class,
+        SupervisorLgaEntity::class, OtpDispensingEntity::class, PendingAdjustmentEntity::class,
     ],
-    version = 11,
+    version = 12,
     exportSchema = true,
 )
 @TypeConverters(Converters::class)

@@ -39,3 +39,6 @@ const val ATTENDANCE_EVIDENCE_BUCKET = "attendance-evidence"
 
 /** Private bucket for stock evidence (waybills, stock cards, register pages) — web migration 0101. */
 const val LEDGER_EVIDENCE_BUCKET = "ledger-evidence"
+
+/** Private bucket for supervision evidence (stock card, stack, register page, selfie) — web migration 0103. */
+const val VISIT_EVIDENCE_BUCKET = "visit-evidence"

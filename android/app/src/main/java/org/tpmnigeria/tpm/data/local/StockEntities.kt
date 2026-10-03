@@ -61,3 +61,30 @@ data class DispensingDayEntity(
     val facilityId: String,
     val dispenseDate: String,
 )
+
+/** An LGA the signed-in supervisor covers (web migration 0103's supervisor_lgas). */
+@Entity(tableName = "ref_supervisor_lgas")
+data class SupervisorLgaEntity(
+    @PrimaryKey val lgaId: String,
+)
+
+/** Recent OTP daily dispensing at the facilities a supervisor covers — for the OTP Verification
+ *  preview of the verification factor, offline. Aggregate tallies only (brief §10). */
+@Entity(tableName = "ref_otp_dispensing", primaryKeys = ["facilityId", "dispenseDate"])
+data class OtpDispensingEntity(
+    val facilityId: String,
+    val dispenseDate: String,
+    val newAdmissions: Int,
+    val sachetsDispensed: Int,
+)
+
+/** An adjustment a facility recorded that still waits for supervisor confirmation (DECISIONS R7). */
+@Entity(tableName = "ref_pending_adjustments")
+data class PendingAdjustmentEntity(
+    @PrimaryKey val id: String,
+    val facilityId: String,
+    val txnDate: String,
+    val lotId: String?,
+    val quantity: Int,
+    val reason: String?,
+)

@@ -30,6 +30,8 @@ data class CurrentUser(
     val projectId: String?,
     /** The facility a facility user (dri) records for — null for every other role. */
     val facilityId: String? = null,
+    /** For a supervisor: "stores" or "otp_sites" (web migration 0103) — what they supervise in their LGAs. */
+    val supervisionLevel: String? = null,
 )
 
 /** Short, user-facing text for a real (online) sign-in rejection from Supabase Auth —
@@ -91,9 +93,10 @@ class AppSession(
         val roleStr = prefs.getString("user_role", "") ?: ""
         val projectId = prefs.getString("project_id", null)
         val facilityId = prefs.getString("facility_id", null)
+        val supervisionLevel = prefs.getString("supervision_level", null)
         
         val role = UserRole.entries.firstOrNull { it.name == roleStr } ?: return
-        _currentUser.value = CurrentUser(id, name, email, role, projectId, facilityId)
+        _currentUser.value = CurrentUser(id, name, email, role, projectId, facilityId, supervisionLevel)
     }
 
     private fun cacheProfile(user: CurrentUser) {
@@ -104,6 +107,7 @@ class AppSession(
             .putString("user_role", user.role.name)
             .putString("project_id", user.projectId)
             .putString("facility_id", user.facilityId)
+            .putString("supervision_level", user.supervisionLevel)
             .apply()
     }
 
@@ -243,7 +247,7 @@ class AppSession(
     private suspend fun loadProfile(userId: String): Result<CurrentUser> {
         return try {
             val profile = postgrest.from("profiles")
-                .select(columns = Columns.list("id", "name", "email", "role", "project_id", "status", "facility_id")) {
+                .select(columns = Columns.list("id", "name", "email", "role", "project_id", "status", "facility_id", "supervision_level")) {
                     filter { eq("id", userId) }
                 }
                 .decodeSingle<ProfileDto>()
@@ -258,7 +262,7 @@ class AppSession(
                     IllegalStateException("Your account role doesn't have access to the mobile app. Sign in to the web dashboard instead."),
                 )
             }
-            val user = CurrentUser(profile.id, profile.name, profile.email, role, profile.project_id, profile.facility_id)
+            val user = CurrentUser(profile.id, profile.name, profile.email, role, profile.project_id, profile.facility_id, profile.supervision_level)
             _currentUser.value = user
             cacheProfile(user)
             Result.success(user)

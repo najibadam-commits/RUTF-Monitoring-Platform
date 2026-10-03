@@ -34,7 +34,10 @@ data class LedgerSubmission(
 )
 
 @Serializable
-enum class LedgerKind { Receipt, Issue, Dispensing, StockCount, Loss }
+enum class LedgerKind { Receipt, Issue, Dispensing, StockCount, Loss, StoreCheck, OtpVerification, ConfirmAdjustment }
+
+/** Supervision kinds (web migration 0103) carry no stock movement of their own. */
+val LedgerKind.isSupervision: Boolean get() = this == LedgerKind.StoreCheck || this == LedgerKind.OtpVerification || this == LedgerKind.ConfirmAdjustment
 
 /** A lot line. [lotId] for a lot already in the list, else [lotNo] + [expiryDate] as read off the
  *  carton (the server adds it — DECISIONS R22). For a count, [quantity] is the physical count. */
@@ -63,8 +66,57 @@ private fun linesJson(lines: List<LedgerLine>, countField: Boolean = false): Jso
     })
 }
 
-/** Builders: one per record_* function, parameter names exactly as in migration 0101. */
+/** A supervisor's count of one lot at a visit (web migration 0103's stock_check_lines). */
+@Serializable
+data class VisitCountLine(
+    val lotId: String? = null,
+    val lotNo: String? = null,
+    val expiryDate: String? = null,
+    val stockCardBalance: Int? = null,
+    val physicalCount: Int,
+    val damagedCount: Int = 0,
+    val expiredCount: Int = 0,
+)
+
+/** Builders: one per record_* function, parameter names exactly as in migrations 0101 / 0103. */
 object LedgerSubmissions {
+    /** A supervision visit — record_visit (0103). [checklist] keys as the migration documents. */
+    fun visit(
+        kind: LedgerKind, localId: String, facilityId: String, date: String, lat: Double, lng: Double, accuracyM: Int,
+        lines: List<VisitCountLine>, checklist: JsonObject, periodStart: String?, periodEnd: String?, deviceId: String,
+        photos: List<LedgerPhoto>, summary: String,
+    ) = LedgerSubmission(
+        kind = kind, localId = localId, facilityId = facilityId, rpc = "record_visit", txnDate = date,
+        photos = photos, summary = summary,
+        params = buildJsonObject {
+            put("p_local_id", localId)
+            put("p_visit_type", if (kind == LedgerKind.StoreCheck) "store_check" else "otp_verification")
+            put("p_facility_id", facilityId); put("p_visit_date", date)
+            put("p_lat", lat); put("p_lng", lng); put("p_gps_accuracy_m", accuracyM)
+            put("p_lines", buildJsonArray {
+                for (l in lines) add(buildJsonObject {
+                    l.lotId?.let { put("lot_id", it) }
+                    l.lotNo?.let { put("lot_no", it.trim()) }
+                    l.expiryDate?.let { put("expiry_date", it) }
+                    l.stockCardBalance?.let { put("stock_card_balance", it) }
+                    put("physical_count", l.physicalCount)
+                    put("damaged_count", l.damagedCount)
+                    put("expired_count", l.expiredCount)
+                })
+            })
+            put("p_checklist", checklist)
+            put("p_period_start", periodStart); put("p_period_end", periodEnd)
+            put("p_device_id", deviceId)
+        },
+    )
+
+    /** A supervisor confirms a facility's adjustment — confirm_adjustment (0103). */
+    fun confirmAdjustment(localId: String, facilityId: String, adjustmentId: String, note: String?, date: String, summary: String) = LedgerSubmission(
+        kind = LedgerKind.ConfirmAdjustment, localId = localId, facilityId = facilityId, rpc = "confirm_adjustment", txnDate = date,
+        summary = summary,
+        params = buildJsonObject { put("p_txn_id", adjustmentId); put("p_note", note?.takeIf { it.isNotBlank() }) },
+    )
+
     fun receipt(
         localId: String, facilityId: String, date: String, lines: List<LedgerLine>, transferId: String?,
         documentNo: String?, deviceId: String, photos: List<LedgerPhoto>, summary: String,

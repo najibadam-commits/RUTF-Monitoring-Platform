@@ -100,6 +100,8 @@ async function inBatches(items, fn) {
     if (!project.rowCount) throw new Error(`Project "${PROJECT_NAME}" not found — apply migration 0100 first`);
     const projectId = project.rows[0].id;
     const katsina = (await pg.query("select id from states where code = 'KT'")).rows[0]?.id ?? null;
+    const hasSupervisionColumns = (await pg.query("select to_regclass('public.supervisor_lgas') is not null as ok")).rows[0].ok;
+    const lgaIdByName = new Map((await pg.query("select id, name from lgas")).rows.map((r) => [r.name.toLowerCase(), r.id]));
 
     for (const p of people) {
       const id = ids.get(p.email.trim().toLowerCase());
@@ -111,6 +113,21 @@ async function inBatches(items, fn) {
           where id = $1`,
         [id, p.full_name, p.role, projectId, p.role === "state_coordinator" ? katsina : null, p.role === "dri" ? p.facility_id || null : null],
       );
+
+      // Supervisors: what they supervise and where (migration 0103) — level SST in people.csv
+      // means the stores in their LGAs, OTP the OTP sites in theirs; LGAs are ';'-separated.
+      if (hasSupervisionColumns) {
+        const level = p.role === "tpm_supervisor" ? (p.level_abbr === "OTP" ? "otp_sites" : "stores") : null;
+        await pg.query(`update profiles set supervision_level = $2 where id = $1`, [id, level]);
+        await pg.query(`delete from supervisor_lgas where profile_id = $1`, [id]);
+        if (level) {
+          for (const lga of p.lga.split(";").map((s) => s.trim()).filter(Boolean)) {
+            const lgaId = lgaIdByName.get(lga.toLowerCase());
+            if (!lgaId) throw new Error(`Unknown LGA "${lga}" for ${p.email}`);
+            await pg.query(`insert into supervisor_lgas (profile_id, lga_id) values ($1, $2)`, [id, lgaId]);
+          }
+        }
+      }
     }
     await pg.query("commit");
 

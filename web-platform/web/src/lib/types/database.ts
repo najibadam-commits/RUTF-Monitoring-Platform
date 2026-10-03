@@ -51,6 +51,8 @@ export interface Database {
           assigned_category_id: string | null;
           // The one facility a dri records for (migration 0100); sets assigned_category_id to its level.
           facility_id: string | null;
+          // Supervisor: what they supervise in their supervisor_lgas (migration 0103).
+          supervision_level: "stores" | "otp_sites" | null;
         };
         Insert: Partial<Database["public"]["Tables"]["profiles"]["Row"]> & { id: string; name: string; email: string };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Row"]>;
@@ -395,6 +397,12 @@ export interface Database {
         Row: { project_id: string; key: string; value: number; note: string | null; updated_at: string };
         Insert: { project_id: string; key: string; value: number; note?: string | null };
         Update: Partial<Database["public"]["Tables"]["rutf_thresholds"]["Row"]>;
+        Relationships: [];
+      };
+      supervisor_lgas: {
+        Row: { profile_id: string; lga_id: string };
+        Insert: { profile_id: string; lga_id: string };
+        Update: never;
         Relationships: [];
       };
       finding_types: {

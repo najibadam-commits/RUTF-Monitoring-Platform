@@ -89,6 +89,9 @@ fun HomeScreen(
                 )
             }
             Spacer(Modifier.height(TpmSpacing.space3))
+            if (MobileAccess.canSupervise(role) && user.supervisionLevel != null) {
+                SupervisionActions(user.supervisionLevel, onStartStock)
+            }
             if (role == UserRole.Dri) {
                 MyFacilityCard(user.facilityId)
                 Spacer(Modifier.height(TpmSpacing.space2))
@@ -283,6 +286,27 @@ private fun StockActions(facilityId: String, onStart: (String) -> Unit) {
         if (isOtp) add("Daily Dispensing" to Routes.DailyDispensing)
         add("Stock Count" to Routes.StockCount)
         add("Record Loss / Adjustment" to Routes.LossAdjustment)
+    }
+    actions.forEachIndexed { i, (label, route) ->
+        TpmButton(
+            text = label,
+            onClick = { onStart(route) },
+            variant = if (i == 0) TpmButtonVariant.Primary else TpmButtonVariant.Secondary,
+            blueprint = true,
+            fullWidth = true,
+        )
+        Spacer(Modifier.height(TpmSpacing.space2))
+    }
+}
+
+/** A supervisor's visit actions (brief §8), by level: Store Check for the stores they cover, OTP
+ *  Verification for OTP sites; both confirm adjustments. */
+@Composable
+private fun SupervisionActions(level: String, onStart: (String) -> Unit) {
+    val actions = buildList {
+        if (level == "stores") add("Store Check" to Routes.StoreCheck)
+        if (level == "otp_sites") add("OTP Verification" to Routes.OtpVerification)
+        add("Confirm Adjustments" to Routes.ConfirmAdjustments)
     }
     actions.forEachIndexed { i, (label, route) ->
         TpmButton(

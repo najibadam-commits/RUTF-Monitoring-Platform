@@ -26,5 +26,9 @@ data class SyncQueueItem(
 
 /** Stored by name (Converters), so new values need no Room migration. The Stock* / Dispensing
  *  types carry a LedgerSubmission as payloadJson; [SyncQueueItem.issueId] is its localId. */
-enum class SubmissionType { NewIssue, DriResponse, FinalVerification, Attendance, StockReceipt, StockIssue, Dispensing, StockCount, StockLoss }
+enum class SubmissionType {
+    NewIssue, DriResponse, FinalVerification, Attendance,
+    StockReceipt, StockIssue, Dispensing, StockCount, StockLoss,
+    StoreCheck, OtpVerification, AdjustmentConfirmation,
+}
 enum class SyncStatus { Pending, Synced, Failed }

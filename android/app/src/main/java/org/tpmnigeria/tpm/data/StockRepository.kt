@@ -10,6 +10,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import org.tpmnigeria.tpm.data.local.DispensingDayEntity
+import org.tpmnigeria.tpm.data.local.FacilityRefEntity
+import org.tpmnigeria.tpm.data.local.OtpDispensingEntity
+import org.tpmnigeria.tpm.data.local.PendingAdjustmentEntity
+import org.tpmnigeria.tpm.data.local.SupervisorLgaEntity
 import org.tpmnigeria.tpm.data.local.IncomingTransferEntity
 import org.tpmnigeria.tpm.data.local.IncomingTransferLineEntity
 import org.tpmnigeria.tpm.data.local.LotRefEntity
@@ -20,6 +24,10 @@ import org.tpmnigeria.tpm.data.local.SyncQueueDao
 import org.tpmnigeria.tpm.data.local.SyncQueueEntity
 import org.tpmnigeria.tpm.data.remote.Supabase
 import org.tpmnigeria.tpm.data.remote.dto.DispensingDayDto
+import org.tpmnigeria.tpm.data.remote.dto.FacilityIdDto
+import org.tpmnigeria.tpm.data.remote.dto.OtpDispensingDto
+import org.tpmnigeria.tpm.data.remote.dto.PendingAdjustmentDto
+import org.tpmnigeria.tpm.data.remote.dto.SupervisorLgaDto
 import org.tpmnigeria.tpm.data.remote.dto.LotDto
 import org.tpmnigeria.tpm.data.remote.dto.ProductDto
 import org.tpmnigeria.tpm.data.remote.dto.StockBalanceDto
@@ -43,6 +51,9 @@ val LEDGER_SUBMISSION_TYPES = mapOf(
     LedgerKind.Dispensing to SubmissionType.Dispensing,
     LedgerKind.StockCount to SubmissionType.StockCount,
     LedgerKind.Loss to SubmissionType.StockLoss,
+    LedgerKind.StoreCheck to SubmissionType.StoreCheck,
+    LedgerKind.OtpVerification to SubmissionType.OtpVerification,
+    LedgerKind.ConfirmAdjustment to SubmissionType.AdjustmentConfirmation,
 )
 
 /**
@@ -84,6 +95,70 @@ class StockRepository(
                 pending = pending.filter { it.facilityId == facilityId },
             )
         }
+
+    // ── Supervision (web migration 0103) ────────────────────────────────────────────────────────
+
+    fun observeSupervisedFacilities(level: String): Flow<List<FacilityRefEntity>> = dao.observeSupervisedFacilities(level)
+
+    /** Adjustments waiting for confirmation, minus those this device already confirmed (queued). */
+    fun observePendingAdjustments(): Flow<List<PendingAdjustmentEntity>> =
+        combine(dao.observePendingAdjustments(), observePendingSubmissions()) { adjustments, pending ->
+            val confirmedHere = pending.filter { it.kind == LedgerKind.ConfirmAdjustment }
+                .mapNotNull { it.params["p_txn_id"]?.toString()?.trim('"') }.toSet()
+            adjustments.filter { it.id !in confirmedHere }
+        }
+
+    /** Ledger balance by lot at a supervised facility, as of the last sync. */
+    suspend fun getBalances(facilityId: String) = dao.getBalances(facilityId)
+
+    /** App-recorded dispensing at an OTP for a period (for the verification-factor preview). */
+    suspend fun getRecordedDispensing(facilityId: String, from: LocalDate, to: LocalDate): Pair<Int, Int> {
+        val rows = dao.getOtpDispensing(facilityId, from.toString(), to.toString())
+        return rows.sumOf { it.newAdmissions } to rows.sumOf { it.sachetsDispensed }
+    }
+
+    /**
+     * A supervisor's cache: their LGAs, and for the facilities they cover at their level the
+     * ledger balances, recent OTP dispensing and adjustments waiting for confirmation.
+     */
+    suspend fun refreshSupervision(supervisorId: String, level: String) {
+        val lgas = postgrest.from("supervisor_lgas").select(columns = Columns.list("lga_id")) {
+            filter { eq("profile_id", supervisorId) }
+        }.decodeList<SupervisorLgaDto>().map { it.lga_id }
+        val facilities = if (lgas.isEmpty()) emptyList() else postgrest.from("facilities").select(columns = Columns.list("id")) {
+            filter {
+                eq("status", "approved"); eq("is_active", true)
+                if (level == "otp_sites") {
+                    eq("is_otp_site", true); isIn("lga_id", lgas)
+                } else {
+                    or { eq("facility_type", "state_store"); and { eq("facility_type", "lga_store"); isIn("lga_id", lgas) } }
+                }
+            }
+        }.decodeList<FacilityIdDto>().map { it.id }
+
+        val now = System.currentTimeMillis()
+        val balances = if (facilities.isEmpty()) emptyList() else postgrest.from("stock_balances")
+            .select(columns = Columns.list("facility_id", "lot_id", "balance")) { filter { isIn("facility_id", facilities) } }
+            .decodeList<StockBalanceDto>()
+        val since = LocalDate.now().minusDays(DISPENSING_DAYS_BACK).toString()
+        val dispensing = if (level != "otp_sites" || facilities.isEmpty()) emptyList() else pageAll { from, to ->
+            postgrest.from("otp_daily_dispensing").select(columns = Columns.list("facility_id", "dispense_date", "new_admissions", "sachets_dispensed")) {
+                filter { isIn("facility_id", facilities); gte("dispense_date", since) }
+                order("dispense_date", Order.ASCENDING); range(from, to)
+            }.decodeList<OtpDispensingDto>()
+        }
+        val adjustments = if (facilities.isEmpty()) emptyList() else postgrest.from("stock_transactions")
+            .select(columns = Columns.list("id", "facility_id", "txn_date", "lot_id", "quantity_sachets", "reason")) {
+                filter { isIn("facility_id", facilities); eq("txn_type", "adjustment"); eq("status", "recorded") }
+            }.decodeList<PendingAdjustmentDto>()
+
+        dao.replaceSupervision(
+            lgas = lgas.map(::SupervisorLgaEntity),
+            balances = balances.map { StockBalanceEntity(it.facility_id, it.lot_id ?: "", it.lot_id, it.balance, now) },
+            dispensing = dispensing.map { OtpDispensingEntity(it.facility_id, it.dispense_date, it.new_admissions, it.sachets_dispensed) },
+            adjustments = adjustments.map { PendingAdjustmentEntity(it.id, it.facility_id, it.txn_date, it.lot_id, it.quantity_sachets, it.reason) },
+        )
+    }
 
     /** When the cached balances were last refreshed from the server (null = never). */
     fun observeRefreshedAt(facilityId: String): Flow<Long?> = dao.observeBalances(facilityId).map { rows -> rows.maxOfOrNull { it.refreshedAtMillis } }

@@ -60,11 +60,13 @@ fun projectStock(
             val current = positions[line.lotKey]?.projected ?: 0
             bump(line, line.quantity - current)
         }
+        // Supervision moves no stock (a confirmed adjustment was already counted when recorded).
+        LedgerKind.StoreCheck, LedgerKind.OtpVerification, LedgerKind.ConfirmAdjustment -> Unit
     }
     return StockPosition(
         lots = positions.values.sortedWith(compareBy<LotPosition> { it.expiryDate ?: "9999" }.thenBy { it.lotNo ?: "" }),
         pendingDispensed = pendingDispensed,
-        pendingSubmissions = pending.size,
+        pendingSubmissions = pending.count { !it.kind.isSupervision },
     )
 }
 

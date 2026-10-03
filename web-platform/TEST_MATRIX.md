@@ -168,3 +168,20 @@ existing RBAC helpers) rather than introducing new patterns.
 | Nightly job | `cron.job` row `rutf-nightly-findings`, 01:30 UTC, active | ✅ queried |
 | Earlier suites after 0102 | test-ledger 26/26, role access 137/137 | ✅ |
 | Findings list (Auto tag, source/type filters) and detail (Automatic check card) | Query shapes return facility, type, metric, transfer for a reviewer | ✅ via the API as the demo State Coordinator; ⏳ browser click-through |
+
+# RUTF M4 — Supervision (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| OTP verification: register 875 vs app 700 sachets (VF 1.25) | Exactly one `dispensing_gap` Finding in review, linked to the visit | ✅ `node tools/db/test-visits.js` (21/21) |
+| Retried visit sync | Same visit returned, marked duplicate; no second visit or Finding | ✅ test-visits.js |
+| Store check: 13% count variance, no stock card, stock on the floor, ~1 km from the point | `stock_variance`, `no_stock_card`, `poor_storage`; visit flagged outside the geofence | ✅ test-visits.js |
+| Supervisor outside their LGA / wrong level / facility user / store check at an OTP / future date | Refused | ✅ test-visits.js |
+| Adjustment confirmation | Only the facility's own supervisor; retry harmless; facility user refused | ✅ test-visits.js |
+| Dummy visits vs `check.py` | dispensing_gap 15, register_missing 9, poor_storage 7, no_stock_card 6, supervisor variance 18, outside geofence 7 — all equal | ✅ `import-visits.js` (live) |
+| Stockout rule from first receipt (0104) | Test facilities onboarded mid-month: no false stockout; dummy unchanged (16 / 8) | ✅ test-findings.js 13/13 |
+| Earlier suites | ledger 26/26, findings 13/13, role access 137/137 | ✅ |
+| Android visit preview (same cases as the server test), record_visit parameters | As the server | ✅ `VisitPreviewTest` — Android unit tests 37/37 |
+| Android Room v11 → v12 | Three supervision cache tables, SQL equal to `12.json` | ✅ schema compared; 🔧 `MigrationTest.migrate11To12…` compiles, run on a device |
+| **Both visit types end-to-end on a physical device** (brief M4 "done when") | Visit recorded offline, synced once, Findings in review | 🔧 `assembleDebug` builds — **needs a phone** with `hadiza.danjuma@…` (OTP sites) and `hadiza.kankia@…` (stores) |
+| Users & Roles: assign a supervisor's level and LGAs | Shown under the role; scope applies to visits | ⏳ click-through |

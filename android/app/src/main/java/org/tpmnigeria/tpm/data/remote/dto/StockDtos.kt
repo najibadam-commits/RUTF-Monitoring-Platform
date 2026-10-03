@@ -31,6 +31,21 @@ data class TransferLineDto(val transfer_id: String, val lot_id: String? = null, 
 data class DispensingDayDto(val dispense_date: String)
 
 @Serializable
+data class SupervisorLgaDto(val lga_id: String)
+
+@Serializable
+data class FacilityIdDto(val id: String)
+
+@Serializable
+data class OtpDispensingDto(val facility_id: String, val dispense_date: String, val new_admissions: Int, val sachets_dispensed: Int)
+
+@Serializable
+data class PendingAdjustmentDto(val id: String, val facility_id: String, val txn_date: String, val lot_id: String? = null, val quantity_sachets: Int, val reason: String? = null)
+
+@Serializable
+data class VisitPhotoInsertDto(val visit_id: String, val storage_path: String, val kind: String, val mime_type: String = "image/jpeg", val size_bytes: Long? = null)
+
+@Serializable
 data class LedgerPhotoInsertDto(
     val submission_local_id: String,
     val facility_id: String,

@@ -17,11 +17,12 @@ type ActionResult = { error?: string };
  */
 async function roleScopedColumns(
   client: ReturnType<typeof createAdminClient> | Awaited<ReturnType<typeof createClient>>,
-  input: { role: UserRole; managedStateId?: string | null; facilityId?: string | null },
+  input: { role: UserRole; managedStateId?: string | null; facilityId?: string | null; supervisionLevel?: string | null },
 ): Promise<{ error?: string; columns?: Record<string, string | null> }> {
   const columns: Record<string, string | null> = {
     managed_state_id: input.role === "state_coordinator" ? (input.managedStateId ?? null) : null,
     facility_id: input.role === "dri" ? (input.facilityId ?? null) : null,
+    supervision_level: input.role === "tpm_supervisor" ? (input.supervisionLevel ?? null) : null,
   };
   if (input.role !== "dri") columns.assigned_category_id = null;
   if (input.role === "dri" && input.facilityId) {
@@ -30,6 +31,32 @@ async function roleScopedColumns(
     if (facility.project_id) columns.project_id = facility.project_id;
   }
   return { columns };
+}
+
+type SupervisionInput = { role: UserRole; supervisionLevel?: string | null; supervisedLgaIds?: string[] };
+
+/** A supervisor needs a level and, for OTP sites, at least one LGA (RUTF DECISIONS R34). */
+function validateSupervision(input: SupervisionInput): string | null {
+  if (input.role !== "tpm_supervisor") return null;
+  if (input.supervisionLevel !== "stores" && input.supervisionLevel !== "otp_sites") return "Select what this supervisor supervises.";
+  if (input.supervisionLevel === "otp_sites" && !input.supervisedLgaIds?.length) return "Select the LGA(s) whose OTP sites this supervisor covers.";
+  return null;
+}
+
+/** Replaces a supervisor's LGAs (supervisor_lgas, migration 0103); clears them for other roles. */
+async function setSupervisorLgas(
+  client: ReturnType<typeof createAdminClient> | Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  input: SupervisionInput,
+): Promise<string | null> {
+  const { error: delError } = await client.from("supervisor_lgas").delete().eq("profile_id", userId);
+  if (delError) return delError.message;
+  const ids = input.role === "tpm_supervisor" ? [...new Set(input.supervisedLgaIds ?? [])] : [];
+  if (ids.length) {
+    const { error } = await client.from("supervisor_lgas").insert(ids.map((lga_id) => ({ profile_id: userId, lga_id })));
+    if (error) return error.message;
+  }
+  return null;
 }
 
 /**
@@ -54,6 +81,8 @@ async function inviteAndSetupUser(
     // DECISIONS.md #22 and RUTF DECISIONS R15. Undefined/omitted for every other role.
     managedStateId?: string | null;
     facilityId?: string | null;
+    supervisionLevel?: string | null;
+    supervisedLgaIds?: string[];
   },
   // Explicit override for callers that already know the target project (e.g. the Project
   // Admin bulk import, which just created/resolved one). Omit to fall back to the normal
@@ -64,6 +93,8 @@ async function inviteAndSetupUser(
   if (!input.name.trim() || !input.email.trim()) return { error: "Name and email are required." };
   if (input.role === "state_coordinator" && !input.managedStateId) return { error: "Select the State this coordinator will manage." };
   if (input.role === "dri" && !input.facilityId) return { error: "Select the facility this facility user records for." };
+  const supervisionError = validateSupervision(input);
+  if (supervisionError) return { error: supervisionError };
   const scoped = await roleScopedColumns(admin, input);
   if (scoped.error) return { error: scoped.error };
 
@@ -89,6 +120,8 @@ async function inviteAndSetupUser(
     })
     .eq("id", data.user.id);
   if (profileError) return { error: profileError.message };
+  const lgaError = await setSupervisorLgas(admin, data.user.id, input);
+  if (lgaError) return { error: lgaError };
 
   return {};
 }
@@ -101,6 +134,8 @@ export async function addUserAction(input: {
   role: UserRole;
   managedStateId?: string | null;
   facilityId?: string | null;
+  supervisionLevel?: string | null;
+  supervisedLgaIds?: string[];
 }): Promise<ActionResult> {
   const caller = await getCurrentProfile();
   if (!canAccessUsersScreen(caller.role)) return { error: "Not authorized." };
@@ -165,11 +200,15 @@ export async function editUserAction(input: {
   status: "active" | "inactive";
   managedStateId?: string | null;
   facilityId?: string | null;
+  supervisionLevel?: string | null;
+  supervisedLgaIds?: string[];
 }): Promise<ActionResult> {
   const caller = await getCurrentProfile();
   if (!canAccessUsersScreen(caller.role)) return { error: "Not authorized." };
   if (input.role === "state_coordinator" && !input.managedStateId) return { error: "Select the State this coordinator will manage." };
   if (input.role === "dri" && !input.facilityId) return { error: "Select the facility this facility user records for." };
+  const supervisionError = validateSupervision(input);
+  if (supervisionError) return { error: supervisionError };
 
   // Regular (RLS-respecting) client: the enforce_profile_update_rules
   // trigger is the real boundary here (project scope, role-escalation guard,
@@ -189,6 +228,9 @@ export async function editUserAction(input: {
     })
     .eq("id", input.userId);
   if (error) return { error: error.message };
+  // RLS: a Project Admin can set the LGAs of supervisors in their own project only.
+  const lgaError = await setSupervisorLgas(supabase, input.userId, input);
+  if (lgaError) return { error: lgaError };
 
   revalidatePath("/users");
   return {};

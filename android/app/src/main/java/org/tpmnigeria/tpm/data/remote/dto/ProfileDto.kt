@@ -13,4 +13,5 @@ data class ProfileDto(
     val project_id: String? = null,
     val status: String, // account_status enum: active | inactive
     val facility_id: String? = null, // the facility a dri records for (web migration 0100)
+    val supervision_level: String? = null, // supervisor: "stores" | "otp_sites" (web migration 0103)
 )

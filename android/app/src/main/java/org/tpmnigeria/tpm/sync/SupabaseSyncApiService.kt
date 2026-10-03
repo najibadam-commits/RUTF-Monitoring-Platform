@@ -13,6 +13,10 @@ import org.tpmnigeria.tpm.data.AppRepository
 import org.tpmnigeria.tpm.data.LEDGER_SUBMISSION_TYPES
 import org.tpmnigeria.tpm.data.StockRepository
 import org.tpmnigeria.tpm.data.remote.LEDGER_EVIDENCE_BUCKET
+import org.tpmnigeria.tpm.data.remote.VISIT_EVIDENCE_BUCKET
+import org.tpmnigeria.tpm.data.remote.dto.VisitPhotoInsertDto
+import org.tpmnigeria.tpm.domain.LedgerKind
+import kotlinx.serialization.json.jsonPrimitive
 import org.tpmnigeria.tpm.data.remote.dto.LedgerPhotoInsertDto
 import org.tpmnigeria.tpm.domain.LedgerSubmission
 import org.tpmnigeria.tpm.data.remote.ATTENDANCE_EVIDENCE_BUCKET
@@ -310,6 +314,7 @@ class SupabaseSyncApiService(
     override suspend fun afterSync() {
         val user = session.currentUser.value ?: return
         stockRepository.refresh(user.facilityId)
+        if (user.supervisionLevel != null) stockRepository.refreshSupervision(user.id, user.supervisionLevel)
     }
 
     /**
@@ -322,12 +327,42 @@ class SupabaseSyncApiService(
         if (session.currentUser.value == null) return false
         return try {
             val submission = ledgerJson.decodeFromString(LedgerSubmission.serializer(), item.payloadJson)
-            postgrest.rpc(submission.rpc, submission.params)
-            for (photo in submission.photos) uploadLedgerPhoto(submission, photo.localPath, photo.kind)
+            val result = postgrest.rpc(submission.rpc, submission.params)
+            if (submission.kind == LedgerKind.StoreCheck || submission.kind == LedgerKind.OtpVerification) {
+                // record_visit answers with the visit id (also on a retried, duplicate call).
+                val visitId = ledgerJson.parseToJsonElement(result.data).jsonObject["visit_id"]?.jsonPrimitive?.content
+                    ?: error("record_visit returned no visit id")
+                for (photo in submission.photos) uploadVisitPhoto(submission, visitId, photo.localPath, photo.kind)
+            } else {
+                for (photo in submission.photos) uploadLedgerPhoto(submission, photo.localPath, photo.kind)
+            }
             true
         } catch (e: Exception) {
             android.util.Log.e("SupabaseSyncApiService", "Ledger push failed for ${item.issueId}: ${e.message}", e)
             false
+        }
+    }
+
+    /** Path {supervisor id}/{visit local_id}/{kind}.jpg — the visit-evidence insert policy requires
+     *  the first segment to be the uploader's own id (web migration 0103). Idempotent like ledger photos. */
+    private suspend fun uploadVisitPhoto(submission: LedgerSubmission, visitId: String, localPath: String, kind: String) {
+        val user = session.currentUser.value ?: error("signed out")
+        val storagePath = "${user.id}/${submission.localId}/$kind.jpg"
+        val already = postgrest.from("visit_photos").select(columns = Columns.list("id")) {
+            filter { eq("storage_path", storagePath) }
+        }.decodeList<IssueIdDto>().isNotEmpty()
+        if (already) return
+        val file = File(localPath)
+        if (!file.exists()) return
+        try {
+            storage.from(VISIT_EVIDENCE_BUCKET).upload(storagePath, file.readBytes()) { upsert = false }
+        } catch (e: Exception) {
+            if (e.message?.contains("exists", ignoreCase = true) != true && e.message?.contains("Duplicate", ignoreCase = true) != true) throw e
+        }
+        try {
+            postgrest.from("visit_photos").insert(VisitPhotoInsertDto(visitId, storagePath, kind, size_bytes = file.length()))
+        } catch (e: PostgrestRestException) {
+            if (e.code != "23505") throw e
         }
     }
 
@@ -383,7 +418,8 @@ class SupabaseSyncApiService(
                 SubmissionType.FinalVerification -> pushFinalVerification(issue, user)
                 SubmissionType.Attendance -> Unit // handled above
                 SubmissionType.StockReceipt, SubmissionType.StockIssue, SubmissionType.Dispensing,
-                SubmissionType.StockCount, SubmissionType.StockLoss -> Unit // pushLedger, above
+                SubmissionType.StockCount, SubmissionType.StockLoss, SubmissionType.StoreCheck,
+                SubmissionType.OtpVerification, SubmissionType.AdjustmentConfirmation -> Unit // pushLedger, above
             }
             true
         } catch (e: Exception) {

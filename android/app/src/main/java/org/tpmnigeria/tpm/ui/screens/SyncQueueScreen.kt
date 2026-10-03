@@ -136,5 +136,8 @@ private fun submissionTypeLabel(name: String): String = when (name) {
     "Dispensing" -> "Daily Dispensing"
     "StockCount" -> "Stock Count"
     "StockLoss" -> "Loss / Adjustment"
+    "StoreCheck" -> "Store Check"
+    "OtpVerification" -> "OTP Verification"
+    "AdjustmentConfirmation" -> "Adjustment confirmed"
     else -> name
 }

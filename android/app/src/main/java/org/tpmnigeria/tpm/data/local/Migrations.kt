@@ -113,4 +113,14 @@ val MIGRATION_10_11 = object : Migration(10, 11) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+/** Supervision caches (web migration 0103): the supervisor's LGAs, recent OTP dispensing at the
+ *  facilities they cover, adjustments waiting for confirmation. New, server-derived, additive. */
+val MIGRATION_11_12 = object : Migration(11, 12) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_supervisor_lgas` (`lgaId` TEXT NOT NULL, PRIMARY KEY(`lgaId`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_otp_dispensing` (`facilityId` TEXT NOT NULL, `dispenseDate` TEXT NOT NULL, `newAdmissions` INTEGER NOT NULL, `sachetsDispensed` INTEGER NOT NULL, PRIMARY KEY(`facilityId`, `dispenseDate`))")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `ref_pending_adjustments` (`id` TEXT NOT NULL, `facilityId` TEXT NOT NULL, `txnDate` TEXT NOT NULL, `lotId` TEXT, `quantity` INTEGER NOT NULL, `reason` TEXT, PRIMARY KEY(`id`))")
+    }
+}
+
+val ALL_MIGRATIONS = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)

@@ -60,6 +60,9 @@ import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
 import org.tpmnigeria.tpm.ui.stock.MyStockScreen
 import org.tpmnigeria.tpm.ui.stock.ReceiveStockScreen
 import org.tpmnigeria.tpm.ui.stock.StockCountScreen
+import org.tpmnigeria.tpm.ui.stock.SupervisionVisitScreen
+import org.tpmnigeria.tpm.ui.stock.ConfirmAdjustmentsScreen
+import org.tpmnigeria.tpm.domain.LedgerKind
 import org.tpmnigeria.tpm.ui.wizard.driresponse.DriRespondWizardScreen
 import org.tpmnigeria.tpm.ui.wizard.newissue.NewIssueWizardScreen
 import org.tpmnigeria.tpm.ui.wizard.verification.FinalVerifyWizardScreen
@@ -297,6 +300,22 @@ fun AppNavHost(session: AppSession) {
                         RequireAccess(stockAllowed, { navController.popBackStack() }) {
                             StockCountScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
                         }
+                    }
+                    // Supervision — needs the supervisor's level (DECISIONS R34).
+                    val level = currentUser.supervisionLevel
+                    val superviseAllowed = MobileAccess.canSupervise(currentUser.role) && level != null
+                    composable(Routes.StoreCheck) {
+                        RequireAccess(superviseAllowed && level == "stores", { navController.popBackStack() }) {
+                            SupervisionVisitScreen(LedgerKind.StoreCheck, level!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.OtpVerification) {
+                        RequireAccess(superviseAllowed && level == "otp_sites", { navController.popBackStack() }) {
+                            SupervisionVisitScreen(LedgerKind.OtpVerification, level!!, onDone = backHome, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.ConfirmAdjustments) {
+                        RequireAccess(superviseAllowed, { navController.popBackStack() }) { ConfirmAdjustmentsScreen() }
                     }
                     composable(Routes.LossAdjustment) {
                         RequireAccess(stockAllowed, { navController.popBackStack() }) {

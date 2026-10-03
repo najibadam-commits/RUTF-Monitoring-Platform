@@ -38,6 +38,10 @@ object MobileAccess {
      *  needs a store, Daily Dispensing an OTP site (checked against the facility). */
     fun canRecordStock(role: UserRole): Boolean = role == UserRole.Dri
 
+    /** Supervision visits and adjustment confirmation — record_visit / confirm_adjustment
+     *  (web migration 0103): supervisors, for the facilities in their LGAs at their level. */
+    fun canSupervise(role: UserRole): Boolean = role == UserRole.FieldMonitor
+
     /** Senior roles use the app to oversee/support field work rather than to be the field
      *  worker — they get the oversight Home and see all in-scope Findings, not "my" Findings. */
     fun isOversightRole(role: UserRole): Boolean =
