@@ -19,9 +19,14 @@ if (!email || !newPassword) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: list, error: listErr } = await admin.auth.admin.listUsers();
-  if (listErr) { console.error("Lookup failed:", listErr.message); process.exit(1); }
-  const user = list.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+  // listUsers returns one page (50 by default); there are hundreds of demo accounts, so walk every page.
+  let user;
+  for (let page = 1; !user; page++) {
+    const { data: list, error: listErr } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (listErr) { console.error("Lookup failed:", listErr.message); process.exit(1); }
+    user = list.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
+    if (list.users.length < 1000) break;
+  }
   if (!user) { console.error(`No auth user found for ${email}`); process.exit(1); }
 
   const { error } = await admin.auth.admin.updateUserById(user.id, { password: newPassword });
