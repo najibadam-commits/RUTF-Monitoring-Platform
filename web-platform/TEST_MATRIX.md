@@ -321,3 +321,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | Status filters (Findings Register, Situation Map) | Seven RUTF stages in workflow order, no "New" | ✅ typecheck + lint; ⏳ browser check |
 | Command Centre "Findings by status" | Lists all seven including Awaiting review (150 on demo data) | ⏳ browser check |
 | Situation Map filters | "Raised by" (Automatic checks + people), "Facility level" | ⏳ browser check |
+
+# Finding ID format (R75)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| New Finding | `KT-DAU-MAJ-OTP-26005`-style ID, continuing the group's sequence | ✅ dry run; test-findings 13/13 with 0118 (format check updated) |
+| Existing DUMMY Findings | All 585 re-numbered, unique, in order raised (e.g. Mazoji A: KT-DAU-MAJ-OTP-26001…) | ✅ applied and checked live |
+| ID cannot be edited | Update leaves the code unchanged | ✅ |

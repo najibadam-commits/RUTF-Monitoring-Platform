@@ -149,7 +149,7 @@ private fun LookUpIssueStep(vm: DriRespondWizardViewModel) {
         Row(modifier = Modifier.fillMaxWidth()) {
             TpmTextField(
                 label = "Finding ID", value = vm.lookupId, onValueChange = { vm.lookupId = it },
-                placeholder = "e.g. KMC-NAS-WSF-26-NI001", modifier = Modifier.weight(1f),
+                placeholder = "e.g. KT-DAU-MAJ-OTP-26001", modifier = Modifier.weight(1f),
             )
         }
         Spacer(Modifier.height(8.dp))

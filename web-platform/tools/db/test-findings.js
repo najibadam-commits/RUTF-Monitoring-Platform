@@ -84,7 +84,7 @@ function check(what, expected, actual) {
     check("…into review (pending_review, auto-generated)", "pending_review/true", sv[0] ? `${sv[0].status}/${sv[0].auto_generated}` : null);
     check("…with the measured variance and limit", { variance_pct: 7, threshold: 5 }, sv[0] ? { variance_pct: Number(sv[0].metric.variance_pct), threshold: Number(sv[0].metric.threshold) } : null);
     check("…filed under the facility's level (OTP)", "OTP", (await one(`select c.abbr from issues i join categories c on c.id = i.category_id where i.id = $1`, [sv[0]?.id]))?.abbr);
-    check("…with a structured Finding ID", true, /^[A-Z]{3}-[A-Z]{3}-OTP-\d{2}-[A-Z]{2}\d{3}$/.test(sv[0]?.code ?? ""));
+    check("…with a structured Finding ID (STATE-LGA-WARD-LEVEL-YYNNN, migration 0118)", true, /^[A-Z]{2,3}-[A-Z]{3}-[A-Z]{3}-OTP-\d{5,}$/.test(sv[0]?.code ?? ""));
 
     // 2. Re-running the checks (nightly job, a retried sync) never duplicates.
     const month = await one(`select date_trunc('month', current_date)::date s, (date_trunc('month', current_date) + interval '1 month - 1 day')::date e`);
