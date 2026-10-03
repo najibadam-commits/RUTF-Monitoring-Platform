@@ -217,7 +217,7 @@ export function IssueDetailClient({
                 {new Date(issue.reported_at).toLocaleString()}
               </div>
               <div>
-                <span className="text-muted">Reporting TPM</span>
+                <span className="text-muted">Reported by</span>
                 <br />
                 {issue.reporter?.name ?? "—"}
               </div>
@@ -316,7 +316,7 @@ export function IssueDetailClient({
           onConfirm={() => approveAndAssignFindingAction(issue.id, driId, note)}
         >
           <div className="dialog-body">
-            <p style={{ marginTop: 0 }}>Approving routes this issue straight to the selected DRI, who is notified immediately.</p>
+            <p style={{ marginTop: 0 }}>Approving routes this Finding straight to the selected DRI, who is notified immediately.</p>
             <div className="field">
               <label>Assign to a Direct Responsible Individual (DRI)</label>
               <select className="input" value={driId} onChange={(e) => setDriId(e.target.value)}>
@@ -329,7 +329,7 @@ export function IssueDetailClient({
               </select>
               {sectorDris.length === 0 && (
                 <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  No DRI is currently assigned this issue&apos;s sector — assign one a sector under Users &amp; Access first.
+                  No DRI is set up for this Finding&apos;s facility level yet — assign one under Users &amp; Access first.
                 </div>
               )}
             </div>
@@ -358,7 +358,7 @@ export function IssueDetailClient({
           <div className="dialog-body">
             <div className="field">
               <label>Response</label>
-              <textarea className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Describe the response to this issue…" />
+              <textarea className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Describe the response to this Finding…" />
             </div>
           </div>
         </Modal>
@@ -378,7 +378,7 @@ export function IssueDetailClient({
       {modal === "verify" && (
         <Modal title="Verify & Close" confirmLabel="Verify & Close" onClose={closeModal} onConfirm={() => verifyAndCloseIssueAction(issue.id, note)}>
           <div className="dialog-body">
-            <p style={{ marginTop: 0 }}>Confirm this issue has been resolved during a follow-up visit.</p>
+            <p style={{ marginTop: 0 }}>Confirm this Finding has been resolved during a follow-up visit.</p>
             <div className="field">
               <label>Notes</label>
               <textarea className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add supporting detail…" />
@@ -395,7 +395,7 @@ export function IssueDetailClient({
         >
           <div className="dialog-body" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <div className="field">
-              <label>Sector</label>
+              <label>Facility level</label>
               <select className="input" value={editForm.categoryId} onChange={(e) => setEditForm((f) => ({ ...f, categoryId: e.target.value }))}>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>

@@ -298,3 +298,10 @@ existing RBAC helpers) rather than introducing new patterns.
 |---|---|---|
 | Menu, heading, title | "Corrective Action Tracker" at `/action-tracker`; `/findings-follow-up` and `/subpanel` redirect | ✅ typecheck + lint; ⏳ browser check (restart dev server) |
 | Assign a Finding to a DRI | History actor "Corrective Action Tracker" | ✅ 0114 dry run (same function as 0112, which passed role access 202/202); applied; permissions audit clean |
+
+# Finding wording on the detail page (R72)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Finding detail page and not-found page | No user-facing "issue" / "TPM"; "Reported by", "Facility level" | ✅ typecheck + lint; ⏳ browser check |
+| Review functions (0116) | Same behaviour, Finding wording in history and messages | ✅ role access 202/202 with 0116; applied; `role_label` → "Supervisor" (0117); no live function uses the old wording; permissions audit clean |
