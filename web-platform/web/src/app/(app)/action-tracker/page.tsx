@@ -1,15 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { canAccessFindingsFollowUp } from "@/lib/rbac";
+import { canAccessActionTracker } from "@/lib/rbac";
 import { StatusTag } from "@/components/ui/Tags";
 import { ClickableRow } from "@/components/ui/ClickableRow";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import type { IssueStatus } from "@/lib/types/database";
 
-export default async function FindingsFollowUpPage() {
+export default async function ActionTrackerPage() {
   const profile = await getCurrentProfile();
-  if (!canAccessFindingsFollowUp(profile.role)) redirect("/dashboard");
+  if (!canAccessActionTracker(profile.role)) redirect("/dashboard");
 
   const supabase = await createClient();
   const { data } = await supabase
@@ -25,7 +25,7 @@ export default async function FindingsFollowUpPage() {
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
       <div>
-        <h2 style={{ marginBottom: 2 }}>Findings Follow-up</h2>
+        <h2 style={{ marginBottom: 2 }}>Corrective Action Tracker</h2>
         <p className="text-muted" style={{ fontSize: 13 }}>
           Approved Findings that are still open: waiting for the responsible person (DRI) to respond, being worked on, or waiting for a supervisor to verify and close.
         </p>

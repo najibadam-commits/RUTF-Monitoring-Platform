@@ -291,3 +291,10 @@ existing RBAC helpers) rather than introducing new patterns.
 | `/analytics`, `/time-efficiency` | Redirect to `/accountability` | ⏳ browser check (restart dev server — next.config changed) |
 | `simulate-review.js` | Dry run then commit; deterministic; DUMMY Findings only; no notifications sent | ✅ |
 | KPIs after the simulation | test-kpis 26/26 | ✅ |
+
+# Corrective Action Tracker rename (R61)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Menu, heading, title | "Corrective Action Tracker" at `/action-tracker`; `/findings-follow-up` and `/subpanel` redirect | ✅ typecheck + lint; ⏳ browser check (restart dev server) |
+| Assign a Finding to a DRI | History actor "Corrective Action Tracker" | ✅ 0114 dry run (same function as 0112, which passed role access 202/202); applied; permissions audit clean |

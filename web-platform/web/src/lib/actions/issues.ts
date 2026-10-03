@@ -12,7 +12,7 @@ async function afterMutation(issueId: string) {
   revalidatePath("/issues");
   revalidatePath("/dashboard");
   revalidatePath("/gis");
-  revalidatePath("/findings-follow-up");
+  revalidatePath("/action-tracker");
   revalidatePath("/accountability");
 }
 

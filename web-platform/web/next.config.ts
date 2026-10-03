@@ -1,10 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // TPM Sub-Panel was renamed Findings Follow-up (DECISIONS R56); keep old links and bookmarks working.
+  // TPM Sub-Panel → Findings Follow-up (R56) → Corrective Action Tracker (R61); keep old links working.
   async redirects() {
     return [
-      { source: "/subpanel", destination: "/findings-follow-up", permanent: true },
+      { source: "/subpanel", destination: "/action-tracker", permanent: true },
+      { source: "/findings-follow-up", destination: "/action-tracker", permanent: true },
       // Findings Analytics and Time Efficiency Analysis became the Accountability Scorecard (R57).
       { source: "/analytics", destination: "/accountability", permanent: true },
       { source: "/time-efficiency", destination: "/accountability", permanent: true },

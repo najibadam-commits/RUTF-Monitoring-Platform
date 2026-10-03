@@ -41,7 +41,7 @@ design_handoff_tpm_monitoring_platform/   Original design reference (do not edit
   Verify/Close, each transition a Postgres RPC that atomically updates the
   issue and appends to the immutable `issue_history` audit trail.
 - All 8 screens from the design: Dashboard (now Command Centre), GIS Map (now Situation Map), Issues List/Detail,
-  Findings Follow-up (formerly TPM Sub-Panel), Analytics, Users & Roles, Project Admin Panel, Settings.
+  Corrective Action Tracker (formerly TPM Sub-Panel), Analytics, Users & Roles, Project Admin Panel, Settings.
 - **Data Sets** (added post-launch by request): Settlement Lists and
   Activity Sites, managed by Super Admin and Project Admin, with Project
   Admin submissions requiring Super Admin approval before going live —

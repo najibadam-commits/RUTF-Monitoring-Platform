@@ -67,7 +67,7 @@ export function canReviewDownloadRequests(role: UserRole) {
   return role === "super_admin" || role === "project_admin";
 }
 
-export function canAccessFindingsFollowUp(role: UserRole) {
+export function canAccessActionTracker(role: UserRole) {
   return role === "tpm_supervisor" || role === "super_admin";
 }
 
@@ -134,7 +134,7 @@ export type NavKey =
   | "dashboard"
   | "gis"
   | "issues"
-  | "findingsFollowUp"
+  | "actionTracker"
   | "accountability"
   | "reportingCentre"
   | "devices"
@@ -171,7 +171,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // reached by clicking in revert to "Issue" terminology (see DECISIONS.md #29) — the module name
   // and the operational terminology inside it are deliberately different, not a naming mistake.
   { key: "issues", label: "Findings Register", href: "/issues", icon: "ph-list-bullets", section: "overview" },
-  { key: "findingsFollowUp", label: "Findings Follow-up", href: "/findings-follow-up", icon: "ph-kanban", section: "overview" },
+  { key: "actionTracker", label: "Corrective Action Tracker", href: "/action-tracker", icon: "ph-kanban", section: "overview" },
   // Findings Analytics + Time Efficiency merged (DECISIONS R57).
   { key: "accountability", label: "Accountability Scorecard", href: "/accountability", icon: "ph-seal-check", section: "overview" },
   // RUTF stock (brief §9). Every role sees these; RLS scopes the rows (a facility user: their own
@@ -198,7 +198,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
 
 export function visibleNavItemsFor(role: UserRole) {
   return NAV_ITEMS.filter((item) => {
-    if (item.key === "findingsFollowUp") return canAccessFindingsFollowUp(role);
+    if (item.key === "actionTracker") return canAccessActionTracker(role);
     if (item.key === "users") return canAccessUsersScreen(role);
     if (item.key === "datasets") return canManageDatasets(role);
     if (item.key === "projectadmins") return canAccessProjectAdminPanel(role);

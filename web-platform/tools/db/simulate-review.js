@@ -1,5 +1,5 @@
 // DEMO ONLY: walks the DUMMY Findings through a realistic review history so the Accountability
-// Scorecard, Findings Follow-up and Finding activity histories show a working process (DECISIONS
+// Scorecard, Corrective Action Tracker and Finding activity histories show a working process (DECISIONS
 // R57). Touches only Findings at facilities tagged DUMMY (facilities.dummy_fields is not null).
 //
 //  - Each Finding is dated to the period it concerns: a ledger check the night after the period

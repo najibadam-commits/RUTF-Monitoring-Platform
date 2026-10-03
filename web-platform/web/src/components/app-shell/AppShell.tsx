@@ -14,7 +14,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/dashboard": "Command Centre",
   "/gis": "Situation Map",
   "/issues": "Findings Register",
-  "/findings-follow-up": "Findings Follow-up",
+  "/action-tracker": "Corrective Action Tracker",
   "/accountability": "Accountability Scorecard",
   "/reporting": "Reporting & Export Centre",
   "/devices": "Devices & Sync",
