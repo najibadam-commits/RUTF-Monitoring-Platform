@@ -28,7 +28,7 @@ export type TxnType =
   | "loss_other"
   | "adjustment"
   | "physical_count";
-export type TransferStatus = "in_transit" | "received" | "discrepancy";
+export type TransferStatus = "in_transit" | "received" | "discrepancy" | "cancelled";
 
 export interface Database {
   public: {
@@ -459,6 +459,11 @@ export interface Database {
           status: "recorded" | "confirmed" | "voided";
           confirmed_by: string | null;
           confirmed_at: string | null;
+          confirmation_note: string | null;
+          // Voided by an administrator (migration 0109).
+          voided_by: string | null;
+          voided_at: string | null;
+          void_reason: string | null;
           created_at: string;
         };
         Insert: never;
@@ -847,6 +852,10 @@ export interface Database {
           dhis2_wasted: number | null; ledger_wasted: number; dhis2_stockout_days: number | null; ledger_stockout_days: number;
           distributed_diff_pct: number | null;
         }[];
+      };
+      void_ledger_submission: {
+        Args: { p_local_id: string; p_reason: string };
+        Returns: Json;
       };
       approve_facility: {
         Args: { p_id: string; p_note?: string | null };

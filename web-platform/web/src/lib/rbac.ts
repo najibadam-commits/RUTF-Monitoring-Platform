@@ -82,6 +82,11 @@ export function canAccessDevices(role: UserRole) {
   return role === "super_admin" || role === "project_admin" || role === "state_coordinator";
 }
 
+/** Void a ledger submission (migration 0109): void_ledger_submission() allows these roles only. */
+export function canVoidLedger(role: UserRole) {
+  return role === "super_admin" || role === "project_admin";
+}
+
 /** Audit trail (migration 0108): audit_log is readable by Super Admin and Project Admin. */
 export function canAccessAuditLog(role: UserRole) {
   return role === "super_admin" || role === "project_admin";

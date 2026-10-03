@@ -77,6 +77,9 @@ purpose, so live figures aren't touched. Remove them afterwards.
 | E4 | Project Admin | Deactivate a test account; that user tries to sync | Sign-in refused; records stay on the phone (not lost) until reactivated | | |
 | E5 | Any | Look through every OTP screen and export | No field for child or caregiver names, phones or IDs | | |
 | E6 | Project Admin | Request an export through Reporting → Download Requests | Needs approval before download | | |
+| E7 | Project Admin | Stock Ledger → the OTP → **Void** one dispensing day from A6 with a reason | Entry struck through with name, date and reason; balance goes up by that day's sachets; the OTP can record that day again; the void appears in Audit Trail | | |
+| E8 | Project Admin | Try to void the State store's issue from A2 | Refused — its transfer was received; void the receipt at the LGA store first | | |
+| E9 | Facility user / supervisor | Look for a Void action | None — only administrators can void | | |
 
 ## F. Sign-off
 

@@ -5,6 +5,8 @@ import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getLgas } from "@/lib/queries/lookups";
 import { TXN_LABEL, facilityNames, getFacilityLedger, getFacilitySummaries, signedQuantity } from "@/lib/queries/stock";
 import { tagBg } from "@/lib/constants";
+import { canVoidLedger } from "@/lib/rbac";
+import { VoidEntryButton } from "@/components/stock/VoidEntryButton";
 import type { FacilityType, TxnType } from "@/lib/types/database";
 
 // Stock Ledger (brief §9): stores and OTP sites with their stock position, and per facility the
@@ -26,6 +28,7 @@ const TXN_COLOR: Partial<Record<TxnType, string>> = {
 };
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
+const STRUCK = { textDecoration: "line-through", opacity: 0.55 } as const;
 const daysBetween = (a: string, b: string) => Math.round((Date.parse(b) - Date.parse(a)) / 86_400_000);
 
 type SP = Record<string, string | undefined>;
@@ -64,7 +67,9 @@ export default async function StockLedgerPage({ searchParams }: { searchParams: 
   }
   const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
-  return sp.facility ? <FacilityLedger supabase={supabase} facilityId={sp.facility} sp={sp} today={today} isDri={profile.role === "dri"} /> : <FacilityList supabase={supabase} sp={sp} today={today} />;
+  return sp.facility
+    ? <FacilityLedger supabase={supabase} facilityId={sp.facility} sp={sp} today={today} isDri={profile.role === "dri"} canVoid={canVoidLedger(profile.role)} />
+    : <FacilityList supabase={supabase} sp={sp} today={today} />;
 }
 
 // ── List ────────────────────────────────────────────────────────────────────────────────────────
@@ -192,12 +197,14 @@ async function FacilityLedger({
   sp,
   today,
   isDri,
+  canVoid,
 }: {
   supabase: Awaited<ReturnType<typeof createClient>>;
   facilityId: string;
   sp: SP;
   today: string;
   isDri: boolean;
+  canVoid: boolean;
 }) {
   const { data: facility } = await supabase.from("facilities").select("*").eq("id", facilityId).maybeSingle();
   if (!facility) {
@@ -238,6 +245,16 @@ async function FacilityLedger({
   const total = ledger.length ? ledger[ledger.length - 1].runningBalance : 0;
   const lastCount = [...ledger].reverse().find((t) => t.txn_type === "physical_count");
   const lgaName = lgas.find((l) => l.id === facility.lga_id)?.name ?? "—";
+  // Who voided what (migration 0109), and where each submission's void button goes: its first row on this page.
+  const voiders = [...new Set(ledger.map((t) => t.voided_by).filter((v): v is string => !!v))];
+  const { data: voiderRows } = voiders.length ? await supabase.from("profiles").select("id, name").in("id", voiders) : { data: [] };
+  const voiderName = Object.fromEntries((voiderRows ?? []).map((p) => [p.id, p.name]));
+  const voidHere = new Set<string>();
+  const seenSubmission = new Set<string>();
+  for (const t of rows) {
+    if (t.submission_local_id && t.status !== "voided" && !seenSubmission.has(t.submission_local_id)) voidHere.add(t.id);
+    if (t.submission_local_id) seenSubmission.add(t.submission_local_id);
+  }
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
@@ -312,6 +329,7 @@ async function FacilityLedger({
               <th style={{ textAlign: "right" }}>Balance</th>
               <th>Counterparty / reference</th>
               <th>Note</th>
+              {canVoid && <th></th>}
             </tr>
           </thead>
           <tbody>
@@ -320,16 +338,22 @@ async function FacilityLedger({
               const color = TXN_COLOR[t.txn_type] ?? "var(--color-neutral-600)";
               const evidence = t.submission_local_id ? photoUrls[t.submission_local_id] : undefined;
               return (
-                <tr key={t.id} style={t.status === "voided" ? { opacity: 0.5, textDecoration: "line-through" } : undefined}>
-                  <td style={{ whiteSpace: "nowrap" }}>{t.txn_date}</td>
+                <tr key={t.id}>
+                  <td style={{ whiteSpace: "nowrap", ...(t.status === "voided" ? STRUCK : {}) }}>{t.txn_date}</td>
                   <td>
-                    <span className="tag" style={{ background: tagBg(color), color }}>{TXN_LABEL[t.txn_type]}</span>
+                    <span className="tag" style={{ background: tagBg(color), color, ...(t.status === "voided" ? STRUCK : {}) }}>{TXN_LABEL[t.txn_type]}</span>
+                    {t.status === "voided" && (
+                      <div style={{ fontSize: 11, color: "var(--color-neutral-700)", marginTop: 2 }}>
+                        <i className="ph ph-prohibit" aria-hidden="true" /> Voided{t.voided_by ? ` by ${voiderName[t.voided_by] ?? "an administrator"}` : ""}
+                        {t.voided_at ? ` on ${t.voided_at.slice(0, 10)}` : ""}
+                      </div>
+                    )}
                     {t.txn_type === "adjustment" && t.status === "recorded" && (
                       <div style={{ fontSize: 11, color: "var(--priority-high)", marginTop: 2 }}>awaiting supervisor confirmation</div>
                     )}
                   </td>
-                  <td className="text-muted" style={{ fontSize: 13 }}>{t.lotNo ?? "—"}</td>
-                  <td style={{ textAlign: "right", fontWeight: 600, color: t.txn_type === "physical_count" ? "var(--color-neutral-600)" : signed < 0 ? "var(--priority-critical)" : "var(--status-resolved)" }}>
+                  <td className="text-muted" style={{ fontSize: 13, ...(t.status === "voided" ? STRUCK : {}) }}>{t.lotNo ?? "—"}</td>
+                  <td style={{ textAlign: "right", fontWeight: 600, color: t.txn_type === "physical_count" ? "var(--color-neutral-600)" : signed < 0 ? "var(--priority-critical)" : "var(--status-resolved)", ...(t.status === "voided" ? STRUCK : {}) }}>
                     {t.txn_type === "physical_count" ? `counted ${fmt(t.quantity_sachets)}` : `${signed > 0 ? "+" : ""}${fmt(signed)}`}
                   </td>
                   <td style={{ textAlign: "right" }}>{fmt(t.runningBalance)}</td>
@@ -339,18 +363,26 @@ async function FacilityLedger({
                     {t.document_no && <div className="text-muted" style={{ fontSize: 12 }}>{t.document_no}</div>}
                   </td>
                   <td style={{ fontSize: 13 }}>
-                    {t.reason}
+                    <span style={t.status === "voided" ? STRUCK : undefined}>{t.reason}</span>
+                    {t.status === "voided" && t.void_reason && <div style={{ fontSize: 12 }}>Void reason: {t.void_reason}</div>}
                     {evidence?.map((e, i) => (
                       <a key={i} href={e.url} target="_blank" rel="noreferrer" style={{ marginLeft: 6, fontSize: 12 }}>
                         <i className="ph ph-image" /> {e.kind.replace("_", " ")}
                       </a>
                     ))}
                   </td>
+                  {canVoid && (
+                    <td style={{ whiteSpace: "nowrap" }}>
+                      {voidHere.has(t.id) && t.submission_local_id && (
+                        <VoidEntryButton localId={t.submission_local_id} label={`${TXN_LABEL[t.txn_type].toLowerCase()} of ${t.txn_date}`} />
+                      )}
+                    </td>
+                  )}
                 </tr>
               );
             })}
             {rows.length === 0 && (
-              <tr><td colSpan={7} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No transactions{typeFilter || lotFilter ? " match these filters" : " recorded yet"}.</td></tr>
+              <tr><td colSpan={canVoid ? 8 : 7} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No transactions{typeFilter || lotFilter ? " match these filters" : " recorded yet"}.</td></tr>
             )}
           </tbody>
         </table>

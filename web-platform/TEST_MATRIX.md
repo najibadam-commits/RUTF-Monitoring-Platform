@@ -217,3 +217,18 @@ existing RBAC helpers) rather than introducing new patterns.
 | Devices & Sync, Audit Trail pages | Render for admins; hidden from other roles | ✅ typecheck + lint; ⏳ browser click-through |
 | Morning digest (`rutf-sync-digest`, 06:00 UTC) | One unread notification per admin when devices need attention | ⏳ check after the first morning run |
 | **UAT signed by the programme lead** (brief M6 "done when") | `docs/UAT_SCRIPT.md` completed and signed | ⏳ programme |
+
+# Ledger void (migration 0109)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Facility user / supervisor voids; reason under 10 characters | Refused | ✅ `test-ledger.js` §11 |
+| Void an issue whose transfer was received | Refused until the receipt is voided | ✅ |
+| Void a short receipt | 2 rows voided, transfer back in transit, OTP balance −428, 1 lot below zero reported | ✅ |
+| Then void the issue | Transfer cancelled; LGA store gets the 600 back | ✅ |
+| Void a dispensing day | Day leaves the daily totals, kept with who/why; balance +60; the day can be recorded again; re-void answered as duplicate | ✅ |
+| Void a stock count | Its adjustment drops out | ✅ |
+| Audit trail and nothing deleted | Void logged with the actor; every row still present | ✅ — ledger 44/44 |
+| Unchanged results elsewhere | findings 13/13, visits 21/21, KPIs Aug + Sep 26/26 with 0109 | ✅ |
+| Dummy importer through the view | `on conflict (id) do nothing` still works | ✅ (rolled back) |
+| Stock Ledger Void button (admins only) | Opens inline, asks the reason, shows the outcome | ✅ typecheck + lint; ⏳ browser click-through |

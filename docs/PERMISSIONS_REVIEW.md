@@ -53,9 +53,9 @@ All current accounts pass; real pilot accounts must be created in the pilot proj
 
 ## 5. Not changed — for the programme to decide
 
-- **Voiding a ledger entry.** There is no void function: a wrong entry is corrected with an
-  Adjustment (confirmed by the supervisor), which keeps the original visible. If the programme
-  wants an admin "void with reason", it is a small addition after UAT.
+- **Voiding a ledger entry** — added in migration 0109: Super Admin or the project's Project
+  Admin, with a reason, from the Stock Ledger. Facility users and supervisors still correct with
+  an Adjustment.
 - **Supervision Planner CSV** is downloaded directly (admins and supervisors), not through the
   download-request approval. It holds facility names, risk scores and supervisor names, no child data.
 - **Daily Attendance** (TPM feature: selfie + GPS) is still in the supervisor app — keep or remove (DPIA §3).

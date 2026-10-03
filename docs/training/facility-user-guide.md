@@ -121,7 +121,7 @@ as an expired loss once it is set aside.
 | Situation | What to do |
 | --- | --- |
 | A delivery arrived but isn't in the list | Refresh; if it still isn't there, record it as a **Supplier delivery** and note the waybill number. |
-| You entered the wrong figure and already submitted | Record an **Adjustment** with the reason ("typed 1000 instead of 100 on 3 Sept"). Don't enter a second copy of the same record. |
+| You entered the wrong figure and already submitted | Don't enter a second copy. Small differences: record an **Adjustment** with the reason ("typed 1000 instead of 100 on 3 Sept"). A whole entry that is wrong (entered twice, wrong day, wrong facility): ask your Project Admin to **void** it — it stays visible, struck through, and you can then record it correctly. |
 | The lot number on the carton isn't in the list | Choose **A lot not in the list…** and type it exactly as printed, with the expiry date. |
 | The app says you hold less than you are issuing | Count the shelf. If the shelf is right, issue it and record a Stock Count the same day. |
 | You see a Finding at your facility | It is a question for review, not a judgement. Your reviewer will contact you; have the stock card and waybills ready. |

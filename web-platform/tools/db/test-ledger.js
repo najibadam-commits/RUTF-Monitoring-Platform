@@ -21,7 +21,7 @@ function check(what, expected, actual) {
 }
 
 (async () => {
-  const pg = new Client({ connectionString: process.env.DATABASE_URL });
+  const pg = new Client({ connectionString: process.env.DATABASE_URL, keepAlive: true });
   await pg.connect();
   const one = async (sql, params) => (await pg.query(sql, params)).rows[0];
 
@@ -154,6 +154,38 @@ function check(what, expected, actual) {
     check("OTP user cannot read the State store's ledger", 0, await seen(U.otp, SST));
     check("OTP user reads its own ledger", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [OTP1])).n), await seen(U.otp, OTP1));
     check("supervisor reads the State store's ledger", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [SST])).n), await seen(U.sup, SST));
+
+    // 11. Voiding by an administrator (migration 0109). Balances now: SST 1500, LST 900, OTP1 160.
+    const rowsBeforeVoid = Number((await one(`select count(*) n from stock_transactions where submission_local_id like 'LT-%'`)).n);
+    const PA = (await one(`select id from profiles where email like '%@rutf-demo.example' and role = 'project_admin' and status = 'active' limit 1`)).id;
+    const voidAs = (u, localId, reason = "Entered twice by mistake, confirmed by phone") =>
+      as(u, `select void_ledger_submission($1, $2) r`, [localId, reason]);
+    check("facility user voiding", "denied", (await voidAs(U.otp, "LT-8")).error ? "denied" : "allowed");
+    check("supervisor voiding", "denied", (await voidAs(U.sup, "LT-8")).error ? "denied" : "allowed");
+    check("void without a proper reason", "denied", (await voidAs(PA, "LT-8", "oops")).error ? "denied" : "allowed");
+    check("void an issue whose transfer was received", "denied", (await voidAs(PA, "LT-4")).error ? "denied" : "allowed");
+
+    const v5 = (await voidAs(PA, "LT-5")).rows[0].r;
+    check("void the short receipt: rows voided, transfer back in transit", [2, "in_transit"], [v5.rows_voided, v5.transfer_status]);
+    check("OTP1 after voiding the receipt (160 − 590 + 2)", -428, await balance(OTP1));
+    check("void reports lots below zero", 1, v5.lots_below_zero);
+    const v4 = (await voidAs(PA, "LT-4")).rows[0].r;
+    check("then the issue can be voided: transfer cancelled", "cancelled", v4.transfer_status);
+    check("LGA store gets the 600 back", 1500, await balance(LST));
+
+    await voidAs(PA, "LT-D1");
+    check("voided dispensing day leaves the daily totals", 6, Number((await one(`select count(*) n from otp_daily_dispensing where local_id like 'LT-D%'`)).n));
+    check("voided day kept, marked with who and why", 1, Number((await one(`select count(*) n from otp_daily_dispensing_entries where local_id = 'LT-D1' and voided_by = $1 and void_reason is not null`, [PA])).n));
+    check("OTP1 gets the day's 60 back", -368, await balance(OTP1));
+    check("the voided day can be recorded again", "allowed",
+      (await as(U.otp, `select record_dispensing('LT-D1b', $1, ${day(1)}, 2, 12, 62, 60)`, [OTP1])).error ? "denied" : "allowed");
+    check("voiding again is answered as a duplicate", true, (await voidAs(PA, "LT-D1")).rows[0].r.duplicate);
+
+    await voidAs(PA, "LT-7");
+    check("voided count: its adjustment drops out", 0, Number((await one(`select count(*) n from stock_transactions where submission_local_id = 'LT-7' and status <> 'voided'`)).n));
+    check("voids are in the audit trail", true, Number((await one(`select count(*) n from audit_log where table_name = 'stock_transactions' and changes ? 'status' and actor = $1`, [PA])).n) > 0);
+    check("nothing deleted (every row still there, voided or not)", rowsBeforeVoid,
+      Number((await one(`select count(*) n from stock_transactions where submission_local_id like 'LT-%' and submission_local_id <> 'LT-D1b'`)).n));
   } finally {
     await pg.query("rollback").catch(() => {});
     await pg.end();

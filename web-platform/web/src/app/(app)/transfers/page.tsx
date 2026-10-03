@@ -15,6 +15,7 @@ const STATUS_META: Record<TransferStatus, { label: string; color: string }> = {
   in_transit: { label: "In transit", color: "var(--priority-high)" },
   received: { label: "Received", color: "var(--status-resolved)" },
   discrepancy: { label: "Discrepancy", color: "var(--priority-critical)" },
+  cancelled: { label: "Cancelled (issue voided)", color: "var(--color-neutral-600)" },
 };
 const fmt = (n: number) => n.toLocaleString("en-GB");
 
