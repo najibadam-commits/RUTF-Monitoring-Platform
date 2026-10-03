@@ -63,7 +63,7 @@ the app and the API. Reviewed in M6 — see `docs/PERMISSIONS_REVIEW.md`.
 - Photos are in **private** buckets, served only through short-lived signed links.
 - Nothing is callable without signing in (verified by `tools/db/audit-permissions.js`).
 - Exports go through the existing download-request approval. **Exception to review [DPO]:** the
-  Supervision Planner CSV (facility names, risk scores, supervisor names) is downloaded directly
+  Risk-Based Planner CSV (facility names, risk scores, supervisor names) is downloaded directly
   by admins and supervisors.
 
 ## 5. Storage, security, backup

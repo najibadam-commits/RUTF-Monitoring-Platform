@@ -56,7 +56,7 @@ All current accounts pass; real pilot accounts must be created in the pilot proj
 - **Voiding a ledger entry** — added in migration 0109: Super Admin or the project's Project
   Admin, with a reason, from the Stock Ledger. Facility users and supervisors still correct with
   an Adjustment.
-- **Supervision Planner CSV** is downloaded directly (admins and supervisors), not through the
+- **Risk-Based Planner CSV** is downloaded directly (admins and supervisors), not through the
   download-request approval. It holds facility names, risk scores and supervisor names, no child data.
 - **Daily Attendance** — removed from the supervisor app (R50) and the web (R51). The server table and bucket still hold records captured earlier, readable only through the API by the roles RLS allows, until the DPO decides on retention.
 - **Email links** — removed (migration 0110): notification emails carry the text and ask the reader to sign in; no link to the TPM deployment. The sender is a setting (Settings → Notifications, migration 0111), still empty = Resend's test address — set it once the programme's domain is verified in Resend.

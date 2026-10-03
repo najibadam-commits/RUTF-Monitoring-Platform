@@ -69,7 +69,7 @@ adjustments above 2% of the balance raise a Finding.
 - **Never write child or caregiver names, phone numbers or IDs** in notes.
 - Record the visit **at the facility**, on the day — the GPS and selfie are what make your visit
   evidence.
-- Your Supervision Planner (on the web) lists the facilities due a visit this month, highest risk
+- Your Risk-Based Planner (on the web, Risk-Based Supervision) lists the facilities due a visit this month, highest risk
   first. Aim for your monthly workload (8 visits).
 
 ## 7. Syncing
@@ -85,5 +85,5 @@ anything is waiting.
 - [ ] Signed in, synced, the facilities you cover are listed
 - [ ] Store Check or OTP Verification completed at the training venue, every step
 - [ ] Register photo taken with names covered (use the training register)
-- [ ] Visit synced; it appears on the web under Supervision → Visits & Planner
+- [ ] Visit synced; it appears on the web under Supervision → Risk-Based Supervision
 - [ ] One adjustment confirmed with a note

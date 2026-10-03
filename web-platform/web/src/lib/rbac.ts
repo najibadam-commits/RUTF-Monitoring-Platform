@@ -182,7 +182,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "stockIntegrity", label: "Stock Reconciliation", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
   { key: "reportingCompleteness", label: "Completeness & Timeliness", href: "/reporting-completeness", icon: "ph-check-square-offset", section: "stock" },
   { key: "otpDispensing", label: "Last-Mile Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
-  { key: "supervision", label: "Visits & Planner", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
+  { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },
   { key: "devices", label: "Devices & Sync", href: "/devices", icon: "ph-device-mobile", section: "administration" },

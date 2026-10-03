@@ -27,7 +27,7 @@ export default async function SupervisionPage({ searchParams }: { searchParams: 
       {(canPlan ? (["visits", "planner"] as const) : (["visits"] as const)).map((t) => (
         <Link key={t} href={`/supervision?tab=${t}&month=${month.key}`} className="seg-opt"
           style={{ textDecoration: "none", color: "inherit", ...(tab === t ? { color: "var(--color-accent)", boxShadow: "inset 0 0 0 1px var(--color-accent)" } : {}) }}>
-          {t === "visits" ? "Visits" : "Supervision Planner"}
+          {t === "visits" ? "Visits" : "Risk-Based Planner"}
         </Link>
       ))}
     </div>
@@ -40,7 +40,7 @@ export default async function SupervisionPage({ searchParams }: { searchParams: 
     for (const r of rows) bySupervisor.set(r.supervisor_id, [...(bySupervisor.get(r.supervisor_id) ?? []), r]);
     const suggested = rows.filter((r) => r.suggested);
     return (
-      <ReportShell title="Supervision" monthKey={month.key} lgas={lgas} sp={{ ...sp, tab: "planner" }} showLevel={false}
+      <ReportShell title="Risk-Based Supervision" monthKey={month.key} lgas={lgas} sp={{ ...sp, tab: "planner" }} showLevel={false}
         intro={<>Each supervisor&apos;s facilities ranked by risk as of {month.end}. Due: never visited, not visited in 90 days, or high-risk and not visited in 30 days. The top due facilities, up to the monthly workload, are suggested.</>}
         extraFilters={<input type="hidden" name="tab" defaultValue="planner" />}>
         {tabs}
@@ -97,7 +97,7 @@ export default async function SupervisionPage({ searchParams }: { searchParams: 
   const who = Object.fromEntries((people ?? []).map((p) => [p.id, p.name]));
 
   return (
-    <ReportShell title="Supervision" monthKey={month.key} lgas={lgas} sp={sp} showLevel={false}
+    <ReportShell title="Risk-Based Supervision" monthKey={month.key} lgas={lgas} sp={sp} showLevel={false}
       intro={<>Store Checks and OTP Verifications recorded in {month.label}, with the Findings each visit raised. A visit more than 150 m from the facility&apos;s recorded point is flagged.</>}>
       {tabs}
       <SummaryTiles items={[
