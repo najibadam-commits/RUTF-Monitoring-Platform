@@ -41,7 +41,7 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
     const search = sp.search?.replace(/[%,()]/g, " ").trim() || null;
 
     let q = supabase.from("facilities").select("*", { count: "exact" }).order("facility_type").order("name");
-    if (search) q = q.or(`name.ilike.%${search}%,national_code.ilike.%${search}%`);
+    if (search) q = q.or(`name.ilike.%${search}%,facility_code.ilike.%${search}%,national_code.ilike.%${search}%`);
     if (sp.status === "pending") q = q.in("status", PENDING_STATUSES);
     else if (sp.status) q = q.eq("status", sp.status as DatasetStatus);
     if (sp.lga) q = q.eq("lga_id", sp.lga);

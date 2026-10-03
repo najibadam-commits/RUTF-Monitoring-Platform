@@ -269,7 +269,7 @@ async function FacilityLedger({
         )}
         <h2 style={{ margin: "6px 0 2px" }}>{facility.name}</h2>
         <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
-          {TYPE_LABEL[facility.facility_type]} · {lgaName}
+          {facility.facility_code && <>{facility.facility_code} · </>}{TYPE_LABEL[facility.facility_type]} · {lgaName}
           {facility.supplied_by_facility_id && <> · supplied by {names[facility.supplied_by_facility_id] ?? "—"}</>}
           {" · "}
           <Link href={`/transfers?facility=${facility.id}`}>Transfers</Link>

@@ -371,9 +371,11 @@ export function FacilitiesTab({
                       )}
                       {!row.is_active && <span className="text-muted" style={{ marginLeft: 6, fontSize: 11 }}>(inactive)</span>}
                     </div>
-                    {row.national_code && (
+                    {(row.facility_code || row.national_code) && (
                       <div className="text-muted" style={{ fontSize: 11 }}>
-                        {row.national_code}
+                        {row.facility_code && <span style={{ fontFamily: "var(--font-heading)", color: "var(--color-text)" }}>{row.facility_code}</span>}
+                        {row.facility_code && row.national_code && " · "}
+                        {row.national_code && <span title="Registry code (national_code)">registry {row.national_code}</span>}
                       </div>
                     )}
                     {row.status === "pending_update" && pd && typeof pd.name === "string" && pd.name !== row.name && (

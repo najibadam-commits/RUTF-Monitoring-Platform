@@ -48,7 +48,7 @@ async function pages<T>(fetch: (from: number, to: number) => PromiseLike<{ data:
 
 async function names(supabase: Client) {
   const [facilities, lgas, lots] = await Promise.all([
-    pages((a, b) => supabase.from("facilities").select("id, name, facility_type, lga_id").order("id").range(a, b)),
+    pages((a, b) => supabase.from("facilities").select("id, name, facility_type, lga_id, facility_code").order("id").range(a, b)),
     supabase.from("lgas").select("id, name"),
     pages((a, b) => supabase.from("product_lots").select("id, lot_no, expiry_date").order("id").range(a, b)),
   ]);
@@ -82,10 +82,10 @@ export async function buildRutfExport(supabase: Client, kind: RutfExportKind, mo
   if (kind === "facility_metrics") {
     const { data, error } = await supabase.rpc("facility_metrics", { p_start: month.start, p_end: month.end });
     if (error) throw new Error(error.message);
-    const header = ["facility", "level", "lga", "balance", "monthly_outflow", "months_of_stock", "expired_balance", "stockout_days",
+    const header = ["facility_id", "facility", "level", "lga", "balance", "monthly_outflow", "months_of_stock", "expired_balance", "stockout_days",
       "last_count_date", "last_variance_pct", "sachets_prescribed", "sachets_dispensed", "short_pct", "children_seen", "new_admissions",
       "dispensing_weeks", "expected_weeks", "count_on_time", "last_visit_date", "last_vf", "open_findings", "open_critical"];
-    const rows = (data ?? []).map((r) => [r.facility_name, LEVEL[r.facility_type], n.lga.get(r.lga_id), r.balance, r.monthly_outflow,
+    const rows = (data ?? []).map((r) => [fac(r.facility_id)?.facility_code, r.facility_name, LEVEL[r.facility_type], n.lga.get(r.lga_id), r.balance, r.monthly_outflow,
       r.months_of_stock, r.expired_balance, r.stockout_days, r.last_count_date, r.last_variance_pct, r.sachets_prescribed,
       r.sachets_dispensed, r.short_pct, small(r.children_seen), small(r.new_admissions), r.dispensing_weeks, r.expected_weeks,
       r.count_on_time ? "yes" : "no", r.last_visit_date, r.last_vf, r.open_findings, r.open_critical]);

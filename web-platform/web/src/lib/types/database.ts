@@ -326,6 +326,8 @@ export interface Database {
           facility_type: FacilityType;
           name: string;
           national_code: string | null;
+          /** STATE-LGA-WARD-LEVEL-NNN, e.g. KT-DAU-MAJ-OTP-001 — set by the database (migration 0121), permanent. */
+          facility_code: string | null;
           state_id: string;
           lga_id: string;
           ward_id: string | null;

@@ -345,3 +345,12 @@ existing RBAC helpers) rather than introducing new patterns.
 | New visit | `VIS-KT-…-26NNN` for the visited facility, continuing its sequence | ✅ dry run; test-visits 21/21 with 0120 |
 | Existing DUMMY visits | 306 re-numbered, unique | ✅ applied and checked live |
 | `import-visits.js` on a fresh load | Old CSV IDs replaced in visit order | ✅ re-numbering tested on 5 visits reset to old IDs (rolled back) |
+
+# Facility ID (R78)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Existing facilities | 2,455 coded, unique (SST 1, LST 34, OTP 272, HF 2,148); no audit flood | ✅ applied and checked live |
+| New facility | Ward derived from GPS first, then the next code (e.g. KT-BAA-AJI-OTP-002); code can't be edited | ✅ dry run |
+| Role access with 0121 | 202/202 | ✅ |
+| Master Data / Stock Ledger / facility-metrics export show it; search finds it | — | ✅ typecheck + lint; ⏳ browser check |
