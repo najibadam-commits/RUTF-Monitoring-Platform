@@ -42,7 +42,7 @@ export default async function SupervisionPage({ searchParams }: { searchParams: 
     return (
       <ReportShell title="Supervision" monthKey={month.key} lgas={lgas} sp={{ ...sp, tab: "planner" }} showLevel={false}
         intro={<>Each supervisor&apos;s facilities ranked by risk as of {month.end}. Due: never visited, not visited in 90 days, or high-risk and not visited in 30 days. The top due facilities, up to the monthly workload, are suggested.</>}
-        extraFilters={<input type="hidden" name="tab" value="planner" />}>
+        extraFilters={<input type="hidden" name="tab" defaultValue="planner" />}>
         {tabs}
         {error && <p style={{ color: "var(--priority-critical)" }}>The plan couldn&apos;t be loaded.</p>}
         <SummaryTiles items={[

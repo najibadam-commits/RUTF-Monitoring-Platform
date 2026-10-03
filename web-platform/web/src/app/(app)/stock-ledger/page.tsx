@@ -300,7 +300,7 @@ async function FacilityLedger({
       </div>
 
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
-        <input type="hidden" name="facility" value={facility.id} />
+        <input type="hidden" name="facility" defaultValue={facility.id} />
         <select className="input" name="txn" defaultValue={sp.txn ?? ""} style={{ maxWidth: 180 }}>
           <option value="">All transaction types</option>
           {(Object.keys(TXN_LABEL) as TxnType[]).map((t) => (

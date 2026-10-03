@@ -108,7 +108,7 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
       </div>
 
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
-        {sp.facility && <input type="hidden" name="facility" value={sp.facility} />}
+        {sp.facility && <input type="hidden" name="facility" defaultValue={sp.facility} />}
         <input className="input" name="search" placeholder="Transfer code…" defaultValue={sp.search ?? ""} style={{ maxWidth: 200 }} />
         <select className="input" name="status" defaultValue={sp.status ?? ""} style={{ maxWidth: 190 }}>
           <option value="">All status</option>
