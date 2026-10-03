@@ -77,7 +77,7 @@ adjustments above 2% of the balance raise a Finding.
 Same as for facility users: every visit is saved on the phone ("Visit saved — it will sync when
 you're online") and goes up with photos when you have a connection. A visit that keeps failing is
 marked **Failed** in Sync Queue — tap **Retry**, and if it still fails, contact the platform
-administrator, who sees the same error on Devices & Sync. Don't clear the app's data while
+administrator, who sees the same error on Offline Sync Health. Don't clear the app's data while
 anything is waiting.
 
 ## 8. Practice visit checklist (training day)

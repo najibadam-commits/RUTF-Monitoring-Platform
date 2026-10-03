@@ -68,7 +68,7 @@ class SyncWorker(
         }
     }
 
-    /** Tells the server what is still waiting on this phone (Devices & Sync on the web). Never
+    /** Tells the server what is still waiting on this phone (Offline Sync Health on the web). Never
      *  fails the run — offline, the report simply goes with the next one. */
     private suspend fun reportStatus() {
         runCatching { api.reportStatus(androidDeviceId(applicationContext), repository.unsyncedSyncItems()) }

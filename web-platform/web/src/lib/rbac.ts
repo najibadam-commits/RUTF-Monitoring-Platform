@@ -71,7 +71,7 @@ export function canAccessActionTracker(role: UserRole) {
   return role === "tpm_supervisor" || role === "super_admin";
 }
 
-/** Devices & Sync (migration 0108): sync_health() returns rows to these roles only. */
+/** Offline Sync Health (migration 0108): sync_health() returns rows to these roles only. */
 export function canAccessDevices(role: UserRole) {
   return role === "super_admin" || role === "project_admin" || role === "state_coordinator";
 }
@@ -185,7 +185,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },
-  { key: "devices", label: "Devices & Sync", href: "/devices", icon: "ph-device-mobile", section: "administration" },
+  { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Roles", href: "/users", icon: "ph-users-three", section: "administration" },
   { key: "datasets", label: "Data Sets", href: "/data-sets", icon: "ph-database", section: "administration" },

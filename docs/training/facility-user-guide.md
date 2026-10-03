@@ -112,7 +112,7 @@ as an expired loss once it is set aside.
   tap **Sync Now** when you have a connection.
 - A record that fails five times is marked **Failed**. Tap **Retry**. If it fails again, call your
   LGA focal person — the platform administrators see the same error on their side
-  (Devices & Sync) and can tell you what to fix.
+  (Offline Sync Health) and can tell you what to fix.
 - **Do not uninstall the app or clear its data while records are waiting** — they would be lost.
 - Sync at least once a day when you can, and always before month-end.
 

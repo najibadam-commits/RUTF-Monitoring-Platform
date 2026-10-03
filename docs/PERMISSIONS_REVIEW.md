@@ -44,7 +44,7 @@ node test-mobile-role-access.js    # every role tried against every rule (rolled
 | P4 | DECISIONS R27: a facility user's ledger read policy included the supplier's issue lines (to pre-fill Receive Stock), so an unfiltered balance query showed partial supplier rows. | Low | Policy narrowed to own facility; the app reads the pre-fill through `incoming_transfer_lines()`. **Phones on the M5 build lose the Receive Stock pre-fill until updated** — install the M6 build before the pilot. |
 | P5 | No audit trail for changes to reference data, user access or ledger status (brief §10). | Medium | `audit_log` with triggers on facilities, lots, dosing rules, thresholds, profiles, supervisor LGAs, DHIS2 reports, and status changes on ledger rows and transfers. Readable by Super Admin and Project Admin (web: Administration → Audit Trail). |
 | P6 | `in_scope()` treats a non-Super-Admin with no project as unscoped (inherited TPM rule). | Medium | Not changed (the TPM Project Admin flow relies on it). Audit check 6 lists any such account; every pilot account must be assigned to *Katsina RUTF Pilot*. |
-| P7 | Devices page was sample data; no visibility of phones that stop syncing. | Medium | Devices & Sync (real data, see §5). |
+| P7 | Devices page was sample data; no visibility of phones that stop syncing. | Medium | Offline Sync Health (real data, see §5). |
 
 ## 4. Accounts
 

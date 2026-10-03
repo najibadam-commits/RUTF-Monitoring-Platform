@@ -7,7 +7,7 @@ import java.time.Instant
 /**
  * What the app tells the server after every sync run (web migration 0108, `report_sync_status`):
  * how much is still waiting, and which submissions keep failing and why — so an administrator
- * sees a stuck phone on Devices & Sync before the facility's figures go missing. Carries no
+ * sees a stuck phone on Offline Sync Health before the facility's figures go missing. Carries no
  * submission content, only the queue key, its type and a cleaned-up error line.
  */
 data class SyncReport(

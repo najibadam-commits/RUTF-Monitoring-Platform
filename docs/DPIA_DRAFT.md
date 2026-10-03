@@ -55,7 +55,7 @@ the app and the API. Reviewed in M6 — see `docs/PERMISSIONS_REVIEW.md`.
 | --- | --- |
 | Facility user | Their own facility only (stock, dispensing, its Findings) — offline too |
 | Supervisor | Facilities in their LGAs and level; visits they recorded |
-| State Coordinator (reviewer) | The project's data; Findings to review; Devices & Sync |
+| State Coordinator (reviewer) | The project's data; Findings to review; Offline Sync Health |
 | Project Admin | The project's data, user management, DHIS2 upload, audit trail |
 | Super Admin | Everything; reference data sign-off |
 | Viewer | Read-only dashboards; no administration; exports only through approval |

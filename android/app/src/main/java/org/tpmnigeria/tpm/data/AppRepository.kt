@@ -109,7 +109,7 @@ class AppRepository(
     suspend fun markSynced(localId: String) = syncQueueDao.updateStatus(localId, SyncStatus.Synced)
 
     /** Every queue row not yet synced (Pending and Failed) — what SyncWorker reports to the
-     *  server after each run (web migration 0108, Devices & Sync). */
+     *  server after each run (web migration 0108, Offline Sync Health). */
     suspend fun unsyncedSyncItems(): List<SyncQueueItem> =
         (syncQueueDao.getByStatus(SyncStatus.Pending) + syncQueueDao.getByStatus(SyncStatus.Failed)).map { it.toDomain() }
 

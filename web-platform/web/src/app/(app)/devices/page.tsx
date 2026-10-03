@@ -7,7 +7,7 @@ import { getLgas } from "@/lib/queries/lookups";
 import { Flag, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
 import type { Database } from "@/lib/types/database";
 
-// Devices & Sync (brief M6, sync-failure monitoring): every facility user and supervisor with the
+// Offline Sync Health (brief M6, sync-failure monitoring): every facility user and supervisor with the
 // latest report from their phone — sync_health() (migration 0108). Each sync run reports what is
 // still waiting and why; a morning digest notifies administrators when something is stuck.
 
@@ -66,7 +66,7 @@ export default async function DevicesPage({ searchParams }: { searchParams: Prom
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <h2 style={{ marginBottom: 2 }}>Devices &amp; Sync</h2>
+        <h2 style={{ marginBottom: 2 }}>Offline Sync Health</h2>
         <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 820 }}>
           The phones facility users and supervisors record on. Each sync reports what is still waiting on the phone;
           a submission that keeps failing, or records waiting more than a day, needs a call to the user. Administrators

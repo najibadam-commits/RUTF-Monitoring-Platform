@@ -42,8 +42,8 @@ purpose, so live figures aren't touched. Remove them afterwards.
 | B1 | OTP | Airplane mode: record Daily Dispensing and a Loss | "Saved — it will sync when you're online"; Home banner shows 2 waiting | | |
 | B2 | OTP | Turn data on, Sync Now | Both sync **once**; the ledger shows each record once | | |
 | B3 | OTP | Airplane mode on and off three times during a sync | No duplicates on the web | | |
-| B4 | Project Admin | Open Devices & Sync | The OTP user shows **OK** with the last sync time and phone model | | |
-| B5 | Facility user | Record something, leave the phone offline > 1 day, then open Devices & Sync on the web | The user shows **Waiting > 1 day** once the phone reports; the next morning the admin gets a "records waiting to sync" notification | | |
+| B4 | Project Admin | Open Offline Sync Health | The OTP user shows **OK** with the last sync time and phone model | | |
+| B5 | Facility user | Record something, leave the phone offline > 1 day, then open Offline Sync Health on the web | The user shows **Waiting > 1 day** once the phone reports; the next morning the admin gets a "records waiting to sync" notification | | |
 
 ## C. Supervision
 
@@ -72,7 +72,7 @@ purpose, so live figures aren't touched. Remove them afterwards.
 | # | Who | Steps | Expected | Result | Note |
 | --- | --- | --- | --- | --- | --- |
 | E1 | OTP user | On the web, open Stock Ledger | Only their own facility | | |
-| E2 | Viewer | Try Users & Roles, Data Sets, Devices & Sync, Audit Trail | Not in the menu; direct links redirect to the dashboard | | |
+| E2 | Viewer | Try Users & Roles, Data Sets, Offline Sync Health, Audit Trail | Not in the menu; direct links redirect to the dashboard | | |
 | E3 | Project Admin | Change a threshold or a facility name, then open Audit Trail | The change is listed with their name, old and new value | | |
 | E4 | Project Admin | Deactivate a test account; that user tries to sync | Sign-in refused; records stay on the phone (not lost) until reactivated | | |
 | E5 | Any | Look through every OTP screen and export | No field for child or caregiver names, phones or IDs | | |
