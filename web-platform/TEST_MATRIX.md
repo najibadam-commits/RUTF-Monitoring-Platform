@@ -248,3 +248,11 @@ existing RBAC helpers) rather than introducing new patterns.
 |---|---|---|
 | `create_notification` body | No vercel.app / TPM link; platform-only guard and grants unchanged | ✅ dry run (rolled back) |
 | Review actions that notify | Still allowed for the right roles | ✅ role access 202/202 with 0110; applied, permissions audit clean |
+
+# Email sender setting (migration 0111)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| `email_from_address` format check | Accepts `noreply@ehealthnigeria.org`, `rutf.alerts@health.kt.gov.ng`; rejects `not-an-email`, `a@b`, two addresses, `Name <x@y.org>` | ✅ dry run (rolled back) |
+| `create_notification` | Uses the setting, falls back to `onboarding@resend.dev`; guard and grants unchanged; no TPM link | ✅ role access 202/202 with 0111; applied, permissions audit clean |
+| Settings → Notifications sender field | Saves for Super Admin; invalid address refused in the form | ✅ typecheck; ⏳ browser check |

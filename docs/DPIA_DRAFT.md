@@ -75,7 +75,7 @@ the app and the API. Reviewed in M6 — see `docs/PERMISSIONS_REVIEW.md`.
 | Phone storage | Records wait in the app's private storage until synced; photos in the app's private files | **[PROG]** require a screen lock on programme phones |
 | Backups | Provider daily backups (plan-dependent) | **[PROG]** confirm the plan includes point-in-time recovery for the pilot |
 | Keys | Service keys only on the server and admin workstations, never in the app or repository | — |
-| Email | Notification emails via Resend; contain the notification text only (no link since migration 0110), no child data | Sender domain to be moved to the programme's own domain before go-live |
+| Email | Notification emails via Resend; contain the notification text only (no link since migration 0110), no child data | Sender is set in Settings → Notifications (migration 0111); set the programme's verified domain before go-live |
 
 ## 6. Retention [DPO]
 

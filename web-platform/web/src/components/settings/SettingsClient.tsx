@@ -6,12 +6,16 @@ import { updateSettingsAction } from "@/lib/actions/settings";
 
 type Settings = Database["public"]["Tables"]["settings"]["Row"];
 type Tab = "general" | "notifications" | "data";
+const EMAIL_RE = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/;
+const TEST_SENDER = "onboarding@resend.dev";
 
 export function SettingsClient({ settings, states }: { settings: Settings; states: { id: string; name: string }[] }) {
   const [tab, setTab] = useState<Tab>("general");
   const [form, setForm] = useState(settings);
   const [saved, setSaved] = useState(false);
   const [pending, setPending] = useState(false);
+  const [sender, setSender] = useState(settings.email_from_address ?? "");
+  const [senderError, setSenderError] = useState<string | null>(null);
 
   async function save(patch: Partial<Settings>) {
     setPending(true);
@@ -82,6 +86,37 @@ export function SettingsClient({ settings, states }: { settings: Settings; state
 
       {tab === "notifications" && (
         <div className="card elev-sm" style={{ gap: 12 }}>
+          <div className="field">
+            <label htmlFor="email-sender">Send notification emails from</label>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              <input
+                id="email-sender"
+                className="input"
+                type="email"
+                value={sender}
+                placeholder={TEST_SENDER}
+                onChange={(e) => { setSender(e.target.value); setSenderError(null); }}
+                style={{ flex: "1 1 260px" }}
+              />
+              <button
+                className="btn btn-primary"
+                disabled={pending || sender.trim() === (form.email_from_address ?? "")}
+                onClick={() => {
+                  const v = sender.trim();
+                  if (v && !EMAIL_RE.test(v)) { setSenderError("Enter a single email address, e.g. noreply@your-domain.org"); return; }
+                  save({ email_from_address: v || null });
+                }}
+              >
+                <i className="ph ph-floppy-disk" /> Save sender
+              </button>
+            </div>
+            <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
+              Shown as &quot;RUTF-DTAP Monitoring Platform &lt;{form.email_from_address || TEST_SENDER}&gt;&quot;. Leave empty to use
+              Resend&apos;s test sender. The domain must be verified in the Resend account first — until then Resend won&apos;t
+              send from it (in-app notifications are unaffected).
+            </div>
+            {senderError && <div role="alert" style={{ fontSize: 12, color: "var(--priority-critical)" }}>{senderError}</div>}
+          </div>
           <p className="text-muted" style={{ fontSize: 11.5, margin: 0 }}>
             Changes save automatically.
           </p>

@@ -675,6 +675,8 @@ export interface Database {
           auto_assign_by_ward: boolean;
           data_retention: string;
           export_format: string;
+          // Notification email sender (migration 0111); null = onboarding@resend.dev.
+          email_from_address: string | null;
           updated_by: string | null;
           updated_at: string;
         };
