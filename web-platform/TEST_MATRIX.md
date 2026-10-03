@@ -329,3 +329,10 @@ existing RBAC helpers) rather than introducing new patterns.
 | New Finding | `KT-DAU-MAJ-OTP-26005`-style ID, continuing the group's sequence | ✅ dry run; test-findings 13/13 with 0118 (format check updated) |
 | Existing DUMMY Findings | All 585 re-numbered, unique, in order raised (e.g. Mazoji A: KT-DAU-MAJ-OTP-26001…) | ✅ applied and checked live |
 | ID cannot be edited | Update leaves the code unchanged | ✅ |
+
+# Transfer ID format (R76)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| New transfer | `TRF-KT-…-26NNN` for the receiving facility, continuing its sequence | ✅ dry run; test-ledger 44/44 with 0119 |
+| Existing DUMMY transfers | 3,364 re-numbered, unique; Findings quoting them updated (0 old IDs left); no audit flood | ✅ applied and checked live |
