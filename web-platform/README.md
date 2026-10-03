@@ -100,7 +100,8 @@ node import-visits.js                     # dummy supervision visits + their Fin
 node import-dhis2.js                      # dummy DHIS2 monthly extract for triangulation (or a real CSV path)
 ```
 
-Tests: `node test-ledger.js` (M2), `node test-findings.js` (M3), `node test-visits.js` (M4), `node test-kpis.js [YYYY-MM]` (M5 — compares `rutf_kpis` with `python tools/dummy-data/kpis.py`) and `node test-mobile-role-access.js`.
+Tests: `node test-ledger.js` (M2), `node test-findings.js` (M3), `node test-visits.js` (M4), `node test-kpis.js [YYYY-MM]` (M5 — compares `rutf_kpis` with `python tools/dummy-data/kpis.py`) and `node test-mobile-role-access.js` (every role against every rule, including the M6 checks).
+Permissions review: `node audit-permissions.js` (RLS on every table, nothing callable signed out, definer functions, views, buckets, accounts without a project) — see `docs/PERMISSIONS_REVIEW.md`.
 
 ### 4. Seed demo accounts + sample issues (optional, for local testing)
 

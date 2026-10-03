@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import org.tpmnigeria.tpm.data.AppRepository
+import org.tpmnigeria.tpm.domain.androidDeviceId
 
 /**
  * Pushes every `pending` sync-queue row via [SyncApiService] and flips it to `synced` on success.
@@ -29,6 +30,7 @@ class SyncWorker(
             val items = repository.pendingSyncItemsOldestFirst()
             if (items.isEmpty()) {
                 runCatching { api.afterSync() }
+                reportStatus()
                 return Result.success()
             }
 
@@ -58,10 +60,18 @@ class SyncWorker(
                 }
             }
             runCatching { api.afterSync() }
+            reportStatus()
             return if (anyFailed) Result.retry() else Result.success()
         } catch (e: Exception) {
             android.util.Log.e("SyncWorker", "Worker failed", e)
             return Result.failure()
         }
+    }
+
+    /** Tells the server what is still waiting on this phone (Devices & Sync on the web). Never
+     *  fails the run — offline, the report simply goes with the next one. */
+    private suspend fun reportStatus() {
+        runCatching { api.reportStatus(androidDeviceId(applicationContext), repository.unsyncedSyncItems()) }
+            .onFailure { android.util.Log.w("SyncWorker", "Sync status report not sent: ${it.message}") }
     }
 }

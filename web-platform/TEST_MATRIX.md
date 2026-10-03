@@ -199,3 +199,21 @@ existing RBAC helpers) rather than introducing new patterns.
 | Dashboard layout with real data | Hero, sections, meters, Findings panels | ✅ checked on a temporary preview page (removed) |
 | Stock Integrity / Reporting Completeness / OTP Dispensing / Supervision / DHIS2 pages, CSV export, DHIS2 upload | Render for each role; upload replaces facility-months | ✅ typecheck + lint; ⏳ browser click-through (sign-in needed) |
 | Map layers by risk / months of stock | — | ⏳ deferred (R42) |
+
+# RUTF M6 — Pilot hardening (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Catalogue audit (`tools/db/audit-permissions.js`) | RLS on every table; no signed-out policies or functions; definer `search_path`; `security_invoker` views; private buckets; every account in a project | ✅ no problems (before 0108: 27 SECURITY DEFINER functions callable signed out) |
+| Role-access matrix incl. section D (0108) | 202 checks across 5 roles + signed out | ✅ `node tools/db/test-mobile-role-access.js` 202/202 |
+| Facility user can't read the supplier's ledger or balance; Receive Stock pre-fill via `incoming_transfer_lines` (own facility only) | 0 rows / 0 balance; 1 line; 0 for another facility | ✅ section D |
+| Direct ledger insert / void, direct visit insert | Denied for every role | ✅ section D |
+| `create_notification` called directly (any role, signed out) | Denied; review RPCs that use it still work | ✅ section B + D |
+| Audit trail | Change logged; visible to Super Admin / Project Admin only | ✅ section D |
+| Sync report → status | Failing device shows *failing*; visible to own user and reviewers, not other supervisors; cleared once synced | ✅ section D |
+| Earlier suites after 0108 | ledger, findings, visits, KPIs | ✅ ledger 27/27 (pre-fill check moved to `incoming_transfer_lines`, plus supplier rows hidden), findings 13/13, visits 21/21, KPIs 26/26 |
+| New queries per demo role | Sync health and failures: admins and State Coordinator only; audit trail: admins; under 0.5 s | ✅ via JWT claims (rolled back) |
+| Android `SyncReport` (counts, failing list, error cleaning, cap) | As specified | ✅ `SyncReportTest` — unit tests 41/41; `assembleDebug` builds |
+| Devices & Sync, Audit Trail pages | Render for admins; hidden from other roles | ✅ typecheck + lint; ⏳ browser click-through |
+| Morning digest (`rutf-sync-digest`, 06:00 UTC) | One unread notification per admin when devices need attention | ⏳ check after the first morning run |
+| **UAT signed by the programme lead** (brief M6 "done when") | `docs/UAT_SCRIPT.md` completed and signed | ⏳ programme |

@@ -77,8 +77,14 @@ export function canAccessTeams(role: UserRole) {
   return role !== "viewer";
 }
 
+/** Devices & Sync (migration 0108): sync_health() returns rows to these roles only. */
 export function canAccessDevices(role: UserRole) {
-  return role !== "viewer";
+  return role === "super_admin" || role === "project_admin" || role === "state_coordinator";
+}
+
+/** Audit trail (migration 0108): audit_log is readable by Super Admin and Project Admin. */
+export function canAccessAuditLog(role: UserRole) {
+  return role === "super_admin" || role === "project_admin";
 }
 
 export function canCreateIssue(role: UserRole) {
@@ -152,6 +158,7 @@ export type NavKey =
   | "settings"
   | "downloadRequests"
   | "attendance"
+  | "auditLog"
   | "stockLedger"
   | "transfers"
   | "stockIntegrity"
@@ -198,7 +205,8 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "postImplementationReport", label: "Post Implementation Report", href: "/post-implementation-report", icon: "ph-file-text", section: "reporting" },
   { key: "teamPerformance", label: "Team Performance Report", href: "/team-performance", icon: "ph-chart-bar", section: "reporting" },
   { key: "teams", label: "Teams", href: "/teams", icon: "ph-users", section: "administration" },
-  { key: "devices", label: "Devices", href: "/devices", icon: "ph-device-mobile", section: "administration" },
+  { key: "devices", label: "Devices & Sync", href: "/devices", icon: "ph-device-mobile", section: "administration" },
+  { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Roles", href: "/users", icon: "ph-users-three", section: "administration" },
   { key: "datasets", label: "Data Sets", href: "/data-sets", icon: "ph-database", section: "administration" },
   { key: "projectadmins", label: "Project Admin Panel", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
@@ -218,6 +226,7 @@ export function visibleNavItemsFor(role: UserRole) {
     if (item.key === "settings") return canAccessSettings(role);
     if (item.key === "teams") return canAccessTeams(role);
     if (item.key === "devices") return canAccessDevices(role);
+    if (item.key === "auditLog") return canAccessAuditLog(role);
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);
     if (item.key === "attendance") return canAccessAttendance(role);
     return true;

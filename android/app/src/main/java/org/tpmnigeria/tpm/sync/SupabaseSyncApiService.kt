@@ -59,6 +59,12 @@ import org.tpmnigeria.tpm.session.AppSession
 import org.tpmnigeria.tpm.session.CurrentUser
 import java.io.File
 import java.time.Instant
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.tpmnigeria.tpm.BuildConfig
+import org.tpmnigeria.tpm.domain.buildSyncReport
 
 /**
  * Real push implementation against the TPM Monitoring Platform Supabase project — replaces
@@ -72,6 +78,8 @@ class SupabaseSyncApiService(
     private val stockRepository: StockRepository,
 ) : SyncApiService {
     private val ledgerJson = Json { ignoreUnknownKeys = true }
+    /** Last error per queue key during this run, sent with the sync report (cleaned there). */
+    private val lastErrors = mutableMapOf<String, String?>()
     private val postgrest get() = Supabase.client.postgrest
     private val storage get() = Supabase.client.storage
 
@@ -311,6 +319,26 @@ class SupabaseSyncApiService(
         )
     }
 
+    override suspend fun reportStatus(deviceId: String, unsynced: List<SyncQueueItem>) {
+        if (session.currentUser.value == null) return
+        val report = buildSyncReport(unsynced, lastErrors)
+        postgrest.rpc("report_sync_status", buildJsonObject {
+            put("p_device_id", deviceId)
+            put("p_app_version", BuildConfig.VERSION_NAME)
+            put("p_device_model", "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
+            put("p_os_version", "Android ${android.os.Build.VERSION.RELEASE}")
+            put("p_pending", report.pending)
+            put("p_failed", report.failed)
+            put("p_oldest_pending", report.oldestPendingAt?.let { JsonPrimitive(it) } ?: kotlinx.serialization.json.JsonNull)
+            put("p_failures", JsonArray(report.failures.map { f ->
+                buildJsonObject {
+                    put("local_id", f.localId); put("type", f.type); put("error", f.error)
+                    put("attempts", f.attempts); put("queued_at", f.queuedAt)
+                }
+            }))
+        })
+    }
+
     override suspend fun afterSync() {
         val user = session.currentUser.value ?: return
         stockRepository.refresh(user.facilityId)
@@ -339,6 +367,7 @@ class SupabaseSyncApiService(
             true
         } catch (e: Exception) {
             android.util.Log.e("SupabaseSyncApiService", "Ledger push failed for ${item.issueId}: ${e.message}", e)
+            lastErrors[item.localId] = e.message ?: e::class.simpleName
             false
         }
     }
@@ -405,6 +434,7 @@ class SupabaseSyncApiService(
                 true
             } catch (e: Exception) {
                 android.util.Log.e("SupabaseSyncApiService", "Attendance push failed for ${item.issueId}: ${e.message}", e)
+                lastErrors[item.localId] = e.message ?: e::class.simpleName
                 false
             }
         }
@@ -424,6 +454,7 @@ class SupabaseSyncApiService(
             true
         } catch (e: Exception) {
             android.util.Log.e("SupabaseSyncApiService", "Push failed for ${item.issueId}: ${e.message}", e)
+            lastErrors[item.localId] = e.message ?: e::class.simpleName
             false
         }
     }

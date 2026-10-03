@@ -601,6 +601,41 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["dhis2_reports"]["Insert"]>;
         Relationships: [];
       };
+      // Pilot hardening (migration 0108) — read-only from the web.
+      sync_failures: {
+        Row: {
+          id: string;
+          device_id: string;
+          profile_id: string;
+          project_id: string | null;
+          local_id: string;
+          submission_type: string | null;
+          error: string | null;
+          attempts: number;
+          queued_at: string | null;
+          first_seen_at: string;
+          last_seen_at: string;
+          resolved_at: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      audit_log: {
+        Row: {
+          id: number;
+          at: string;
+          actor: string | null;
+          table_name: string;
+          row_id: string | null;
+          action: "insert" | "update" | "delete";
+          changes: Json;
+          project_id: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       ledger_photos: {
         Row: {
           id: string;
@@ -697,6 +732,17 @@ export interface Database {
       };
     };
     Functions: {
+      sync_health: {
+        Args: Record<string, never>;
+        Returns: {
+          profile_id: string; name: string; role: UserRole; project_id: string | null; facility_id: string | null;
+          facility_name: string | null; lga_id: string | null; device_id: string | null; app_version: string | null;
+          device_model: string | null; last_report_at: string | null; last_success_at: string | null;
+          last_submission_at: string | null; pending_count: number; failed_count: number; oldest_pending_at: string | null;
+          last_error: string | null; open_failures: number;
+          status: "failing" | "stuck" | "not_syncing" | "no_report" | "never" | "ok";
+        }[];
+      };
       get_dashboard_stats: {
         Args: Record<string, never>;
         Returns: Json;

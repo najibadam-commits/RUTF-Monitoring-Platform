@@ -24,6 +24,10 @@ interface SyncApiService {
     /** Best-effort refresh after each sync run (e.g. the facility's stock cache once its
      *  submissions have landed) — no-op by default. */
     suspend fun afterSync() {}
+
+    /** Best-effort report of the queue left after a run — pending, failed, and why (web
+     *  migration 0108, `report_sync_status`) — no-op by default. */
+    suspend fun reportStatus(deviceId: String, unsynced: List<SyncQueueItem>) {}
 }
 
 /** Always-succeeds, no-network stand-in — see the interface kdoc above for when to use this

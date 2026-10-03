@@ -38,8 +38,12 @@ function check(area, role, what, expected, actual) {
 
 (async () => {
   const admin = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false } });
-  const pg = new Client({ connectionString: process.env.DATABASE_URL });
+  const pg = new Client({ connectionString: process.env.DATABASE_URL, keepAlive: true });
   await pg.connect();
+  if (process.env.RBAC_DEBUG) {
+    const q = pg.query.bind(pg);
+    pg.query = (sql, ...rest) => { console.error(`[sql] ${String(sql).replace(/\s+/g, " ").slice(0, 110)}`); return q(sql, ...rest); };
+  }
   const users = {}; // role -> { id, email, password }
 
   try {
@@ -270,6 +274,99 @@ function check(area, role, what, expected, actual) {
         }
       });
     }
+
+    // ── D. Pilot hardening (migration 0108, brief M6) ───────────────────────────────────────────
+    // LST1 holds stock and has a transfer in transit to OTP1 (the DRI's facility).
+    const today = new Date().toISOString().slice(0, 10);
+    const LOT = (await one(`select id from product_lots limit 1`)).id;
+    const TR = (await one(`insert into transfers (project_id, from_facility_id, to_facility_id, issued_date, sachets_issued)
+                           values ($1, $2, $3, $4, 150) returning id`, [P, LST1, OTP1, today])).id;
+    await pg.query(`insert into stock_transactions (project_id, facility_id, txn_type, txn_date, lot_id, quantity_sachets, recorded_by, document_no)
+                    values ($1, $2, 'receipt', $3, $4, 1000, $5, 'RBAC TEST')`, [P, LST1, today, LOT, u("super_admin")]);
+    await pg.query(`insert into stock_transactions (project_id, facility_id, txn_type, txn_date, lot_id, quantity_sachets, recorded_by,
+                                                    counterparty_facility_id, transfer_id, local_id)
+                    values ($1, $2, 'issue', $3, $4, 150, $5, $6, $7, 'rbac-test-issue:1')`, [P, LST1, today, LOT, u("super_admin"), OTP1, TR]);
+    await pg.query(`update facilities set name = name || ' (audited)' where id = $1`, [OTP2]); // owner, so actor null
+
+    const EXPECT_D = {
+      supplierLedgerRows: { super_admin: 2, project_admin: 2, state_coordinator: 2, tpm_supervisor: 2, dri: 0 },
+      supplierBalance:    { super_admin: 850, project_admin: 850, state_coordinator: 850, tpm_supervisor: 850, dri: 0 },
+      incomingLines:      { super_admin: 1, project_admin: 1, state_coordinator: 1, tpm_supervisor: 1, dri: 1 },
+      writeDhis2:         { super_admin: "allowed", project_admin: "allowed", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
+      auditVisible:       { super_admin: true, project_admin: true, state_coordinator: false, tpm_supervisor: false, dri: false },
+      syncHealthVisible:  { super_admin: true, project_admin: true, state_coordinator: true, tpm_supervisor: false, dri: false },
+    };
+    for (const role of ROLES) {
+      await asRole(role, async () => {
+        check("D. hardening", role, "supplier's ledger rows readable", EXPECT_D.supplierLedgerRows[role],
+          Number((await one(`select count(*)::int n from stock_transactions where facility_id = $1`, [LST1])).n));
+        check("D. hardening", role, "ledger_balance of the supplier", EXPECT_D.supplierBalance[role],
+          Number((await one(`select ledger_balance($1, null, $2) b`, [LST1, today])).b));
+        check("D. hardening", role, "incoming_transfer_lines(own/scoped facility)", EXPECT_D.incomingLines[role],
+          Number((await one(`select count(*)::int n from incoming_transfer_lines($1)`, [OTP1])).n));
+        if (role === "dri") check("D. hardening", role, "incoming_transfer_lines(another facility)", 0,
+          Number((await one(`select count(*)::int n from incoming_transfer_lines($1)`, [OTP2])).n));
+        check("D. hardening", role, "write a ledger row directly (not via record_*)", "denied",
+          await attempt(`insert into stock_transactions (facility_id, txn_type, txn_date, quantity_sachets, recorded_by)
+                         values ($1, 'receipt', $2, 5, $3)`, [OTP1, today, u(role)]));
+        check("D. hardening", role, "void a ledger row directly", "denied",
+          await attempt(`update stock_transactions set status = 'voided' where facility_id = $1`, [LST1], { rowsMustChange: true }));
+        check("D. hardening", role, "write a visit directly (not via record_visit)", "denied",
+          await attempt(`insert into monitoring_visits (visit_type, facility_id, supervisor_id, visit_date, lat, lng, device_id)
+                         values ('store_check', $1, $2, $3, 12, 7, 'x')`, [LST1, u(role), today]));
+        check("D. hardening", role, "upload a DHIS2 report row", EXPECT_D.writeDhis2[role],
+          await attempt(`insert into dhis2_reports (project_id, facility_id, period, sachets_distributed) values ($1, $2, date_trunc('month', now())::date, 1)`, [P, OTP1]));
+        check("D. hardening", role, "send a notification/email via create_notification", "denied",
+          await attempt(`select create_notification($1, 'x', 'x', null, null)`, [u("super_admin")]));
+        check("D. hardening", role, "sees the audit trail", EXPECT_D.auditVisible[role],
+          Number((await one(`select count(*)::int n from audit_log where table_name = 'facilities' and row_id = $1::text`, [OTP2])).n) > 0);
+        check("D. hardening", role, "report_sync_status from own device", "allowed",
+          await attempt(`select report_sync_status('rbac-dev-' || $1, '1.0', 'Test', '14', 2, 1, now() - interval '2 days',
+                         '[{"local_id":"rbac-l1","type":"Dispensing","error":"timeout","attempts":3}]'::jsonb)`, [role]));
+        const seen = await attempt(`select 1 from sync_health() limit 1`);
+        const rows = seen === "allowed" ? Number((await one(`select count(*)::int n from sync_health()`)).n) : 0;
+        check("D. hardening", role, "sees sync health", EXPECT_D.syncHealthVisible[role], rows > 0);
+      });
+    }
+    // A failing device shows as failing, and only its own user and the reviewers see the report.
+    await asRole("dri", async () => {
+      await pg.query(`select report_sync_status('rbac-dev', '1.0', 'Test', '14', 2, 1, now() - interval '2 days',
+                      '[{"local_id":"rbac-l1","type":"Dispensing","error":"timeout","attempts":3}]'::jsonb)`);
+      check("D. hardening", "dri", "own sync report visible", 1, Number((await one(`select count(*)::int n from device_sync_status where device_id = 'rbac-dev'`)).n));
+    });
+    await pg.query("set local role authenticated");
+    await pg.query(`select set_config('request.jwt.claims', $1, true), set_config('request.jwt.claim.sub', $2, true)`, [JSON.stringify({ sub: u("dri"), role: "authenticated" }), u("dri")]);
+    await pg.query(`select report_sync_status('rbac-dev', '1.0', 'Test', '14', 2, 1, now() - interval '2 days',
+                    '[{"local_id":"rbac-l1","type":"Dispensing","error":"timeout","attempts":3}]'::jsonb)`);
+    await pg.query("reset role");
+    await pg.query(`select set_config('request.jwt.claims', '', true), set_config('request.jwt.claim.sub', '', true)`);
+    check("D. hardening", "dri", "failing device reported as failing", "failing",
+      (await one(`select status from sync_health_internal($1) where profile_id = $2`, [P, u("dri")])).status);
+    for (const role of ["tpm_supervisor", "state_coordinator"]) {
+      await asRole(role, async () => {
+        check("D. hardening", role, "another user's sync report visible", role === "state_coordinator" ? 1 : 0,
+          Number((await one(`select count(*)::int n from device_sync_status where device_id = 'rbac-dev'`)).n));
+      });
+    }
+    // Clearing the queue resolves the failure.
+    await pg.query("set local role authenticated");
+    await pg.query(`select set_config('request.jwt.claims', $1, true), set_config('request.jwt.claim.sub', $2, true)`, [JSON.stringify({ sub: u("dri"), role: "authenticated" }), u("dri")]);
+    await pg.query(`select report_sync_status('rbac-dev', '1.0', 'Test', '14', 0, 0, null, '[]'::jsonb)`);
+    await pg.query("reset role");
+    await pg.query(`select set_config('request.jwt.claims', '', true), set_config('request.jwt.claim.sub', '', true)`);
+    check("D. hardening", "dri", "failure resolved once synced", "0/ok",
+      `${(await one(`select count(*) filter (where resolved_at is null)::int n from sync_failures where profile_id = $1 and device_id = 'rbac-dev'`, [u("dri")])).n}/` +
+      (await one(`select status from sync_health_internal($1) where profile_id = $2`, [P, u("dri")])).status);
+
+    // Signed out (anon key, no session): no data, no functions.
+    await pg.query("savepoint anon_ctx");
+    await pg.query("set local role anon");
+    check("D. hardening", "anon", "signed out: facilities readable", 0, Number((await one(`select count(*)::int n from facilities`)).n));
+    check("D. hardening", "anon", "signed out: call rutf_kpis", "denied", await attempt(`select rutf_kpis('2026-09-01', '2026-09-30')`));
+    check("D. hardening", "anon", "signed out: call ledger_balance", "denied", await attempt(`select ledger_balance($1, null, current_date)`, [LST1]));
+    check("D. hardening", "anon", "signed out: call create_notification", "denied", await attempt(`select create_notification($1, 'x', 'x', null, null)`, [u("super_admin")]));
+    await pg.query("reset role");
+    await pg.query("rollback to savepoint anon_ctx"); await pg.query("release savepoint anon_ctx");
   } finally {
     try { await pg.query("rollback"); } catch { /* no open transaction */ }
     for (const role of Object.keys(users)) {

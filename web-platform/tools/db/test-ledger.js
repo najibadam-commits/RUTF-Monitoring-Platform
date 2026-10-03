@@ -99,8 +99,11 @@ function check(what, expected, actual) {
 
     // 4. LGA store -> OTP1, and OTP1 receives 10 short (2 of them damaged).
     const r4 = await rpc(U.lst, `select record_issue('LT-4', $1, $2, ${day(10)}, $3)`, [LST, OTP1, lines([{ lot_id: lotId, quantity: 600 }])]);
-    const issueLinesSeen = (await as(U.otp, `select count(*)::int n from stock_transactions where transfer_id = $1 and txn_type = 'issue'`, [r4.transfer_id])).rows[0].n;
+    // The pre-fill comes through incoming_transfer_lines(); the supplier's ledger rows stay hidden (0108, R44).
+    const issueLinesSeen = (await as(U.otp, `select count(*)::int n from incoming_transfer_lines($1) where transfer_id = $2`, [OTP1, r4.transfer_id])).rows[0].n;
     check("OTP user sees the issue lines addressed to it (pre-fill)", 1, issueLinesSeen);
+    const supplierRowsSeen = (await as(U.otp, `select count(*)::int n from stock_transactions where transfer_id = $1 and txn_type = 'issue'`, [r4.transfer_id])).rows[0].n;
+    check("OTP user can't read the supplier's ledger rows", 0, supplierRowsSeen);
     const r5 = await rpc(U.otp, `select record_receipt('LT-5', $1, ${day(9)}, $2, $3)`, [OTP1, lines([{ lot_id: lotId, quantity: 590, damaged: 2 }]), r4.transfer_id]);
     check("short receipt marks a discrepancy", "discrepancy", r5.transfer_status);
     check("transfer gap", 10, (await one(`select gap from transfer_overview where id = $1`, [r4.transfer_id])).gap);

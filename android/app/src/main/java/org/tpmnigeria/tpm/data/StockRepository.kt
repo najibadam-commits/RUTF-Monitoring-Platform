@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.tpmnigeria.tpm.data.local.DispensingDayEntity
 import org.tpmnigeria.tpm.data.local.FacilityRefEntity
 import org.tpmnigeria.tpm.data.local.OtpDispensingEntity
@@ -209,14 +211,11 @@ class StockRepository(
             .select(columns = Columns.list("id", "code", "from_facility_id", "to_facility_id", "issued_date", "sachets_issued", "document_no")) {
                 filter { eq("to_facility_id", facilityId); eq("status", "in_transit") }
             }.decodeList<TransferDto>()
-        val lines = if (transfers.isEmpty()) emptyList() else postgrest.from("stock_transactions")
-            .select(columns = Columns.list("transfer_id", "lot_id", "quantity_sachets", "local_id")) {
-                filter {
-                    isIn("transfer_id", transfers.map { it.id })
-                    eq("txn_type", "issue")
-                }
-                order("local_id", Order.ASCENDING)
-            }.decodeList<TransferLineDto>()
+        // The supplier's issue lines come through incoming_transfer_lines() (web migration 0108):
+        // a facility user can't read the supplier's ledger rows directly (DECISIONS R27).
+        val lines = if (transfers.isEmpty()) emptyList() else postgrest
+            .rpc("incoming_transfer_lines", buildJsonObject { put("p_facility_id", facilityId) })
+            .decodeList<TransferLineDto>()
         val since = LocalDate.now().minusDays(DISPENSING_DAYS_BACK).toString()
         val days = postgrest.from("otp_daily_dispensing").select(columns = Columns.list("dispense_date")) {
             filter { eq("facility_id", facilityId); gte("dispense_date", since) }

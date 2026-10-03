@@ -111,6 +111,11 @@ class AppRepository(
      *  not this method directly. */
     suspend fun markSynced(localId: String) = syncQueueDao.updateStatus(localId, SyncStatus.Synced)
 
+    /** Every queue row not yet synced (Pending and Failed) — what SyncWorker reports to the
+     *  server after each run (web migration 0108, Devices & Sync). */
+    suspend fun unsyncedSyncItems(): List<SyncQueueItem> =
+        (syncQueueDao.getByStatus(SyncStatus.Pending) + syncQueueDao.getByStatus(SyncStatus.Failed)).map { it.toDomain() }
+
     /** Called by SyncWorker after a failed push. Below MAX_SYNC_RETRIES this is a no-op status-wise
      *  (stays Pending so WorkManager's own backoff keeps retrying) — past it, the row flips to
      *  Failed so it stops being retried forever and becomes visible to the user as needing

@@ -10,6 +10,7 @@ Decisions: [DECISIONS.md](DECISIONS.md).
 | `android/` | Offline Android app (Kotlin, Room, sync queue) |
 | `data/reference/` | Katsina health facility list |
 | `data/dummy/` | Generated demo data (`tools/dummy-data/`) |
+| `docs/` | Pilot hardening (M6): [permissions review](docs/PERMISSIONS_REVIEW.md), [DPIA draft](docs/DPIA_DRAFT.md), [UAT script](docs/UAT_SCRIPT.md), training guides for [facility users](docs/training/facility-user-guide.md) and [supervisors](docs/training/supervisor-guide.md) |
 
 Supabase applies `web-platform/supabase/migrations` on every push to `main` (GitHub integration,
 Supabase directory = `web-platform`). Secrets live only in untracked `web-platform/web/.env.local`,
