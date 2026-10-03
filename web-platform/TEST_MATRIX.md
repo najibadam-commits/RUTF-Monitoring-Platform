@@ -362,3 +362,4 @@ existing RBAC helpers) rather than introducing new patterns.
 | Ward ID from stored codes, readable by any signed-in role | Mazoji A, Daura → KT-DAU-MAJ; Mazoji B → KT-DAU-MAZ | ✅ queried as the demo Viewer |
 | Master Data facility list, Finding detail | Ward name followed by its Ward ID | ✅ typecheck + lint; ⏳ browser check |
 | LGA ID (R80) | Daura → KT-DAU in Master Data and on the Finding page | ✅ typecheck + lint; ⏳ browser check |
+| State ID (R81) | "State ID KT" on the Finding page; "Katsina (KT)" in the map's state filter | ✅ typecheck + lint; ⏳ browser check |

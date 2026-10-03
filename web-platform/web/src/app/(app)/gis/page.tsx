@@ -81,7 +81,7 @@ export default async function GisPage() {
       <RealtimeRefresher table="issues" />
       <GisMap
         issues={issues}
-        states={states.map((s) => ({ id: s.id, name: s.name }))}
+        states={states.map((s) => ({ id: s.id, name: s.code ? `${s.name} (${s.code})` : s.name }))}
         lgas={lgas.map((l) => ({ id: l.id, stateId: l.state_id, name: l.name }))}
         categories={categories.map((c) => c.name)}
         statuses={STATUS_FILTER_OPTIONS.map((s) => ({ value: s, label: STATUS_LABEL[s], color: STATUS_COLOR[s] }))}

@@ -191,9 +191,10 @@ export function IssueDetailClient({
                 <span className="text-muted">State / LGA / Ward</span>
                 <br />
                 {issue.state?.name} / {issue.lga?.name} / {issue.ward_ref?.name ?? issue.ward ?? "—"}
-                {lgaId(issue.state?.code, issue.lga?.abbr) && (
+                {issue.state?.code && (
                   <div className="text-muted" style={{ fontSize: 11.5 }}>
-                    LGA ID {lgaId(issue.state?.code, issue.lga?.abbr)}
+                    State ID {issue.state.code}
+                    {lgaId(issue.state?.code, issue.lga?.abbr) && <> · LGA ID {lgaId(issue.state?.code, issue.lga?.abbr)}</>}
                     {wardId(issue.state?.code, issue.lga?.abbr, issue.ward_ref?.abbr) && <> · Ward ID {wardId(issue.state?.code, issue.lga?.abbr, issue.ward_ref?.abbr)}</>}
                   </div>
                 )}

@@ -1,4 +1,5 @@
-// LGA and Ward IDs in the platform's administrative order (DECISIONS R79, R80): STATE-LGA, e.g. KT-DAU,
+// State, LGA and Ward IDs in the platform's administrative order (DECISIONS R79–R81): the State ID is
+// the state's code (KT); STATE-LGA, e.g. KT-DAU,
 // and STATE-LGA-WARD, e.g. KT-DAU-MAJ —
 // the first three parts of every Facility, Finding, transfer and visit ID. Built from the stored
 // codes (states.code, lgas.abbr, wards.abbr); the ward's official numeric code (wards.code) stays
