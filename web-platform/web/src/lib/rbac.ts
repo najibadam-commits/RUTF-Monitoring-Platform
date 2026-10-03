@@ -153,13 +153,19 @@ export type NavKey =
   | "downloadRequests"
   | "attendance"
   | "stockLedger"
-  | "transfers";
+  | "transfers"
+  | "stockIntegrity"
+  | "reportingCompleteness"
+  | "otpDispensing"
+  | "supervision"
+  | "dhis2Triangulation";
 
-export type NavSection = "overview" | "stock" | "analytics" | "reporting" | "administration";
+export type NavSection = "overview" | "stock" | "supervision" | "analytics" | "reporting" | "administration";
 
 export const NAV_SECTION_LABELS: Record<NavSection, string> = {
   overview: "Overview",
   stock: "Stock",
+  supervision: "Supervision",
   analytics: "Analytics",
   reporting: "Reporting",
   administration: "Administration",
@@ -180,6 +186,12 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // facility only).
   { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
   { key: "transfers", label: "Transfers", href: "/transfers", icon: "ph-truck", section: "stock" },
+  // Analysis pages (brief §9, M5) — facility_metrics() is security invoker, so RLS scopes them too.
+  { key: "stockIntegrity", label: "Stock Integrity", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
+  { key: "reportingCompleteness", label: "Reporting Completeness", href: "/reporting-completeness", icon: "ph-check-square-offset", section: "stock" },
+  { key: "otpDispensing", label: "OTP Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
+  { key: "supervision", label: "Visits & Planner", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
+  { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "analytics", label: "Analytics", href: "/analytics", icon: "ph-chart-line", section: "analytics" },
   { key: "timeEfficiency", label: "Time Efficiency Analysis", href: "/time-efficiency", icon: "ph-gauge", section: "analytics" },
   { key: "reportingCentre", label: "Reporting Centre", href: "/reporting", icon: "ph-export", section: "reporting" },

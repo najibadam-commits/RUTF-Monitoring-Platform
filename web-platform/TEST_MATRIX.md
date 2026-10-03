@@ -185,3 +185,17 @@ existing RBAC helpers) rather than introducing new patterns.
 | Android Room v11 → v12 | Three supervision cache tables, SQL equal to `12.json` | ✅ schema compared; 🔧 `MigrationTest.migrate11To12…` compiles, run on a device |
 | **Both visit types end-to-end on a physical device** (brief M4 "done when") | Visit recorded offline, synced once, Findings in review | 🔧 `assembleDebug` builds — **needs a phone** with `hadiza.danjuma@…` (OTP sites) and `hadiza.kankia@…` (stores) |
 | Users & Roles: assign a supervisor's level and LGAs | Shown under the role; scope applies to visits | ⏳ click-through |
+
+# RUTF M5 — Dashboards, metrics, risk, planner, DHIS2 (brief §11)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| `rutf_kpis` vs hand calculation (`tools/dummy-data/kpis.py`) — Jul, Aug, Sep 2026 | Every KPI equal (Sep: stock on hand 2,876,700 / 1,092,803 / 609,347; MoS 3.22 / 1.25 / 0.72; stockout 2.0%; variance 2.79%; short −0.19%; VF median 1.00; dispensing completeness 98.0%; counts on time 98.4%; supervision 306 / 307) | ✅ `node tools/db/test-kpis.js 2026-09` (26/26; also 07, 08) |
+| Risk score and planner sanity | Scores 0–100; due reasons consistent; suggestions ≤ workload per supervisor | ✅ test-kpis.js |
+| DHIS2 import | 1,632 facility-months; re-run updates in place | ✅ `import-dhis2.js` (live) |
+| Queries per role (rolled back, JWT claims) | Admin / reviewer / supervisor see the project, a facility user only their facility; planner rows for admins and the supervisor's own facilities | ✅ project admin, supervisor, facility user, viewer, state coordinator |
+| Performance after 0106 / 0107 | Reviewer KPI call < 2 s via the API (was 34.7 s) | ✅ ~0.5–1.1 s |
+| Earlier suites after 0105–0107 | role access 137, ledger 26, findings 13, visits 21 | ✅ |
+| Dashboard layout with real data | Hero, sections, meters, Findings panels | ✅ checked on a temporary preview page (removed) |
+| Stock Integrity / Reporting Completeness / OTP Dispensing / Supervision / DHIS2 pages, CSV export, DHIS2 upload | Render for each role; upload replaces facility-months | ✅ typecheck + lint; ⏳ browser click-through (sign-in needed) |
+| Map layers by risk / months of stock | — | ⏳ deferred (R42) |

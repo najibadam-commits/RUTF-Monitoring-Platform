@@ -147,6 +147,7 @@ export interface Database {
           period_start: string | null;
           period_end: string | null;
           dedupe_key: string | null;
+          visit_id: string | null; // supervision visit that raised it (migration 0103)
         };
         Insert: {
           id?: string;
@@ -483,6 +484,123 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      // Supervision visits (migration 0103) — written only through record_visit(); read-only here.
+      monitoring_visits: {
+        Row: {
+          id: string;
+          code: string | null;
+          project_id: string | null;
+          visit_type: "store_check" | "otp_verification";
+          facility_id: string;
+          supervisor_id: string;
+          visit_date: string;
+          period_start: string | null;
+          period_end: string | null;
+          lat: number;
+          lng: number;
+          gps_accuracy_m: number | null;
+          distance_to_facility_m: number | null;
+          outside_geofence: boolean | null;
+          device_id: string;
+          local_id: string | null;
+          status: string;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      stock_check_lines: {
+        Row: {
+          id: string;
+          visit_id: string;
+          lot_id: string | null;
+          lot_no_seen: string | null;
+          expiry_seen: string | null;
+          stock_card_balance: number | null;
+          system_balance: number | null;
+          physical_count: number;
+          damaged_count: number;
+          expired_count: number;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      store_checks: {
+        Row: {
+          visit_id: string;
+          stock_card_present: boolean;
+          stock_card_up_to_date: boolean | null;
+          storage_dry: boolean | null;
+          storage_off_floor: boolean | null;
+          storage_ventilated: boolean | null;
+          pests_seen: boolean | null;
+          fefo_followed: boolean | null;
+          notes: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      otp_verifications: {
+        Row: {
+          visit_id: string;
+          register_present: boolean;
+          admissions_counted: number | null;
+          sachets_dispensed_counted: number | null;
+          admissions_recorded: number | null;
+          sachets_dispensed_recorded: number | null;
+          notes: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      visit_photos: {
+        Row: {
+          id: string;
+          visit_id: string;
+          storage_path: string;
+          kind: "stock_card" | "stock" | "register_page" | "selfie" | "other";
+          mime_type: string | null;
+          size_bytes: number | null;
+          uploaded_by: string | null;
+          uploaded_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      // DHIS2 monthly RUTF reports (migration 0105) — written by the admin CSV upload.
+      dhis2_reports: {
+        Row: {
+          id: string;
+          project_id: string | null;
+          facility_id: string;
+          period: string;
+          otp_admissions: number | null;
+          sachets_received: number | null;
+          sachets_distributed: number | null;
+          sachets_wasted: number | null;
+          stockout_days: number | null;
+          imported_by: string | null;
+          imported_at: string;
+        };
+        Insert: {
+          project_id?: string | null;
+          facility_id: string;
+          period: string;
+          otp_admissions?: number | null;
+          sachets_received?: number | null;
+          sachets_distributed?: number | null;
+          sachets_wasted?: number | null;
+          stockout_days?: number | null;
+          imported_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["dhis2_reports"]["Insert"]>;
+        Relationships: [];
+      };
       ledger_photos: {
         Row: {
           id: string;
@@ -646,6 +764,43 @@ export interface Database {
       reject_activity_site: {
         Args: { p_id: string; p_note: string };
         Returns: Database["public"]["Tables"]["activity_sites"]["Row"];
+      };
+      // RUTF metrics (migrations 0105/0106) — security invoker: callers aggregate what RLS shows them.
+      rutf_kpis: {
+        Args: { p_start: string; p_end: string };
+        Returns: Json;
+      };
+      facility_metrics: {
+        Args: { p_start: string; p_end: string };
+        Returns: {
+          facility_id: string; facility_name: string; facility_type: FacilityType; is_otp_site: boolean; lga_id: string;
+          balance: number; monthly_outflow: number | null; months_of_stock: number | null; expired_balance: number;
+          stockout_days: number; last_count_date: string | null; last_variance_pct: number | null;
+          sachets_prescribed: number; sachets_dispensed: number; short_pct: number | null; children_seen: number; new_admissions: number;
+          dispensing_weeks: number | null; expected_weeks: number | null; count_on_time: boolean;
+          last_visit_date: string | null; last_vf: number | null; open_findings: number; open_critical: number;
+        }[];
+      };
+      facility_risk: {
+        Args: { p_as_of?: string };
+        Returns: { facility_id: string; facility_name: string; facility_type: FacilityType; lga_id: string; risk_score: number; components: Json; last_visit_date: string | null }[];
+      };
+      supervision_plan: {
+        Args: { p_as_of?: string };
+        Returns: {
+          supervisor_id: string; supervisor_name: string; facility_id: string; facility_name: string; facility_type: FacilityType;
+          lga_id: string; risk_score: number; last_visit_date: string | null; days_since_visit: number | null; due: boolean;
+          reason: string | null; suggested: boolean; rank: number;
+        }[];
+      };
+      dhis2_triangulation: {
+        Args: { p_start: string; p_end: string };
+        Returns: {
+          facility_id: string; facility_name: string; lga_id: string; period: string;
+          dhis2_received: number | null; ledger_received: number; dhis2_distributed: number | null; ledger_distributed: number;
+          dhis2_wasted: number | null; ledger_wasted: number; dhis2_stockout_days: number | null; ledger_stockout_days: number;
+          distributed_diff_pct: number | null;
+        }[];
       };
       approve_facility: {
         Args: { p_id: string; p_note?: string | null };

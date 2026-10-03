@@ -31,7 +31,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/attendance": "Field Monitor Attendance",
 };
 
-const SECTION_ORDER: NavSection[] = ["overview", "stock", "analytics", "reporting", "administration"];
+const SECTION_ORDER: NavSection[] = ["overview", "stock", "supervision", "analytics", "reporting", "administration"];
 
 const SIDEBAR_COLLAPSE_KEY = "tpm.sidebar.collapsed";
 
