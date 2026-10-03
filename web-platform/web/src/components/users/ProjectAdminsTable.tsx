@@ -33,9 +33,10 @@ export function ProjectAdminsTable({ admins }: { admins: Admin[] }) {
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>Project Admin Panel</h2>
+          <h2 style={{ marginBottom: 2 }}>Programme Administrators</h2>
           <p className="text-muted" style={{ fontSize: 13 }}>
-            Create and manage Project Admin accounts and their access — Super Admin only.
+            The administrators who run each programme on the platform — the Katsina RUTF Pilot today, more states as it scales.
+            Super Admin only.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>

@@ -189,7 +189,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Access", href: "/users", icon: "ph-users-three", section: "administration" },
   { key: "datasets", label: "Master Data", href: "/data-sets", icon: "ph-database", section: "administration" },
-  { key: "projectadmins", label: "Project Admin Panel", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
+  { key: "projectadmins", label: "Programme Administrators", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
   { key: "settings", label: "Settings", href: "/settings", icon: "ph-gear-six", section: "administration" },
   // "reporting", not "administration" — Viewer must have zero Administration-section access, and
   // Viewer is exactly the role that needs this item (to track their own requests).

@@ -301,7 +301,7 @@ export async function resetUserPasswordAction(email: string): Promise<ActionResu
   return {};
 }
 
-/** Project Admin Panel — Super Admin only: creates a project + its Project Admin account together (see DECISIONS.md #2). */
+/** Programme Administrators — Super Admin only: creates a project + its Project Admin account together (see DECISIONS.md #2). */
 export async function addProjectAdminAction(input: { name: string; email: string; phone: string; projectName: string }): Promise<ActionResult> {
   const caller = await getCurrentProfile();
   if (!canAccessProjectAdminPanel(caller.role)) return { error: "Not authorized." };
@@ -331,7 +331,7 @@ export async function addProjectAdminAction(input: { name: string; email: string
 }
 
 /**
- * Bulk Import (Project Admin Panel) — same column-mapped CSV pattern as bulkAddUsersAction, but
+ * Bulk Import (Programme Administrators) — same column-mapped CSV pattern as bulkAddUsersAction, but
  * each row also names a project. Per the product decision recorded in DECISIONS.md: rows sharing
  * the same (trimmed, case-insensitive) project name become multiple admins on ONE newly-created
  * project; different names each create their own new project. This never targets a pre-existing

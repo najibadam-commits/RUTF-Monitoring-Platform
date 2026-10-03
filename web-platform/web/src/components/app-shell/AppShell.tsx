@@ -25,7 +25,7 @@ const VIEW_TITLES: Record<string, string> = {
   "/devices": "Offline Sync Health",
   "/users": "Users & Access",
   "/data-sets": "Master Data",
-  "/project-admins": "Project Admin Panel",
+  "/project-admins": "Programme Administrators",
   "/settings": "System Settings",
 };
 
