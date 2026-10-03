@@ -7,6 +7,8 @@
 //
 // Rows keep the CSV's ids and insert with ON CONFLICT (id) DO NOTHING, so a re-run adds only
 // what is missing. Direct connection: the tables have no write policies, by design.
+// Transfer IDs: the CSV's TRF-DUMMY-… codes are replaced in the same transaction by the
+// TRF-STATE-LGA-WARD-LEVEL-YYNNN format (migration 0119, DECISIONS R76), in issue order.
 //
 // Usage: node import-ledger.js
 require("dotenv").config({ quiet: true });
@@ -19,6 +21,8 @@ const DATA_DIR = path.join(__dirname, "..", "..", "..", "data", "dummy");
 const BATCH = 500;
 const read = (f) => parse(fs.readFileSync(path.join(DATA_DIR, f)), { columns: true, skip_empty_lines: true });
 const blank = (s) => ((s ?? "").trim() === "" ? null : s.trim());
+// A transfer ID in the migration-0119 format, e.g. TRF-KT-DAU-MAJ-OTP-26001.
+const NEW_TRANSFER_ID = "^TRF-[A-Z]{2,3}-[A-Z]{3}-[A-Z]{3}-[A-Z]{3}-[0-9]{5,}$";
 
 async function insertBatch(client, table, cols, rows) {
   let inserted = 0;
@@ -63,6 +67,27 @@ async function insertBatch(client, table, cols, rows) {
         to_facility_id: t.to_facility_id, issued_date: t.issued_date, received_date: blank(t.received_date),
         sachets_issued: Number(t.sachets_issued), sachets_received: blank(t.sachets_received) === null ? null : Number(t.sachets_received), status: t.status,
       })));
+
+    // Same IDs record_issue gives (migration 0119): any transfer not yet in the new format is
+    // re-numbered in issue order. Audit trigger paused for this, as in the migration.
+    const { n: toNumber } = (await client.query(`select count(*)::int n from transfers where code !~ $1`, [NEW_TRANSFER_ID])).rows[0];
+    if (toNumber) {
+      if (!(await client.query(`select 1 from pg_proc where proname = 'next_transfer_code'`)).rowCount) {
+        throw new Error("next_transfer_code() not found — apply migration 0119 first");
+      }
+      await client.query(`
+        do $$
+        declare r record;
+        begin
+          alter table transfers disable trigger transfers_audit;
+          for r in select id, to_facility_id, issued_date from transfers where code !~ '${NEW_TRANSFER_ID}'
+                   order by issued_date, created_at, id loop
+            update transfers set code = next_transfer_code(r.to_facility_id, r.issued_date) where id = r.id;
+          end loop;
+          alter table transfers enable trigger transfers_audit;
+        end $$`);
+      console.log(`  transfers: ${toNumber} given TRF-STATE-LGA-WARD-LEVEL-YYNNN IDs`);
+    }
 
     const txnRows = txns.map((t) => ({
       id: t.id, project_id: projectByFacility.get(t.facility_id), facility_id: t.facility_id, txn_type: t.txn_type, txn_date: t.txn_date,
