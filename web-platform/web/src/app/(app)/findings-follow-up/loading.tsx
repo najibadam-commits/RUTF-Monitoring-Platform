@@ -1,6 +1,6 @@
 import { Skeleton, SkeletonTable } from "@/components/ui/Skeleton";
 
-export default function SubpanelLoading() {
+export default function FindingsFollowUpLoading() {
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>

@@ -1,15 +1,15 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { canAccessSubPanel } from "@/lib/rbac";
+import { canAccessFindingsFollowUp } from "@/lib/rbac";
 import { StatusTag } from "@/components/ui/Tags";
 import { ClickableRow } from "@/components/ui/ClickableRow";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import type { IssueStatus } from "@/lib/types/database";
 
-export default async function SubPanelPage() {
+export default async function FindingsFollowUpPage() {
   const profile = await getCurrentProfile();
-  if (!canAccessSubPanel(profile.role)) redirect("/dashboard");
+  if (!canAccessFindingsFollowUp(profile.role)) redirect("/dashboard");
 
   const supabase = await createClient();
   const { data } = await supabase

@@ -167,7 +167,7 @@ function pick(rand, arr) {
     let cursor = new Date(reportedAt.getTime() + (4 + Math.floor(rand() * 20)) * 3600000);
 
     if (statusIdx >= 1) {
-      await pg.query(`insert into issue_history (issue_id, actor_id, actor_label, action, note) values ($1,$2,'TPM Sub-Panel','Assigned to DRI',$3)`, [
+      await pg.query(`insert into issue_history (issue_id, actor_id, actor_label, action, note) values ($1,$2,'Findings Follow-up','Assigned to DRI',$3)`, [
         issue.id,
         tpmId,
         "Routed to the assigned DRI for action.",

@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // TPM Sub-Panel was renamed Findings Follow-up (DECISIONS R56); keep old links and bookmarks working.
+  async redirects() {
+    return [{ source: "/subpanel", destination: "/findings-follow-up", permanent: true }];
+  },
   experimental: {
     // Every route under (app)/ reads cookies (Supabase session), so Next treats all of them as
     // fully dynamic and — with the default of 0 — never reuses a page the client already fetched,

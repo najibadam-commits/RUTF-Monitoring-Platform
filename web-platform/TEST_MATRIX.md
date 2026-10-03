@@ -274,3 +274,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | Exports, Sep 2026, live data | KPIs 27 indicators (stock on hand 2,876,700 / MoS 3.22 as on the dashboard); facility metrics 307 rows with 10 child-count cells as "<5"; ledger 2,829 rows; transfers 571 rows; each ≤ 3 s | ✅ (service key, read-only) |
 | Direct export as Viewer | `/reporting/export` refuses (403) | ✅ code path; ⏳ browser check |
 | Viewer request → approval → one-time download | Request appears as e.g. "Facility metrics · CSV, month: 2026-09"; download built on approval | ⏳ click-through |
+
+# Findings Follow-up rename (R56)
+
+| Test case | Expected result | Status |
+|---|---|---|
+| Menu, page heading, browser title | "Findings Follow-up" at `/findings-follow-up` | ✅ typecheck; ⏳ browser check (restart the dev server — next.config changed) |
+| Old address `/subpanel` | Redirects permanently to `/findings-follow-up` | ⏳ browser check |
+| Assign a Finding to a DRI | History entry actor "Findings Follow-up" | ✅ role access 202/202 with 0112; applied, live function checked, permissions audit clean |
