@@ -44,6 +44,38 @@ export const getLgas = cache(async (client: SupabaseClient<Database>, stateId?: 
   return data ?? [];
 });
 
+// Programme-scoped lists for filters and pickers (DECISIONS R98): only the states and LGAs that
+// have an approved, active facility on the platform — Katsina and its 34 LGAs in the pilot, not all
+// of Nigeria. A new state appears by itself once its facility registry is loaded (Master Data,
+// which keeps the full national lists for that). RLS applies, so each user gets the states and
+// LGAs they can see; if that's none, the full list is returned so a picker is never empty.
+
+/** States with at least one approved, active facility the caller can see. */
+export const getProgrammeStates = cache(async (client: SupabaseClient<Database>) => {
+  const { data } = await client
+    .from("states")
+    .select("id, code, name, geozone, capital, facilities!inner(id)")
+    .eq("facilities.status", "approved")
+    .eq("facilities.is_active", true)
+    .limit(1, { referencedTable: "facilities" })
+    .order("name");
+  const rows = (data ?? []).map((s) => ({ id: s.id, code: s.code, name: s.name, geozone: s.geozone, capital: s.capital }));
+  return rows.length ? rows : getStates(client);
+});
+
+/** LGAs with at least one approved, active facility the caller can see. */
+export const getProgrammeLgas = cache(async (client: SupabaseClient<Database>) => {
+  const { data } = await client
+    .from("lgas")
+    .select("id, state_id, code, abbr, name, facilities!inner(id)")
+    .eq("facilities.status", "approved")
+    .eq("facilities.is_active", true)
+    .limit(1, { referencedTable: "facilities" })
+    .order("name");
+  const rows = (data ?? []).map((l) => ({ id: l.id, state_id: l.state_id, code: l.code, abbr: l.abbr, name: l.name }));
+  return rows.length ? rows : getLgas(client);
+});
+
 /**
  * All wards nationally (id/lga_id/name only — no geometry). Used by the Master Data screen so
  * Settlement/Activity Site forms and CSV upload can resolve a typed-in Ward name to a real

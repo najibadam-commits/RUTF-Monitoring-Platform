@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth, type FacilityMetric } from "@/lib/queries/metrics";
 import { FacilityLink, Flag, LEVEL_LABEL, ReportShell, fmt, type SP } from "@/components/reports/ReportShell";
 
@@ -37,7 +37,7 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
   const month = await reportMonth(supabase, sp.month);
   const [rows, lgas, { data: lots }, { data: thresholds }] = await Promise.all([
     getFacilityMetrics(supabase, month, { level: sp.level, lga: sp.lga }),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     supabase.from("stock_balances").select("facility_id, lot_id, lot_no, expiry_date, balance").gt("balance", 0).not("expiry_date", "is", null)
       .lte("expiry_date", new Date(Date.parse(month.end) + EXPIRY_WARN_DAYS * DAY).toISOString().slice(0, 10))
       .order("expiry_date").limit(500),

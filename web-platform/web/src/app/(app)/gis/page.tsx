@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
-import { getCategories, getDris, getLgas, getStates } from "@/lib/queries/lookups";
+import { getCategories, getDris, getProgrammeLgas, getProgrammeStates } from "@/lib/queries/lookups";
 import { STATUS_LABEL, STATUS_FILTER_OPTIONS, STATUS_COLOR } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { GisMap, type GisFacility } from "@/components/gis/GisMap";
@@ -28,10 +28,10 @@ export default async function GisPage() {
       )
       .not("lat", "is", null)
       .not("lng", "is", null),
-    getStates(supabase),
+    getProgrammeStates(supabase),
     getCategories(supabase),
     getDris(supabase),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
   ]);
 
   // Facility layer (brief §9 map): stores and OTP sites coloured by risk score or months of stock,

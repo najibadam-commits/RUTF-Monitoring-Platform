@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canManageDatasets } from "@/lib/rbac";
-import { getLgas, getAllWards, getStates } from "@/lib/queries/lookups";
+import { getLgas, getAllWards, getProgrammeLgas, getStates } from "@/lib/queries/lookups";
 import { lgaId, wardId } from "@/lib/wardId";
 import { DataSetsTabs, type DataSetTab } from "@/components/datasets/DataSetsTabs";
 import { FacilitiesTab, type Store } from "@/components/datasets/FacilitiesTab";
@@ -74,12 +74,13 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
     if (sp.otp === "1") q = q.eq("is_otp_site", true);
     if (sp.flagged === "1") q = q.not("location_flag", "is", null);
 
-    const [{ data, count }, lgas, wards, { data: stores }, states] = await Promise.all([
+    const [{ data, count }, lgas, wards, { data: stores }, states, programmeLgas] = await Promise.all([
       q.range(from, from + PAGE_SIZE - 1),
       getLgas(supabase),
       getAllWards(supabase),
       supabase.from("facilities").select("id, name, facility_type, lga_id").in("facility_type", ["state_store", "lga_store"]).eq("status", "approved").order("name"),
       getStates(supabase),
+      getProgrammeLgas(supabase),
     ]);
 
     // LGA ID (KT-DAU) and Ward ID (KT-DAU-MAJ) shown next to the names — DECISIONS R79, R80.
@@ -100,6 +101,7 @@ export default async function DataSetsPage({ searchParams }: { searchParams: Pro
         totalPages={Math.max(1, Math.ceil(total / PAGE_SIZE))}
         filters={{ search: sp.search ?? "", status: sp.status ?? "", lga: sp.lga ?? "", type: sp.type ?? "", otp: sp.otp ?? "", flagged: sp.flagged ?? "" }}
         lgas={lgas.map((l) => ({ id: l.id, name: l.name, code: lgaId(stateCode[l.state_id], l.abbr) }))}
+        programmeLgaIds={programmeLgas.map((l) => l.id)}
         wardsByLga={wardsByLga}
         stores={(stores ?? []) as Store[]}
         isSuperAdmin={isSuperAdmin}

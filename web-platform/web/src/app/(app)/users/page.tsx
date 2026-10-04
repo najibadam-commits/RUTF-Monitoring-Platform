@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canAccessUsersScreen } from "@/lib/rbac";
-import { getLgas, getStates } from "@/lib/queries/lookups";
+import { getProgrammeLgas, getProgrammeStates } from "@/lib/queries/lookups";
 import { UsersTable } from "@/components/users/UsersTable";
 import type { FacilityOption } from "@/components/users/FacilityPicker";
 
@@ -16,8 +16,8 @@ export default async function UsersPage() {
   const supabase = await createClient();
   const [{ data }, states, lgas, { data: facilities }] = await Promise.all([
     supabase.from("profiles").select("*").order("name"),
-    getStates(supabase),
-    getLgas(supabase),
+    getProgrammeStates(supabase),
+    getProgrammeLgas(supabase),
     // Facility users are assigned to stores and OTP sites only (RUTF DECISIONS R15).
     supabase
       .from("facilities")

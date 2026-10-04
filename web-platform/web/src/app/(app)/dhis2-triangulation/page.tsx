@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { reportMonth } from "@/lib/queries/metrics";
 import { monthOf, type Month } from "@/lib/queries/kpis";
 import { FacilityLink, Flag, ReportShell, fmt, type SP } from "@/components/reports/ReportShell";
@@ -69,7 +69,7 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
     return monthOf(d.toISOString().slice(0, 7));
   });
   const [lgas, { count: otpSites }, ...results] = await Promise.all([
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     (() => {
       let q = supabase.from("facilities").select("id", { count: "exact", head: true }).eq("status", "approved").eq("is_otp_site", true);
       if (sp.lga) q = q.eq("lga_id", sp.lga);

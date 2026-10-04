@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth, type FacilityMetric } from "@/lib/queries/metrics";
 import { monthOf } from "@/lib/queries/kpis";
 import { Meter } from "@/components/dashboard/Kpi";
@@ -49,7 +49,7 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
   const filters = { level: sp.level, lga: sp.lga };
   const [rows, lgas, ...history] = await Promise.all([
     getFacilityMetrics(supabase, month, filters),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     ...trendMonths.slice(0, -1).map((m) => getFacilityMetrics(supabase, m, filters)),
   ]);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));

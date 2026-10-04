@@ -5,7 +5,7 @@ import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getKpis, latestLedgerMonth, monthOf, previousMonth } from "@/lib/queries/kpis";
 import { getFacilityMetrics } from "@/lib/queries/metrics";
 import { getFindingTargetDays } from "@/lib/queries/issues";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { OPEN_STATUSES } from "@/lib/constants";
 import { attentionItems } from "@/components/dashboard/AttentionPanel";
 import { compact } from "@/components/dashboard/Kpi";
@@ -69,7 +69,7 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
     getKpis(supabase, month),
     getKpis(supabase, previousMonth(monthKey)),
     getFacilityMetrics(supabase, month, {}),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     getFindingTargetDays(supabase),
     supabase.rpc("dhis2_triangulation", { p_start: month.start, p_end: month.end }),
     supabase.from("issues").select("id", { count: "exact", head: true }),

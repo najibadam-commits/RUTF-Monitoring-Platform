@@ -77,6 +77,7 @@ export function FacilitiesTab({
   totalPages,
   filters,
   lgas,
+  programmeLgaIds = [],
   wardsByLga,
   stores,
   isSuperAdmin,
@@ -87,7 +88,11 @@ export function FacilitiesTab({
   page: number;
   totalPages: number;
   filters: FacilityFilters;
+  /** Every LGA nationally — the add/edit form and CSV import need them to onboard a new state. */
   lgas: NamedRef[];
+  /** LGAs that have facilities on the platform (DECISIONS R98): the filter lists only these, and
+   *  the form lists them first. */
+  programmeLgaIds?: string[];
   wardsByLga: Record<string, NamedRef[]>;
   stores: Store[];
   isSuperAdmin: boolean;
@@ -286,7 +291,7 @@ export function FacilitiesTab({
         />
         <select className="input" style={{ maxWidth: 170 }} defaultValue={filters.lga || "All"} onChange={(e) => router.push(hrefWith({ lga: e.target.value === "All" ? null : e.target.value, page: null }))}>
           <option value="All">All LGAs</option>
-          {lgas.map((l) => (
+          {(programmeLgaIds.length ? lgas.filter((l) => programmeLgaIds.includes(l.id)) : lgas).map((l) => (
             <option key={l.id} value={l.id}>
               {l.name}
             </option>
@@ -489,11 +494,22 @@ export function FacilitiesTab({
               <label>LGA</label>
               <select className="input" value={form.lgaId} onChange={(e) => setForm((f) => ({ ...f, lgaId: e.target.value, wardId: "" }))}>
                 <option value="">Select an LGA…</option>
-                {lgas.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
+                {programmeLgaIds.length ? (
+                  <>
+                    <optgroup label="Programme LGAs">
+                      {lgas.filter((l) => programmeLgaIds.includes(l.id)).map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </optgroup>
+                    <optgroup label="Other LGAs (a new state)">
+                      {lgas.filter((l) => !programmeLgaIds.includes(l.id)).map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                    </optgroup>
+                  </>
+                ) : (
+                  lgas.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             <div className="field">

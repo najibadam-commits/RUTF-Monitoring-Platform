@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth, type FacilityMetric } from "@/lib/queries/metrics";
 import { monthOf } from "@/lib/queries/kpis";
 import { FacilityLink, Flag, ReportShell, fmt, type SP } from "@/components/reports/ReportShell";
@@ -31,7 +31,7 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
   const filters = { level: "health_facility", lga: sp.lga };
   const [rowsAll, lgas, { data: th }, ...history] = await Promise.all([
     getFacilityMetrics(supabase, month, filters),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     supabase.from("rutf_thresholds").select("key, value").in("key", ["short_dispense_pct", "vf_min", "vf_max"]),
     ...trendMonths.slice(0, -1).map((m) => getFacilityMetrics(supabase, m, filters)),
   ]);

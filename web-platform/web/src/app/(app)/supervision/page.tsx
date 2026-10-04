@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { reportMonth } from "@/lib/queries/metrics";
 import { getKpis } from "@/lib/queries/kpis";
 import { Meter } from "@/components/dashboard/Kpi";
@@ -61,7 +61,7 @@ export default async function SupervisionPage({ searchParams }: { searchParams: 
   const supabase = await createClient();
   const month = await reportMonth(supabase, sp.month);
   const [lgas, { data: th }] = await Promise.all([
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     supabase.from("rutf_thresholds").select("value").eq("key", "risk_high").limit(1).maybeSingle(),
   ]);
   const riskHigh = Number(th?.value ?? 50);

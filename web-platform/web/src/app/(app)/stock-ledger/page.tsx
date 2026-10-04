@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { TXN_LABEL, facilityNames, getFacilityLedger, getFacilitySummaries, signedQuantity } from "@/lib/queries/stock";
 import { tagBg } from "@/lib/constants";
 import { canVoidLedger } from "@/lib/rbac";
@@ -78,7 +78,7 @@ export default async function StockLedgerPage({ searchParams }: { searchParams: 
 // ── List ────────────────────────────────────────────────────────────────────────────────────────
 
 async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnType<typeof createClient>>; sp: SP; today: string }) {
-  const [summaries, lgas] = await Promise.all([getFacilitySummaries(supabase, today), getLgas(supabase)]);
+  const [summaries, lgas] = await Promise.all([getFacilitySummaries(supabase, today), getProgrammeLgas(supabase)]);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));
   const search = sp.search?.trim().toLowerCase();
   const filtered = summaries
@@ -224,7 +224,7 @@ async function FacilityLedger({
     getFacilityLedger(supabase, facilityId),
     supabase.from("stock_balances").select("*").eq("facility_id", facilityId).order("expiry_date"),
     supabase.from("ledger_photos").select("*").eq("facility_id", facilityId),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     supabase.from("products").select("units_per_carton").order("created_at").limit(1).maybeSingle(),
   ]);
   const perCarton = product?.units_per_carton ?? 150;

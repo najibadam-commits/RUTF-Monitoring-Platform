@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canAccessDevices, ROLE_LABELS } from "@/lib/rbac";
-import { getLgas } from "@/lib/queries/lookups";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { Flag, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
 import type { Database } from "@/lib/types/database";
 
@@ -52,7 +52,7 @@ export default async function DevicesPage({ searchParams }: { searchParams: Prom
   const supabase = await createClient();
   const [{ data, error }, lgas, { data: failures }] = await Promise.all([
     supabase.rpc("sync_health"),
-    getLgas(supabase),
+    getProgrammeLgas(supabase),
     supabase.from("sync_failures").select("*").is("resolved_at", null).order("last_seen_at", { ascending: false }).limit(100),
   ]);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));
