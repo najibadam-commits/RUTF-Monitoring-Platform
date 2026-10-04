@@ -64,7 +64,7 @@ fun IssueRow(
             TpmTag(statusLabel, statusVariant)
             if (overdue) {
                 Spacer(Modifier.height(3.dp))
-                TpmTag("Overdue", TpmTagVariant.Outline)
+                TpmTag("Past target", TpmTagVariant.Outline)
             }
         }
     }

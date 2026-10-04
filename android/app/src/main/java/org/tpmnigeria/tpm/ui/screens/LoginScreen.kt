@@ -72,12 +72,12 @@ fun LoginScreen(session: AppSession) {
         }
         Spacer(Modifier.height(TpmSpacing.space3))
         Text(
-            "RUTF Monitoring",
+            "RUTF-DTAP",
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
         Text(
-            "Field Monitoring & Finding Resolution",
+            "RUTF Digital Traceability & Accountability",
             style = MaterialTheme.typography.bodyMedium,
             color = TpmColors.TextMuted,
             textAlign = TextAlign.Center,
@@ -89,7 +89,7 @@ fun LoginScreen(session: AppSession) {
             label = "Email",
             value = email,
             onValueChange = { email = it; error = null },
-            placeholder = "e.g. chidinma.okafor@tpmnigeria.org",
+            placeholder = "name@example.org",
             keyboardType = androidx.compose.ui.text.input.KeyboardType.Email,
             modifier = Modifier.fillMaxWidth(),
         )
@@ -163,7 +163,7 @@ fun LoginScreen(session: AppSession) {
 
         Spacer(Modifier.height(TpmSpacing.space4))
         Text(
-            "Your role and profile are detected automatically after login.",
+            "Works offline: record at the facility without a signal; it syncs when you're back online. Your role and facility load after you sign in.",
             style = MaterialTheme.typography.bodySmall,
             color = TpmColors.TextMuted,
             textAlign = TextAlign.Center,

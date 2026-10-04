@@ -41,7 +41,7 @@ private val SEVERITY_FILTERS = Severity.entries.map { it.name }
 
 private fun filterLabel(value: String): String = when (value) {
     "all" -> "All"
-    "overdue" -> "Overdue"
+    "overdue" -> "Past target"
     else -> runCatching { IssueStatus.valueOf(value).let { statusMeta(it).label } }
         .getOrElse { runCatching { value.lowercase().replaceFirstChar { c -> c.uppercase() } }.getOrDefault(value) }
 }

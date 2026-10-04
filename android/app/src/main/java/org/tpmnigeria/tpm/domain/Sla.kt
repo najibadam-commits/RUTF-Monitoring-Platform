@@ -2,16 +2,15 @@ package org.tpmnigeria.tpm.domain
 
 import org.tpmnigeria.tpm.domain.model.Issue
 import org.tpmnigeria.tpm.domain.model.IssueStatus
-import org.tpmnigeria.tpm.domain.model.Severity
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
-/** SLA-day thresholds per severity — README "Status & Severity System". */
-val SLA_DAYS: Map<Severity, Long> = mapOf(
-    Severity.High to 2L,
-    Severity.Medium to 5L,
-    Severity.Low to 14L,
-)
+/**
+ * Days from report to verified closure — the RUTF Finding target, the same as the web's
+ * Accountability Scorecard and Findings Register (rutf_thresholds.finding_target_days, DECISIONS
+ * R101). Replaces the TPM-era per-severity SLA (2 / 5 / 14 days).
+ */
+const val FINDING_TARGET_DAYS: Long = 30L
 
 data class SlaState(
     val hasSla: Boolean,
@@ -28,9 +27,9 @@ fun computeSla(issue: Issue, today: LocalDate = LocalDate.now()): SlaState {
     if (issue.status == IssueStatus.VerifiedClosed) {
         return SlaState(hasSla = false, overdue = false, label = "")
     }
-    val dueDate = issue.dateReported.plusDays(SLA_DAYS.getValue(issue.severity))
+    val dueDate = issue.dateReported.plusDays(FINDING_TARGET_DAYS)
     val diffDays = ChronoUnit.DAYS.between(today, dueDate)
     val overdue = diffDays < 0
-    val label = if (overdue) "Overdue ${-diffDays}d" else "Due in ${diffDays}d"
+    val label = if (overdue) "Past target by ${-diffDays}d" else "${diffDays}d to target"
     return SlaState(hasSla = true, overdue = overdue, label = label)
 }

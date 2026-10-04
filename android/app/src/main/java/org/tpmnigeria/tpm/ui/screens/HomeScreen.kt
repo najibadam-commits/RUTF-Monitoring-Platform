@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import org.tpmnigeria.tpm.domain.MobileAccess
+import org.tpmnigeria.tpm.domain.FINDING_TARGET_DAYS
 import org.tpmnigeria.tpm.domain.computeSla
 import org.tpmnigeria.tpm.domain.model.Issue
 import org.tpmnigeria.tpm.domain.model.IssueStatus
@@ -32,6 +33,7 @@ import org.tpmnigeria.tpm.domain.statusMeta
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.LocalAppSession
 import org.tpmnigeria.tpm.ui.LocalReferenceRepository
+import org.tpmnigeria.tpm.ui.LocalStockRepository
 import org.tpmnigeria.tpm.ui.navigation.Routes
 import org.tpmnigeria.tpm.ui.components.IssueRow
 import org.tpmnigeria.tpm.ui.components.TpmButton
@@ -82,11 +84,12 @@ fun HomeScreen(
                     Text(user.name, style = MaterialTheme.typography.headlineMedium)
                 }
                 TpmButton(
-                    text = "Sign Out",
+                    text = "Sign out",
                     onClick = onLogout,
                     variant = TpmButtonVariant.Ghost,
                 )
             }
+            SyncStatusLine(pendingSync, onNavigateToSyncQueue)
             Spacer(Modifier.height(TpmSpacing.space3))
             if (MobileAccess.canSupervise(role) && user.supervisionLevel != null) {
                 SupervisionActions(user.supervisionLevel, onStartStock)
@@ -182,37 +185,52 @@ private fun buildKpis(issues: List<Issue>, pendingSync: Int, role: UserRole): Li
         // Pending Sync only appears for a role that can queue writes at all.
         val canQueueWrites = MobileAccess.canRegisterFinding(role) || MobileAccess.canVerifyResolution(role)
         return listOfNotNull(
-            Kpi("Total Findings", issues.size, "all"),
-            Kpi("Pending Review", count { it.status == IssueStatus.PendingReview }, IssueStatus.PendingReview.name),
-            Kpi("Ongoing", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
-            Kpi("Resolved — Awaiting Verification", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
-            Kpi("Verified / Closed", count { it.status == IssueStatus.VerifiedClosed }, IssueStatus.VerifiedClosed.name),
+            Kpi("All Findings", issues.size, "all"),
+            Kpi("Awaiting review", count { it.status == IssueStatus.PendingReview }, IssueStatus.PendingReview.name),
+            Kpi("With the facility", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
+            Kpi("Action recorded, to verify", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
+            Kpi("Verified & closed", count { it.status == IssueStatus.VerifiedClosed }, IssueStatus.VerifiedClosed.name),
             Kpi("Reopened", count { it.status == IssueStatus.Reopened }, IssueStatus.Reopened.name),
-            Kpi("Overdue (SLA)", overdueCount, "overdue"),
-            if (canQueueWrites) Kpi("Pending Sync", pendingSync, null, toSyncQueue = true) else null,
+            Kpi("Past the ${FINDING_TARGET_DAYS}-day target", overdueCount, "overdue"),
+            if (canQueueWrites) Kpi("Waiting to sync", pendingSync, null, toSyncQueue = true) else null,
         )
     }
     return if (role == UserRole.FieldMonitor) {
         listOf(
-            Kpi("Registered", issues.size, "all"),
-            Kpi("Ongoing", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
-            Kpi("Resolved — Awaiting Verification", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
-            Kpi("Verified / Closed", count { it.status == IssueStatus.VerifiedClosed }, IssueStatus.VerifiedClosed.name),
+            Kpi("Findings raised", issues.size, "all"),
+            Kpi("With the facility", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
+            Kpi("Action recorded, to verify", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
+            Kpi("Verified & closed", count { it.status == IssueStatus.VerifiedClosed }, IssueStatus.VerifiedClosed.name),
             Kpi("Reopened", count { it.status == IssueStatus.Reopened }, IssueStatus.Reopened.name),
-            Kpi("Overdue (SLA)", overdueCount, "overdue"),
-            Kpi("Pending Sync", pendingSync, null, toSyncQueue = true),
+            Kpi("Past the ${FINDING_TARGET_DAYS}-day target", overdueCount, "overdue"),
+            Kpi("Waiting to sync", pendingSync, null, toSyncQueue = true),
         )
     } else {
         listOf(
-            Kpi("Assigned", count { it.status != IssueStatus.VerifiedClosed }, "all"),
-            Kpi("New Assignments", count { it.status == IssueStatus.New }, IssueStatus.New.name),
-            Kpi("Ongoing", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
-            Kpi("Resolved", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
-            Kpi("Returned for Action", count { it.status == IssueStatus.Reopened }, IssueStatus.Reopened.name),
-            Kpi("Overdue (SLA)", overdueCount, "overdue"),
-            Kpi("Pending Sync", pendingSync, null, toSyncQueue = true),
+            Kpi("Open Findings", count { it.status != IssueStatus.VerifiedClosed }, "all"),
+            Kpi("New to respond to", count { it.status == IssueStatus.New }, IssueStatus.New.name),
+            Kpi("Being addressed", count { it.status == IssueStatus.Ongoing }, IssueStatus.Ongoing.name),
+            Kpi("Action recorded", count { it.status == IssueStatus.ResolvedPendingVerification }, IssueStatus.ResolvedPendingVerification.name),
+            Kpi("Returned for more action", count { it.status == IssueStatus.Reopened }, IssueStatus.Reopened.name),
+            Kpi("Past the ${FINDING_TARGET_DAYS}-day target", overdueCount, "overdue"),
+            Kpi("Waiting to sync", pendingSync, null, toSyncQueue = true),
         )
     }
+}
+
+/** Offline status at a glance: everything synced, or how many entries are still on the phone. */
+@Composable
+private fun SyncStatusLine(pendingSync: Int, onOpen: () -> Unit) {
+    Text(
+        if (pendingSync == 0) "✓ Everything is synced"
+        else "$pendingSync ${if (pendingSync == 1) "entry is" else "entries are"} on this phone, waiting to sync. They send by themselves when you're online.",
+        style = MaterialTheme.typography.bodySmall,
+        color = if (pendingSync == 0) TpmColors.TextMuted else TpmColors.Accent800,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onOpen)
+            .padding(top = TpmSpacing.space1),
+    )
 }
 
 private val FACILITY_TYPE_LABEL = mapOf(
@@ -249,6 +267,17 @@ private fun MyFacilityCard(facilityId: String?) {
         Text(current.name, style = MaterialTheme.typography.titleMedium)
         val type = FACILITY_TYPE_LABEL[current.facilityType] ?: current.facilityType
         Text(if (current.isOtpSite) "$type · OTP site" else type, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        // Stock on hand from the offline ledger cache plus entries still waiting to sync (R101).
+        val stock = LocalStockRepository.current
+        val position by remember(current.id) { stock.observeStock(current.id) }.collectAsState(initial = null)
+        position?.let { p ->
+            Spacer(Modifier.height(TpmSpacing.space2))
+            Text(
+                "On hand: ${"%,d".format(p.total)} sachets",
+                style = MaterialTheme.typography.titleSmall,
+                color = if (p.total <= 0) TpmColors.Accent800 else MaterialTheme.colorScheme.onSurface,
+            )
+        }
         supplier?.let { Text("Supplied by ${it.name}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted) }
         if (supplied.isNotEmpty()) {
             Text("Supplies ${supplied.size} facilit${if (supplied.size == 1) "y" else "ies"}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)

@@ -12,12 +12,13 @@ import org.tpmnigeria.tpm.ui.components.TpmTagVariant
 data class StatusMeta(val label: String, val variant: TpmTagVariant)
 
 fun statusMeta(status: IssueStatus): StatusMeta = when (status) {
-    IssueStatus.PendingReview -> StatusMeta("Pending Review", TpmTagVariant.Outline)
+    // RUTF stage names, the same as the web platform (DECISIONS R74, R101).
+    IssueStatus.PendingReview -> StatusMeta("Awaiting review", TpmTagVariant.Outline)
     IssueStatus.ReturnedForCorrection -> StatusMeta("Returned", TpmTagVariant.Outline)
     IssueStatus.New -> StatusMeta("New", TpmTagVariant.Outline)
-    IssueStatus.Ongoing -> StatusMeta("Ongoing", TpmTagVariant.Accent)
-    IssueStatus.ResolvedPendingVerification -> StatusMeta("Resolved · Pending", TpmTagVariant.Accent)
-    IssueStatus.VerifiedClosed -> StatusMeta("Verified", TpmTagVariant.Neutral)
+    IssueStatus.Ongoing -> StatusMeta("With the facility", TpmTagVariant.Accent)
+    IssueStatus.ResolvedPendingVerification -> StatusMeta("Action recorded", TpmTagVariant.Accent)
+    IssueStatus.VerifiedClosed -> StatusMeta("Verified & closed", TpmTagVariant.Neutral)
     IssueStatus.Reopened -> StatusMeta("Reopened", TpmTagVariant.Outline)
 }
 
@@ -26,11 +27,11 @@ fun IssueStatus.displayName(): String = when (this) {
     // Not "Pending State Coordinator Review" — Project Admin and Super Admin can review/approve
     // too now (see DECISIONS.md #29 in the web project), so naming one specific role here would
     // be inaccurate.
-    IssueStatus.PendingReview -> "Pending Review"
-    IssueStatus.ReturnedForCorrection -> "Returned for Correction"
+    IssueStatus.PendingReview -> "Awaiting review"
+    IssueStatus.ReturnedForCorrection -> "Returned to reporter"
     IssueStatus.New -> "New"
-    IssueStatus.Ongoing -> "Ongoing"
-    IssueStatus.ResolvedPendingVerification -> "Resolved — Pending Verification"
-    IssueStatus.VerifiedClosed -> "Verified / Closed"
+    IssueStatus.Ongoing -> "With the facility"
+    IssueStatus.ResolvedPendingVerification -> "Action recorded, awaiting verification"
+    IssueStatus.VerifiedClosed -> "Verified & closed"
     IssueStatus.Reopened -> "Reopened"
 }
