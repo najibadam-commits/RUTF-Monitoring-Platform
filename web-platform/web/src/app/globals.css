@@ -387,3 +387,12 @@ select.input {
 .marker-cluster-large { background-color: color-mix(in srgb, var(--color-accent-700) 55%, transparent) !important; }
 .marker-cluster-large div { background-color: var(--color-accent-800) !important; }
 .marker-cluster span { color: #fff !important; font-weight: 600; }
+/* Printing (Monthly Programme Report, DECISIONS R92): just the page content, on white. */
+@media print {
+  .app-sidebar, .app-sidebar-backdrop, .app-topbar, .no-print { display: none !important; }
+  .app-root { display: block !important; height: auto !important; background: #fff !important; }
+  .app-main { overflow: visible !important; }
+  body { background: #fff !important; }
+  .report-page { padding: 0 !important; }
+  .report-doc { box-shadow: none !important; border: none !important; max-width: none !important; padding: 0 !important; }
+}

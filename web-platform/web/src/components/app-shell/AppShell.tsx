@@ -101,7 +101,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
   })).filter((group) => group.items.length > 0);
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "var(--color-bg)", color: "var(--color-text)", fontFamily: "var(--font-body)", fontSize: 14 }}>
+    <div className="app-root" style={{ display: "flex", height: "100vh", background: "var(--color-bg)", color: "var(--color-text)", fontFamily: "var(--font-body)", fontSize: 14 }}>
       <div
         className={`app-sidebar-backdrop${mobileOpen ? " open" : ""}`}
         onClick={() => setMobileOpen(false)}
@@ -207,7 +207,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
       </aside>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <header style={{ height: 58, flex: "none", display: "flex", alignItems: "center", gap: 16, padding: "0 24px", borderBottom: "1px solid var(--color-divider)" }}>
+        <header className="app-topbar" style={{ height: 58, flex: "none", display: "flex", alignItems: "center", gap: 16, padding: "0 24px", borderBottom: "1px solid var(--color-divider)" }}>
           <button
             type="button"
             className="app-hamburger"
@@ -224,7 +224,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
             <div className="tag tag-outline">{ROLE_LABELS[profile.role]}</div>
           </div>
         </header>
-        <main style={{ flex: 1, overflow: "auto" }}>{children}</main>
+        <main className="app-main" style={{ flex: 1, overflow: "auto" }}>{children}</main>
       </div>
     </div>
   );
