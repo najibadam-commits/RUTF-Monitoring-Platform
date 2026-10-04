@@ -6,6 +6,7 @@ import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { StatusDot } from "@/components/ui/Tags";
 import { DashboardMap } from "@/components/gis/DashboardMap";
 import { KpiSections } from "@/components/dashboard/KpiSections";
+import { AttentionPanel } from "@/components/dashboard/AttentionPanel";
 import { getKpis, latestLedgerMonth, monthOf, previousMonth } from "@/lib/queries/kpis";
 import type { IssueStatus } from "@/lib/types/database";
 
@@ -14,6 +15,12 @@ export const metadata: Metadata = { title: "Command Centre" };
 // RUTF dashboard (brief §9): the headline KPIs for a month from rutf_kpis() (migrations
 // 0105/0106 — the same definitions test-kpis.js checks against hand-calculated values), then the
 // Findings map, status, recent Findings and activity. RLS scopes everything to the viewer.
+
+/** The time "now" for the Finding target — read once per request (a server component). */
+const requestTime = () => Date.now();
+
+/** Statuses still awaiting verified closure — the Accountability Scorecard's "open". */
+const OPEN_STATUSES: IssueStatus[] = ["new", "pending_review", "returned_for_correction", "assigned", "in_progress", "resolved", "reopened"];
 
 interface DashboardStats {
   total: number;
@@ -27,7 +34,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const month = monthOf(monthKey);
   const prevMonth = previousMonth(monthKey);
 
-  const [k, p, { data: statsRaw }, { data: mapRows }, { data: recentIssuesRaw }, { data: timelineRaw }] = await Promise.all([
+  const [k, p, { data: statsRaw }, { data: mapRows }, { data: recentIssuesRaw }, { data: timelineRaw }, { data: target }] = await Promise.all([
     getKpis(supabase, month),
     getKpis(supabase, prevMonth),
     supabase.rpc("get_dashboard_stats"),
@@ -36,7 +43,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       .order("reported_at", { ascending: false }).limit(6),
     supabase.from("issue_history").select("id, occurred_at, actor_label, action, note, issue:issues(code)")
       .order("occurred_at", { ascending: false }).limit(8),
+    supabase.from("rutf_thresholds").select("value").eq("key", "finding_target_days").limit(1).maybeSingle(),
   ]);
+  const targetDays = Number(target?.value ?? 30);
+  const { count: pastTarget } = await supabase.from("issues").select("id", { count: "exact", head: true })
+    .in("status", OPEN_STATUSES).lt("reported_at", new Date(requestTime() - targetDays * 86_400_000).toISOString());
   const stats = statsRaw as unknown as DashboardStats;
   const byStatus = stats?.by_status ?? {};
 
@@ -54,8 +65,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <div>
           <h2 style={{ marginBottom: 2 }}>Command Centre</h2>
           <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
-            The RUTF pipeline at a glance — State store → LGA stores → OTP sites · {month.label} ·{" "}
-            {k ? `${k.active_facilities} stores and OTP sites reporting` : "No data for this month"}
+            Katsina State RUTF pipeline, State store → LGA stores → OTP sites · {month.label} ·{" "}
+            {k ? `${k.active_facilities.toLocaleString("en-GB")} stores and OTP sites reporting` : "No data for this month"}
           </p>
         </div>
         <form method="get" style={{ display: "flex", gap: 8 }}>
@@ -67,6 +78,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <button className="btn btn-primary" type="submit">Show</button>
         </form>
       </div>
+
+      {k && <AttentionPanel k={k} pastTarget={pastTarget ?? 0} targetDays={targetDays} monthLabel={month.label} />}
 
       <KpiSections k={k} p={p} monthLabel={month.label} />
 

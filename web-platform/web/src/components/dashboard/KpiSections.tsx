@@ -24,6 +24,16 @@ const LEVELS: { key: "state_store" | "lga_store" | "otp"; label: string }[] = [
   { key: "otp", label: "OTP sites" },
 ];
 
+/** A KPI group's heading, with a link to the page that goes into it. */
+function SectionHead({ title, href, link }: { title: string; href: string; link: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", margin: "0 0 10px" }}>
+      <h3 style={{ fontSize: 15, margin: 0 }}>{title}</h3>
+      <Link href={href} style={{ fontSize: 12.5 }}>{link} <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
+    </div>
+  );
+}
+
 export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | null; monthLabel: string }) {
   const month = { label: monthLabel };
   const totalSoh = k ? LEVELS.reduce((n, l) => n + (k.stock_on_hand[l.key] ?? 0), 0) : 0;
@@ -66,7 +76,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
           </div>
 
           <section>
-            <h3 style={{ fontSize: 15, margin: "0 0 10px" }}>Stock</h3>
+            <SectionHead title="Stock position" href="/stock-integrity" link="Stock Reconciliation" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
               <StatTile label="Stockout rate" value={pct(k.stockout_rate_pct)} unit="%" sub="Stores and OTP sites with a day at zero"
                 delta={delta(k.stockout_rate_pct, p?.stockout_rate_pct, " pts")} upIsGood={false} href="/stock-ledger?flag=stockout"
@@ -85,7 +95,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
           </section>
 
           <section>
-            <h3 style={{ fontSize: 15, margin: "0 0 10px" }}>OTP dispensing and verification</h3>
+            <SectionHead title="Last-mile dispensing and verification" href="/otp-dispensing" link="Last-Mile Dispensing" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
               <StatTile label="Short-dispensing" value={pct(k.short_dispensing_pct)} unit="%" sub="Prescribed but not dispensed (negative: more dispensed)"
                 delta={delta(k.short_dispensing_pct, p?.short_dispensing_pct, " pts")} upIsGood={false}
@@ -99,7 +109,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
           </section>
 
           <section>
-            <h3 style={{ fontSize: 15, margin: "0 0 10px" }}>Reporting and supervision</h3>
+            <SectionHead title="Reporting and supervision" href="/reporting-completeness" link="Completeness & Timeliness" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
               <Meter label="Daily dispensing reported" pct={k.dispensing_completeness_pct === null ? null : Number(k.dispensing_completeness_pct)}
                 sub="OTP-weeks with at least one entry" warnBelow={90} criticalBelow={75} />
@@ -111,7 +121,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
           </section>
 
           <section>
-            <h3 style={{ fontSize: 15, margin: "0 0 10px" }}>Findings</h3>
+            <SectionHead title="Findings and corrective action" href="/action-tracker" link="Corrective Action Tracker" />
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
               <StatTile label="Open critical Findings" value={compact(k.open_critical_findings)} href="/issues?priority=critical"
                 status={k.open_critical_findings > 0 ? { level: "critical", label: "Needs review" } : { level: "good", label: "None open" }} />
