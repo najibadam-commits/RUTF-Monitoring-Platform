@@ -49,7 +49,120 @@ function summarise(rows: ScorecardRow[], targetDays: number, now: number) {
   const pastTarget = open.filter((r) => (now - Date.parse(r.reported_at)) / DAY > targetDays);
   const days = rows.filter((r) => RESOLVED.includes(r.status) && r.resolution_date)
     .map((r) => (Date.parse(r.resolution_date!) - Date.parse(r.reported_at)) / DAY);
-  return { raised: rows.length, open: open.length, closed: closed.length, pastTarget: pastTarget.length, medianDays: median(days) };
+  // Accountability score (DECISIONS R86), 0–100: half the share of Findings verified & closed, half
+  // the share not left open past the target. Transparent on purpose — both halves are in the table.
+  const score = rows.length ? Math.round(50 * (closed.length / rows.length) + 50 * (1 - pastTarget.length / rows.length)) : null;
+  return { raised: rows.length, open: open.length, closed: closed.length, pastTarget: pastTarget.length, medianDays: median(days), score };
+}
+
+/** Score bands, with icon + label (never colour alone). "Needs support", not "failing": Findings
+ *  are for review, not accusation. */
+function grade(score: number | null) {
+  if (score === null) return { label: "No Findings", color: "var(--color-neutral-600)", icon: "ph-minus-circle" };
+  if (score >= 80) return { label: "On track", color: "var(--status-resolved)", icon: "ph-check-circle" };
+  if (score >= 60) return { label: "Needs attention", color: "var(--priority-high)", icon: "ph-warning" };
+  return { label: "Needs support", color: "var(--priority-critical)", icon: "ph-hand-heart" };
+}
+
+/** Fewer Findings than this and the score is shown but flagged as based on few Findings. */
+const FEW = 5;
+
+function LgaLeague({ groups, targetDays, now }: { groups: Map<string, ScorecardRow[]>; targetDays: number; now: number }) {
+  const lines = [...groups.entries()]
+    .map(([name, rs]) => ({ name, ...summarise(rs, targetDays, now) }))
+    .sort((a, b) => (b.score ?? -1) - (a.score ?? -1) || b.raised - a.raised || a.name.localeCompare(b.name));
+  const counts = { on: 0, attn: 0, support: 0 };
+  for (const l of lines) {
+    if (l.score === null) continue;
+    if (l.score >= 80) counts.on += 1;
+    else if (l.score >= 60) counts.attn += 1;
+    else counts.support += 1;
+  }
+  const row = (l: (typeof lines)[number], rank: number) => {
+    const g = grade(l.score);
+    return (
+      <tr key={l.name}>
+        <td className="text-muted" style={{ textAlign: "right" }}>{rank}</td>
+        <td>
+          {l.name}
+          {l.raised < FEW && <span className="text-muted" style={{ fontSize: 11 }}> · few Findings</span>}
+        </td>
+        <td>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <strong style={{ width: 28, textAlign: "right", fontFamily: "var(--font-heading)" }}>{l.score ?? "—"}</strong>
+            <div style={{ flex: 1, minWidth: 60 }}><Bar value={l.score ?? 0} max={100} color={g.color} /></div>
+          </div>
+        </td>
+        <td style={{ color: g.color, fontWeight: 600, fontSize: 12.5, whiteSpace: "nowrap" }}>
+          <i className={`ph-fill ${g.icon}`} aria-hidden="true" /> {g.label}
+        </td>
+        <td style={{ textAlign: "right" }}>{l.raised}</td>
+        <td style={{ textAlign: "right" }}>{pct(l.closed, l.raised)}%</td>
+        <td style={{ textAlign: "right" }}>{l.pastTarget ? <Flag level="warning">{l.pastTarget}</Flag> : 0}</td>
+        <td style={{ textAlign: "right" }}>{fmtDays(l.medianDays)}</td>
+      </tr>
+    );
+  };
+  const head = (
+    <colgroup>
+      <col style={{ width: 44 }} /><col style={{ width: "20%" }} /><col style={{ width: "22%" }} /><col style={{ width: 150 }} /><col /><col /><col /><col />
+    </colgroup>
+  );
+  return (
+    <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "14px 16px 0" }}>
+        <div>
+          <div className="card-title">LGA league table</div>
+          <div className="text-muted" style={{ fontSize: 12, maxWidth: 620 }}>
+            Score out of 100: half the share of Findings verified &amp; closed, half the share not left open past {targetDays} days.
+            80 and above is on track; below 60, the LGA team needs support to close its Findings.
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: 14, fontSize: 12.5 }}>
+          {([["on track", counts.on, 90], [counts.attn === 1 ? "needs attention" : "need attention", counts.attn, 70], [counts.support === 1 ? "needs support" : "need support", counts.support, 0]] as const).map(([label, n, sample]) => {
+            const g = grade(sample);
+            return (
+              <span key={label} style={{ color: g.color, fontWeight: 600, whiteSpace: "nowrap" }}>
+                <i className={`ph-fill ${g.icon}`} aria-hidden="true" /> {n} {label}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+      <table className="table" style={{ marginTop: 8, tableLayout: "fixed", minWidth: 760 }}>
+        {head}
+        <thead>
+          <tr>
+            <th style={{ textAlign: "right" }}>#</th>
+            <th>LGA</th>
+            <th>Score</th>
+            <th>Rating</th>
+            <th style={{ textAlign: "right" }}>Findings</th>
+            <th style={{ textAlign: "right" }}>Closed</th>
+            <th style={{ textAlign: "right" }}>Past target</th>
+            <th style={{ textAlign: "right" }}>Median days</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lines.slice(0, SHOWN).map((l, i) => row(l, i + 1))}
+          {lines.length === 0 && (
+            <tr><td colSpan={8} className="text-muted" style={{ textAlign: "center", padding: 16 }}>No Findings yet.</td></tr>
+          )}
+        </tbody>
+      </table>
+      {lines.length > SHOWN && (
+        <details>
+          <summary style={{ cursor: "pointer", padding: "10px 16px", fontSize: 13, color: "var(--color-accent)" }}>
+            Show all {lines.length} LGAs
+          </summary>
+          <table className="table" style={{ tableLayout: "fixed", minWidth: 760 }}>
+            {head}
+            <tbody>{lines.slice(SHOWN).map((l, i) => row(l, i + SHOWN + 1))}</tbody>
+          </table>
+        </details>
+      )}
+    </div>
+  );
 }
 
 function groupBy(rows: ScorecardRow[], key: (r: ScorecardRow) => string) {
@@ -168,21 +281,24 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
   const stageMax = Math.max(1, ...stages.map((s) => s.hours ?? 0));
   const byPriority = new Map((stats?.by_priority ?? []).map((p) => [p.priority, p]));
 
+  const g = grade(all.score);
   const tiles = [
+    { label: "Accountability score", value: all.score === null ? "—" : `${all.score}`, sub: g.label, icon: g.icon, tone: g.color, unit: "/ 100" },
     { label: "Findings raised", value: all.raised.toLocaleString("en-GB"), sub: `${trend[5].raised} this month`, icon: "ph-flag" },
     { label: "Verified & closed", value: `${pct(all.closed, all.raised)}%`, sub: `${all.closed.toLocaleString("en-GB")} of ${all.raised.toLocaleString("en-GB")}`, icon: "ph-seal-check" },
     { label: "Median days to resolve", value: fmtDays(all.medianDays), sub: "From raised to corrective action", icon: "ph-timer" },
     { label: `Open past ${targetDays} days`, value: all.pastTarget.toLocaleString("en-GB"), sub: `of ${all.open.toLocaleString("en-GB")} still open`, icon: "ph-hourglass-medium", warn: all.pastTarget > 0 },
-  ];
+  ] as { label: string; value: string; sub: string; icon: string; warn?: boolean; tone?: string; unit?: string }[];
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
       <div>
         <h2 style={{ marginBottom: 2 }}>Accountability Scorecard</h2>
-        <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 860 }}>
-          Every Finding from the moment it is raised to verified closure — how many, how far along, how fast, and where follow-up is
-          waiting. Findings are for review, not accusation. Target: verified and closed within {targetDays} days (Master Data → Thresholds).
+        <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 900 }}>
+          Every Finding from the moment it is raised to verified closure: how many, how far along, how fast, and which LGAs, facility
+          levels and responsible people are keeping up. Findings are for review, not accusation; the score shows where support is
+          needed. Target: verified and closed within {targetDays} days (Master Data → Thresholds).
         </p>
       </div>
 
@@ -191,10 +307,15 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
           <div className="card elev-sm" key={t.label} style={{ gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span className="card-kicker">{t.label}</span>
-              <i className={`ph ${t.icon}`} style={{ color: t.warn ? "var(--priority-high)" : "var(--color-accent)" }} aria-hidden="true" />
+              <i className={`ph ${t.icon}`} style={{ color: t.tone ?? (t.warn ? "var(--priority-high)" : "var(--color-accent)") }} aria-hidden="true" />
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.02em" }}>{t.value}</div>
-            <div className="card-meta">{t.warn ? <Flag level="warning">{t.sub}</Flag> : t.sub}</div>
+            <div style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.02em" }}>
+              {t.value}
+              {t.unit && <span style={{ fontSize: 15, fontWeight: 600, marginLeft: 4, color: "var(--color-neutral-700)" }}>{t.unit}</span>}
+            </div>
+            <div className="card-meta">
+              {t.warn ? <Flag level="warning">{t.sub}</Flag> : t.tone ? <span style={{ color: t.tone, fontWeight: 600 }}>{t.sub}</span> : t.sub}
+            </div>
           </div>
         ))}
       </div>
@@ -275,7 +396,7 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
         </div>
       </div>
 
-      <ResponsibilityTable title="By LGA" label="LGA" groups={groupBy(rows, (r) => r.lga?.name ?? "No LGA")} targetDays={targetDays} now={now} />
+      <LgaLeague groups={groupBy(rows, (r) => r.lga?.name ?? "No LGA")} targetDays={targetDays} now={now} />
       <ResponsibilityTable title="By facility level" label="Level" groups={groupBy(rows, (r) => r.category?.name ?? "Not set")} targetDays={targetDays} now={now} />
 
       <ResponsibilityTable title="By responsible person (DRI)" label="DRI" countLabel="Assigned"
