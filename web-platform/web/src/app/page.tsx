@@ -31,6 +31,12 @@ const FEATURES = [
   { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only: no child or caregiver names, IDs or per-child records. Every change is audited." },
 ] as const;
 
+const HERO_POINTS = [
+  { icon: "ph-wifi-slash", label: "Works offline" },
+  { icon: "ph-flag", label: "Automatic discrepancy checks" },
+  { icon: "ph-intersect", label: "DHIS2 triangulation" },
+] as const;
+
 const GOVERNANCE = [
   "Data is recorded only by authorised government facility, store and programme staff",
   "Role-based access: each user works at their own facility and supply-chain level",
@@ -75,13 +81,18 @@ export default async function LandingPage() {
           <div className={s.heroText}>
             <div className={s.kicker}>{TAGLINE}</div>
             <h1 className={s.heroTitle}>
-              Ready-to-Use Therapeutic Food <span className={s.accent}>(RUTF)</span> Monitoring &amp; Accountability Platform
+              Every sachet of <span className={s.accent}>RUTF</span> tracked, verified and accounted for
             </h1>
             <p className={s.lead}>
-              Every packet of RUTF is tracked, verified and accounted for — from the State store to the LGA store to
-              the outpatient therapeutic programme (OTP) — so that malnourished children get the right nutrition, at
-              the right time, in the right place.
+              From the State store to the LGA store to the outpatient therapeutic programme (OTP), discrepancies are
+              flagged automatically and followed to verified closure, so malnourished children get the right
+              nutrition, at the right time, in the right place.
             </p>
+            <ul className={s.heroPoints}>
+              {HERO_POINTS.map((p) => (
+                <li key={p.label}><i className={`ph-fill ${p.icon}`} aria-hidden="true" /> {p.label}</li>
+              ))}
+            </ul>
             <div className={s.heroActions}>
               <Link href={cta.href} className={s.btnPrimary}>
                 {profile ? "Open dashboard" : "Sign in to the platform"} <i className="ph ph-arrow-right" aria-hidden="true" />

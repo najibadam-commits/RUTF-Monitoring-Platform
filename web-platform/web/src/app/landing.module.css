@@ -70,6 +70,9 @@
 .heroTitle { font-size: clamp(30px, 3.6vw, 44px); font-weight: 700; color: var(--navy); line-height: 1.15; margin-bottom: 18px; }
 .accent { color: var(--blue); }
 .lead { font-size: 16.5px; line-height: 1.65; color: var(--color-neutral-800); margin-bottom: 28px; }
+.heroPoints { list-style: none; margin: -8px 0 26px; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.heroPoints li { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.85); border: 1px solid var(--color-accent-200); font-size: 13px; font-weight: 600; color: var(--navy); }
+.heroPoints i { color: var(--blue); font-size: 15px; }
 .heroActions { display: flex; flex-wrap: wrap; gap: 14px; }
 .pilot { margin-top: 24px; font-size: 13.5px; color: var(--color-neutral-800); display: flex; align-items: center; gap: 6px; }
 .pilot i { color: var(--tone-green); }
