@@ -5,11 +5,15 @@ import type { Database } from "@/lib/types/database";
 export const DOWNLOAD_REQUEST_SELECT = `
   id, requester_id, resource_type, format, filters, reason, status,
   reviewed_by, reviewed_at, review_note, download_token, fulfilled_at, created_at,
-  requester:profiles!download_requests_requester_id_fkey(name, email)
+  requester:profiles!download_requests_requester_id_fkey(name, email),
+  reviewer:profiles!download_requests_reviewed_by_fkey(name)
 `;
 
 export type DownloadRequestRow = Database["public"]["Tables"]["download_requests"]["Row"] & {
   requester: { name: string; email: string } | null;
+  reviewer: { name: string } | null;
+  /** The request's scope in words (describeScope), filled in by the page. */
+  scope?: string;
 };
 
 /** Super Admin/Project Admin review view — newest first. RLS already scopes this correctly:
