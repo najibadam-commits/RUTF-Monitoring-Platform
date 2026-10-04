@@ -13,6 +13,28 @@ import { addUserAction, editUserAction, removeUserAction, resetUserPasswordActio
 type Profile = Database["public"]["Tables"]["profiles"]["Row"];
 type ModalKind = "add" | "edit" | "remove" | "reset" | "bulkImport" | null;
 
+// Users & Access (DECISIONS R94): who can do what, at a glance — one card per role with what it can
+// do and how many active accounts hold it (click to filter), a search and status filter, each
+// account's area (facility, supervised LGAs, state or the whole platform) and when it was last active.
+const ROLE_ORDER: UserRole[] = ["super_admin", "project_admin", "state_coordinator", "tpm_supervisor", "dri", "viewer"];
+const ROLE_CAN: Record<UserRole, { icon: string; can: string }> = {
+  super_admin: { icon: "ph-crown", can: "Everything: users, settings, master data, void ledger entries, approve data requests" },
+  project_admin: { icon: "ph-identification-badge", can: "Runs the pilot: users, master data, voids, data requests and the audit trail" },
+  state_coordinator: { icon: "ph-user-check", can: "Reviews new Findings: approves them for action or returns them for correction" },
+  tpm_supervisor: { icon: "ph-clipboard-text", can: "Store checks and OTP verifications in their LGAs; verifies and closes Findings" },
+  dri: { icon: "ph-first-aid-kit", can: "Records stock and dispensing at their store or OTP site; responds to Findings" },
+  viewer: { icon: "ph-eye", can: "Read-only dashboards and reports; data downloads only by approved request" },
+};
+
+function lastActive(iso: string | null, now: number) {
+  if (!iso) return "Never signed in";
+  const days = Math.floor((now - Date.parse(iso)) / 86_400_000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Yesterday";
+  if (days < 30) return `${days} days ago`;
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export function UsersTable({
   users,
   callerRole,
@@ -60,6 +82,35 @@ export function UsersTable({
     supervisedLgaIds: [] as string[],
   });
   const [resetState, setResetState] = useState<{ id: string; status: "pending" | "success" | "error"; message?: string } | null>(null);
+  const [query, setQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<UserRole | "all">("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("active");
+  const [now] = useState(() => Date.now());
+
+  const roleCounts = Object.fromEntries(ROLE_ORDER.map((r) => [r, users.filter((u) => u.role === r && u.status === "active").length])) as Record<UserRole, number>;
+  const q = query.trim().toLowerCase();
+  const shown = users.filter(
+    (u) =>
+      (roleFilter === "all" || u.role === roleFilter) &&
+      (statusFilter === "all" || u.status === statusFilter) &&
+      (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q) || (u.phone ?? "").includes(q)),
+  );
+  const activeRecently = users.filter((u) => u.status === "active" && u.last_login && now - Date.parse(u.last_login) < 30 * 86_400_000).length;
+  const activeCount = users.filter((u) => u.status === "active").length;
+
+  /** Where an account works: its facility, supervised LGAs, managed state, or the whole platform. */
+  function areaOf(u: Profile) {
+    if (u.role === "dri") return u.facility_id ? (facilityNames[u.facility_id] ?? "Facility") : "No facility assigned";
+    if (u.role === "tpm_supervisor") {
+      if (!u.supervision_level) return "No supervision area set";
+      const ids = supervisedLgas[u.id] ?? [];
+      const where = ids.length === 1 ? (lgas.find((l) => l.id === ids[0])?.name ?? "1 LGA") : `${ids.length} LGAs`;
+      return `${u.supervision_level === "stores" ? "Stores" : "OTP sites"} · ${where}`;
+    }
+    if (u.role === "super_admin") return "Whole platform";
+    if (u.managed_state_id) return states.find((s) => s.id === u.managed_state_id)?.name ?? "Their state";
+    return u.role === "viewer" ? "Dashboards, read-only" : "Their project";
+  }
 
   async function handleResetPassword(u: Profile) {
     setResetState({ id: u.id, status: "pending" });
@@ -100,66 +151,87 @@ export function UsersTable({
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
           <h2 style={{ marginBottom: 2 }}>Users &amp; Access</h2>
-          <p className="text-muted" style={{ fontSize: 13 }}>
-            {users.length} account{users.length === 1 ? "" : "s"}
-            {callerRole === "project_admin" ? " in your project." : " across the platform."}
+          <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 820 }}>
+            {activeCount} active account{activeCount === 1 ? "" : "s"}
+            {callerRole === "project_admin" ? " in your project" : " across the platform"}, {activeRecently} signed in during the last 30 days.
+            Each role sees and changes only its own area; the database enforces it for the web, the app and the API alike, and every
+            change to an account is in the Audit Trail.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
           <button className="btn btn-secondary" onClick={() => setModal("bulkImport")}>
-            <i className="ph ph-upload-simple" /> Bulk Import
+            <i className="ph ph-upload-simple" /> Bulk import
           </button>
           <button className="btn btn-primary" onClick={() => setModal("add")}>
-            <i className="ph ph-user-plus" /> Add User
+            <i className="ph ph-user-plus" /> Add user
           </button>
         </div>
       </div>
 
-      <div className="card elev-sm" style={{ padding: 0 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(175px, 1fr))", gap: 10 }}>
+        {ROLE_ORDER.filter((r) => roleCounts[r] > 0 || r !== "state_coordinator").map((r) => {
+          const active = roleFilter === r;
+          return (
+            <button key={r} type="button" className="card elev-sm" aria-pressed={active} onClick={() => setRoleFilter(active ? "all" : r)}
+              title={active ? "Show every role" : `Show only ${ROLE_LABELS[r]} accounts`}
+              style={{ padding: 12, gap: 4, textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <i className={`ph-fill ${ROLE_CAN[r].icon}`} aria-hidden="true" style={{ color: "var(--color-accent-600)", fontSize: 16 }} />
+                <strong style={{ fontSize: 13.5, flex: 1 }}>{r === "dri" ? "Facility user (DRI)" : ROLE_LABELS[r]}</strong>
+                <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700 }}>{roleCounts[r]}</span>
+              </span>
+              <span className="text-muted" style={{ fontSize: 11.5, lineHeight: 1.4 }}>{ROLE_CAN[r].can}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="filter-bar">
+        <input className="input" style={{ maxWidth: 260 }} placeholder="Search name, email or phone…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search users" />
+        <select className="input" style={{ maxWidth: 190 }} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as UserRole | "all")} aria-label="Role">
+          <option value="all">All roles</option>
+          {ROLE_ORDER.map((r) => <option key={r} value={r}>{r === "dri" ? "Facility user (DRI)" : ROLE_LABELS[r]}</option>)}
+        </select>
+        <select className="input" style={{ maxWidth: 160 }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "inactive")} aria-label="Status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="all">Active and inactive</option>
+        </select>
+        <span className="text-muted" style={{ fontSize: 12.5, marginLeft: "auto" }}>{shown.length} of {users.length} accounts</span>
+      </div>
+
+      <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
         <table className="table">
           <thead>
             <tr>
               <th>Name</th>
-              <th>Email</th>
-              <th>Phone</th>
               <th>Role</th>
+              <th>Area</th>
               <th>Status</th>
-              <th>Last Login</th>
+              <th>Last active</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {users.map((u) => (
+            {shown.map((u) => (
               <tr key={u.id}>
-                <td>{u.name}</td>
-                <td className="text-muted">{u.email}</td>
-                <td className="text-muted">{u.phone || "—"}</td>
+                <td>
+                  {u.name}
+                  <div className="text-muted" style={{ fontSize: 11.5 }}>{u.email}{u.phone ? ` · ${u.phone}` : ""}</div>
+                </td>
                 <td>
                   <span className="tag tag-accent">{ROLE_LABELS[u.role]}</span>
-                  {u.role === "dri" && (
-                    <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
-                      {u.facility_id ? (facilityNames[u.facility_id] ?? "Facility") : "No facility assigned"}
-                    </div>
-                  )}
-                  {u.role === "tpm_supervisor" && (
-                    <div className="text-muted" style={{ fontSize: 11, marginTop: 2 }}>
-                      {u.supervision_level
-                        ? `${u.supervision_level === "stores" ? "Stores" : "OTP sites"} · ${
-                            (supervisedLgas[u.id] ?? []).length === 1
-                              ? (lgas.find((l) => l.id === supervisedLgas[u.id][0])?.name ?? "1 LGA")
-                              : `${(supervisedLgas[u.id] ?? []).length} LGAs`
-                          }`
-                        : "No supervision area set"}
-                    </div>
-                  )}
                 </td>
+                <td className="text-muted" style={{ fontSize: 12.5, maxWidth: 260 }}>{areaOf(u)}</td>
                 <td>
                   <ActiveStatusTag status={u.status === "active" ? "active" : "inactive"} />
                 </td>
-                <td className="text-muted">{u.last_login ? new Date(u.last_login).toLocaleString() : "—"}</td>
+                <td className="text-muted" style={{ fontSize: 12.5 }} title={u.last_login ? new Date(u.last_login).toLocaleString("en-GB") : undefined}>
+                  {lastActive(u.last_login, now)}
+                </td>
                 <td className="table-actions">
                   {canManage(u) && (
                     <>
@@ -198,10 +270,10 @@ export function UsersTable({
                 </td>
               </tr>
             ))}
-            {users.length === 0 && (
+            {shown.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-muted" style={{ textAlign: "center", padding: 24 }}>
-                  No users yet.
+                <td colSpan={6} className="text-muted" style={{ textAlign: "center", padding: 24 }}>
+                  {users.length === 0 ? "No users yet." : "No accounts match these filters."}
                 </td>
               </tr>
             )}
