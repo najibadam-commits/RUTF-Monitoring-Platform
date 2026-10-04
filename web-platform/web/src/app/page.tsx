@@ -19,13 +19,16 @@ const STEPS = [
   { icon: "ph-flag", tone: "teal", title: "Findings & reporting", body: "Discrepancies above threshold become Findings, followed through to corrective action and closure." },
 ] as const;
 
+// Named after the platform's own modules (lib/rbac.ts NAV_ITEMS), so the proposal and the demo match.
 const FEATURES = [
-  { icon: "ph-book-open-text", title: "Stock ledger", body: "Running balance per facility and lot, with documents and photos of stock cards." },
-  { icon: "ph-arrows-left-right", title: "Transfers", body: "State → LGA → OTP movements in transit, received, or with a discrepancy." },
-  { icon: "ph-device-mobile", title: "Offline Android app", body: "Record at the facility without a signal; entries sync once connectivity returns." },
-  { icon: "ph-map-trifold", title: "GIS map", body: "Facilities, stock-outs, transfers and open Findings across Katsina's LGAs and wards." },
-  { icon: "ph-chart-line-up", title: "Dashboards", body: "Stock on hand, variance, short-dispensing, reporting completeness and expiries." },
-  { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only — no child or caregiver names, IDs or per-child records." },
+  { icon: "ph-book-open-text", title: "Stock Ledger & Transfers", body: "A running balance per facility and lot. State → LGA → OTP movements are reconciled on receipt, short deliveries included." },
+  { icon: "ph-device-mobile", title: "Offline Android app", body: "Facility staff and supervisors record without a signal. Offline Sync Health shows every device's last sync." },
+  { icon: "ph-flag", title: "Automatic Findings", body: "Variances above threshold raise a Finding on their own, with a traceable ID such as KT-DAU-MAJ-OTP-26001." },
+  { icon: "ph-kanban", title: "Corrective Action Tracker", body: "Every Finding is assigned, addressed and independently verified, with a target date for closure." },
+  { icon: "ph-seal-check", title: "Accountability Scorecard", body: "Follow-through by LGA and facility: closed on time, overdue and reopened, so performance is visible." },
+  { icon: "ph-map-trifold", title: "Command Centre & Situation Map", body: "Stock on hand, stock-outs, expiries and open Findings across every LGA, ward and facility in Katsina." },
+  { icon: "ph-intersect", title: "DHIS2 Triangulation", body: "Each facility's DHIS2 monthly report is checked against the ledger, and the largest gaps are flagged first." },
+  { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only: no child or caregiver names, IDs or per-child records. Every change is audited." },
 ] as const;
 
 export default async function LandingPage() {
@@ -136,7 +139,11 @@ export default async function LandingPage() {
         <section id="features" className={s.section}>
           <div className={s.sectionHead}>
             <div className={s.kicker}>Features</div>
-            <h2 className={s.h2}>Built for facilities, stores and supervisors</h2>
+            <h2 className={s.h2}>From the store shelf to the child, every sachet accounted for</h2>
+            <p className={s.sub}>
+              One platform for facilities, stores, supervisors and programme managers: record, detect, correct and
+              report on a single trusted record.
+            </p>
           </div>
           <div className={s.featureWrap}>
             <div className={s.featurePhoto} role="img" aria-label="A health worker smiles with a child holding RUTF sachets" />
