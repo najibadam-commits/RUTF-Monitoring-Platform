@@ -154,7 +154,8 @@
   background: var(--color-accent-100); border-radius: var(--radius-lg);
 }
 .govBadge { width: 140px; height: 140px; border-radius: 50%; background: var(--color-surface); display: grid; place-items: center; font-size: 76px; color: var(--tone-green); box-shadow: var(--shadow-md); }
-.govList { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
+.govLead { font-size: 16px; color: var(--color-neutral-800); margin: 0; }
+.govList { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px 28px; }
 .govList li { display: flex; gap: 10px; font-size: 15px; color: var(--color-neutral-800); }
 .govList i { color: var(--tone-green); font-size: 20px; flex: none; margin-top: 1px; }
 
@@ -185,7 +186,7 @@
   .governance { margin-inline: 16px; }
   .featurePhoto { min-height: 260px; }
   .govBadge { width: 96px; height: 96px; font-size: 52px; }
-  .features { grid-template-columns: 1fr; }
+  .features, .govList { grid-template-columns: 1fr; }
   .quote { text-align: left; }
 }
 @media (max-width: 520px) {

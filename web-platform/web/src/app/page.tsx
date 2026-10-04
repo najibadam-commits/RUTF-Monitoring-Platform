@@ -31,6 +31,15 @@ const FEATURES = [
   { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only: no child or caregiver names, IDs or per-child records. Every change is audited." },
 ] as const;
 
+const GOVERNANCE = [
+  "Data is recorded only by authorised government facility, store and programme staff",
+  "Role-based access: each user works at their own facility and supply-chain level",
+  "A supervisor reviews every Finding before anyone is asked to act, and can return it for correction",
+  "Transactions are never deleted, only voided with a reason, and every change is in the Audit Trail",
+  "Data exports need approval; small counts are suppressed in public views",
+  "Designed for the Nigeria Data Protection Act 2023: aggregate OTP data only, with a data protection impact assessment",
+] as const;
+
 export default async function LandingPage() {
   const profile = await getOptionalProfile();
   const cta = profile
@@ -165,12 +174,15 @@ export default async function LandingPage() {
           <div className={s.govBadge} aria-hidden="true"><i className="ph-duotone ph-shield-check" /></div>
           <div className={s.govText}>
             <div className={s.kicker}>Governance</div>
-            <h2 className={s.h2}>Findings are for review, not accusation</h2>
+            <h2 className={s.h2}>Trusted data, fair process, a complete audit trail</h2>
+            <p className={s.govLead}>
+              Findings are for review, not accusation. Every safeguard below is built into the platform, not left to
+              policy alone.
+            </p>
             <ul className={s.govList}>
-              <li><i className="ph-fill ph-check-circle" aria-hidden="true" /> Data recorded by authorised government facility and programme staff</li>
-              <li><i className="ph-fill ph-check-circle" aria-hidden="true" /> Role-based access per facility and supply-chain level</li>
-              <li><i className="ph-fill ph-check-circle" aria-hidden="true" /> Transactions are never deleted — only voided with a reason, in the audit trail</li>
-              <li><i className="ph-fill ph-check-circle" aria-hidden="true" /> Exports go through an approval step; small counts are suppressed in public views</li>
+              {GOVERNANCE.map((g) => (
+                <li key={g}><i className="ph-fill ph-check-circle" aria-hidden="true" /> {g}</li>
+              ))}
             </ul>
           </div>
         </section>
