@@ -122,11 +122,12 @@ export default async function LandingPage() {
           <div className={s.whyInner}>
             <div className={s.whyText}>
               <div className={`${s.kicker} ${s.kickerLight}`}>Why it matters</div>
-              <h2 className={s.whyTitle}>Transparency today.<br />Healthier tomorrows.</h2>
+              <h2 className={s.whyTitle}>Every sachet counts.<br />Every child counts.</h2>
               <p className={s.whyLead}>
-                By digitising the RUTF supply chain inside the health-facility structure, the platform reduces loss
-                and diversion, builds trust and helps save the lives of children suffering from severe acute
-                malnutrition.
+                RUTF is a life-saving treatment for children with severe acute malnutrition (SAM), and every carton
+                lost, expired or diverted is treatment a child does not receive. The platform gives the State, LGAs,
+                facilities and partners one verified record of where RUTF is, so problems are caught early and put
+                right, and donors can see that supplies reach the children they were meant for.
               </p>
               <a href="#features" className={s.btnLight}>
                 Learn more <i className="ph ph-arrow-right" aria-hidden="true" />
