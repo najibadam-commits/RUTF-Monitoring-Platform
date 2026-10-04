@@ -1,34 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getOptionalProfile } from "@/lib/supabase/dal";
-import { createAdminClient } from "@/lib/supabase/admin";
 import { LoginForm } from "./LoginForm";
 import { FragmentAuthHandler } from "./FragmentAuthHandler";
 import { RutfMark } from "@/components/RutfMark";
 import { BRAND, QUOTE, TAGLINE, WHY } from "@/lib/rutf-copy";
 import s from "./login.module.css";
-
-/**
- * Live coverage counts for the stat row under the photo. Uses the service-role client because this
- * renders before sign-in and lgas/wards/activity_sites RLS only grants SELECT to `authenticated` —
- * safe because only aggregate counts leave this function, never row data (see createAdminClient).
- * Health facilities count `status = 'approved'` activity sites, i.e. what is live on the platform.
- * A count of zero is dropped (facilities aren't imported until M1), so the row never shows "0".
- */
-async function getPlatformStats() {
-  const admin = createAdminClient();
-  const [lgas, wards, facilities] = await Promise.all([
-    admin.from("lgas").select("*", { count: "exact", head: true }),
-    admin.from("wards").select("*", { count: "exact", head: true }),
-    admin.from("activity_sites").select("*", { count: "exact", head: true }).eq("status", "approved"),
-  ]);
-  const rows = [
-    { label: "LGAs", value: lgas.count ?? 0 },
-    { label: "Wards", value: wards.count ?? 0 },
-    { label: "Health facilities", value: facilities.count ?? 0 },
-  ].filter((r) => r.value > 0);
-  return rows.length ? rows : null;
-}
 
 /** Query-param error codes /auth/confirm and other auth routes redirect here with — never
  *  Supabase's own raw error text, and never silently dropped (see LoginForm's linkError prop). */
@@ -53,13 +30,6 @@ export default async function LoginPage({
   const { next, error, message } = await searchParams;
   const linkError = error ? (LINK_ERROR_MESSAGES[error] ?? "That link is no longer valid. Please try again or contact your administrator.") : undefined;
   const linkMessage = message ? LINK_SUCCESS_MESSAGES[message] : undefined;
-  // Never let a stats query failure take down the login page itself — but do log it, so a
-  // silent failure (e.g. a missing env var in this deploy's environment scope) is at least
-  // visible in the server's runtime logs instead of just quietly hiding the stat row forever.
-  const stats = await getPlatformStats().catch((e) => {
-    console.error("getPlatformStats failed:", e instanceof Error ? e.message : e);
-    return null;
-  });
 
   return (
     <div className={s.page}>
@@ -116,18 +86,7 @@ export default async function LoginPage({
             </li>
           ))}
         </ul>
-        <p className={s.quote}>
-          {QUOTE}
-          {stats && (
-            <span className={s.stats}>
-              {stats.map((stat) => (
-                <span key={stat.label}>
-                  <strong>{stat.value.toLocaleString()}</strong> {stat.label}
-                </span>
-              ))}
-            </span>
-          )}
-        </p>
+        <p className={s.quote}>{QUOTE}</p>
       </footer>
     </div>
   );

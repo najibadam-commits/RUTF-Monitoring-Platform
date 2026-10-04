@@ -12,11 +12,11 @@ import s from "./landing.module.css";
  */
 
 const STEPS = [
-  { icon: "ph-warehouse", tone: "blue", title: "State store", body: "Each batch is received as a lot, with its expiry date, waybill and quantity on the State ledger." },
-  { icon: "ph-truck", tone: "green", title: "LGA store", body: "Shipments are tracked with digital records from warehouse to facility, and short deliveries are reconciled." },
-  { icon: "ph-first-aid-kit", tone: "purple", title: "Health facility", body: "Stock levels are monitored, including arrival, usage and expiry dates, with daily OTP dispensing totals." },
-  { icon: "ph-clipboard-text", tone: "orange", title: "Supervision", body: "LGA and State nutrition officers verify stock and registers on routine supervision visits." },
-  { icon: "ph-flag", tone: "teal", title: "Findings & reporting", body: "Discrepancies above threshold become Findings, followed through to corrective action and closure." },
+  { icon: "ph-warehouse", tone: "blue", title: "Receive at the State store", body: "Each consignment is logged by lot, with its expiry date, waybill and quantity, on the State ledger." },
+  { icon: "ph-truck", tone: "green", title: "Transfer to the LGA store", body: "Every transfer has a traceable ID and is confirmed on receipt; short deliveries are recorded and reconciled." },
+  { icon: "ph-first-aid-kit", tone: "purple", title: "Dispense at the OTP", body: "Facility staff record stock received, dispensed and expired, with daily OTP totals, even offline." },
+  { icon: "ph-clipboard-text", tone: "orange", title: "Verify on supervision", body: "LGA and State nutrition officers count stock and check registers, visiting the highest-risk facilities first." },
+  { icon: "ph-flag", tone: "teal", title: "Detect, correct, report", body: "Discrepancies become Findings, followed through to verified closure and triangulated with DHIS2." },
 ] as const;
 
 // Named after the platform's own modules (lib/rbac.ts NAV_ITEMS), so the proposal and the demo match.
@@ -99,10 +99,10 @@ export default async function LandingPage() {
         <section id="how-it-works" className={s.section}>
           <div className={s.sectionHead}>
             <div className={s.kicker}>How it works</div>
-            <h2 className={s.h2}>End-to-end visibility. Greater impact.</h2>
+            <h2 className={s.h2}>One chain of custody, from State store to child</h2>
             <p className={s.sub}>
-              The platform follows RUTF through the government supply chain, with facility recording and supervisor
-              checks at every level.
+              The platform follows every lot of RUTF through the government supply chain, with a record at each
+              hand-over and an independent check at every level.
             </p>
           </div>
           <ol className={s.steps}>
