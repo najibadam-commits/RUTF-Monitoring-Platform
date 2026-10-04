@@ -58,8 +58,9 @@ export default async function LoginPage({
           <div className={s.cardHead}>
             <RutfMark size={52} />
             <div>
-              <div className={s.cardKicker}>Sign in to your account</div>
-              <p className={s.cardSub}>Use the email and password your administrator set up for you.</p>
+              <div className={s.cardKicker}>Secure sign-in</div>
+              <h2 className={s.cardTitle}>Welcome back</h2>
+              <p className={s.cardSub}>For authorised programme staff only.</p>
             </div>
           </div>
 
@@ -67,9 +68,11 @@ export default async function LoginPage({
 
           <div className={s.assurances}>
             <span><i className="ph-fill ph-shield-check" aria-hidden="true" /> Role-based access</span>
-            <span><i className="ph-fill ph-clock-counter-clockwise" aria-hidden="true" /> Audit trail</span>
+            <span><i className="ph-fill ph-clock-counter-clockwise" aria-hidden="true" /> Full audit trail</span>
             <span><i className="ph-fill ph-lock-key" aria-hidden="true" /> No child-level data</span>
+            <span><i className="ph-fill ph-scales" aria-hidden="true" /> Designed for NDPA 2023</span>
           </div>
+          <p className={s.help}>Need access? Ask your programme administrator.</p>
         </section>
       </main>
 

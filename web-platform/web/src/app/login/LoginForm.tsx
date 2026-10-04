@@ -78,7 +78,7 @@ export function LoginForm({ next, linkError, linkMessage }: { next?: string; lin
         ) : (
           <>
             <i className="ph ph-sign-in" style={{ fontSize: 18 }} />
-            Sign In
+            Sign in
           </>
         )}
       </button>
