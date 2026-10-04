@@ -91,14 +91,26 @@ interface Props {
   statuses: { value: string; label: string; color: string }[];
   reporters: string[];
   driNames: string[];
+  /** The state the map opens on (the pilot state); "All" when not given. */
+  defaultStateId?: string;
 }
+
+/** Finding statuses that are still open (not yet verified and closed). */
+const isOpen = (status: string) => status !== "verified_closed";
 
 const ALL = "All";
 const DEFAULT_CENTER: [number, number] = [9.08, 8.68];
 const DEFAULT_ZOOM = 6;
 
-export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, states, lgas, categories, statuses, reporters, driNames }: Props) {
-  const [filters, setFilters] = useState({ state: ALL, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
+export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, states, lgas, categories, statuses, reporters, driNames, defaultStateId }: Props) {
+  const homeState = defaultStateId && states.some((s) => s.id === defaultStateId) ? defaultStateId : ALL;
+  const [filters, setFilters] = useState({ state: homeState, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
+  // The pilot state's extent from its Findings, so the map opens there at once; the LGA outlines
+  // refine it when they load.
+  const [homeBounds] = useState(() => {
+    const pts = homeState === ALL ? [] : issues.filter((i) => i.stateId === homeState).map((i) => [i.lat, i.lng] as [number, number]);
+    return pts.length ? L.latLngBounds(pts) : null;
+  });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedLga, setSelectedLga] = useState<{ id: string; name: string } | null>(null);
   const [wardsUnavailable, setWardsUnavailable] = useState(false);
@@ -149,6 +161,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
     // registering a duplicate "State Boundaries" overlay on the map the second mount created.
     let cancelled = false;
     const map = L.map(mapNodeRef.current, { zoomControl: true }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    if (homeBounds) map.fitBounds(homeBounds, { padding: [24, 24] });
 
     const openTopoMap = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
       attribution: "&copy; OpenStreetMap contributors, SRTM &copy; OpenTopoMap (CC-BY-SA)",
@@ -184,7 +197,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
     const layersControl = L.control
       .layers(
         { "Topographic": openTopoMap, "Streets": streets, "Satellite": satellite },
-        { "Finding markers": clusterGroup, "Facilities": facilityGroup },
+        { "Findings": clusterGroup, "Facilities": facilityGroup },
         { position: "topright", collapsed: true },
       )
       .addTo(map);
@@ -201,7 +214,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         style: { color: "#595d6c", weight: 1, fillOpacity: 0, opacity: 0.6 },
       }).addTo(mapRef.current);
       boundaryLayerRef.current.bringToBack();
-      layersControlRef.current.addOverlay(boundaryLayerRef.current, "State Boundaries");
+      layersControlRef.current.addOverlay(boundaryLayerRef.current, "State boundaries");
     });
 
     setTimeout(() => map.invalidateSize(), 150);
@@ -213,7 +226,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
       boundaryLayerRef.current = null;
       layersControlRef.current = null;
     };
-  }, []);
+  }, [homeBounds]);
 
   // load LGA outlines for the selected state filter
   useEffect(() => {
@@ -248,7 +261,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
             layer.on("click", () => setSelectedLga({ id: feature.properties.id, name: feature.properties.name }));
           },
         }).addTo(mapRef.current);
-        layersControlRef.current?.addOverlay(lgaLayerRef.current, "LGA Boundaries");
+        layersControlRef.current?.addOverlay(lgaLayerRef.current, "LGA boundaries");
         const bounds = lgaLayerRef.current.getBounds();
         if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [24, 24] });
       });
@@ -284,7 +297,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         wardLayerRef.current = L.geoJSON(fc, { style: { color: "#b45309", weight: 1, fillOpacity: 0.05, opacity: 0.9 } }).addTo(
           mapRef.current,
         );
-        layersControlRef.current?.addOverlay(wardLayerRef.current, "Ward Boundaries");
+        layersControlRef.current?.addOverlay(wardLayerRef.current, "Ward boundaries");
         const bounds = wardLayerRef.current.getBounds();
         if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [24, 24] });
       });
@@ -357,11 +370,28 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
     }
   }, [shownFacilities, facilityMeasure, riskHigh]);
 
+  // Situation summary over the map: what needs attention in the current selection.
+  const summary = useMemo(() => {
+    const open = filtered.filter((i) => isOpen(i.status));
+    const lt1 = shownFacilities.filter((f) => f.monthsOfStock !== null && f.monthsOfStock < 1).length;
+    const highRisk = shownFacilities.filter((f) => f.risk !== null && f.risk >= riskHigh).length;
+    return { open: open.length, critical: open.filter((i) => i.priority === "critical").length, lt1, highRisk };
+  }, [filtered, shownFacilities, riskHigh]);
+  const statusCount = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const i of filtered) m.set(i.status, (m.get(i.status) ?? 0) + 1);
+    return m;
+  }, [filtered]);
+
   function resetFilters() {
-    setFilters({ state: ALL, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
+    // Back to the home view: the pilot state's LGAs when they are already loaded, else the country.
+    const lgaBounds = homeState !== ALL && filters.state === homeState ? lgaLayerRef.current?.getBounds() : null;
+    setFilters({ state: homeState, lga: ALL, category: ALL, status: ALL, reporter: ALL, dri: ALL });
     setSelectedLga(null);
     setSelectedId(null);
-    mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+    if (lgaBounds?.isValid()) mapRef.current?.fitBounds(lgaBounds, { padding: [24, 24] });
+    else if (homeBounds && filters.state === homeState) mapRef.current?.fitBounds(homeBounds, { padding: [24, 24] });
+    else if (homeState === ALL) mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
   }
 
   return (
@@ -404,7 +434,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         <div className="field">
           <label>Status</label>
           <select className="input" value={filters.status} onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}>
-            <option value={ALL}>All Status</option>
+            <option value={ALL}>All statuses</option>
             {statuses.map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
@@ -424,7 +454,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           </select>
         </div>
         <div className="field">
-          <label>Direct Responsible Individual (DRI)</label>
+          <label>Assigned to (DRI)</label>
           <select className="input" value={filters.dri} onChange={(e) => setFilters((f) => ({ ...f, dri: e.target.value }))}>
             <option value={ALL}>All DRIs</option>
             {driNames.map((d) => (
@@ -436,7 +466,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         </div>
         <button className="btn btn-secondary btn-block" onClick={resetFilters}>
           <i className="ph ph-arrow-counter-clockwise" />
-          Reset Filters
+          Reset filters
         </button>
         {selectedLga && (
           <div
@@ -488,10 +518,13 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         <h6 style={{ marginBottom: 6 }}>Findings</h6>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           {statuses.map((s) => (
-            <div key={s.value} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12 }}>
+            <button key={s.value} type="button" onClick={() => setFilters((f) => ({ ...f, status: f.status === s.value ? ALL : s.value }))}
+              title={filters.status === s.value ? "Show all statuses" : `Show only ${s.label}`}
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: filters.status === s.value ? "var(--color-accent-100)" : "none", border: "none", borderRadius: 4, padding: "1px 4px", margin: "0 -4px", cursor: "pointer", color: "inherit", textAlign: "left" }}>
               <span style={{ width: 9, height: 9, borderRadius: "50%", background: s.color, flex: "none" }} />
-              {s.label}
-            </div>
+              <span style={{ flex: 1 }}>{s.label}</span>
+              <span className="text-muted">{(statusCount.get(s.value) ?? 0).toLocaleString("en-GB")}</span>
+            </button>
           ))}
         </div>
         <div className="hr" style={{ margin: "4px 0" }} />
@@ -503,6 +536,19 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
       <div style={{ flex: 1, position: "relative", minWidth: 0 }}>
         <div ref={mapNodeRef} style={{ position: "absolute", inset: 0 }} />
 
+        <div className="card elev-lg" style={{ position: "absolute", left: 12, bottom: 24, zIndex: 500, padding: "10px 14px", gap: 6, maxWidth: "calc(100% - 24px)" }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>
+            Situation · {filters.state === ALL ? "All states" : states.find((s) => s.id === filters.state)?.name}
+            {filters.lga !== ALL ? ` · ${lgas.find((l) => l.id === filters.lga)?.name ?? ""}` : ""}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "6px 18px", fontSize: 12.5 }}>
+            <SummaryStat icon="ph-flag" value={summary.open} label="open Findings" />
+            <SummaryStat icon="ph-warning-octagon" value={summary.critical} label="critical" alert="var(--priority-critical)" />
+            {facilityMeasure !== "off" && <SummaryStat icon="ph-gauge" value={summary.highRisk} label="high-risk facilities" alert="var(--priority-critical)" />}
+            {facilityMeasure !== "off" && <SummaryStat icon="ph-package" value={summary.lt1} label="under 1 month of stock" alert="var(--priority-high)" />}
+          </div>
+        </div>
+
         {noResults && (
           <div
             className="card elev-lg text-muted"
@@ -513,7 +559,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         )}
 
         {selected && (
-          <div className="card elev-lg" style={{ position: "absolute", top: 16, right: 16, width: 300, padding: 14, gap: 10 }}>
+          <div className="card elev-lg" style={{ position: "absolute", top: 64, right: 12, width: 300, padding: 14, gap: 10, zIndex: 500 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span className="tag tag-outline">{selected.code}</span>
               <button className="btn btn-icon btn-ghost" onClick={() => setSelectedId(null)}>
@@ -541,11 +587,22 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
               GPS {selected.lat.toFixed(4)}, {selected.lng.toFixed(4)} · {new Date(selected.reportedAt).toLocaleString()}
             </div>
             <Link href={`/issues/${selected.id}`} className="btn btn-primary btn-block">
-              View Full Details
+              Open Finding
             </Link>
           </div>
         )}
       </div>
     </>
+  );
+}
+
+/** One figure in the map's situation summary; an alert colour only with its icon, and only when non-zero. */
+function SummaryStat({ icon, value, label, alert }: { icon: string; value: number; label: string; alert?: string }) {
+  const color = alert && value > 0 ? alert : "var(--color-neutral-700)";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, whiteSpace: "nowrap" }}>
+      <i className={`ph-fill ${icon}`} aria-hidden="true" style={{ color, fontSize: 15 }} />
+      <strong style={{ fontSize: 14 }}>{value.toLocaleString("en-GB")}</strong> {label}
+    </span>
   );
 }

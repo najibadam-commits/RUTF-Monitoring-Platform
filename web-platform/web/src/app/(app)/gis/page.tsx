@@ -76,6 +76,12 @@ export default async function GisPage() {
     driName: (i.dri as unknown as { name: string } | null)?.name ?? null,
   }));
 
+  // Open on the pilot state (DECISIONS R83): the state with the most Findings, with its LGA
+  // outlines, rather than the whole of Nigeria.
+  const perState = new Map<string, number>();
+  for (const i of issues) if (i.stateId) perState.set(i.stateId, (perState.get(i.stateId) ?? 0) + 1);
+  const defaultStateId = [...perState].sort((a, b) => b[1] - a[1])[0]?.[0];
+
   return (
     <div style={{ display: "flex", height: "100%", minHeight: 0 }}>
       <RealtimeRefresher table="issues" />
@@ -90,6 +96,7 @@ export default async function GisPage() {
         facilities={facilities}
         facilityMonth={month.label}
         riskHigh={Number(riskHigh?.value ?? 50)}
+        defaultStateId={defaultStateId}
       />
     </div>
   );
