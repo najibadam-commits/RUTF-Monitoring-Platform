@@ -29,7 +29,7 @@ export function IssuesFilterBar({
     router.push(`/issues?${params.toString()}`);
   }
 
-  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type", "view"].some((k) => searchParams.get(k));
+  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type", "view", "visit"].some((k) => searchParams.get(k));
   // Keys the uncontrolled search input + selects to the active filter set, so they properly
   // remount (and re-apply their defaultValue) whenever filters change via something other than
   // typing/selecting directly in them — e.g. "Clear Filters" below, or browser back/forward.

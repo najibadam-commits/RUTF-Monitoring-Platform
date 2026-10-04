@@ -44,8 +44,10 @@ export interface IssueFilters {
   source?: string;
   type?: string;
   view?: string;
+  /** The supervision visit that raised it (Risk-Based Supervision links here). */
+  visit?: string;
 }
-export const ISSUE_FILTER_KEYS = ["status", "priority", "category", "state", "search", "source", "type", "view"] as const;
+export const ISSUE_FILTER_KEYS = ["status", "priority", "category", "state", "search", "source", "type", "view", "visit"] as const;
 
 type Filterable<T> = {
   eq(column: string, value: string | boolean): T;
@@ -65,6 +67,7 @@ export function applyIssueFilters<T extends Filterable<T>>(query: T, f: IssueFil
   if (f.source === "auto") q = q.eq("auto_generated", true);
   else if (f.source === "manual") q = q.eq("auto_generated", false);
   if (f.type) q = q.eq("finding_type", f.type);
+  if (f.visit) q = q.eq("visit_id", f.visit);
   if (f.view === "open" || f.view === "critical" || f.view === "overdue") q = q.in("status", OPEN_STATUSES);
   if (f.view === "critical") q = q.eq("priority", "critical");
   if (f.view === "overdue") q = q.lt("reported_at", new Date(now - targetDays * 86_400_000).toISOString());
