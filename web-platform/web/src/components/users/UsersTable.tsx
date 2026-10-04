@@ -26,6 +26,9 @@ const ROLE_CAN: Record<UserRole, { icon: string; can: string }> = {
   viewer: { icon: "ph-eye", can: "Read-only dashboards and reports; data downloads only by approved request" },
 };
 
+/** The "signed in during the last 30 days" figure appears from this many accounts (DECISIONS R99). */
+const MIN_ACTIVE_TO_SHOW = 5;
+
 function lastActive(iso: string | null, now: number) {
   if (!iso) return "Never signed in";
   const days = Math.floor((now - Date.parse(iso)) / 86_400_000);
@@ -156,7 +159,9 @@ export function UsersTable({
           <h2 style={{ marginBottom: 2 }}>Users &amp; Access</h2>
           <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 820 }}>
             {activeCount} active account{activeCount === 1 ? "" : "s"}
-            {callerRole === "project_admin" ? " in your project" : " across the platform"}, {activeRecently} signed in during the last 30 days.
+            {callerRole === "project_admin" ? " in your project" : " across the platform"}
+            {/* Shown once there is real use (DECISIONS R99): with only demo accounts it would read as "nobody uses it". */}
+            {activeRecently >= MIN_ACTIVE_TO_SHOW ? `, ${activeRecently} signed in during the last 30 days. ` : ". "}
             Each role sees and changes only its own area; the database enforces it for the web, the app and the API alike, and every
             change to an account is in the Audit Trail.
           </p>
