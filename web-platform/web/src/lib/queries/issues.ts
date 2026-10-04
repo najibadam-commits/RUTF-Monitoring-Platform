@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, IssuePriority, IssueStatus } from "@/lib/types/database";
+import { OPEN_STATUSES } from "@/lib/constants";
 
 export const ISSUE_SELECT = `
   *,
@@ -26,8 +27,55 @@ export const ISSUE_LIST_SELECT = `
   category:categories(name),
   state:states(name),
   lga:lgas(name),
+  ward_ref:wards(name),
+  facility:facilities(name),
   dri:profiles!issues_assigned_dri_fkey(name)
 `;
+
+/** The Findings Register's filters (URL params), shared with its CSV/JSON export so a download
+ *  always matches the list on screen. `view` is a summary-card shortcut: open, critical (open and
+ *  critical) or overdue (open past the Finding target). */
+export interface IssueFilters {
+  status?: string;
+  priority?: string;
+  category?: string;
+  state?: string;
+  search?: string;
+  source?: string;
+  type?: string;
+  view?: string;
+}
+export const ISSUE_FILTER_KEYS = ["status", "priority", "category", "state", "search", "source", "type", "view"] as const;
+
+type Filterable<T> = {
+  eq(column: string, value: string | boolean): T;
+  in(column: string, values: readonly string[]): T;
+  lt(column: string, value: string): T;
+  or(filters: string): T;
+};
+
+export function applyIssueFilters<T extends Filterable<T>>(query: T, f: IssueFilters, targetDays: number, now: number): T {
+  let q = query;
+  if (f.status) q = q.eq("status", f.status);
+  if (f.priority) q = q.eq("priority", f.priority);
+  if (f.category) q = q.eq("category_id", f.category);
+  if (f.state) q = q.eq("state_id", f.state);
+  if (f.search) q = q.or(`description.ilike.%${f.search}%,code.ilike.%${f.search}%`);
+  // RUTF auto-Findings (migration 0102): automatic vs registered by a person, and the rule.
+  if (f.source === "auto") q = q.eq("auto_generated", true);
+  else if (f.source === "manual") q = q.eq("auto_generated", false);
+  if (f.type) q = q.eq("finding_type", f.type);
+  if (f.view === "open" || f.view === "critical" || f.view === "overdue") q = q.in("status", OPEN_STATUSES);
+  if (f.view === "critical") q = q.eq("priority", "critical");
+  if (f.view === "overdue") q = q.lt("reported_at", new Date(now - targetDays * 86_400_000).toISOString());
+  return q;
+}
+
+/** The Finding target in days (rutf_thresholds.finding_target_days, default 30). */
+export async function getFindingTargetDays(supabase: SupabaseClient<Database>) {
+  const { data } = await supabase.from("rutf_thresholds").select("value").eq("key", "finding_target_days").limit(1).maybeSingle();
+  return Number(data?.value ?? 30);
+}
 
 type IssueRow = Database["public"]["Tables"]["issues"]["Row"];
 
@@ -48,6 +96,8 @@ export type IssueListRow = Pick<IssueRow, "id" | "code" | "description" | "prior
   category: { name: string } | null;
   state: { name: string } | null;
   lga: { name: string } | null;
+  ward_ref: { name: string } | null;
+  facility: { name: string } | null;
   dri: { name: string } | null;
 };
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { buildIssuesExportQuery, renderIssuesExport } from "@/lib/exports/issuesExport";
-import type { IssueWithRelations } from "@/lib/queries/issues";
+import { ISSUE_FILTER_KEYS, getFindingTargetDays, type IssueFilters, type IssueWithRelations } from "@/lib/queries/issues";
 
 export async function GET(request: NextRequest) {
   const profile = await getCurrentProfile();
@@ -17,13 +17,8 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const sp = request.nextUrl.searchParams;
 
-  const query = buildIssuesExportQuery(supabase, {
-    status: sp.get("status") ?? undefined,
-    priority: sp.get("priority") ?? undefined,
-    category: sp.get("category") ?? undefined,
-    state: sp.get("state") ?? undefined,
-    search: sp.get("search") ?? undefined,
-  });
+  const filters: IssueFilters = Object.fromEntries(ISSUE_FILTER_KEYS.flatMap((k) => (sp.get(k) ? [[k, sp.get(k)!]] : [])));
+  const query = buildIssuesExportQuery(supabase, filters, await getFindingTargetDays(supabase));
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 

@@ -29,7 +29,7 @@ export function IssuesFilterBar({
     router.push(`/issues?${params.toString()}`);
   }
 
-  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type"].some((k) => searchParams.get(k));
+  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type", "view"].some((k) => searchParams.get(k));
   // Keys the uncontrolled search input + selects to the active filter set, so they properly
   // remount (and re-apply their defaultValue) whenever filters change via something other than
   // typing/selecting directly in them — e.g. "Clear Filters" below, or browser back/forward.
@@ -39,8 +39,8 @@ export function IssuesFilterBar({
     <div className="filter-bar" key={remountKey}>
       <input
         className="input"
-        style={{ maxWidth: 220 }}
-        placeholder="Search…"
+        style={{ maxWidth: 240 }}
+        placeholder="Search ID or description…"
         defaultValue={searchParams.get("search") ?? ""}
         onChange={(e) => {
           if (searchTimer.current) clearTimeout(searchTimer.current);
@@ -49,7 +49,7 @@ export function IssuesFilterBar({
         }}
       />
       <select className="input" style={{ maxWidth: 170 }} defaultValue={searchParams.get("status") ?? "All"} onChange={(e) => update("status", e.target.value)}>
-        <option value="All">All Status</option>
+        <option value="All">All statuses</option>
         {statuses.map((s) => (
           <option key={s.value} value={s.value}>
             {s.label}
@@ -65,7 +65,7 @@ export function IssuesFilterBar({
         ))}
       </select>
       <select className="input" style={{ maxWidth: 170 }} defaultValue={searchParams.get("state") ?? "All"} onChange={(e) => update("state", e.target.value)}>
-        <option value="All">All States</option>
+        <option value="All">All states</option>
         {states.map((s) => (
           <option key={s.id} value={s.id}>
             {s.name}
@@ -73,7 +73,7 @@ export function IssuesFilterBar({
         ))}
       </select>
       <select className="input" style={{ maxWidth: 150 }} defaultValue={searchParams.get("priority") ?? "All"} onChange={(e) => update("priority", e.target.value)}>
-        <option value="All">All Priorities</option>
+        <option value="All">All priorities</option>
         {priorities.map((p) => (
           <option key={p.value} value={p.value}>
             {p.label}
@@ -96,7 +96,7 @@ export function IssuesFilterBar({
       {hasActiveFilters && (
         <button className="btn btn-secondary" style={{ marginLeft: "auto" }} onClick={() => router.push("/issues")}>
           <i className="ph ph-x-circle" />
-          Clear Filters
+          Clear filters
         </button>
       )}
     </div>

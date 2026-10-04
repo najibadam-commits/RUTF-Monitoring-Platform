@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { buildIssuesExportQuery, renderIssuesExport, type IssuesExportFilters } from "@/lib/exports/issuesExport";
-import type { IssueWithRelations } from "@/lib/queries/issues";
+import { getFindingTargetDays, type IssueWithRelations } from "@/lib/queries/issues";
 import type { Json } from "@/lib/types/database";
 import { buildRutfExport, resourceToKind, RUTF_EXPORTS, type RutfExportKind } from "@/lib/exports/rutfExports";
 
@@ -91,7 +91,7 @@ export async function fetchApprovedDownloadAction(
     }
   } else {
     const filters = (reqRow.filters ?? {}) as unknown as IssuesExportFilters;
-    const query = buildIssuesExportQuery(supabase, filters);
+    const query = buildIssuesExportQuery(supabase, filters, await getFindingTargetDays(supabase));
     const { data, error } = await query;
     if (error) return { error: error.message };
     const rows = (data ?? []) as unknown as IssueWithRelations[];

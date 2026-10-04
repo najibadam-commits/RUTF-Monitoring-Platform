@@ -37,6 +37,10 @@ export const STATUS_FILTER_OPTIONS: IssueStatus[] = [
   "reopened",
 ];
 
+/** Statuses still awaiting verified closure — "open" on the Findings Register, Command Centre and
+ *  Accountability Scorecard. */
+export const OPEN_STATUSES: IssueStatus[] = ["new", "pending_review", "returned_for_correction", "assigned", "in_progress", "resolved", "reopened"];
+
 // Plain RUTF stage names — the same as the Accountability Scorecard's follow-through (R74).
 export const STATUS_LABEL: Record<IssueStatus, string> = {
   new: "New",

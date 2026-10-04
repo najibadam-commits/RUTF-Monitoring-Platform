@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { STATUS_LABEL, STATUS_COLOR, STATUS_FILTER_OPTIONS } from "@/lib/constants";
+import { OPEN_STATUSES, STATUS_LABEL, STATUS_COLOR, STATUS_FILTER_OPTIONS } from "@/lib/constants";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { StatusDot } from "@/components/ui/Tags";
 import { DashboardMap } from "@/components/gis/DashboardMap";
@@ -18,9 +18,6 @@ export const metadata: Metadata = { title: "Command Centre" };
 
 /** The time "now" for the Finding target — read once per request (a server component). */
 const requestTime = () => Date.now();
-
-/** Statuses still awaiting verified closure — the Accountability Scorecard's "open". */
-const OPEN_STATUSES: IssueStatus[] = ["new", "pending_review", "returned_for_correction", "assigned", "in_progress", "resolved", "reopened"];
 
 interface DashboardStats {
   total: number;

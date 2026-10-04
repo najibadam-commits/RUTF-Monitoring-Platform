@@ -3,9 +3,9 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getAllCategories, getCategories, getStates } from "@/lib/queries/lookups";
-import { ISSUE_LIST_SELECT, type IssueListRow } from "@/lib/queries/issues";
-import { PRIORITY_LABEL, PRIORITY_ORDER, STATUS_FILTER_OPTIONS, STATUS_LABEL } from "@/lib/constants";
-import type { IssuePriority, IssueStatus } from "@/lib/types/database";
+import { ISSUE_FILTER_KEYS, ISSUE_LIST_SELECT, applyIssueFilters, getFindingTargetDays, type IssueFilters, type IssueListRow } from "@/lib/queries/issues";
+import { OPEN_STATUSES, PRIORITY_LABEL, PRIORITY_ORDER, STATUS_FILTER_OPTIONS, STATUS_LABEL } from "@/lib/constants";
+import type { IssueStatus } from "@/lib/types/database";
 import { canCreateIssue } from "@/lib/rbac";
 import { StatusTag, PriorityTag } from "@/components/ui/Tags";
 import { IssuesFilterBar } from "@/components/issues/IssuesFilterBar";
@@ -16,7 +16,15 @@ import { RequestDownloadButton } from "@/components/issues/RequestDownloadButton
 
 export const metadata: Metadata = { title: "Findings Register" };
 
-const PAGE_SIZE = 10;
+// Findings Register (DECISIONS R84): summary cards that double as filters (open, critical, past
+// the Finding target, raised automatically, verified & closed), then the filtered list with each
+// Finding's facility, ward and age against the target. The same filters drive the export.
+
+const PAGE_SIZE = 20;
+const DAY = 86_400_000;
+
+/** The time "now" for ages and the target — read once per request (a server component). */
+const requestTime = () => Date.now();
 
 export default async function IssuesPage({
   searchParams,
@@ -26,59 +34,72 @@ export default async function IssuesPage({
   const sp = await searchParams;
   const page = Math.max(1, Number(sp.page ?? "1") || 1);
   const supabase = await createClient();
+  const now = requestTime();
+  const targetDays = await getFindingTargetDays(supabase);
+  const filters: IssueFilters = Object.fromEntries(ISSUE_FILTER_KEYS.flatMap((k) => (sp[k] ? [[k, sp[k]!]] : [])));
 
-  let query = supabase.from("issues").select(ISSUE_LIST_SELECT, { count: "exact" }).order("reported_at", { ascending: false });
-  if (sp.status) query = query.eq("status", sp.status as IssueStatus);
-  if (sp.priority) query = query.eq("priority", sp.priority as IssuePriority);
-  if (sp.category) query = query.eq("category_id", sp.category);
-  if (sp.state) query = query.eq("state_id", sp.state);
-  if (sp.search) query = query.or(`description.ilike.%${sp.search}%,code.ilike.%${sp.search}%`);
-  // RUTF auto-Findings (migration 0102): automatic vs registered by a person, and the rule.
-  if (sp.source === "auto") query = query.eq("auto_generated", true);
-  else if (sp.source === "manual") query = query.eq("auto_generated", false);
-  if (sp.type) query = query.eq("finding_type", sp.type);
+  const query = applyIssueFilters(
+    supabase.from("issues").select(ISSUE_LIST_SELECT, { count: "exact" }).order("reported_at", { ascending: false }),
+    filters,
+    targetDays,
+    now,
+  );
+  // Summary-card counts (RLS-scoped, independent of the filters below them).
+  const head = () => supabase.from("issues").select("id", { count: "exact", head: true });
+  const cutoff = new Date(now - targetDays * DAY).toISOString();
 
   const from = (page - 1) * PAGE_SIZE;
-  // The paginated issues query, the two independent lookup queries (categories/states), and the
-  // signed-in viewer's own profile (used below only for the "Report Finding" button's role
-  // check, not a redirect gate) don't depend on each other's results — run all of them
-  // concurrently instead of awaiting the profile first and only then starting the rest.
-  // categories (active-only, for the "Register Finding" sector picker) vs. filterCategories
-  // (every sector, active or legacy — so the filter can still find an old Finding under a
-  // category that's since been retired) are deliberately different queries — see getCategories'
-  // kdoc.
-  const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }] = await Promise.all([
+  // categories (active-only, for the "Register Finding" picker) vs. filterCategories (every level,
+  // active or legacy — so the filter can still find an old Finding under a retired category) are
+  // deliberately different queries — see getCategories' kdoc.
+  const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }, counts] = await Promise.all([
     getCurrentProfile(),
     query.range(from, from + PAGE_SIZE - 1),
     Promise.all([getCategories(supabase), getAllCategories(supabase), getStates(supabase)]),
     supabase.from("finding_types").select("key, label").order("label"),
+    Promise.all([
+      head(),
+      head().in("status", OPEN_STATUSES),
+      head().in("status", OPEN_STATUSES).eq("priority", "critical"),
+      head().in("status", OPEN_STATUSES).lt("reported_at", cutoff),
+      head().eq("auto_generated", true),
+      head().eq("status", "verified_closed"),
+    ]).then((rs) => rs.map((r) => r.count ?? 0)),
   ]);
+  const [all, open, critical, overdue, auto, closed] = counts;
   const issues = (data ?? []) as unknown as IssueListRow[];
   const total = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const exportParams = new URLSearchParams();
-  for (const key of ["status", "priority", "category", "state", "search", "source", "type"] as const) {
-    if (sp[key]) exportParams.set(key, sp[key]!);
-  }
+  const exportParams = new URLSearchParams(filters as Record<string, string>);
 
-  function pageHref(p: number) {
-    const params = new URLSearchParams();
-    for (const key of ["status", "priority", "category", "state", "search", "source", "type"] as const) {
-      if (sp[key]) params.set(key, sp[key]!);
+  function hrefWith(changes: Record<string, string | null>) {
+    const params = new URLSearchParams(filters as Record<string, string>);
+    for (const [k, v] of Object.entries(changes)) {
+      if (v === null) params.delete(k);
+      else params.set(k, v);
     }
-    params.set("page", String(p));
-    return `/issues?${params.toString()}`;
+    const qs = params.toString();
+    return qs ? `/issues?${qs}` : "/issues";
   }
+  const pct = (n: number) => (all ? Math.round((n * 100) / all) : 0);
+  const cards: { key: string; label: string; value: number; sub: string; icon: string; href: string; active: boolean; tone?: string }[] = [
+    { key: "open", label: "Open", value: open, sub: `of ${all.toLocaleString("en-GB")} raised`, icon: "ph-flag", href: hrefWith({ view: filters.view === "open" ? null : "open", status: null }), active: filters.view === "open" },
+    { key: "critical", label: "Critical and open", value: critical, sub: "Needs review first", icon: "ph-warning-octagon", href: hrefWith({ view: filters.view === "critical" ? null : "critical", priority: null, status: null }), active: filters.view === "critical", tone: critical ? "var(--priority-critical)" : undefined },
+    { key: "overdue", label: `Open past ${targetDays} days`, value: overdue, sub: "The Finding target", icon: "ph-hourglass-medium", href: hrefWith({ view: filters.view === "overdue" ? null : "overdue", status: null }), active: filters.view === "overdue", tone: overdue ? "var(--priority-high)" : undefined },
+    { key: "auto", label: "Raised automatically", value: auto, sub: `${pct(auto)}% from ledger and visit checks`, icon: "ph-robot", href: hrefWith({ source: filters.source === "auto" ? null : "auto" }), active: filters.source === "auto" },
+    { key: "closed", label: "Verified & closed", value: closed, sub: `${pct(closed)}% of all Findings`, icon: "ph-seal-check", href: hrefWith({ status: filters.status === "verified_closed" ? null : "verified_closed", view: null }), active: filters.status === "verified_closed", tone: closed ? "var(--status-resolved)" : undefined },
+  ];
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
           <h2 style={{ marginBottom: 2 }}>Findings Register</h2>
-          <p className="text-muted" style={{ fontSize: 13 }}>
-            Every Finding — raised automatically from the ledger and visits, or registered by a person · {total} matching
+          <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
+            Every discrepancy, raised automatically from the ledger and supervision visits or registered by a person, with
+            its status and owner until it is verified and closed. Findings are for review, not accusation.
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -94,6 +115,20 @@ export default async function IssuesPage({
         </div>
       </div>
 
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12 }}>
+        {cards.map((c) => (
+          <Link key={c.key} href={c.href} className="card elev-sm" aria-pressed={c.active}
+            title={c.active ? "Clear this filter" : `Show ${c.label.toLowerCase()} Findings`}
+            style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: c.active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
+              <i className={`ph-fill ${c.icon}`} aria-hidden="true" style={{ fontSize: 15, color: c.tone ?? "var(--color-accent-600)" }} /> {c.label}
+            </div>
+            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{c.value.toLocaleString("en-GB")}</div>
+            <div className="text-muted" style={{ fontSize: 11.5 }}>{c.active ? "Filtered · click to clear" : c.sub}</div>
+          </Link>
+        ))}
+      </div>
+
       <IssuesFilterBar
         statuses={STATUS_FILTER_OPTIONS.map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
         priorities={PRIORITY_ORDER.map((p) => ({ value: p, label: PRIORITY_LABEL[p] }))}
@@ -107,64 +142,70 @@ export default async function IssuesPage({
           <thead>
             <tr>
               <th>Finding ID</th>
-              <th>Facility level</th>
-              <th>Description</th>
-              <th>Location</th>
+              <th>Finding</th>
+              <th>Facility</th>
               <th>Priority</th>
               <th>Status</th>
-              <th>Assigned DRI</th>
+              <th>Assigned to</th>
               <th>Reported</th>
             </tr>
           </thead>
           <tbody>
-            {issues.map((i) => (
-              <ClickableRow key={i.id} href={`/issues/${i.id}`}>
-                <td style={{ fontFamily: "var(--font-heading)" }}>
-                  {i.code}
-                  {i.auto_generated && (
-                    <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "var(--color-accent-700)" }}>
-                      <i className="ph ph-robot" /> Auto · {i.finding?.label ?? "check"}
+            {issues.map((i) => {
+              const isOpen = OPEN_STATUSES.includes(i.status as IssueStatus);
+              const days = Math.floor((now - Date.parse(i.reported_at)) / DAY);
+              const late = isOpen && days > targetDays;
+              return (
+                <ClickableRow key={i.id} href={`/issues/${i.id}`}>
+                  <td style={{ fontFamily: "var(--font-heading)", whiteSpace: "nowrap" }}>
+                    {i.code}
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 11, color: i.auto_generated ? "var(--color-accent-700)" : "var(--color-neutral-600)" }}>
+                      {i.auto_generated ? <><i className="ph ph-robot" aria-hidden="true" /> Automatic check</> : <><i className="ph ph-user" aria-hidden="true" /> Registered</>}
                     </div>
-                  )}
-                </td>
-                <td>{i.category?.name ?? "—"}</td>
-                <td
-                  title={i.description ?? undefined}
-                  style={{
-                    maxWidth: 260,
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    textDecoration: "underline",
-                    textDecorationColor: "var(--color-divider)",
-                    textUnderlineOffset: 3,
-                  }}
-                >
-                  {i.description || "—"}
-                </td>
-                <td className="text-muted">
-                  {i.state?.name ?? "—"}, {i.lga?.name ?? "—"}
-                </td>
-                <td>
-                  <PriorityTag priority={i.priority} />
-                </td>
-                <td>
-                  <StatusTag status={i.status} />
-                </td>
-                <td className="text-muted">{i.dri?.name ?? "Unassigned"}</td>
-                <td className="text-muted">{new Date(i.reported_at).toLocaleDateString()}</td>
-              </ClickableRow>
-            ))}
+                  </td>
+                  <td style={{ maxWidth: 300 }}>
+                    <div style={{ fontWeight: 600, fontSize: 13 }}>{i.finding?.label ?? i.category?.name ?? "Finding"}</div>
+                    <div className="text-muted" title={i.description ?? undefined}
+                      style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {i.description || "—"}
+                    </div>
+                  </td>
+                  <td style={{ maxWidth: 240 }}>
+                    <div style={{ fontSize: 13, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{i.facility?.name ?? i.category?.name ?? "—"}</div>
+                    <div className="text-muted" style={{ fontSize: 12 }}>
+                      {[i.lga?.name, i.ward_ref?.name].filter(Boolean).join(" · ") || i.state?.name || "—"}
+                    </div>
+                  </td>
+                  <td>
+                    <PriorityTag priority={i.priority} />
+                  </td>
+                  <td>
+                    <StatusTag status={i.status} />
+                  </td>
+                  <td className="text-muted">{i.dri?.name ?? "Unassigned"}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    <div className="text-muted" style={{ fontSize: 12.5 }}>
+                      {new Date(i.reported_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                    </div>
+                    {isOpen && (
+                      <div style={{ fontSize: 11.5, color: late ? "var(--priority-high)" : "var(--color-neutral-600)", fontWeight: late ? 600 : 400 }}>
+                        {late && <i className="ph-fill ph-hourglass-medium" aria-hidden="true" />} {days} {days === 1 ? "day" : "days"} open{late ? " · past target" : ""}
+                      </div>
+                    )}
+                  </td>
+                </ClickableRow>
+              );
+            })}
           </tbody>
         </table>
         {issues.length === 0 && (
           <div className="text-muted" style={{ padding: 24, textAlign: "center", fontSize: 13 }}>
-            No issues match these filters.
+            No Findings match these filters.
           </div>
         )}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderTop: "1px solid var(--color-divider)" }}>
           <span className="text-muted" style={{ fontSize: 12.5 }}>
-            Page {page} of {totalPages}
+            {total.toLocaleString("en-GB")} {total === 1 ? "Finding" : "Findings"} · page {page} of {totalPages}
           </span>
           <div style={{ display: "flex", gap: 8 }}>
             {page <= 1 ? (
@@ -172,7 +213,7 @@ export default async function IssuesPage({
                 Previous
               </span>
             ) : (
-              <Link className="btn btn-secondary" href={pageHref(page - 1)}>
+              <Link className="btn btn-secondary" href={hrefWith({ page: String(page - 1) })}>
                 Previous
               </Link>
             )}
@@ -181,7 +222,7 @@ export default async function IssuesPage({
                 Next
               </span>
             ) : (
-              <Link className="btn btn-secondary" href={pageHref(page + 1)}>
+              <Link className="btn btn-secondary" href={hrefWith({ page: String(page + 1) })}>
                 Next
               </Link>
             )}

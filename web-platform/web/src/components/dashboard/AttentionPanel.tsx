@@ -24,11 +24,11 @@ const plural = (v: number, one: string, many = `${one}s`) => `${n(v)} ${v === 1 
 export function attentionItems(k: Kpis, pastTarget: number, targetDays: number): Item[] {
   const items: Item[] = [];
   if (k.open_critical_findings > 0)
-    items.push({ level: "critical", icon: "ph-warning-octagon", text: `${plural(k.open_critical_findings, "critical Finding")} open`, action: "Review", href: "/issues?priority=critical" });
+    items.push({ level: "critical", icon: "ph-warning-octagon", text: `${plural(k.open_critical_findings, "critical Finding")} open`, action: "Review", href: "/issues?view=critical" });
   if (k.expired_on_hand > 0)
     items.push({ level: "critical", icon: "ph-calendar-x", text: `${plural(k.expired_on_hand, "expired sachet")} still on hand`, action: "Remove from stock", href: "/stock-ledger?flag=expired" });
   if (pastTarget > 0)
-    items.push({ level: "warning", icon: "ph-hourglass-medium", text: `${plural(pastTarget, "Finding")} open past the ${targetDays}-day target`, action: "Follow up", href: "/action-tracker" });
+    items.push({ level: "warning", icon: "ph-hourglass-medium", text: `${plural(pastTarget, "Finding")} open past the ${targetDays}-day target`, action: "Follow up", href: "/issues?view=overdue" });
   for (const l of LEVELS) {
     const mos = k.months_of_stock[l.key];
     if (mos !== null && mos !== undefined && mos < 1)
