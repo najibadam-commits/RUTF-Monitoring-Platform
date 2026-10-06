@@ -37,7 +37,7 @@ export const STATUS_FILTER_OPTIONS: IssueStatus[] = [
   "reopened",
 ];
 
-/** Statuses still awaiting verified closure — "open" on the Findings Register, Command Centre and
+/** Statuses still awaiting verified closure — "open" on the Findings Register, Overview Dashboard and
  *  Accountability Scorecard. */
 export const OPEN_STATUSES: IssueStatus[] = ["new", "pending_review", "returned_for_correction", "assigned", "in_progress", "resolved", "reopened"];
 

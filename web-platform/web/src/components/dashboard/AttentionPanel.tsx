@@ -1,6 +1,6 @@
 import type { Kpis } from "@/lib/queries/kpis";
 
-// Command Centre "Needs attention" list (DECISIONS R82): the month's KPIs turned into actions, most
+// Overview Dashboard "Needs attention" list (DECISIONS R82): the month's KPIs turned into actions, most
 // serious first, each linking to the page where it is dealt with. Thresholds are the same ones the
 // KPI tiles below colour by. Severity always shows as icon + label, never colour alone.
 

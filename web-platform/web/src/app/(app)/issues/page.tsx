@@ -115,16 +115,16 @@ export default async function IssuesPage({
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {cards.map((c) => (
-          <Link key={c.key} href={c.href} className="card elev-sm" aria-pressed={c.active}
+          <Link key={c.key} href={c.href} className="card elev-sm kpi-card" aria-pressed={c.active}
             title={c.active ? "Clear this filter" : `Show ${c.label.toLowerCase()} Findings`}
-            style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: c.active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-              <i className={`ph-fill ${c.icon}`} aria-hidden="true" style={{ fontSize: 15, color: c.tone ?? "var(--color-accent-600)" }} /> {c.label}
+            style={{ textDecoration: "none", color: "inherit", outline: c.active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+            <div className="kpi-label">
+              <i className={`ph-fill ${c.icon}`} aria-hidden="true" style={{ color: c.tone ?? "var(--color-accent-600)" }} /> {c.label}
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{c.value.toLocaleString("en-GB")}</div>
-            <div className="text-muted" style={{ fontSize: 11.5 }}>{c.active ? "Filtered · click to clear" : c.sub}</div>
+            <div className="kpi-value">{c.value.toLocaleString("en-GB")}</div>
+            <div className="kpi-sub">{c.active ? "Filtered · click to clear" : c.sub}</div>
           </Link>
         ))}
       </div>

@@ -11,7 +11,7 @@ import { TopSearch } from "./TopSearch";
 import { RutfMark } from "@/components/RutfMark";
 
 const VIEW_TITLES: Record<string, string> = {
-  "/dashboard": "Command Centre",
+  "/dashboard": "Overview Dashboard",
   "/gis": "Situation Map",
   "/issues": "Findings Register",
   "/action-tracker": "Corrective Action Tracker",

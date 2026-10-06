@@ -44,11 +44,12 @@ type Row = {
 const SELECT =
   "id, code, status, priority, reported_at, resolution_date, finding:finding_types(label), category:categories(name), facility:facilities(name), lga:lgas(name), ward_ref:wards(name), dri:profiles!issues_assigned_dri_fkey(name)";
 
-const COLUMNS: { key: string; title: string; hint: string; statuses: IssueStatus[]; icon: string }[] = [
-  { key: "assigned", title: "Assigned to facility", hint: "Waiting for the responsible person to respond", statuses: ["assigned", "reopened"], icon: "ph-user-focus" },
-  { key: "in_progress", title: "Being addressed", hint: "Corrective action under way", statuses: ["in_progress"], icon: "ph-wrench" },
-  { key: "resolved", title: "Action recorded", hint: "Waiting for a supervisor to verify", statuses: ["resolved"], icon: "ph-clipboard-text" },
-  { key: "closed", title: "Verified & closed", hint: `In the last ${RECENT_DAYS} days`, statuses: ["verified_closed"], icon: "ph-seal-check" },
+// Stage colours (DECISIONS R104): blue, orange, green, black — tokens in globals.css.
+const COLUMNS: { key: string; title: string; hint: string; statuses: IssueStatus[]; icon: string; color: string }[] = [
+  { key: "assigned", title: "Assigned to facility", hint: "Waiting for the responsible person to respond", statuses: ["assigned", "reopened"], icon: "ph-user-focus", color: "var(--stage-assigned)" },
+  { key: "in_progress", title: "Being addressed", hint: "Corrective action under way", statuses: ["in_progress"], icon: "ph-wrench", color: "var(--stage-addressing)" },
+  { key: "resolved", title: "Action recorded", hint: "Waiting for a supervisor to verify", statuses: ["resolved"], icon: "ph-clipboard-text", color: "var(--stage-recorded)" },
+  { key: "closed", title: "Verified & closed", hint: `In the last ${RECENT_DAYS} days`, statuses: ["verified_closed"], icon: "ph-seal-check", color: "var(--stage-closed)" },
 ];
 
 const PRIORITY_RANK: Record<IssuePriority, number> = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -120,61 +121,63 @@ export default async function ActionTrackerPage() {
         </Link>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {stats.map((s) => (
-          <div key={s.label} className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-              <i className={`ph-fill ${s.icon}`} aria-hidden="true" style={{ fontSize: 15, color: s.tone ?? "var(--color-accent-600)" }} /> {s.label}
+          <div key={s.label} className="card elev-sm kpi-card">
+            <div className="kpi-label">
+              <i className={`ph-fill ${s.icon}`} aria-hidden="true" style={{ color: s.tone ?? "var(--color-accent-600)" }} /> {s.label}
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{s.value}</div>
-            <div className="text-muted" style={{ fontSize: 11.5 }}>{s.sub}</div>
+            <div className="kpi-value">{s.value}</div>
+            <div className="kpi-sub">{s.sub}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 12, alignItems: "start" }}>
+      {/* Four stages side by side where the screen allows (R104); they wrap two-up, then one-up. */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10, alignItems: "start" }}>
         {COLUMNS.map((col) => {
           const all = col.key === "closed" ? closed : open.filter((r) => col.statuses.includes(r.status));
           // Open stages: past target first, then priority, then oldest. Closed: most recent first.
           const cards = col.key === "closed" ? all : [...all].sort((a, b) => Number(late(b)) - Number(late(a)) || PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority] || age(b) - age(a));
-          const color = STATUS_COLOR[col.statuses[0]];
+          const color = col.color;
           const moreHref = col.key === "closed" ? "/issues?status=verified_closed" : `/issues?status=${col.statuses[0]}`;
           return (
-            <section key={col.key} aria-label={col.title} style={{ background: "var(--color-neutral-100)", borderRadius: "var(--radius-lg)", padding: 10, display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ padding: "2px 4px 4px", borderTop: `3px solid ${color}`, borderRadius: 2 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
-                  <i className={`ph-fill ${col.icon}`} aria-hidden="true" style={{ color, fontSize: 16 }} />
-                  <h3 style={{ fontSize: 14, margin: 0, flex: 1 }}>{col.title}</h3>
-                  <span className="tag tag-outline" style={{ fontSize: 12 }}>{all.length.toLocaleString("en-GB")}</span>
+            <section key={col.key} aria-label={col.title} style={{ background: `color-mix(in srgb, ${color} 6%, var(--color-neutral-100))`, borderRadius: "var(--radius-lg)", padding: 8, display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
+              <div style={{ padding: "8px 8px 6px", borderRadius: 8, background: color, color: "#fff" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <i className={`ph-fill ${col.icon}`} aria-hidden="true" style={{ fontSize: 15 }} />
+                  <h3 style={{ fontSize: 13, margin: 0, flex: 1, color: "#fff" }}>{col.title}</h3>
+                  <span style={{ fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700 }}>{all.length.toLocaleString("en-GB")}</span>
                 </div>
-                <div className="text-muted" style={{ fontSize: 11.5, marginTop: 2 }}>{col.hint}</div>
+                <div style={{ fontSize: 11, marginTop: 1, opacity: 0.9 }}>{col.hint}</div>
               </div>
               {cards.slice(0, PER_COLUMN).map((r) => {
                 const days = age(r);
                 const isLate = col.key !== "closed" && late(r);
                 return (
                   <Link key={r.id} href={`/issues/${r.id}`} className="card elev-sm"
-                    style={{ padding: 10, gap: 4, textDecoration: "none", color: "inherit", borderLeft: isLate ? "3px solid var(--priority-high)" : undefined }}>
+                    style={{ padding: "8px 9px", gap: 3, textDecoration: "none", color: "inherit", borderLeft: `4px solid ${color}`, background: `color-mix(in srgb, ${color} 5%, var(--color-surface))` }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
-                      <span style={{ fontFamily: "var(--font-heading)", fontSize: 11.5, color: "var(--color-neutral-700)" }}>{r.code}</span>
+                      <span style={{ fontFamily: "var(--font-heading)", fontSize: 11, color: "var(--color-neutral-700)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.code}</span>
                       {(r.priority === "critical" || r.priority === "high") && <PriorityTag priority={r.priority} />}
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>
+                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>
                       {r.finding?.label ?? r.category?.name ?? "Finding"}
                       {r.status === "reopened" && <span style={{ color: STATUS_COLOR.reopened, fontWeight: 600, fontSize: 11.5 }}> · Reopened</span>}
                     </div>
-                    <div className="text-muted" style={{ fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="text-muted" style={{ fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {r.facility?.name ?? "—"}{r.lga?.name ? ` · ${r.lga.name}` : ""}
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, fontSize: 11.5 }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6, fontSize: 11 }}>
                       <span className="text-muted" style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         <i className="ph ph-user" aria-hidden="true" /> {r.dri?.name ?? "Unassigned"}
                       </span>
                       {col.key === "closed" ? (
                         <span style={{ color: "var(--status-resolved)", whiteSpace: "nowrap" }}>Closed in {daysToClose(r)} d</span>
                       ) : (
-                        <span style={{ whiteSpace: "nowrap", color: isLate ? "var(--priority-high)" : "var(--color-neutral-600)", fontWeight: isLate ? 600 : 400 }}>
-                          {isLate && <i className="ph-fill ph-hourglass-medium" aria-hidden="true" />} {days} d open
+                        <span style={{ whiteSpace: "nowrap", color: isLate ? "var(--priority-critical)" : "var(--color-neutral-600)", fontWeight: isLate ? 600 : 400 }}
+                          title={isLate ? "Past the target" : undefined}>
+                          {isLate && <i className="ph-fill ph-hourglass-medium" aria-hidden="true" />} {days} d open{isLate ? " · late" : ""}
                         </span>
                       )}
                     </div>
@@ -183,7 +186,7 @@ export default async function ActionTrackerPage() {
               })}
               {all.length === 0 && <div className="text-muted" style={{ fontSize: 12, padding: "6px 4px" }}>Nothing at this stage.</div>}
               {all.length > PER_COLUMN && (
-                <Link href={moreHref} style={{ fontSize: 12.5, padding: "2px 4px" }}>
+                <Link href={moreHref} style={{ fontSize: 12, padding: "2px 4px", color }}>
                   {(all.length - PER_COLUMN).toLocaleString("en-GB")} more in the Findings Register <i className="ph ph-arrow-right" aria-hidden="true" />
                 </Link>
               )}

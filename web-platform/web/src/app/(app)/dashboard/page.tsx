@@ -10,7 +10,7 @@ import { AttentionPanel } from "@/components/dashboard/AttentionPanel";
 import { getKpis, latestLedgerMonth, monthOf, previousMonth } from "@/lib/queries/kpis";
 import type { IssueStatus } from "@/lib/types/database";
 
-export const metadata: Metadata = { title: "Command Centre" };
+export const metadata: Metadata = { title: "Overview Dashboard" };
 
 // RUTF dashboard (brief §9): the headline KPIs for a month from rutf_kpis() (migrations
 // 0105/0106 — the same definitions test-kpis.js checks against hand-calculated values), then the
@@ -60,7 +60,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <RealtimeRefresher table="issues" />
       <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>Command Centre</h2>
+          <h2 style={{ marginBottom: 2 }}>Overview Dashboard</h2>
           <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
             Katsina State RUTF pipeline, State store → LGA stores → OTP sites · {month.label} ·{" "}
             {k ? `${k.active_facilities.toLocaleString("en-GB")} stores and OTP sites reporting` : "No data for this month"}

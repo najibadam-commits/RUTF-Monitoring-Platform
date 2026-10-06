@@ -27,8 +27,8 @@ const LEVELS: { key: "state_store" | "lga_store" | "otp"; label: string }[] = [
 /** A KPI group's heading, with a link to the page that goes into it. */
 function SectionHead({ title, href, link }: { title: string; href: string; link: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", margin: "0 0 10px" }}>
-      <h3 style={{ fontSize: 15, margin: 0 }}>{title}</h3>
+    <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", margin: "0 0 6px" }}>
+      <h3 style={{ fontSize: 14, margin: 0 }}>{title}</h3>
       <Link href={href} style={{ fontSize: 12.5 }}>{link} <i className="ph ph-arrow-right" aria-hidden="true" /></Link>
     </div>
   );
@@ -47,26 +47,26 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
       ) : (
         <>
           {/* Hero: stock on hand, by level, with months of stock */}
-          <div className="card elev-sm" style={{ padding: 18, gap: 0 }}>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 28, alignItems: "flex-end" }}>
+          <div className="card elev-sm" style={{ padding: "12px 16px", gap: 0 }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px 28px", alignItems: "flex-end" }}>
               <div>
-                <div style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Stock on hand, all levels — end of {month.label}</div>
-                <div style={{ fontFamily: "var(--font-heading)", fontSize: 52, fontWeight: 800, lineHeight: 1 }}>
-                  {compact(totalSoh)}<span style={{ fontSize: 18, fontWeight: 600, marginLeft: 6, color: "var(--color-neutral-700)" }}>sachets</span>
+                <div className="kpi-label">Stock on hand, all levels — end of {month.label}</div>
+                <div style={{ fontFamily: "var(--font-heading)", fontSize: 32, fontWeight: 800, lineHeight: 1.05 }}>
+                  {compact(totalSoh)}<span style={{ fontSize: 14, fontWeight: 600, marginLeft: 5, color: "var(--color-neutral-700)" }}>sachets</span>
                 </div>
                 {prevSoh !== null && (() => {
                   const d = delta(totalSoh, prevSoh, "", 0);
-                  return d ? <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>{d.text} sachets vs last month</div> : null;
+                  return d ? <div className="kpi-sub" style={{ marginTop: 2 }}>{d.text} sachets vs last month</div> : null;
                 })()}
               </div>
               {LEVELS.map((l) => {
                 const mos = k.months_of_stock[l.key];
                 const low = mos !== null && mos !== undefined && mos < 1;
                 return (
-                  <Link key={l.key} href={`/stock-ledger?type=${l.key === "otp" ? "health_facility" : l.key}`} style={{ textDecoration: "none", color: "inherit", minWidth: 150 }}>
-                    <div style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{l.label}</div>
-                    <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{compact(k.stock_on_hand[l.key] ?? 0)}</div>
-                    <div style={{ fontSize: 12, color: low ? "var(--priority-high)" : "var(--color-neutral-700)", fontWeight: low ? 600 : 400 }}>
+                  <Link key={l.key} href={`/stock-ledger?type=${l.key === "otp" ? "health_facility" : l.key}`} style={{ textDecoration: "none", color: "inherit", minWidth: 130 }}>
+                    <div className="kpi-label">{l.label}</div>
+                    <div className="kpi-value" style={{ fontSize: 18 }}>{compact(k.stock_on_hand[l.key] ?? 0)}</div>
+                    <div style={{ fontSize: 11, color: low ? "var(--priority-high)" : "var(--color-neutral-700)", fontWeight: low ? 600 : 400 }}>
                       {low && <i className="ph-fill ph-warning" aria-hidden="true" />} {mos === null || mos === undefined ? "—" : mos.toFixed(1)} months of stock{low ? " — under 1 month" : ""}
                     </div>
                   </Link>
@@ -77,7 +77,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
 
           <section>
             <SectionHead title="Stock position" href="/stock-integrity" link="Stock Reconciliation" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 10 }}>
               <StatTile label="Stockout rate" value={pct(k.stockout_rate_pct)} unit="%" sub="Stores and OTP sites with a day at zero"
                 delta={delta(k.stockout_rate_pct, p?.stockout_rate_pct, " pts")} upIsGood={false} href="/stock-ledger?flag=stockout"
                 status={(k.stockout_rate_pct ?? 0) > 0 ? { level: "warning", label: "Stockouts this month" } : { level: "good", label: "No stockouts" }} />
@@ -96,7 +96,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
 
           <section>
             <SectionHead title="Last-mile dispensing and verification" href="/otp-dispensing" link="Last-Mile Dispensing" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 10 }}>
               <StatTile label="Short-dispensing" value={pct(k.short_dispensing_pct)} unit="%" sub="Prescribed but not dispensed (negative: more dispensed)"
                 delta={delta(k.short_dispensing_pct, p?.short_dispensing_pct, " pts")} upIsGood={false}
                 status={(k.short_dispensing_pct ?? 0) > 5 ? { level: "warning", label: "Above the 5% limit" } : undefined} />
@@ -110,7 +110,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
 
           <section>
             <SectionHead title="Reporting and supervision" href="/reporting-completeness" link="Completeness & Timeliness" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10 }}>
               <Meter label="Daily dispensing reported" pct={k.dispensing_completeness_pct === null ? null : Number(k.dispensing_completeness_pct)}
                 sub="OTP-weeks with at least one entry" warnBelow={90} criticalBelow={75} />
               <Meter label="Month-end counts on time" pct={k.count_on_time_pct === null ? null : Number(k.count_on_time_pct)}
@@ -122,7 +122,7 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
 
           <section>
             <SectionHead title="Findings and corrective action" href="/action-tracker" link="Corrective Action Tracker" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))", gap: 12 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 150px), 1fr))", gap: 10 }}>
               <StatTile label="Open critical Findings" value={compact(k.open_critical_findings)} href="/issues?priority=critical"
                 status={k.open_critical_findings > 0 ? { level: "critical", label: "Needs review" } : { level: "good", label: "None open" }} />
               <StatTile label="Open Findings" value={compact(k.open_findings)} href="/issues" />

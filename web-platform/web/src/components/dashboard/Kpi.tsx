@@ -41,15 +41,13 @@ export function StatTile({
   const good = delta && delta.direction !== 0 ? (delta.direction > 0) === !!upIsGood : null;
   const body = (
     <>
-      <div className="card-kicker" style={{ fontSize: 12, textTransform: "none", letterSpacing: 0, color: "var(--color-neutral-700)" }}>
-        {label}
-      </div>
-      <div style={{ fontFamily: "var(--font-heading)", fontSize: 30, fontWeight: 700, lineHeight: 1.1, marginTop: 4 }}>
+      <div className="kpi-label">{label}</div>
+      <div className="kpi-value" style={{ marginTop: 2 }}>
         {value}
-        {unit && <span style={{ fontSize: 15, fontWeight: 600, marginLeft: 3, color: "var(--color-neutral-700)" }}>{unit}</span>}
+        {unit && <span className="kpi-unit">{unit}</span>}
       </div>
-      {sub && <div className="text-muted" style={{ fontSize: 12, marginTop: 2 }}>{sub}</div>}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 10px", marginTop: 6, fontSize: 12 }}>
+      {sub && <div className="kpi-sub">{sub}</div>}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "2px 8px", marginTop: 4, fontSize: 11 }}>
         {delta && (
           <span style={{ color: good === null ? "var(--color-neutral-600)" : good ? "var(--status-resolved)" : "var(--priority-critical)" }}>
             <i className={`ph ${delta.direction > 0 ? "ph-arrow-up-right" : delta.direction < 0 ? "ph-arrow-down-right" : "ph-minus"}`} aria-hidden="true" />{" "}
@@ -64,11 +62,11 @@ export function StatTile({
       </div>
     </>
   );
-  const style = { padding: 14, gap: 0, textDecoration: "none", color: "inherit" } as const;
+  const style = { textDecoration: "none", color: "inherit" } as const;
   return href ? (
-    <a href={href} className="card elev-sm" style={style}>{body}</a>
+    <a href={href} className="card elev-sm kpi-card" style={style}>{body}</a>
   ) : (
-    <div className="card elev-sm" style={style}>{body}</div>
+    <div className="card elev-sm kpi-card" style={style}>{body}</div>
   );
 }
 
@@ -81,18 +79,18 @@ export function Meter({ label, pct, sub, warnBelow, criticalBelow }: { label: st
   const track = level === "critical" ? "color-mix(in srgb, var(--priority-critical) 18%, transparent)"
     : level === "warning" ? "color-mix(in srgb, var(--priority-high) 20%, transparent)" : "var(--color-accent-100)";
   return (
-    <div className="card elev-sm" style={{ padding: 14, gap: 0 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-        <span style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{label}</span>
-        <span style={{ fontFamily: "var(--font-heading)", fontSize: 22, fontWeight: 700 }}>{pct === null ? "—" : `${v.toFixed(1)}%`}</span>
+    <div className="card elev-sm kpi-card">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>
+        <span className="kpi-label">{label}</span>
+        <span className="kpi-value" style={{ fontSize: 18 }}>{pct === null ? "—" : `${v.toFixed(1)}%`}</span>
       </div>
       <div role="meter" aria-valuenow={v} aria-valuemin={0} aria-valuemax={100} aria-label={label}
-        style={{ height: 8, borderRadius: 4, background: track, marginTop: 8, overflow: "hidden" }}>
-        <div style={{ width: `${Math.min(100, Math.max(0, v))}%`, height: "100%", background: fill, borderRadius: 4 }} />
+        style={{ height: 6, borderRadius: 3, background: track, marginTop: 6, overflow: "hidden" }}>
+        <div style={{ width: `${Math.min(100, Math.max(0, v))}%`, height: "100%", background: fill, borderRadius: 3 }} />
       </div>
-      {sub && <div className="text-muted" style={{ fontSize: 12, marginTop: 6 }}>{sub}</div>}
+      {sub && <div className="kpi-sub" style={{ marginTop: 4 }}>{sub}</div>}
       {level && level !== "good" && (
-        <div style={{ fontSize: 12, marginTop: 4, fontWeight: 600, color: fill }}>
+        <div style={{ fontSize: 11, marginTop: 2, fontWeight: 600, color: fill }}>
           <i className={`ph-fill ${level === "critical" ? "ph-warning-octagon" : "ph-warning"}`} aria-hidden="true" />{" "}
           {level === "critical" ? `Below ${criticalBelow}%` : `Below ${warnBelow}%`}
         </div>

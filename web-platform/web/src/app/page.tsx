@@ -26,7 +26,7 @@ const FEATURES = [
   { icon: "ph-flag", title: "Automatic Findings", body: "Variances above threshold raise a Finding on their own, with a traceable ID such as KT-DAU-MAJ-OTP-26001." },
   { icon: "ph-kanban", title: "Corrective Action Tracker", body: "Every Finding is assigned, addressed and independently verified, with a target date for closure." },
   { icon: "ph-seal-check", title: "Accountability Scorecard", body: "Follow-through by LGA and facility: closed on time, overdue and reopened, so performance is visible." },
-  { icon: "ph-map-trifold", title: "Command Centre & Situation Map", body: "Stock on hand, stock-outs, expiries and open Findings across every LGA, ward and facility in Katsina." },
+  { icon: "ph-map-trifold", title: "Overview Dashboard & Situation Map", body: "Stock on hand, stock-outs, expiries and open Findings across every LGA, ward and facility in Katsina." },
   { icon: "ph-intersect", title: "DHIS2 Triangulation", body: "Each facility's DHIS2 monthly report is checked against the ledger, and the largest gaps are flagged first." },
   { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only: no child or caregiver names, IDs or per-child records. Every change is audited." },
 ] as const;

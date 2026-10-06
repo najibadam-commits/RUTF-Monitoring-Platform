@@ -25,7 +25,7 @@ const n = (v: number | null | undefined, digits = 0) =>
   v === null || v === undefined ? "—" : Number(v).toLocaleString("en-GB", { maximumFractionDigits: digits, minimumFractionDigits: digits });
 const pct = (a: number, b: number) => (b ? (a * 100) / b : null);
 
-/** Command Centre button labels, worded for a written report. */
+/** Overview Dashboard button labels, worded for a written report. */
 const REPORT_ACTION: Record<string, string> = { "See where": "Investigate stockouts", "Check OTPs": "Check OTP dispensing", "Chase reports": "Chase missing reports" };
 
 /** The time "now" for the Finding target — read once per request (a server component). */
@@ -227,7 +227,7 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
         </Section>
 
         <footer className="text-muted" style={{ fontSize: 11, borderTop: "1px solid var(--color-divider)", paddingTop: 8 }}>
-          Definitions as in the platform&apos;s KPIs (Command Centre). Thresholds are set in Master Data → Thresholds. Figures are scoped to the reader&apos;s access.
+          Definitions as in the platform&apos;s KPIs (Overview Dashboard). Thresholds are set in Master Data → Thresholds. Figures are scoped to the reader&apos;s access.
         </footer>
       </article>
     </div>

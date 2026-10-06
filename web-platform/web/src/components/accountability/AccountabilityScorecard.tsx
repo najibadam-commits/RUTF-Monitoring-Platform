@@ -302,18 +302,18 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 14 }}>
+      <div className="kpi-row">
         {tiles.map((t) => (
-          <div className="card elev-sm" key={t.label} style={{ gap: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-              <span className="card-kicker">{t.label}</span>
+          <div className="card elev-sm kpi-card" key={t.label}>
+            <div className="kpi-label" style={{ justifyContent: "space-between" }}>
+              <span>{t.label}</span>
               <i className={`ph ${t.icon}`} style={{ color: t.tone ?? (t.warn ? "var(--priority-high)" : "var(--color-accent)") }} aria-hidden="true" />
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 36, fontWeight: 800, letterSpacing: "-0.02em" }}>
+            <div className="kpi-value" style={{ fontSize: 22 }}>
               {t.value}
-              {t.unit && <span style={{ fontSize: 15, fontWeight: 600, marginLeft: 4, color: "var(--color-neutral-700)" }}>{t.unit}</span>}
+              {t.unit && <span className="kpi-unit">{t.unit}</span>}
             </div>
-            <div className="card-meta">
+            <div className="kpi-sub">
               {t.warn ? <Flag level="warning">{t.sub}</Flag> : t.tone ? <span style={{ color: t.tone, fontWeight: 600 }}>{t.sub}</span> : t.sub}
             </div>
           </div>
