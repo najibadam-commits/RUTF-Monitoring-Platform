@@ -24,7 +24,7 @@ export default async function GisPage() {
     supabase
       .from("issues")
       .select(
-        "id, code, description, status, priority, lat, lng, reported_at, auto_generated, category:categories(name), state:states(id, name), lga:lgas(id, name), ward, reporter:profiles!issues_reported_by_fkey(name), dri:profiles!issues_assigned_dri_fkey(name)",
+        "id, code, description, status, priority, lat, lng, reported_at, auto_generated, category:categories(name), state:states(id, name), lga:lgas(id, name), ward, facility:facilities(name), reporter:profiles!issues_reported_by_fkey(name), dri:profiles!issues_assigned_dri_fkey(name)",
       )
       .not("lat", "is", null)
       .not("lng", "is", null),
@@ -40,7 +40,7 @@ export default async function GisPage() {
   const [metrics, { data: risk }, { data: points }, { data: riskHigh }] = await Promise.all([
     getFacilityMetrics(supabase, month, {}),
     supabase.rpc("facility_risk", { p_as_of: month.end }),
-    supabase.from("facilities").select("id, lat, lng").eq("status", "approved")
+    supabase.from("facilities").select("id, lat, lng, facility_code").eq("status", "approved")
       .or("facility_type.neq.health_facility,is_otp_site.eq.true").not("lat", "is", null).not("lng", "is", null),
     supabase.from("rutf_thresholds").select("value").eq("key", "risk_high").limit(1).maybeSingle(),
   ]);
@@ -54,6 +54,8 @@ export default async function GisPage() {
       lat: Number(p.lat), lng: Number(p.lng), balance: m.balance,
       monthsOfStock: m.months_of_stock === null ? null : Number(m.months_of_stock),
       risk: riskById.get(m.facility_id) ?? null,
+      code: p.facility_code ?? null,
+      openFindings: m.open_findings,
     }];
   });
 
@@ -72,6 +74,7 @@ export default async function GisPage() {
     lgaId: (i.lga as unknown as { id: string } | null)?.id ?? "",
     lgaName: (i.lga as unknown as { name: string } | null)?.name ?? "—",
     ward: (i.ward as string | null) ?? "—",
+    facilityName: (i.facility as unknown as { name: string } | null)?.name ?? null,
     reportedBy: i.auto_generated ? AUTOMATIC : (i.reporter as unknown as { name: string } | null)?.name ?? "—",
     driName: (i.dri as unknown as { name: string } | null)?.name ?? null,
   }));

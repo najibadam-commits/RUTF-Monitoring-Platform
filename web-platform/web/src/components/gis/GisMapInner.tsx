@@ -22,6 +22,7 @@ export interface GisIssue {
   lgaId: string;
   lgaName: string;
   ward: string;
+  facilityName?: string | null;
   /** "Automatic checks", or the person who registered it (DECISIONS R74). */
   reportedBy: string;
   driName: string | null;
@@ -38,7 +39,19 @@ export interface GisFacility {
   balance: number;
   monthsOfStock: number | null;
   risk: number | null;
+  code?: string | null;
+  openFindings?: number;
 }
+
+// LGA shading (DECISIONS R105): one measure per LGA as a single-hue sequential scale (light → dark),
+// so the LGAs needing attention stand out. Values are binned into five steps from 0 to the highest.
+type ShadeBy = "none" | "findings" | "lowstock" | "risk";
+const SHADE_STEPS = ["#e3eefa", "#b5d2f2", "#7fb0e6", "#3f86d4", "#185ba6"];
+const SHADE_LABEL: Record<Exclude<ShadeBy, "none">, { title: string; unit: string }> = {
+  findings: { title: "Open Findings", unit: "open Findings" },
+  lowstock: { title: "Facilities under 1 month of stock", unit: "% of facilities" },
+  risk: { title: "Average facility risk", unit: "average risk" },
+};
 
 type FacilityMeasure = "off" | "risk" | "mos";
 type FacilityClass = { key: string; label: string; color: string };
@@ -115,6 +128,8 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
   const [selectedLga, setSelectedLga] = useState<{ id: string; name: string } | null>(null);
   const [wardsUnavailable, setWardsUnavailable] = useState(false);
   const [facilityMeasure, setFacilityMeasure] = useState<FacilityMeasure>("risk");
+  const [shadeBy, setShadeBy] = useState<ShadeBy>("findings");
+  const [lgaLayerVersion, setLgaLayerVersion] = useState(0);
   const facilityLayerRef = useRef<L.LayerGroup | null>(null);
 
   const mapNodeRef = useRef<HTMLDivElement>(null);
@@ -257,11 +272,13 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
             // Click drills into ward boundaries for this LGA; hover gives the only visual cue
             // that a boundary-only (no-fill) outline is actually clickable.
             layer.on("mouseover", () => (layer as L.Path).setStyle({ weight: 3, opacity: 1 }));
-            layer.on("mouseout", () => (layer as L.Path).setStyle({ weight: 1, opacity: 0.8 }));
+            layer.on("mouseout", () => (layer as L.Path).setStyle({ weight: 1, opacity: 0.75 }));
             layer.on("click", () => setSelectedLga({ id: feature.properties.id, name: feature.properties.name }));
           },
         }).addTo(mapRef.current);
         layersControlRef.current?.addOverlay(lgaLayerRef.current, "LGA boundaries");
+        lgaLayerRef.current.bringToBack();
+        setLgaLayerVersion((v) => v + 1);
         const bounds = lgaLayerRef.current.getBounds();
         if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [24, 24] });
       });
@@ -362,8 +379,9 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
       L.marker([f.lat, f.lng], { icon, zIndexOffset: 500 })
         .bindTooltip(`${esc(f.name)} — ${cls.label}`)
         .bindPopup(
-          `<strong>${esc(f.name)}</strong><br>${LEVEL_NAME[f.type]}<br>` +
-            `Risk ${f.risk ?? "—"} · ${mos}<br>On hand ${f.balance.toLocaleString("en-GB")} sachets<br>` +
+          `<strong>${esc(f.name)}</strong><br>${f.code ? `${esc(f.code)} · ` : ""}${LEVEL_NAME[f.type]}<br>` +
+            `Risk ${f.risk ?? "—"} · ${mos}<br>On hand ${f.balance.toLocaleString("en-GB")} sachets` +
+            `${f.openFindings ? ` · ${f.openFindings} open Finding${f.openFindings === 1 ? "" : "s"}` : ""}<br>` +
             `<a href="/stock-ledger?facility=${encodeURIComponent(f.id)}">Open stock ledger</a>`,
         )
         .addTo(group);
@@ -382,6 +400,49 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
     for (const i of filtered) m.set(i.status, (m.get(i.status) ?? 0) + 1);
     return m;
   }, [filtered]);
+
+  // The chosen LGA measure for the current selection.
+  const lgaValues = useMemo(() => {
+    const m = new Map<string, number>();
+    if (shadeBy === "findings") {
+      for (const i of filtered) if (isOpen(i.status) && i.lgaId) m.set(i.lgaId, (m.get(i.lgaId) ?? 0) + 1);
+    } else if (shadeBy === "lowstock" || shadeBy === "risk") {
+      const by = new Map<string, GisFacility[]>();
+      for (const f of facilities) by.set(f.lgaId, [...(by.get(f.lgaId) ?? []), f]);
+      for (const [id, fs] of by) {
+        if (shadeBy === "lowstock") m.set(id, Math.round((fs.filter((f) => f.monthsOfStock !== null && f.monthsOfStock < 1).length * 100) / fs.length));
+        else {
+          const rs = fs.filter((f) => f.risk !== null);
+          if (rs.length) m.set(id, Math.round(rs.reduce((n, f) => n + (f.risk ?? 0), 0) / rs.length));
+        }
+      }
+    }
+    return m;
+  }, [shadeBy, filtered, facilities]);
+  const shadeMax = Math.max(1, ...lgaValues.values());
+  const stepOf = (v: number) => Math.min(SHADE_STEPS.length - 1, Math.floor((v / shadeMax) * SHADE_STEPS.length));
+
+  // Restyle the LGA outlines whenever the measure, the selection or the layer changes.
+  useEffect(() => {
+    const layer = lgaLayerRef.current;
+    if (!layer) return;
+    layer.eachLayer((l) => {
+      const feature = (l as L.GeoJSON & { feature?: { properties: { id: string; name: string } } }).feature;
+      if (!feature) return;
+      const v = lgaValues.get(feature.properties.id) ?? 0;
+      const path = l as L.Path;
+      if (shadeBy === "none") {
+        path.setStyle({ color: "#796cbf", weight: 1, fillColor: "#796cbf", fillOpacity: 0.03, opacity: 0.8 });
+        path.unbindTooltip();
+      } else {
+        path.setStyle({ color: "#4a5568", weight: 1, fillColor: SHADE_STEPS[stepOf(v)], fillOpacity: v ? 0.6 : 0.15, opacity: 0.7 });
+        const unit = SHADE_LABEL[shadeBy].unit;
+        path.unbindTooltip();
+        path.bindTooltip(`${esc(feature.properties.name)}: ${shadeBy === "lowstock" ? `${v}%` : v} ${shadeBy === "lowstock" ? "of facilities under 1 month" : unit}`, { sticky: true });
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lgaValues, shadeBy, lgaLayerVersion]);
 
   function resetFilters() {
     // Back to the home view: the pilot state's LGAs when they are already loaded, else the country.
@@ -489,6 +550,29 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         )}
         <div className="hr" style={{ margin: "4px 0" }} />
         <div className="field">
+          <label>Shade LGAs by</label>
+          <select className="input" value={shadeBy} onChange={(e) => setShadeBy(e.target.value as ShadeBy)}>
+            <option value="findings">Open Findings</option>
+            <option value="lowstock">Facilities under 1 month of stock</option>
+            <option value="risk">Average facility risk</option>
+            <option value="none">No shading</option>
+          </select>
+        </div>
+        {shadeBy !== "none" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ display: "flex", height: 10, borderRadius: 3, overflow: "hidden" }} aria-hidden="true">
+              {SHADE_STEPS.map((c) => <span key={c} style={{ flex: 1, background: c }} />)}
+            </div>
+            <div className="text-muted" style={{ display: "flex", justifyContent: "space-between", fontSize: 11 }}>
+              <span>0</span>
+              <span>{shadeBy === "lowstock" ? `${shadeMax}%` : shadeMax}</span>
+            </div>
+            <div className="text-muted" style={{ fontSize: 11.5 }}>
+              {SHADE_LABEL[shadeBy].title} per LGA{filters.state === ALL ? " (choose a state to see LGAs)" : ""}. Hover an LGA for its figure; click it for wards.
+            </div>
+          </div>
+        )}
+        <div className="field">
           <label>Facility layer</label>
           <select className="input" value={facilityMeasure} onChange={(e) => setFacilityMeasure(e.target.value as FacilityMeasure)}>
             <option value="risk">Risk score</option>
@@ -580,6 +664,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
                 {PRIORITY_LABEL[selected.priority as keyof typeof PRIORITY_LABEL]}
               </span>
             </div>
+            {selected.facilityName && <div style={{ fontSize: 12.5, fontWeight: 500 }}><i className="ph ph-buildings" aria-hidden="true" /> {selected.facilityName}</div>}
             <div className="text-muted" style={{ fontSize: 11.5 }}>
               {selected.stateName} · {selected.lgaName} · {selected.ward}
             </div>
