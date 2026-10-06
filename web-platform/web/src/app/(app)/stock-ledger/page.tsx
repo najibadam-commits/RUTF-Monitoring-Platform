@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { TXN_LABEL, facilityNames, getFacilityLedger, getFacilitySummaries, signedQuantity } from "@/lib/queries/stock";
+import { getFacilityMetrics, reportMonth } from "@/lib/queries/metrics";
 import { tagBg } from "@/lib/constants";
 import { canVoidLedger } from "@/lib/rbac";
 import { VoidEntryButton } from "@/components/stock/VoidEntryButton";
@@ -12,9 +13,11 @@ import type { FacilityType, TxnType } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Stock Ledger" };
 
-// Stock Ledger (brief §9): stores and OTP sites with their stock position, and per facility the
-// balance by lot plus every transaction with its running balance. RLS scopes everything — a
-// facility user goes straight to their own facility.
+// Stock Ledger (brief §9; DECISIONS R102): stores and OTP sites with their stock position and months
+// of stock (facility_metrics, latest ledger month), status tiles that filter the list, and per
+// facility the balance by lot, the last 30 days' movement, the ledger's integrity (entries, voids,
+// photo evidence) and every transaction with its running balance. RLS scopes everything — a facility
+// user goes straight to their own facility.
 
 const PAGE_SIZE = 25;
 const EXPIRY_WARN_DAYS = 90;
@@ -78,14 +81,20 @@ export default async function StockLedgerPage({ searchParams }: { searchParams: 
 // ── List ────────────────────────────────────────────────────────────────────────────────────────
 
 async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnType<typeof createClient>>; sp: SP; today: string }) {
-  const [summaries, lgas] = await Promise.all([getFacilitySummaries(supabase, today), getProgrammeLgas(supabase)]);
+  const month = await reportMonth(supabase, undefined);
+  const [summaries, lgas, metrics] = await Promise.all([getFacilitySummaries(supabase, today), getProgrammeLgas(supabase), getFacilityMetrics(supabase, month, {})]);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));
+  const mosOf = Object.fromEntries(metrics.map((m) => [m.facility_id, m.months_of_stock === null ? null : Number(m.months_of_stock)]));
+  const lowMos = (id: string) => mosOf[id] !== null && mosOf[id] !== undefined && mosOf[id]! < 1;
+  const expiringSoon = (f: { nextExpiry: string | null }) => !!f.nextExpiry && daysBetween(today, f.nextExpiry) <= EXPIRY_WARN_DAYS;
   const search = sp.search?.trim().toLowerCase();
   const filtered = summaries
     .filter((f) => !sp.type || f.facility_type === sp.type)
     .filter((f) => !sp.lga || f.lga_id === sp.lga)
     .filter((f) => !search || f.name.toLowerCase().includes(search))
     .filter((f) => sp.flag !== "stockout" || f.balance <= 0)
+    .filter((f) => sp.flag !== "lowmos" || (f.balance > 0 && lowMos(f.id)))
+    .filter((f) => sp.flag !== "expiring" || expiringSoon(f))
     .filter((f) => sp.flag !== "expired" || f.expiredBalance > 0)
     .sort((a, b) => ["state_store", "lga_store", "health_facility"].indexOf(a.facility_type) - ["state_store", "lga_store", "health_facility"].indexOf(b.facility_type) || a.name.localeCompare(b.name));
   const page = Math.max(1, Number(sp.page ?? "1") || 1);
@@ -95,35 +104,56 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
   const totals = (type: FacilityType) => summaries.filter((f) => f.facility_type === type).reduce((n, f) => n + Math.max(0, f.balance), 0);
   const stockedOut = summaries.filter((f) => f.balance <= 0).length;
   const holdingExpired = summaries.filter((f) => f.expiredBalance > 0).length;
+  const underOneMonth = summaries.filter((f) => f.balance > 0 && lowMos(f.id)).length;
+  const expiring = summaries.filter(expiringSoon).length;
+  const flagTiles = [
+    { key: "stockout", label: "Out of stock", value: stockedOut, icon: "ph-prohibit", color: "var(--priority-critical)" },
+    { key: "lowmos", label: "Under 1 month of stock", value: underOneMonth, icon: "ph-package", color: "var(--priority-high)" },
+    { key: "expiring", label: `Lot expiring within ${EXPIRY_WARN_DAYS} days`, value: expiring, icon: "ph-hourglass-medium", color: "var(--priority-high)" },
+    { key: "expired", label: "Holding expired stock", value: holdingExpired, icon: "ph-calendar-x", color: "var(--priority-critical)" },
+  ];
 
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
         <h2 style={{ marginBottom: 2 }}>Stock Ledger</h2>
-        <p className="text-muted" style={{ fontSize: 13 }}>
-          Stock on hand at every store and OTP site, from the ledger. Open a facility for its lots and transactions.
+        <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 900 }}>
+          Every sachet in and out of every store and OTP site, as ledger entries by lot and expiry. Balances are computed from the
+          entries, never typed in; an entry is never edited or deleted, only voided by an administrator with a reason, and stays
+          visible. Open a facility for its lots and transactions.
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))", gap: 12 }}>
-        {[
-          { label: "State store", value: fmt(totals("state_store")), sub: "sachets" },
-          { label: "LGA stores", value: fmt(totals("lga_store")), sub: "sachets" },
-          { label: "OTP sites", value: fmt(totals("health_facility")), sub: "sachets" },
-          { label: "Out of stock", value: fmt(stockedOut), sub: "facilities", href: hrefWith({}, { flag: "stockout" }) },
-          { label: "Holding expired stock", value: fmt(holdingExpired), sub: "facilities", href: hrefWith({}, { flag: "expired" }) },
-        ].map((k) => {
-          const body = (
-            <>
-              <div className="text-muted" style={{ fontSize: 12.5 }}>{k.label}</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{k.value}</div>
-              <div className="text-muted" style={{ fontSize: 12 }}>{k.sub}</div>
-            </>
-          );
-          return k.href ? (
-            <Link key={k.label} href={k.href} className="card elev-sm" style={{ padding: 14, textDecoration: "none", color: "inherit" }}>{body}</Link>
-          ) : (
-            <div key={k.label} className="card elev-sm" style={{ padding: 14 }}>{body}</div>
+      <div className="card elev-sm" style={{ padding: 14, gap: 8 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>
+          Stock on hand along the supply chain
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          {(["state_store", "lga_store", "health_facility"] as FacilityType[]).map((t, i) => (
+            <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 14 }}>
+              {i > 0 && <i className="ph ph-arrow-right text-muted" aria-hidden="true" style={{ fontSize: 18 }} />}
+              <Link href={hrefWith({}, { type: t })} style={{ textDecoration: "none", color: "inherit" }}>
+                <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{fmt(totals(t))}</span>
+                <span className="text-muted" style={{ fontSize: 12 }}>sachets at {t === "state_store" ? "the State store" : t === "lga_store" ? "LGA stores" : "OTP sites"}</span>
+              </Link>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+        {flagTiles.map((k) => {
+          const active = sp.flag === k.key;
+          return (
+            <Link key={k.key} href={hrefWith({}, active ? {} : { flag: k.key })} className="card elev-sm" aria-pressed={active}
+              title={active ? "Show every facility" : `List: ${k.label.toLowerCase()}`}
+              style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
+                <i className={`ph-fill ${k.icon}`} aria-hidden="true" style={{ fontSize: 15, color: k.value ? k.color : "var(--status-resolved)" }} /> {k.label}
+              </div>
+              <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{fmt(k.value)}</div>
+              <div className="text-muted" style={{ fontSize: 11.5 }}>{active ? "Filtered · click to clear" : "facilities"}</div>
+            </Link>
           );
         })}
       </div>
@@ -145,6 +175,8 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
         <select className="input" name="flag" defaultValue={sp.flag ?? ""} style={{ maxWidth: 190 }}>
           <option value="">Any stock position</option>
           <option value="stockout">Out of stock</option>
+          <option value="lowmos">Under 1 month of stock</option>
+          <option value="expiring">Lot expiring within {EXPIRY_WARN_DAYS} days</option>
           <option value="expired">Holding expired stock</option>
         </select>
         <button className="btn btn-primary" type="submit"><i className="ph ph-funnel" /> Apply</button>
@@ -159,6 +191,7 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
               <th>Level</th>
               <th>LGA</th>
               <th style={{ textAlign: "right" }}>On hand (sachets)</th>
+              <th style={{ textAlign: "right" }}>Months of stock</th>
               <th>Next expiry</th>
               <th>Last activity</th>
             </tr>
@@ -175,6 +208,11 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
                     <div style={{ fontSize: 11, fontWeight: 400, color: "var(--priority-critical)" }}>{fmt(f.expiredBalance)} expired</div>
                   )}
                 </td>
+                <td style={{ textAlign: "right" }}>
+                  {mosOf[f.id] === null || mosOf[f.id] === undefined ? <span className="text-muted">—</span> : lowMos(f.id)
+                    ? <span style={{ color: "var(--priority-high)", fontWeight: 600 }}><i className="ph-fill ph-warning" aria-hidden="true" /> {mosOf[f.id]!.toFixed(1)}</span>
+                    : mosOf[f.id]!.toFixed(1)}
+                </td>
                 <td style={{ color: f.nextExpiry && daysBetween(today, f.nextExpiry) <= EXPIRY_WARN_DAYS ? "var(--priority-high)" : undefined }}>
                   {f.nextExpiry ?? "—"}
                 </td>
@@ -182,7 +220,7 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
               </tr>
             ))}
             {rows.length === 0 && (
-              <tr><td colSpan={6} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No facilities match these filters.</td></tr>
+              <tr><td colSpan={7} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No facilities match these filters.</td></tr>
             )}
           </tbody>
         </table>
@@ -220,13 +258,17 @@ async function FacilityLedger({
     );
   }
 
-  const [ledger, { data: balances }, { data: photos }, lgas, { data: product }] = await Promise.all([
+  const month = await reportMonth(supabase, undefined);
+  const [ledger, { data: balances }, { data: photos }, lgas, { data: product }, metrics] = await Promise.all([
     getFacilityLedger(supabase, facilityId),
     supabase.from("stock_balances").select("*").eq("facility_id", facilityId).order("expiry_date"),
     supabase.from("ledger_photos").select("*").eq("facility_id", facilityId),
     getProgrammeLgas(supabase),
     supabase.from("products").select("units_per_carton").order("created_at").limit(1).maybeSingle(),
+    getFacilityMetrics(supabase, month, {}),
   ]);
+  const metric = metrics.find((m) => m.facility_id === facilityId);
+  const mos = metric?.months_of_stock === null || metric?.months_of_stock === undefined ? null : Number(metric.months_of_stock);
   const perCarton = product?.units_per_carton ?? 150;
   const names = await facilityNames(supabase, [facility.supplied_by_facility_id, ...ledger.map((t) => t.counterparty_facility_id)]);
   const photoUrls: Record<string, { url: string; kind: string }[]> = {};
@@ -248,6 +290,14 @@ async function FacilityLedger({
   const total = ledger.length ? ledger[ledger.length - 1].runningBalance : 0;
   const lastCount = [...ledger].reverse().find((t) => t.txn_type === "physical_count");
   const lgaName = lgas.find((l) => l.id === facility.lga_id)?.name ?? "—";
+  // The last 30 days' movement and the ledger's integrity at a glance (R102).
+  const since = new Date(Date.parse(today) - 30 * 86_400_000).toISOString().slice(0, 10);
+  const recent = ledger.filter((t) => t.status !== "voided" && t.txn_date >= since);
+  const sumOf = (types: TxnType[]) => recent.filter((t) => types.includes(t.txn_type)).reduce((n, t) => n + t.quantity_sachets, 0);
+  const moved = { in: sumOf(["receipt"]), out: sumOf(["issue", "dispensed"]), lost: sumOf(["loss_damaged", "loss_expired", "loss_other"]) };
+  const voidedCount = ledger.filter((t) => t.status === "voided").length;
+  const withEvidence = new Set(ledger.filter((t) => t.submission_local_id && photoUrls[t.submission_local_id]).map((t) => t.submission_local_id)).size;
+  const submissions = new Set(ledger.map((t) => t.submission_local_id ?? t.id)).size;
   // Who voided what (migration 0109), and where each submission's void button goes: its first row on this page.
   const voiders = [...new Set(ledger.map((t) => t.voided_by).filter((v): v is string => !!v))];
   const { data: voiderRows } = voiders.length ? await supabase.from("profiles").select("id, name").in("id", voiders) : { data: [] };
@@ -283,6 +333,21 @@ async function FacilityLedger({
           <div className="text-muted" style={{ fontSize: 12 }}>sachets ({fmt(Math.floor(Math.max(0, total) / perCarton))} cartons)</div>
         </div>
         <div className="card elev-sm" style={{ padding: 14 }}>
+          <div className="text-muted" style={{ fontSize: 12.5 }}>Months of stock</div>
+          <div style={{ fontSize: 26, fontWeight: 700, color: mos !== null && mos < 1 ? "var(--priority-high)" : undefined }}>{mos === null ? "—" : mos.toFixed(1)}</div>
+          <div className="text-muted" style={{ fontSize: 12 }}>
+            {metric?.monthly_outflow ? `at ${fmt(Math.round(Number(metric.monthly_outflow)))} sachets a month` : "No outflow this month"}
+          </div>
+        </div>
+        <div className="card elev-sm" style={{ padding: 14 }}>
+          <div className="text-muted" style={{ fontSize: 12.5 }}>Last 30 days</div>
+          <div style={{ fontSize: 13, lineHeight: 1.7 }}>
+            <span style={{ color: "var(--status-resolved)", fontWeight: 600 }}>+{fmt(moved.in)}</span> received<br />
+            <span style={{ color: "var(--color-accent-700)", fontWeight: 600 }}>−{fmt(moved.out)}</span> {facility.is_otp_site ? "dispensed" : "issued"}
+            {moved.lost > 0 && <><br /><span style={{ color: "var(--priority-critical)", fontWeight: 600 }}>−{fmt(moved.lost)}</span> lost</>}
+          </div>
+        </div>
+        <div className="card elev-sm" style={{ padding: 14 }}>
           <div className="text-muted" style={{ fontSize: 12.5 }}>Last physical count</div>
           <div style={{ fontSize: 20, fontWeight: 700 }}>{lastCount ? fmt(lastCount.quantity_sachets) : "—"}</div>
           <div className="text-muted" style={{ fontSize: 12 }}>{lastCount ? lastCount.txn_date : "No count recorded"}</div>
@@ -300,6 +365,15 @@ async function FacilityLedger({
             </div>
           );
         })}
+      </div>
+
+      <div className="text-muted" style={{ fontSize: 12.5, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+        <i className="ph-fill ph-shield-check" aria-hidden="true" style={{ color: "var(--status-resolved)", fontSize: 16 }} />
+        <span>
+          <strong style={{ color: "var(--color-text)" }}>Ledger integrity:</strong> {fmt(ledger.length)} entries from {fmt(submissions)} submissions ·{" "}
+          {voidedCount ? `${fmt(voidedCount)} voided with a reason, still shown` : "none voided"} ·{" "}
+          {withEvidence > 0 && <>{fmt(withEvidence)} with photo evidence · </>}entries are never edited or deleted.
+        </span>
       </div>
 
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
