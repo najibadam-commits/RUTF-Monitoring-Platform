@@ -3,6 +3,8 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { facilityNames } from "@/lib/queries/stock";
+import { getProgrammeLgas } from "@/lib/queries/lookups";
+import { reportMonth } from "@/lib/queries/metrics";
 import { tagBg } from "@/lib/constants";
 import type { TransferStatus } from "@/lib/types/database";
 
@@ -41,26 +43,37 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
   const page = Math.max(1, Number(sp.page ?? "1") || 1);
   const from = (page - 1) * PAGE_SIZE;
 
-  // Level of the shipment, by the sending facility.
-  let fromIds: string[] | null = null;
-  if (sp.level === "state" || sp.level === "lga") {
-    const { data } = await supabase.from("facilities").select("id").eq("facility_type", sp.level === "state" ? "state_store" : "lga_store");
-    fromIds = (data ?? []).map((f) => f.id);
+  // Level of the shipment, by the sending facility; the two lanes below need both store lists.
+  const [{ data: stateStores }, { data: lgaStores }, lgas, { data: lgaFacilities }] = await Promise.all([
+    supabase.from("facilities").select("id").eq("facility_type", "state_store"),
+    supabase.from("facilities").select("id").eq("facility_type", "lga_store"),
+    getProgrammeLgas(supabase),
+    sp.lga ? supabase.from("facilities").select("id").eq("lga_id", sp.lga) : Promise.resolve({ data: null }),
+  ]);
+  const stateIds = (stateStores ?? []).map((f) => f.id);
+  const lgaStoreIds = (lgaStores ?? []).map((f) => f.id);
+  const fromIds = sp.level === "state" ? stateIds : sp.level === "lga" ? lgaStoreIds : null;
+  // LGA (DECISIONS R112): transfers to or from any facility in it.
+  const lgaIds = sp.lga ? (lgaFacilities ?? []).map((f) => f.id) : null;
+  const inLga = lgaIds?.length ? `from_facility_id.in.(${lgaIds.join(",")}),to_facility_id.in.(${lgaIds.join(",")})` : null;
+  function scoped<T extends { or: (f: string) => T }>(b: T): T {
+    let x = b;
+    if (sp.facility) x = x.or(`from_facility_id.eq.${sp.facility},to_facility_id.eq.${sp.facility}`);
+    if (inLga) x = x.or(inLga);
+    return x;
   }
 
   let q = supabase.from("transfer_overview").select("*", { count: "exact" }).order("issued_date", { ascending: false }).order("code", { ascending: false });
   if (sp.transfer) q = q.eq("id", sp.transfer);
   if (sp.status === "overdue") q = q.eq("status", "in_transit").gt("days_in_transit", OVERDUE_DAYS);
   else if (sp.status) q = q.eq("status", sp.status as TransferStatus);
-  if (sp.facility) q = q.or(`from_facility_id.eq.${sp.facility},to_facility_id.eq.${sp.facility}`);
+  q = scoped(q);
   if (fromIds) q = q.in("from_facility_id", fromIds);
   if (sp.search?.trim()) q = q.ilike("code", `%${sp.search.trim().replace(/[%,()]/g, " ")}%`);
 
   const counts = async (build: (b: ReturnType<typeof base>) => ReturnType<typeof base>) => (await build(base())).count ?? 0;
   function base() {
-    let b = supabase.from("transfer_overview").select("id", { count: "exact", head: true });
-    if (sp.facility) b = b.or(`from_facility_id.eq.${sp.facility},to_facility_id.eq.${sp.facility}`);
-    return b;
+    return scoped(supabase.from("transfer_overview").select("id", { count: "exact", head: true }));
   }
 
   const [{ data, count }, inTransit, overdue, discrepancies, receivedFull, gapRows, transitRows] = await Promise.all([
@@ -70,17 +83,36 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
     counts((b) => b.eq("status", "discrepancy")),
     counts((b) => b.eq("status", "received")),
     (() => {
-      let g = supabase.from("transfer_overview").select("gap").eq("status", "discrepancy");
-      if (sp.facility) g = g.or(`from_facility_id.eq.${sp.facility},to_facility_id.eq.${sp.facility}`);
-      return g.limit(1000);
+      return scoped(supabase.from("transfer_overview").select("gap").eq("status", "discrepancy")).limit(1000);
     })(),
     (() => {
-      let g = supabase.from("transfer_overview").select("sachets_issued").eq("status", "in_transit");
-      if (sp.facility) g = g.or(`from_facility_id.eq.${sp.facility},to_facility_id.eq.${sp.facility}`);
-      return g.limit(1000);
+      return scoped(supabase.from("transfer_overview").select("sachets_issued").eq("status", "in_transit")).limit(1000);
     })(),
   ]);
   const rows = data ?? [];
+  // The two supply lanes in the latest month with ledger activity (as on the other report pages).
+  const month = await reportMonth(supabase, undefined);
+  const { data: recent } = await scoped(
+    supabase.from("transfer_overview").select("status, gap, sachets_issued, issued_date, received_date, from_facility_id")
+      .gte("issued_date", month.start).lte("issued_date", month.end),
+  ).limit(5000);
+  const lanes = [
+    { key: "state", title: "State store → LGA stores", ids: new Set(stateIds) },
+    { key: "lga", title: "LGA stores → OTP sites", ids: new Set(lgaStoreIds) },
+  ].map((lane) => {
+    const rs = (recent ?? []).filter((r) => lane.ids.has(r.from_facility_id) && r.status !== "cancelled");
+    const done = rs.filter((r) => r.status === "received" || r.status === "discrepancy");
+    const days = done.filter((r) => r.received_date).map((r) => Math.round((Date.parse(r.received_date!) - Date.parse(r.issued_date)) / 86_400_000)).sort((a, b) => a - b);
+    return {
+      ...lane,
+      n: rs.length,
+      sachets: rs.reduce((t, r) => t + r.sachets_issued, 0),
+      inFull: done.length ? (done.filter((r) => r.status === "received").length * 100) / done.length : null,
+      medianDays: days.length ? days[Math.floor((days.length - 1) / 2)] : null,
+      short: done.filter((r) => r.status === "discrepancy").reduce((t, r) => t + r.gap, 0),
+      inTransit: rs.filter((r) => r.status === "in_transit").length,
+    };
+  });
   const sachetsInTransit = (transitRows.data ?? []).reduce((n, r) => n + r.sachets_issued, 0);
   const delivered = receivedFull + discrepancies;
   const inFullPct = delivered ? (receivedFull * 100) / delivered : null;
@@ -93,7 +125,7 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const missingSachets = (gapRows.data ?? []).reduce((n, r) => n + r.gap, 0);
   const names = await facilityNames(supabase, [sp.facility, ...rows.flatMap((r) => [r.from_facility_id, r.to_facility_id])]);
-  const filtered = !!(sp.status || sp.level || sp.search || sp.transfer);
+  const filtered = !!(sp.status || sp.level || sp.lga || sp.search || sp.transfer);
   const off = { opacity: 0.45, pointerEvents: "none" as const };
 
   return (
@@ -135,6 +167,33 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
         })}
       </div>
 
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 12 }}>
+        {lanes.map((l) => (
+          <Link key={l.key} href={hrefWith({ facility: sp.facility, lga: sp.lga }, { level: sp.level === l.key ? undefined : l.key })} className="card elev-sm"
+            aria-pressed={sp.level === l.key} title={sp.level === l.key ? "Show both lanes" : `List: ${l.title}`}
+            style={{ padding: "10px 14px", gap: 6, textDecoration: "none", color: "inherit", outline: sp.level === l.key ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+            <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
+              <span className="card-title" style={{ fontSize: 13.5 }}><i className="ph ph-truck" aria-hidden="true" /> {l.title}</span>
+              <span className="kpi-sub">issued in {month.label}</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: 8 }}>
+              {[
+                { label: "Transfers", value: fmt(l.n), sub: `${fmt(l.sachets)} sachets` },
+                { label: "Delivered in full", value: l.inFull === null ? "—" : `${l.inFull.toFixed(1)}%`, sub: l.inTransit ? `${fmt(l.inTransit)} in transit` : "none in transit" },
+                { label: "Median days in transit", value: l.medianDays === null ? "—" : String(l.medianDays), sub: "issue to receipt" },
+                { label: "Sachets short", value: fmt(l.short), sub: "on receipt" },
+              ].map((x) => (
+                <div key={x.label} style={{ minWidth: 0 }}>
+                  <div className="kpi-label">{x.label}</div>
+                  <div className="kpi-value" style={{ fontSize: 18, color: x.label === "Sachets short" && l.short ? "var(--priority-critical)" : undefined }}>{x.value}</div>
+                  <div className="kpi-sub">{x.sub}</div>
+                </div>
+              ))}
+            </div>
+          </Link>
+        ))}
+      </div>
+
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
         {sp.facility && <input type="hidden" name="facility" defaultValue={sp.facility} />}
         <input className="input" name="search" placeholder="Transfer code…" defaultValue={sp.search ?? ""} style={{ maxWidth: 200 }} />
@@ -144,6 +203,10 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
           <option value="overdue">Not confirmed in {OVERDUE_DAYS} days</option>
           <option value="received">Received in full</option>
           <option value="discrepancy">Discrepancy</option>
+        </select>
+        <select className="input" name="lga" defaultValue={sp.lga ?? ""} aria-label="LGA" style={{ maxWidth: 170 }}>
+          <option value="">All LGAs</option>
+          {lgas.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
         <select className="input" name="level" defaultValue={sp.level ?? ""} style={{ maxWidth: 200 }}>
           <option value="">All levels</option>
@@ -185,7 +248,14 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
                     <Link href={`/stock-ledger?facility=${t.to_facility_id}`}>{names[t.to_facility_id] ?? "—"}</Link>
                   </td>
                   <td style={{ whiteSpace: "nowrap" }}>{t.issued_date}</td>
-                  <td style={{ whiteSpace: "nowrap" }}>{t.received_date ?? <span className="text-muted">—</span>}</td>
+                  <td style={{ whiteSpace: "nowrap" }}>
+                    {t.received_date ?? <span className="text-muted">—</span>}
+                    {t.received_date && (
+                      <div className="text-muted" style={{ fontSize: 11 }}>
+                        after {Math.round((Date.parse(t.received_date) - Date.parse(t.issued_date)) / 86_400_000)} d
+                      </div>
+                    )}
+                  </td>
                   <td style={{ textAlign: "right" }}>{fmt(t.sachets_issued)}</td>
                   <td style={{ textAlign: "right" }}>{t.sachets_received === null ? "—" : fmt(t.sachets_received)}</td>
                   <td style={{ textAlign: "right", fontWeight: 600, color: t.status === "discrepancy" ? "var(--priority-critical)" : undefined }}>
