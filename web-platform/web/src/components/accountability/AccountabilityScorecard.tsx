@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
 import { PRIORITY_LABEL, PRIORITY_ORDER } from "@/lib/constants";
 import { Flag } from "@/components/reports/ReportShell";
@@ -15,12 +16,16 @@ const RESPONDED: IssueStatus[] = ["in_progress", "resolved", "verified_closed", 
 const RESOLVED: IssueStatus[] = ["resolved", "verified_closed"];
 
 export type ScorecardRow = {
+  id?: string;
+  /** When it was verified and closed (issue_history), for the score at past month ends. */
+  closed_at?: string | null;
   status: IssueStatus;
   priority: IssuePriority;
   reported_at: string;
   resolution_date: string | null;
   auto_generated: boolean;
-  lga: { name: string } | null;
+  lga: { id?: string; name: string } | null;
+  facility?: { id: string; name: string } | null;
   category: { name: string } | null;
   dri: { id: string; name: string } | null;
 };
@@ -68,6 +73,7 @@ function grade(score: number | null) {
 const FEW = 5;
 
 function LgaLeague({ groups, targetDays, now }: { groups: Map<string, ScorecardRow[]>; targetDays: number; now: number }) {
+  const idOf = (name: string) => groups.get(name)?.find((r) => r.lga?.id)?.lga?.id;
   const lines = [...groups.entries()]
     .map(([name, rs]) => ({ name, ...summarise(rs, targetDays, now) }))
     .sort((a, b) => (b.score ?? -1) - (a.score ?? -1) || b.raised - a.raised || a.name.localeCompare(b.name));
@@ -84,7 +90,9 @@ function LgaLeague({ groups, targetDays, now }: { groups: Map<string, ScorecardR
       <tr key={l.name}>
         <td className="text-muted" style={{ textAlign: "right" }}>{rank}</td>
         <td>
-          {l.name}
+          {idOf(l.name) ? (
+            <Link href={`/action-tracker?lga=${idOf(l.name)}${l.pastTarget ? "&late=1" : ""}`} title={l.pastTarget ? "Open this LGA's late actions" : "Open this LGA's actions"}>{l.name}</Link>
+          ) : l.name}
           {l.raised < FEW && <span className="text-muted" style={{ fontSize: 11 }}> · few Findings</span>}
         </td>
         <td>
@@ -248,6 +256,36 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
   const auto = rows.filter((r) => r.auto_generated).length;
   const awaitingReview = rows.filter((r) => ["new", "pending_review", "returned_for_correction"].includes(r.status)).length;
 
+  // The accountability score at each of the last six month ends (R109): Findings raised by then,
+  // verified and closed by then, and open past the target at that date.
+  const scoreAt = (end: number) => {
+    const raised = rows.filter((r) => Date.parse(r.reported_at) <= end);
+    if (!raised.length) return null;
+    const isClosed = (r: ScorecardRow) => !!r.closed_at && Date.parse(r.closed_at) <= end;
+    const closedN = raised.filter(isClosed).length;
+    const late = raised.filter((r) => !isClosed(r) && Date.parse(r.reported_at) < end - targetDays * DAY).length;
+    return Math.round(50 * (closedN / raised.length) + 50 * (1 - late / raised.length));
+  };
+  const scoreTrend = Array.from({ length: 6 }, (_, i) => {
+    const today = new Date(now);
+    const y = today.getUTCFullYear();
+    const m = today.getUTCMonth() - (5 - i); // this month is i = 5
+    const end = i === 5 ? now : Date.UTC(y, m + 1, 1) - 1; // last moment of month m
+    const label = new Date(Date.UTC(y, m, 1)).toLocaleString("en-GB", { month: "short", timeZone: "UTC" });
+    return { label, score: scoreAt(end) };
+  });
+
+  // Facilities needing support: the most Findings open past the target.
+  const byFacility = new Map<string, { id: string; name: string; lga: string; late: number; open: number }>();
+  for (const r of rows) {
+    if (!r.facility || !OPEN.includes(r.status)) continue;
+    const f = byFacility.get(r.facility.id) ?? { id: r.facility.id, name: r.facility.name, lga: r.lga?.name ?? "—", late: 0, open: 0 };
+    f.open += 1;
+    if ((now - Date.parse(r.reported_at)) / DAY > targetDays) f.late += 1;
+    byFacility.set(r.facility.id, f);
+  }
+  const needSupport = [...byFacility.values()].filter((f) => f.late > 0).sort((a, b) => b.late - a.late || b.open - a.open).slice(0, 8);
+
   // Follow-through: how far the Findings have travelled.
   const funnel = [
     { label: "Raised", n: rows.length, help: auto ? `${pct(auto, rows.length)}% by automatic checks on the ledger and visits` : "" },
@@ -391,6 +429,50 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
                   <td style={{ textAlign: "right" }}>{byPriority.get(p)?.avg_days == null ? "—" : `${byPriority.get(p)!.avg_days} d`}</td>
                 </tr>
               ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 12 }}>
+        <div className="card elev-sm" style={{ padding: "12px 14px", gap: 8 }}>
+          <div className="card-title" style={{ fontSize: 14 }}>Accountability score, last 6 months</div>
+          <div role="img" aria-label={scoreTrend.map((t) => `${t.label}: ${t.score ?? "no Findings"}`).join("; ")}
+            style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 140 }}>
+            {scoreTrend.map((t) => {
+              const g = grade(t.score);
+              return (
+                <div key={t.label} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: 3 }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: g.color }}>{t.score ?? "—"}</span>
+                  <div title={`${t.label}: ${t.score ?? "no Findings"} · ${g.label}`}
+                    style={{ width: "70%", height: `${((t.score ?? 0) / 100) * 80}%`, minHeight: t.score ? 2 : 0, background: g.color, borderRadius: "4px 4px 0 0" }} />
+                  <span className="text-muted" style={{ fontSize: 11 }}>{t.label}</span>
+                </div>
+              );
+            })}
+          </div>
+          <div className="kpi-sub">Score at each month end: on track from 80, needs support below 60.</div>
+        </div>
+
+        <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
+          <div style={{ padding: "12px 14px 0" }}>
+            <div className="card-title" style={{ fontSize: 14 }}>Facilities needing support</div>
+            <div className="kpi-sub">Most Findings open past {targetDays} days. Open a facility for its stock and records.</div>
+          </div>
+          <table className="table" style={{ marginTop: 6 }}>
+            <thead><tr><th>Facility</th><th style={{ textAlign: "right" }}>Past target</th><th style={{ textAlign: "right" }}>Open</th></tr></thead>
+            <tbody>
+              {needSupport.map((f) => (
+                <tr key={f.id}>
+                  <td>
+                    <Link href={`/stock-ledger?facility=${f.id}`}>{f.name}</Link>
+                    <div className="text-muted" style={{ fontSize: 11.5 }}>{f.lga}</div>
+                  </td>
+                  <td style={{ textAlign: "right" }}><Flag level="warning">{f.late}</Flag></td>
+                  <td style={{ textAlign: "right" }}>{f.open}</td>
+                </tr>
+              ))}
+              {needSupport.length === 0 && <tr><td colSpan={3} className="text-muted" style={{ textAlign: "center", padding: 16 }}>No facility has Findings past the target.</td></tr>}
             </tbody>
           </table>
         </div>
