@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { getFacilityMetrics, reportMonth, type FacilityMetric } from "@/lib/queries/metrics";
+import { monthOf } from "@/lib/queries/kpis";
 import { FacilityLink, Flag, LEVEL_LABEL, ReportShell, fmt, type SP } from "@/components/reports/ReportShell";
 
 export const metadata: Metadata = { title: "Stock Reconciliation" };
@@ -35,13 +36,19 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
   const sp = await searchParams;
   const supabase = await createClient();
   const month = await reportMonth(supabase, sp.month);
-  const [rows, lgas, { data: lots }, { data: thresholds }] = await Promise.all([
+  // The five months before this one, for the reconciliation trend (DECISIONS R110).
+  const trendMonths = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(Date.UTC(Number(month.key.slice(0, 4)), Number(month.key.slice(5, 7)) - 1 - (5 - i), 1));
+    return monthOf(d.toISOString().slice(0, 7));
+  });
+  const [rows, lgas, { data: lots }, { data: thresholds }, ...history] = await Promise.all([
     getFacilityMetrics(supabase, month, { level: sp.level, lga: sp.lga }),
     getProgrammeLgas(supabase),
     supabase.from("stock_balances").select("facility_id, lot_id, lot_no, expiry_date, balance").gt("balance", 0).not("expiry_date", "is", null)
       .lte("expiry_date", new Date(Date.parse(month.end) + EXPIRY_WARN_DAYS * DAY).toISOString().slice(0, 10))
       .order("expiry_date").limit(500),
     supabase.from("rutf_thresholds").select("key, value").eq("key", "variance_pct_max"),
+    ...trendMonths.slice(0, 5).map((m) => getFacilityMetrics(supabase, m, { level: sp.level, lga: sp.lga })),
   ]);
   const limit = Number(thresholds?.[0]?.value ?? 5);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));
@@ -71,6 +78,17 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
     .sort((a, b) => order.indexOf(a.flags[0]) - order.indexOf(b.flags[0]) || Number(b.r.last_variance_pct ?? -1) - Number(a.r.last_variance_pct ?? -1) || b.r.stockout_days - a.r.stockout_days);
 
   const reconciled = flagged.filter((x) => counted(x.r) && !over(x.r)).length;
+  // Share reconciled within the limit at each month (counted that month and within the limit).
+  const trend = [...history, rows].map((rs, i) => {
+    const m = trendMonths[i];
+    const ok = rs.filter((r) => (r.count_on_time || (r.last_count_date !== null && r.last_count_date >= m.start)) && Number(r.last_variance_pct ?? 0) <= limit).length;
+    return {
+      key: m.key,
+      label: new Date(`${m.key}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", timeZone: "UTC" }),
+      pct: rs.length ? (ok * 100) / rs.length : null,
+      n: rs.length,
+    };
+  });
   const expiredSachets = rows.reduce((n, r) => n + r.expired_balance, 0);
   const watch = (lots ?? []).filter((l) => byId[l.facility_id]);
   const expiringSachets = watch.filter((l) => l.expiry_date! >= month.end).reduce((n, l) => n + l.balance, 0);
@@ -114,19 +132,19 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
       monthKey={month.key} lgas={lgas} sp={sp}
       extraFilters={sp.flag ? <input type="hidden" name="flag" value={sp.flag} /> : undefined}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {tiles.map((t) => {
           const st = STATUS[t.key];
           const active = filter === t.key;
           return (
-            <Link key={t.key} href={hrefWith({ flag: active ? null : t.key })} className="card elev-sm" aria-pressed={active}
+            <Link key={t.key} href={hrefWith({ flag: active ? null : t.key })} className="card elev-sm kpi-card" aria-pressed={active}
               title={active ? "Show all facilities" : `List: ${st.label.toLowerCase()}`}
-              style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ fontSize: 15, color: LEVEL_COLOR[st.level] }} /> {t.label}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ color: LEVEL_COLOR[st.level] }} /> {t.label}
               </div>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: 26, fontWeight: 700, lineHeight: 1.15 }}>{t.value}</div>
-              <div className="text-muted" style={{ fontSize: 11.5 }}>{active ? "Filtered · click to clear" : t.sub}</div>
+              <div className="kpi-value">{t.value}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : t.sub}</div>
             </Link>
           );
         })}
@@ -181,7 +199,23 @@ export default async function StockIntegrityPage({ searchParams }: { searchParam
         {shown.length > SHOWN && <div className="text-muted" style={{ fontSize: 12, padding: "10px 16px" }}>Showing the {SHOWN} most serious of {fmt(shown.length)}. Filter by LGA, level or a tile to see the rest.</div>}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 14, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 12, alignItems: "start" }}>
+        <div className="card elev-sm" style={{ padding: "12px 14px", gap: 8 }}>
+          <div className="card-title" style={{ fontSize: 14 }}>Reconciled within {limit}%, last 6 months</div>
+          <div role="img" aria-label={trend.map((t) => `${t.label}: ${t.pct === null ? "no data" : `${t.pct.toFixed(1)}%`}`).join("; ")}
+            style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 150 }}>
+            {trend.map((t) => (
+              <div key={t.key} style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: 3 }}>
+                <span style={{ fontSize: 10.5, color: t.pct !== null && t.pct < 90 ? "var(--priority-high)" : undefined }}>{t.pct === null ? "—" : `${Math.round(t.pct)}%`}</span>
+                <div title={`${t.label}: ${t.n} facilities`}
+                  style={{ width: "72%", height: `${((t.pct ?? 0) / 100) * 78}%`, minHeight: t.pct ? 2 : 0, borderRadius: "4px 4px 0 0",
+                    background: t.key === month.key ? "var(--status-resolved)" : "color-mix(in srgb, var(--status-resolved) 45%, white)" }} />
+                <span className="text-muted" style={{ fontSize: 11 }}>{t.label}</span>
+              </div>
+            ))}
+          </div>
+          <div className="kpi-sub">Share of stores and OTP sites counted that month with the count within {limit}% of the ledger.</div>
+        </div>
         <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
           <div style={{ padding: "14px 16px 0" }}>
             <div className="card-title">By LGA</div>
