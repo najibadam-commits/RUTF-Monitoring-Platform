@@ -72,12 +72,12 @@ export function ReportShell({
 
 export function SummaryTiles({ items }: { items: { label: string; value: string; sub?: string }[] }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12 }}>
+    <div className="kpi-row">
       {items.map((i) => (
-        <div key={i.label} className="card elev-sm" style={{ padding: 14, gap: 0 }}>
-          <div style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>{i.label}</div>
-          <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{i.value}</div>
-          {i.sub && <div className="text-muted" style={{ fontSize: 12 }}>{i.sub}</div>}
+        <div key={i.label} className="card elev-sm kpi-card">
+          <div className="kpi-label">{i.label}</div>
+          <div className="kpi-value">{i.value}</div>
+          {i.sub && <div className="kpi-sub">{i.sub}</div>}
         </div>
       ))}
     </div>

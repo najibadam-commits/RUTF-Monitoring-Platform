@@ -49,13 +49,13 @@ export function DownloadRequestsTable({ requests }: { requests: DownloadRequestR
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {tiles.map((t) => (
-          <div key={t.label} className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-              <i className={`ph-fill ${t.icon}`} aria-hidden="true" style={{ fontSize: 15, color: t.tone ?? "var(--color-accent-600)" }} /> {t.label}
+          <div key={t.label} className="card elev-sm kpi-card">
+            <div className="kpi-label">
+              <i className={`ph-fill ${t.icon}`} aria-hidden="true" style={{ color: t.tone ?? "var(--color-accent-600)" }} /> {t.label}
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{t.value}</div>
+            <div className="kpi-value">{t.value}</div>
           </div>
         ))}
       </div>

@@ -120,33 +120,33 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
       monthKey={month.key} lgas={lgas} sp={sp} showLevel={false}
       extraFilters={sp.flag ? <input type="hidden" name="flag" value={sp.flag} /> : undefined}
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {reach.map((x) => (
-          <div key={x.label} className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-              <i className={`ph-fill ${x.icon}`} aria-hidden="true" style={{ fontSize: 15, color: "var(--color-accent-600)" }} /> {x.label}
+          <div key={x.label} className="card elev-sm kpi-card">
+            <div className="kpi-label">
+              <i className={`ph-fill ${x.icon}`} aria-hidden="true" style={{ color: "var(--color-accent-600)" }} /> {x.label}
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{x.value}</div>
-            <div className="text-muted" style={{ fontSize: 11.5 }}>{x.sub}</div>
+            <div className="kpi-value">{x.value}</div>
+            <div className="kpi-sub">{x.sub}</div>
           </div>
         ))}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))", gap: 10 }}>
+      <div className="kpi-row">
         {tiles.map((k) => {
           const st = STATUS[k];
           const active = filter === k;
           return (
-            <Link key={k} href={hrefWith({ flag: active ? null : k })} className="card elev-sm" aria-pressed={active}
+            <Link key={k} href={hrefWith({ flag: active ? null : k })} className="card elev-sm kpi-card" aria-pressed={active}
               title={active ? "Show all OTP sites" : `List: ${st.label.toLowerCase()}`}
-              style={{ padding: "10px 12px", gap: 0, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ fontSize: 15, color: COLOR[st.level] }} /> {st.label}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ color: COLOR[st.level] }} /> {st.label}
               </div>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: 22, fontWeight: 700 }}>
-                {fmt(countOf(k))}<span style={{ fontSize: 13, fontWeight: 500, color: "var(--color-neutral-600)" }}> OTP sites</span>
+              <div className="kpi-value">
+                {fmt(countOf(k))}<span className="kpi-unit" style={{ fontWeight: 500 }}> OTP sites</span>
               </div>
-              <div className="text-muted" style={{ fontSize: 11 }}>{active ? "Filtered · click to clear" : st.sub}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : st.sub}</div>
             </Link>
           );
         })}

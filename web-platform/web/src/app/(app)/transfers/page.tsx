@@ -113,7 +113,7 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {[
           { label: "Delivered in full", value: inFullPct === null ? "—" : `${inFullPct.toFixed(1)}%`, sub: `${fmt(receivedFull)} of ${fmt(delivered)} received`, status: "received", icon: "ph-check-circle", color: "var(--status-resolved)" },
           { label: "In transit", value: fmt(inTransit), sub: `${fmt(sachetsInTransit)} sachets on the road`, status: "in_transit", icon: "ph-truck", color: "var(--color-accent-600)" },
@@ -122,14 +122,14 @@ export default async function TransfersPage({ searchParams }: { searchParams: Pr
         ].map((k) => {
           const active = sp.status === k.status;
           return (
-            <Link key={k.status} href={hrefWith({ facility: sp.facility }, active ? {} : { status: k.status })} className="card elev-sm" aria-pressed={active}
+            <Link key={k.status} href={hrefWith({ facility: sp.facility }, active ? {} : { status: k.status })} className="card elev-sm kpi-card" aria-pressed={active}
               title={active ? "Show every transfer" : `List: ${k.label.toLowerCase()}`}
-              style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-                <i className={`ph-fill ${k.icon}`} aria-hidden="true" style={{ fontSize: 15, color: k.color }} /> {k.label}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${k.icon}`} aria-hidden="true" style={{ color: k.color }} /> {k.label}
               </div>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{k.value}</div>
-              <div className="text-muted" style={{ fontSize: 11.5 }}>{active ? "Filtered · click to clear" : k.sub}</div>
+              <div className="kpi-value">{k.value}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : k.sub}</div>
             </Link>
           );
         })}

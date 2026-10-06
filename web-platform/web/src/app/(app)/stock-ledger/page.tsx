@@ -125,7 +125,7 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
       </div>
 
       <div className="card elev-sm" style={{ padding: 14, gap: 8 }}>
-        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>
+        <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>
           Stock on hand along the supply chain
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
@@ -133,26 +133,26 @@ async function FacilityList({ supabase, sp, today }: { supabase: Awaited<ReturnT
             <span key={t} style={{ display: "inline-flex", alignItems: "center", gap: 14 }}>
               {i > 0 && <i className="ph ph-arrow-right text-muted" aria-hidden="true" style={{ fontSize: 18 }} />}
               <Link href={hrefWith({}, { type: t })} style={{ textDecoration: "none", color: "inherit" }}>
-                <span style={{ display: "block", fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{fmt(totals(t))}</span>
-                <span className="text-muted" style={{ fontSize: 12 }}>sachets at {t === "state_store" ? "the State store" : t === "lga_store" ? "LGA stores" : "OTP sites"}</span>
+                <span className="kpi-value" style={{ display: "block" }}>{fmt(totals(t))}</span>
+                <span className="kpi-sub">sachets at {t === "state_store" ? "the State store" : t === "lga_store" ? "LGA stores" : "OTP sites"}</span>
               </Link>
             </span>
           ))}
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {flagTiles.map((k) => {
           const active = sp.flag === k.key;
           return (
-            <Link key={k.key} href={hrefWith({}, active ? {} : { flag: k.key })} className="card elev-sm" aria-pressed={active}
+            <Link key={k.key} href={hrefWith({}, active ? {} : { flag: k.key })} className="card elev-sm kpi-card" aria-pressed={active}
               title={active ? "Show every facility" : `List: ${k.label.toLowerCase()}`}
-              style={{ padding: 14, gap: 2, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-                <i className={`ph-fill ${k.icon}`} aria-hidden="true" style={{ fontSize: 15, color: k.value ? k.color : "var(--status-resolved)" }} /> {k.label}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${k.icon}`} aria-hidden="true" style={{ color: k.value ? k.color : "var(--status-resolved)" }} /> {k.label}
               </div>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: 24, fontWeight: 700 }}>{fmt(k.value)}</div>
-              <div className="text-muted" style={{ fontSize: 11.5 }}>{active ? "Filtered · click to clear" : "facilities"}</div>
+              <div className="kpi-value">{fmt(k.value)}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : "facilities"}</div>
             </Link>
           );
         })}
@@ -326,40 +326,40 @@ async function FacilityLedger({
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 12 }}>
-        <div className="card elev-sm" style={{ padding: 14 }}>
-          <div className="text-muted" style={{ fontSize: 12.5 }}>On hand</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: total <= 0 ? "var(--priority-critical)" : undefined }}>{fmt(total)}</div>
-          <div className="text-muted" style={{ fontSize: 12 }}>sachets ({fmt(Math.floor(Math.max(0, total) / perCarton))} cartons)</div>
+      <div className="kpi-row">
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">On hand</div>
+          <div className="kpi-value" style={{ fontSize: 20, color: total <= 0 ? "var(--priority-critical)" : undefined }}>{fmt(total)}</div>
+          <div className="kpi-sub">sachets ({fmt(Math.floor(Math.max(0, total) / perCarton))} cartons)</div>
         </div>
-        <div className="card elev-sm" style={{ padding: 14 }}>
-          <div className="text-muted" style={{ fontSize: 12.5 }}>Months of stock</div>
-          <div style={{ fontSize: 26, fontWeight: 700, color: mos !== null && mos < 1 ? "var(--priority-high)" : undefined }}>{mos === null ? "—" : mos.toFixed(1)}</div>
-          <div className="text-muted" style={{ fontSize: 12 }}>
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">Months of stock</div>
+          <div className="kpi-value" style={{ fontSize: 20, color: mos !== null && mos < 1 ? "var(--priority-high)" : undefined }}>{mos === null ? "—" : mos.toFixed(1)}</div>
+          <div className="kpi-sub">
             {metric?.monthly_outflow ? `at ${fmt(Math.round(Number(metric.monthly_outflow)))} sachets a month` : "No outflow this month"}
           </div>
         </div>
-        <div className="card elev-sm" style={{ padding: 14 }}>
-          <div className="text-muted" style={{ fontSize: 12.5 }}>Last 30 days</div>
-          <div style={{ fontSize: 13, lineHeight: 1.7 }}>
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">Last 30 days</div>
+          <div style={{ fontSize: 12, lineHeight: 1.6 }}>
             <span style={{ color: "var(--status-resolved)", fontWeight: 600 }}>+{fmt(moved.in)}</span> received<br />
             <span style={{ color: "var(--color-accent-700)", fontWeight: 600 }}>−{fmt(moved.out)}</span> {facility.is_otp_site ? "dispensed" : "issued"}
             {moved.lost > 0 && <><br /><span style={{ color: "var(--priority-critical)", fontWeight: 600 }}>−{fmt(moved.lost)}</span> lost</>}
           </div>
         </div>
-        <div className="card elev-sm" style={{ padding: 14 }}>
-          <div className="text-muted" style={{ fontSize: 12.5 }}>Last physical count</div>
-          <div style={{ fontSize: 20, fontWeight: 700 }}>{lastCount ? fmt(lastCount.quantity_sachets) : "—"}</div>
-          <div className="text-muted" style={{ fontSize: 12 }}>{lastCount ? lastCount.txn_date : "No count recorded"}</div>
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">Last physical count</div>
+          <div className="kpi-value">{lastCount ? fmt(lastCount.quantity_sachets) : "—"}</div>
+          <div className="kpi-sub">{lastCount ? lastCount.txn_date : "No count recorded"}</div>
         </div>
         {lotBalances.map((b) => {
           const expired = b.expiry_date && b.expiry_date < today && b.balance > 0;
           const soon = b.expiry_date && !expired && daysBetween(today, b.expiry_date) <= EXPIRY_WARN_DAYS && b.balance > 0;
           return (
-            <div key={b.lot_id ?? "none"} className="card elev-sm" style={{ padding: 14 }}>
-              <div className="text-muted" style={{ fontSize: 12.5 }}>{b.lot_id ? `Lot ${b.lot_no}` : "No lot recorded"}</div>
-              <div style={{ fontSize: 20, fontWeight: 700 }}>{fmt(b.balance)}</div>
-              <div style={{ fontSize: 12, color: expired ? "var(--priority-critical)" : soon ? "var(--priority-high)" : "var(--color-neutral-600)" }}>
+            <div key={b.lot_id ?? "none"} className="card elev-sm kpi-card">
+              <div className="kpi-label">{b.lot_id ? `Lot ${b.lot_no}` : "No lot recorded"}</div>
+              <div className="kpi-value">{fmt(b.balance)}</div>
+              <div style={{ fontSize: 11, color: expired ? "var(--priority-critical)" : soon ? "var(--priority-high)" : "var(--color-neutral-600)" }}>
                 {b.expiry_date ? `${expired ? "Expired" : "Expires"} ${b.expiry_date}` : "—"}
               </div>
             </div>

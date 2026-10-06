@@ -145,19 +145,19 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
     >
       {error && <p style={{ color: "var(--priority-critical)" }}>The comparison couldn&apos;t be loaded.</p>}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+      <div className="kpi-row">
         {[
           { label: "Reports agreeing with the ledger", value: agreement === null ? "—" : `${fmt(agreement, 1)}%`, sub: `${fmt(within)} of ${fmt(rows.length)} within ${LIMIT}% on distribution`, icon: "ph-intersect", tone: agreement !== null && agreement >= 90 ? "var(--status-resolved)" : "var(--priority-high)" },
           { label: "DHIS2 reporting coverage", value: otpSites ? pctText(rows.length, otpSites) : "—", sub: `${fmt(rows.length)} of ${fmt(otpSites ?? 0)} OTP sites reported for ${month.label}`, icon: "ph-cloud-arrow-up" },
           { label: "Distributed per DHIS2", value: fmt(sum("dhis2_distributed")), sub: "sachets", icon: "ph-database" },
           { label: "Distributed per ledger", value: fmt(sum("ledger_distributed")), sub: sum("ledger_distributed") ? `DHIS2 is ${fmt(((sum("dhis2_distributed") - sum("ledger_distributed")) * 100) / sum("ledger_distributed"), 1)}% ${sum("dhis2_distributed") >= sum("ledger_distributed") ? "above" : "below"} overall` : "sachets", icon: "ph-book-open-text" },
         ].map((t) => (
-          <div key={t.label} className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-              <i className={`ph-fill ${t.icon}`} aria-hidden="true" style={{ fontSize: 15, color: t.tone ?? "var(--color-accent-600)" }} /> {t.label}
+          <div key={t.label} className="card elev-sm kpi-card">
+            <div className="kpi-label">
+              <i className={`ph-fill ${t.icon}`} aria-hidden="true" style={{ color: t.tone ?? "var(--color-accent-600)" }} /> {t.label}
             </div>
-            <div style={{ fontFamily: "var(--font-heading)", fontSize: 28, fontWeight: 700, lineHeight: 1.1 }}>{t.value}</div>
-            <div className="text-muted" style={{ fontSize: 11.5 }}>{t.sub}</div>
+            <div className="kpi-value">{t.value}</div>
+            <div className="kpi-sub">{t.sub}</div>
           </div>
         ))}
       </div>
@@ -221,19 +221,19 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
         </div>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 10 }}>
+      <div className="kpi-row">
         {order.map((k) => {
           const st = STATUS[k];
           const active = filter === k;
           return (
-            <Link key={k} href={hrefWith({ flag: active ? null : k })} className="card elev-sm" aria-pressed={active}
+            <Link key={k} href={hrefWith({ flag: active ? null : k })} className="card elev-sm kpi-card" aria-pressed={active}
               title={active ? "Show all flagged reports" : `List: ${st.label.toLowerCase()}`}
-              style={{ padding: "10px 12px", gap: 0, textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--color-neutral-700)" }}>
-                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ fontSize: 15, color: COLOR[st.level] }} /> {st.label}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ color: COLOR[st.level] }} /> {st.label}
               </div>
-              <div style={{ fontFamily: "var(--font-heading)", fontSize: 22, fontWeight: 700 }}>{fmt(countOf(k))}</div>
-              <div className="text-muted" style={{ fontSize: 11 }}>{active ? "Filtered · click to clear" : st.sub}</div>
+              <div className="kpi-value">{fmt(countOf(k))}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : st.sub}</div>
             </Link>
           );
         })}

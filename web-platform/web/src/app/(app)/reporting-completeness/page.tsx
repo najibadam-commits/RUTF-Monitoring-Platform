@@ -91,11 +91,11 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
         </label>
       }
     >
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))", gap: 12 }}>
-        <div className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-          <div style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Overall reporting rate</div>
-          <div style={{ fontFamily: "var(--font-heading)", fontSize: 30, fontWeight: 700, lineHeight: 1.1 }}>{pctText(overall)}</div>
-          <div style={{ fontSize: 12, color: tone(overall), fontWeight: 600 }}>
+      <div className="kpi-row">
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">Overall reporting rate</div>
+          <div className="kpi-value">{pctText(overall)}</div>
+          <div style={{ fontSize: 11, color: tone(overall), fontWeight: 600 }}>
             <i className={`ph-fill ${overall !== null && overall >= TARGET ? "ph-check-circle" : "ph-warning"}`} aria-hidden="true" />{" "}
             {overall === null ? "No data" : overall >= TARGET ? `Meets the ${TARGET}% target` : `Below the ${TARGET}% target`}
           </div>
@@ -104,12 +104,12 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
           sub={`${fmt(now.weeksSeen)} of ${fmt(now.weeksExpected)} OTP-weeks`} warnBelow={TARGET} criticalBelow={75} />
         <Meter label="Month-end counts on time" pct={countPct(now)}
           sub={`${fmt(now.onTime)} of ${fmt(now.facilities)} stores and OTP sites`} warnBelow={TARGET} criticalBelow={75} />
-        <div className="card elev-sm" style={{ padding: 14, gap: 2 }}>
-          <div style={{ fontSize: 12, color: "var(--color-neutral-700)" }}>Facilities reporting in full</div>
-          <div style={{ fontFamily: "var(--font-heading)", fontSize: 30, fontWeight: 700, lineHeight: 1.1 }}>
-            {fmt(complete)}<span style={{ fontSize: 15, fontWeight: 600, color: "var(--color-neutral-700)" }}> / {fmt(rows.length)}</span>
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label">Facilities reporting in full</div>
+          <div className="kpi-value">
+            {fmt(complete)}<span className="kpi-unit"> / {fmt(rows.length)}</span>
           </div>
-          <div className="text-muted" style={{ fontSize: 12 }}>{fmt(lgasAtTarget)} of {fmt(lgaRows.length)} LGAs at or above {TARGET}%</div>
+          <div className="kpi-sub">{fmt(lgasAtTarget)} of {fmt(lgaRows.length)} LGAs at or above {TARGET}%</div>
         </div>
       </div>
 
