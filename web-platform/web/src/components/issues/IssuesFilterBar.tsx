@@ -7,12 +7,15 @@ export function IssuesFilterBar({
   statuses,
   categories,
   states,
+  lgas = [],
   priorities,
   findingTypes,
 }: {
   statuses: { value: string; label: string }[];
   categories: { id: string; name: string }[];
   states: { id: string; name: string }[];
+  /** Programme LGAs (DECISIONS R98, R107). */
+  lgas?: { id: string; name: string }[];
   priorities: { value: string; label: string }[];
   /** RUTF Finding types (migration 0102) — filters by the rule that raised a Finding. */
   findingTypes: { value: string; label: string }[];
@@ -29,7 +32,7 @@ export function IssuesFilterBar({
     router.push(`/issues?${params.toString()}`);
   }
 
-  const hasActiveFilters = ["search", "status", "category", "state", "priority", "source", "type", "view", "visit"].some((k) => searchParams.get(k));
+  const hasActiveFilters = ["search", "status", "category", "state", "lga", "priority", "source", "type", "view", "visit"].some((k) => searchParams.get(k));
   // Keys the uncontrolled search input + selects to the active filter set, so they properly
   // remount (and re-apply their defaultValue) whenever filters change via something other than
   // typing/selecting directly in them — e.g. "Clear Filters" below, or browser back/forward.
@@ -72,6 +75,16 @@ export function IssuesFilterBar({
           </option>
         ))}
       </select>
+      {lgas.length > 0 && (
+        <select className="input" style={{ maxWidth: 170 }} defaultValue={searchParams.get("lga") ?? "All"} onChange={(e) => update("lga", e.target.value)} aria-label="LGA">
+          <option value="All">All LGAs</option>
+          {lgas.map((l) => (
+            <option key={l.id} value={l.id}>
+              {l.name}
+            </option>
+          ))}
+        </select>
+      )}
       <select className="input" style={{ maxWidth: 150 }} defaultValue={searchParams.get("priority") ?? "All"} onChange={(e) => update("priority", e.target.value)}>
         <option value="All">All priorities</option>
         {priorities.map((p) => (

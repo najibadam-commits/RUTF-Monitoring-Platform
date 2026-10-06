@@ -40,6 +40,7 @@ export interface IssueFilters {
   priority?: string;
   category?: string;
   state?: string;
+  lga?: string;
   search?: string;
   source?: string;
   type?: string;
@@ -47,7 +48,7 @@ export interface IssueFilters {
   /** The supervision visit that raised it (Risk-Based Supervision links here). */
   visit?: string;
 }
-export const ISSUE_FILTER_KEYS = ["status", "priority", "category", "state", "search", "source", "type", "view", "visit"] as const;
+export const ISSUE_FILTER_KEYS = ["status", "priority", "category", "state", "lga", "search", "source", "type", "view", "visit"] as const;
 
 type Filterable<T> = {
   eq(column: string, value: string | boolean): T;
@@ -62,6 +63,7 @@ export function applyIssueFilters<T extends Filterable<T>>(query: T, f: IssueFil
   if (f.priority) q = q.eq("priority", f.priority);
   if (f.category) q = q.eq("category_id", f.category);
   if (f.state) q = q.eq("state_id", f.state);
+  if (f.lga) q = q.eq("lga_id", f.lga);
   if (f.search) q = q.or(`description.ilike.%${f.search}%,code.ilike.%${f.search}%`);
   // RUTF auto-Findings (migration 0102): automatic vs registered by a person, and the rule.
   if (f.source === "auto") q = q.eq("auto_generated", true);

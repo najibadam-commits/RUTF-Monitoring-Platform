@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getAllCategories, getCategories, getProgrammeStates } from "@/lib/queries/lookups";
+import { getAllCategories, getCategories, getProgrammeLgas, getProgrammeStates } from "@/lib/queries/lookups";
 import { ISSUE_FILTER_KEYS, ISSUE_LIST_SELECT, applyIssueFilters, getFindingTargetDays, type IssueFilters, type IssueListRow } from "@/lib/queries/issues";
 import { OPEN_STATUSES, PRIORITY_LABEL, PRIORITY_ORDER, STATUS_FILTER_OPTIONS, STATUS_LABEL } from "@/lib/constants";
 import type { IssueStatus } from "@/lib/types/database";
@@ -52,7 +52,7 @@ export default async function IssuesPage({
   // categories (active-only, for the "Register Finding" picker) vs. filterCategories (every level,
   // active or legacy — so the filter can still find an old Finding under a retired category) are
   // deliberately different queries — see getCategories' kdoc.
-  const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }, counts] = await Promise.all([
+  const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }, counts, lgas, { data: openTypes }] = await Promise.all([
     getCurrentProfile(),
     query.range(from, from + PAGE_SIZE - 1),
     Promise.all([getCategories(supabase), getAllCategories(supabase), getProgrammeStates(supabase)]),
@@ -65,7 +65,20 @@ export default async function IssuesPage({
       head().eq("auto_generated", true),
       head().eq("status", "verified_closed"),
     ]).then((rs) => rs.map((r) => r.count ?? 0)),
+    getProgrammeLgas(supabase),
+    // Open Findings by type, for "What is being found" (R107).
+    supabase.from("issues").select("finding_type, auto_generated").in("status", OPEN_STATUSES).limit(5000),
   ]);
+  const typeLabel = Object.fromEntries((findingTypes ?? []).map((t) => [t.key, t.label]));
+  const byType = new Map<string, { n: number; auto: number }>();
+  for (const r of openTypes ?? []) {
+    const k = r.finding_type ?? "registered";
+    const v = byType.get(k) ?? { n: 0, auto: 0 };
+    v.n += 1;
+    if (r.auto_generated) v.auto += 1;
+    byType.set(k, v);
+  }
+  const typeChips = [...byType].sort((a, b) => b[1].n - a[1].n);
   const [all, open, critical, overdue, auto, closed] = counts;
   const issues = (data ?? []) as unknown as IssueListRow[];
   const total = count ?? 0;
@@ -129,11 +142,37 @@ export default async function IssuesPage({
         ))}
       </div>
 
+      {typeChips.length > 0 && (
+        <div className="card elev-sm" style={{ padding: "10px 12px", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+            <div className="card-title" style={{ fontSize: 13.5 }}>What is being found</div>
+            <span className="kpi-sub">Open Findings by type · the robot marks automatic checks, run nightly on the ledger and at every supervision visit</span>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {typeChips.map(([key, v]) => {
+              const active = key !== "registered" && filters.type === key && filters.view === "open";
+              const label = key === "registered" ? "Registered by a person" : typeLabel[key] ?? key;
+              return (
+                <Link key={key} href={key === "registered" ? hrefWith({ source: "manual", view: "open", type: null }) : hrefWith({ type: active ? null : key, view: active ? null : "open", status: null })}
+                  aria-pressed={active}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 12.5, textDecoration: "none",
+                    color: "inherit", border: "1px solid var(--color-divider)", background: active ? "var(--color-accent-100)" : "var(--color-surface)" }}>
+                  {v.auto > 0 && <i className="ph ph-robot" aria-hidden="true" style={{ color: "var(--color-accent-700)" }} />}
+                  {label}
+                  <strong>{v.n.toLocaleString("en-GB")}</strong>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <IssuesFilterBar
         statuses={STATUS_FILTER_OPTIONS.map((s) => ({ value: s, label: STATUS_LABEL[s] }))}
         priorities={PRIORITY_ORDER.map((p) => ({ value: p, label: PRIORITY_LABEL[p] }))}
         categories={filterCategories}
         states={states}
+        lgas={lgas.map((l) => ({ id: l.id, name: l.name }))}
         findingTypes={(findingTypes ?? []).map((t) => ({ value: t.key, label: t.label }))}
       />
 
