@@ -47,9 +47,12 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
     return monthOf(d.toISOString().slice(0, 7));
   });
   const filters = { level: sp.level, lga: sp.lga };
-  const [rows, lgas, ...history] = await Promise.all([
+  const [rows, lgas, { count: lateOpen }, ...history] = await Promise.all([
     getFacilityMetrics(supabase, month, filters),
     getProgrammeLgas(supabase),
+    // Open "Late reporting" Findings — the follow-up behind the gaps (DECISIONS R117).
+    supabase.from("issues").select("id", { count: "exact", head: true }).eq("finding_type", "late_reporting")
+      .in("status", ["new", "pending_review", "returned_for_correction", "assigned", "in_progress", "resolved", "reopened"]),
     ...trendMonths.slice(0, -1).map((m) => getFacilityMetrics(supabase, m, filters)),
   ]);
   const lgaName = Object.fromEntries(lgas.map((l) => [l.id, l.name]));
@@ -75,6 +78,23 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
     .map(([id, rs]) => ({ id, rates: ratesOf(rs), gaps: rs.filter((r) => gap(r) > 0).length }))
     .sort((a, b) => (overallPct(a.rates) ?? 0) - (overallPct(b.rates) ?? 0) || b.gaps - a.gaps);
   const lgasAtTarget = lgaRows.filter((l) => (overallPct(l.rates) ?? 0) >= TARGET).length;
+
+  // Heat-map: every LGA's overall rate in each of the last six months, lowest current first.
+  const monthsRows = [...history, rows];
+  const heat = [...new Set(monthsRows.flat().map((r) => r.lga_id))]
+    .map((id) => ({
+      id,
+      cells: monthsRows.map((rs) => overallPct(ratesOf(rs.filter((r) => r.lga_id === id)))),
+    }))
+    .sort((a, b) => (a.cells[a.cells.length - 1] ?? 101) - (b.cells[b.cells.length - 1] ?? 101) || (lgaName[a.id] ?? "").localeCompare(lgaName[b.id] ?? ""));
+  const cellStyle = (v: number | null) =>
+    v === null
+      ? { background: "var(--color-neutral-100)", color: "var(--color-neutral-500)" }
+      : v >= TARGET
+        ? { background: "color-mix(in srgb, var(--status-resolved) 22%, transparent)", color: "var(--color-text)" }
+        : v >= 75
+          ? { background: "color-mix(in srgb, var(--priority-high) 35%, transparent)", color: "var(--color-text)" }
+          : { background: "color-mix(in srgb, var(--priority-critical) 40%, transparent)", color: "var(--color-text)", fontWeight: 600 };
 
   const overall = overallPct(now);
   const qs = new URLSearchParams(Object.entries(sp).filter((e): e is [string, string] => !!e[1] && e[0] !== "lga"));
@@ -169,6 +189,49 @@ export default async function ReportingCompletenessPage({ searchParams }: { sear
           </table>
           {lgaRows.length > 10 && <div className="text-muted" style={{ fontSize: 12, padding: "8px 16px 12px" }}>The 10 lowest of {lgaRows.length} LGAs.</div>}
         </div>
+      </div>
+
+      <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap", padding: "12px 14px 0" }}>
+          <div>
+            <div className="card-title" style={{ fontSize: 14 }}>Reporting rate by LGA, last {TREND_MONTHS} months</div>
+            <div className="kpi-sub">
+              Each cell is the LGA&apos;s overall rate for the month: green at or above {TARGET}%, amber 75–{TARGET}%, red below 75%. Lowest this month first.
+            </div>
+          </div>
+          {(lateOpen ?? 0) > 0 && (
+            <Link href="/issues?type=late_reporting&view=open" style={{ fontSize: 12.5 }}>
+              {fmt(lateOpen ?? 0)} open &quot;Late reporting&quot; Findings <i className="ph ph-arrow-right" aria-hidden="true" />
+            </Link>
+          )}
+        </div>
+        <table className="table" style={{ marginTop: 6, fontSize: 12 }}>
+          <thead>
+            <tr>
+              <th>LGA</th>
+              {trend.map((t) => <th key={t.label} style={{ textAlign: "center" }}>{t.label}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {heat.slice(0, sp.heat === "all" ? heat.length : 12).map((h) => (
+              <tr key={h.id}>
+                <td style={{ whiteSpace: "nowrap" }}><Link href={lgaHref(h.id)}>{lgaName[h.id] ?? "—"}</Link></td>
+                {h.cells.map((v, i) => (
+                  <td key={i} style={{ textAlign: "center", padding: "4px 6px" }}>
+                    <span style={{ display: "block", borderRadius: 4, padding: "3px 0", ...cellStyle(v) }}>{v === null ? "—" : Math.round(v)}</span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {heat.length > 12 && (
+          <div style={{ fontSize: 12, padding: "8px 14px 12px" }}>
+            {sp.heat === "all"
+              ? <Link href={`/reporting-completeness?${new URLSearchParams(Object.entries(sp).filter((e): e is [string, string] => !!e[1] && e[0] !== "heat")).toString()}`}>Show the 12 lowest only</Link>
+              : <Link href={`/reporting-completeness?${new URLSearchParams({ ...Object.fromEntries(Object.entries(sp).filter((e): e is [string, string] => !!e[1])), heat: "all" }).toString()}`}>Show all {heat.length} LGAs</Link>}
+          </div>
+        )}
       </div>
 
       <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
