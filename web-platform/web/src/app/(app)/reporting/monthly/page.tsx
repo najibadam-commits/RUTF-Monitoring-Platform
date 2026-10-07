@@ -91,7 +91,9 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
   const soh = k ? (k.stock_on_hand.state_store ?? 0) + (k.stock_on_hand.lga_store ?? 0) + (k.stock_on_hand.otp ?? 0) : null;
 
   const reports = dhis2.data ?? [];
-  const agree = reports.filter((r) => r.distributed_diff_pct === null || Math.abs(Number(r.distributed_diff_pct)) <= 10).length;
+  // Over the reports comparable on distribution, as DHIS2 Triangulation counts it (DECISIONS R126).
+  const comparable = reports.filter((r) => r.distributed_diff_pct !== null);
+  const agree = comparable.filter((r) => Math.abs(Number(r.distributed_diff_pct)) <= 10).length;
 
   const raised = all.count ?? 0;
   const closed = closedAll.count ?? 0;
@@ -147,7 +149,7 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
             {k && <> Daily dispensing was reported for {n(k.dispensing_completeness_pct, 1)}% of OTP-weeks and {n(k.count_on_time_pct, 1)}% of month-end counts were on time.</>}
             {" "}{n(raisedInMonth.count)} Findings were raised and {n(closedInMonth.count)} verified and closed this month;
             {" "}{n(pastTarget)} remain open past the {targetDays}-day target.
-            {reports.length > 0 && <> {n(pct(agree, reports.length), 1)}% of DHIS2 reports agreed with the ledger.</>}
+            {comparable.length > 0 && <> {n(pct(agree, comparable.length), 1)}% of DHIS2 reports agreed with the ledger.</>}
           </p>
         </Section>
 
@@ -194,7 +196,7 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
         <Section num={6} title="Data quality: DHIS2 triangulation">
           <p style={{ margin: 0, fontSize: 13.5 }}>
             {reports.length
-              ? <>{n(reports.length)} DHIS2 reports for {month.label}; <strong>{n(pct(agree, reports.length), 1)}%</strong> agree with the ledger on distribution (within 10%), {n(reports.length - agree)} differ and are listed for review in DHIS2 Triangulation.</>
+              ? <>{n(reports.length)} DHIS2 reports for {month.label}; <strong>{n(pct(agree, comparable.length), 1)}%</strong> agree with the ledger on distribution (within 10%), {n(comparable.length - agree)} differ and are listed for review in DHIS2 Triangulation.</>
               : <>No DHIS2 reports loaded for {month.label}.</>}
           </p>
         </Section>

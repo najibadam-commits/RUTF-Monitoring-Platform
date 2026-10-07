@@ -44,6 +44,19 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     supabase.from("rutf_thresholds").select("value").eq("key", "finding_target_days").limit(1).maybeSingle(),
   ]);
   const targetDays = Number(target?.value ?? 30);
+  // Median days from report to verified closure, for Findings closed in the month (DECISIONS R126):
+  // the "Verified and closed" history entry is the closing time, as on the Corrective Action Tracker.
+  const { data: closuresRaw } = await supabase.from("issue_history").select("occurred_at, issue:issues(reported_at)")
+    .eq("action", "Verified and closed").gte("occurred_at", month.start).lte("occurred_at", `${month.end}T23:59:59`);
+  const closeDays = ((closuresRaw ?? []) as unknown as { occurred_at: string; issue: { reported_at: string } | null }[])
+    .filter((c) => c.issue)
+    .map((c) => (Date.parse(c.occurred_at) - Date.parse(c.issue!.reported_at)) / 86_400_000)
+    .sort((a, b) => a - b);
+  const mid = Math.floor(closeDays.length / 2);
+  const closeMedian = {
+    days: closeDays.length ? Math.round((closeDays.length % 2 ? closeDays[mid] : (closeDays[mid - 1] + closeDays[mid]) / 2) * 10) / 10 : null,
+    n: closeDays.length,
+  };
   const { count: pastTarget } = await supabase.from("issues").select("id", { count: "exact", head: true })
     .in("status", OPEN_STATUSES).lt("reported_at", new Date(requestTime() - targetDays * 86_400_000).toISOString());
   const stats = statsRaw as unknown as DashboardStats;
@@ -112,7 +125,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       {k && <AttentionPanel k={k} pastTarget={pastTarget ?? 0} targetDays={targetDays} monthLabel={month.label} />}
 
-      <KpiSections k={k} p={p} monthLabel={month.label} />
+      <KpiSections k={k} p={p} monthLabel={month.label} closeMedian={closeMedian} />
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 12 }}>
         <div className="card elev-sm" style={{ padding: "12px 14px", gap: 8 }}>

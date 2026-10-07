@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
-import { getAllCategories, getCategories, getProgrammeLgas, getProgrammeStates } from "@/lib/queries/lookups";
+import { getCategories, getFilterCategories, getProgrammeLgas, getProgrammeStates } from "@/lib/queries/lookups";
 import { ISSUE_FILTER_KEYS, ISSUE_LIST_SELECT, applyIssueFilters, getFindingTargetDays, type IssueFilters, type IssueListRow } from "@/lib/queries/issues";
 import { OPEN_STATUSES, PRIORITY_LABEL, PRIORITY_ORDER, STATUS_FILTER_OPTIONS, STATUS_LABEL } from "@/lib/constants";
 import type { IssueStatus } from "@/lib/types/database";
@@ -55,7 +55,7 @@ export default async function IssuesPage({
   const [profile, { data, count }, [categories, filterCategories, states], { data: findingTypes }, counts, lgas, { data: openTypes }] = await Promise.all([
     getCurrentProfile(),
     query.range(from, from + PAGE_SIZE - 1),
-    Promise.all([getCategories(supabase), getAllCategories(supabase), getProgrammeStates(supabase)]),
+    Promise.all([getCategories(supabase), getFilterCategories(supabase), getProgrammeStates(supabase)]),
     supabase.from("finding_types").select("key, label").order("label"),
     Promise.all([
       head(),

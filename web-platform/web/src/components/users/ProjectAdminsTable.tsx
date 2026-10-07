@@ -25,6 +25,7 @@ export type Programme = {
   facilityUsers?: number;
   supervisors?: number;
   lastLedger?: string | null;
+  firstLedger?: string | null;
 };
 
 // Bringing another state on: what the platform already supports, step by step (DECISIONS R96).
@@ -90,7 +91,9 @@ export function ProjectAdminsTable({ admins, programmes = [] }: { admins: Admin[
               <div style={{ minWidth: 0 }}>
                 <div className="card-title" style={{ fontSize: 15 }}>{g.name}</div>
                 <div className="text-muted" style={{ fontSize: 12 }}>
-                  Since {new Date(g.createdAt).toLocaleDateString("en-GB", { month: "long", year: "numeric" })} ·{" "}
+                  {g.firstLedger
+                    ? <>Records from {new Date(`${g.firstLedger}T00:00:00Z`).toLocaleDateString("en-GB", { month: "long", year: "numeric", timeZone: "UTC" })}</>
+                    : <>Set up {new Date(g.createdAt).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}</>} ·{" "}
                   {g.admins.length ? g.admins.join(", ") : "No Project Admin yet"}
                 </div>
               </div>

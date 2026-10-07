@@ -85,7 +85,10 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
 
   const flagged = rows.map((r) => ({ r, flag: flagOf(r) }));
   const countOf = (k: Flagged) => flagged.filter((x) => x.flag === k).length;
-  const within = rows.filter((r) => diff(r) === null || Math.abs(diff(r)!) <= LIMIT).length;
+  // Agreement over the reports that can be compared on distribution (DECISIONS R126), the same
+  // count as the "Distributed" indicator below.
+  const comparable = rows.filter((r) => diff(r) !== null).length;
+  const within = rows.filter((r) => diff(r) !== null && Math.abs(diff(r)!) <= LIMIT).length;
   const filter = (["higher", "lower", "other", "ok"] as const).includes(sp.flag as Flagged) ? (sp.flag as Flagged) : null;
   const order: Flagged[] = ["higher", "lower", "other", "ok"];
   const shown = flagged
@@ -102,8 +105,9 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
 
   const trend = results.map((res, i) => {
     const rs = byLgaFilter((res.data ?? []) as Row[]);
-    const ok = rs.filter((r) => diff(r) === null || Math.abs(diff(r)!) <= LIMIT).length;
-    return { label: new Date(`${trendMonths[i].key}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", timeZone: "UTC" }), n: rs.length, pct: rs.length ? (ok * 100) / rs.length : null };
+    const cmp = rs.filter((r) => diff(r) !== null);
+    const ok = cmp.filter((r) => Math.abs(diff(r)!) <= LIMIT).length;
+    return { label: new Date(`${trendMonths[i].key}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", timeZone: "UTC" }), n: rs.length, pct: cmp.length ? (ok * 100) / cmp.length : null };
   });
 
   // DHIS2 against the ledger, one dot per OTP site (DECISIONS R115).
@@ -147,7 +151,7 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
     return qs ? `/dhis2-triangulation?${qs}` : "/dhis2-triangulation";
   }
 
-  const agreement = rows.length ? (within * 100) / rows.length : null;
+  const agreement = comparable ? (within * 100) / comparable : null;
 
   return (
     <ReportShell
@@ -167,10 +171,10 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
 
       <div className="kpi-row">
         {[
-          { label: "Reports agreeing with the ledger", value: agreement === null ? "—" : `${fmt(agreement, 1)}%`, sub: `${fmt(within)} of ${fmt(rows.length)} within ${LIMIT}% on distribution`, icon: "ph-intersect", tone: agreement !== null && agreement >= 90 ? "var(--status-resolved)" : "var(--priority-high)" },
+          { label: "Reports agreeing with the ledger", value: agreement === null ? "—" : `${fmt(agreement, 1)}%`, sub: `${fmt(within)} of ${fmt(comparable)} within ${LIMIT}% on distribution`, icon: "ph-intersect", tone: agreement !== null && agreement >= 90 ? "var(--status-resolved)" : "var(--priority-high)" },
           { label: "DHIS2 reporting coverage", value: otpSites ? pctText(rows.length, otpSites) : "—", sub: `${fmt(rows.length)} of ${fmt(otpSites ?? 0)} OTP sites reported for ${month.label}`, icon: "ph-cloud-arrow-up" },
           { label: "Distributed per DHIS2", value: fmt(sum("dhis2_distributed")), sub: "sachets", icon: "ph-database" },
-          { label: "Distributed per ledger", value: fmt(sum("ledger_distributed")), sub: sum("ledger_distributed") ? `DHIS2 is ${fmt(((sum("dhis2_distributed") - sum("ledger_distributed")) * 100) / sum("ledger_distributed"), 1)}% ${sum("dhis2_distributed") >= sum("ledger_distributed") ? "above" : "below"} overall` : "sachets", icon: "ph-book-open-text" },
+          { label: "Distributed per ledger", value: fmt(sum("ledger_distributed")), sub: sum("ledger_distributed") ? `DHIS2 is ${fmt(Math.abs(((sum("dhis2_distributed") - sum("ledger_distributed")) * 100) / sum("ledger_distributed")), 1)}% ${sum("dhis2_distributed") >= sum("ledger_distributed") ? "above" : "below"} the ledger overall` : "sachets", icon: "ph-book-open-text" },
         ].map((t) => (
           <div key={t.label} className="card elev-sm kpi-card">
             <div className="kpi-label">

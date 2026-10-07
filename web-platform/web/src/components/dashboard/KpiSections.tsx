@@ -34,7 +34,7 @@ function SectionHead({ title, href, link }: { title: string; href: string; link:
   );
 }
 
-export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | null; monthLabel: string }) {
+export function KpiSections({ k, p, monthLabel, closeMedian }: { k: Kpis | null; p: Kpis | null; monthLabel: string; closeMedian?: { days: number | null; n: number } }) {
   const month = { label: monthLabel };
   const totalSoh = k ? LEVELS.reduce((n, l) => n + (k.stock_on_hand[l.key] ?? 0), 0) : 0;
   const prevSoh = p ? LEVELS.reduce((n, l) => n + (p.stock_on_hand[l.key] ?? 0), 0) : null;
@@ -126,8 +126,13 @@ export function KpiSections({ k, p, monthLabel }: { k: Kpis | null; p: Kpis | nu
               <StatTile label="Open critical Findings" value={compact(k.open_critical_findings)} href="/issues?priority=critical"
                 status={k.open_critical_findings > 0 ? { level: "critical", label: "Needs review" } : { level: "good", label: "None open" }} />
               <StatTile label="Open Findings" value={compact(k.open_findings)} href="/issues" />
-              <StatTile label="Median days to close" value={k.median_days_to_close === null ? "—" : String(k.median_days_to_close)} unit={k.median_days_to_close === null ? undefined : "days"}
-                sub={k.median_days_to_close === null ? "No Finding closed yet" : "From report to verified closure"} />
+              {closeMedian ? (
+                <StatTile label="Median days to close" value={closeMedian.days === null ? "—" : String(closeMedian.days)} unit={closeMedian.days === null ? undefined : "days"}
+                  sub={closeMedian.days === null ? `No Finding closed in ${monthLabel}` : `Report to verified closure · ${closeMedian.n.toLocaleString("en-GB")} closed in ${monthLabel}`} />
+              ) : (
+                <StatTile label="Median days to close" value={k.median_days_to_close === null ? "—" : String(k.median_days_to_close)} unit={k.median_days_to_close === null ? undefined : "days"}
+                  sub={k.median_days_to_close === null ? "No Finding closed yet" : "From report to corrective action"} />
+              )}
             </div>
           </section>
         </>

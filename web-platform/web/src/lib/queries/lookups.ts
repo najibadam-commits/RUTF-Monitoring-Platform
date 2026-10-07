@@ -32,6 +32,19 @@ export const getAllCategories = cache(async (client: SupabaseClient<Database>) =
   return data ?? [];
 });
 
+/** For a Finding filter: the current categories, plus any legacy one a Finding still uses — so old
+ *  Findings stay findable without offering unrelated legacy sectors (DECISIONS R126). */
+export const getFilterCategories = cache(async (client: SupabaseClient<Database>) => {
+  const { data } = await client.from("categories").select("id, name, sort_order, is_active").order("sort_order");
+  const legacy = (data ?? []).filter((c) => !c.is_active).map((c) => c.id);
+  const used = new Set<string>();
+  if (legacy.length) {
+    const { data: rows } = await client.from("issues").select("category_id").in("category_id", legacy).limit(1000);
+    for (const r of rows ?? []) if (r.category_id) used.add(r.category_id);
+  }
+  return (data ?? []).filter((c) => c.is_active || used.has(c.id)).map(({ id, name, sort_order }) => ({ id, name, sort_order }));
+});
+
 export const getStates = cache(async (client: SupabaseClient<Database>) => {
   const { data } = await client.from("states").select("id, code, name, geozone, capital").order("name");
   return data ?? [];

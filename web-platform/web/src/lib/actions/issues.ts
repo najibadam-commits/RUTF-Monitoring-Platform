@@ -108,13 +108,12 @@ export async function editIssueSubmissionAction(
   return {};
 }
 
+/** Findings are never deleted from the app (DECISIONS R126): every one is followed to verified
+ *  closure and stays on record. Kept as a refusal so an old client can't remove one. */
 export async function deleteIssueSubmissionAction(issueId: string): Promise<ActionResult> {
+  void issueId;
   await getCurrentProfile();
-  const supabase = await createClient();
-  const { error } = await supabase.rpc("delete_issue_submission", { p_issue_id: issueId });
-  if (error) return { error: error.message };
-  await afterMutation(issueId);
-  return {};
+  return { error: "Findings are not deleted. Return it for correction or edit its details instead." };
 }
 
 export async function createIssueAction(input: {

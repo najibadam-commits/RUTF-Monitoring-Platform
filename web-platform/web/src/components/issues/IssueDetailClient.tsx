@@ -11,7 +11,6 @@ import { Modal } from "@/components/ui/Modal";
 import {
   approveAndAssignFindingAction,
   assignIssueAction,
-  deleteIssueSubmissionAction,
   editIssueSubmissionAction,
   recordCorrectiveActionAction,
   returnFindingForCorrectionAction,
@@ -19,7 +18,12 @@ import {
   verifyAndCloseIssueAction,
 } from "@/lib/actions/issues";
 
-type ModalKind = "assign" | "approve" | "return" | "respond" | "corrective" | "verify" | "edit" | "delete" | null;
+type ModalKind = "assign" | "approve" | "return" | "respond" | "corrective" | "verify" | "edit" | null;
+
+// Dates as on every other screen ("1 Oct 2026, 01:08"), in Nigerian time on the server and in the
+// browser alike.
+const when = (iso: string) =>
+  new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" });
 
 // Partial: the stepper only ever indexes STATUS_ORDER's 5 forward stages —
 // 'reopened' is a loop-back, not a stepper stage (see constants.ts).
@@ -99,7 +103,7 @@ export function IssueDetailClient({
         <div style={{ display: "flex", gap: 8, flex: "none", flexWrap: "wrap", justifyContent: "flex-end" }}>
           {!permissions.isViewer && permissions.canAssign && (
             <button className="btn btn-primary" onClick={() => setModal("assign")}>
-              <i className="ph ph-user-plus" /> Assign DRI
+              <i className="ph ph-user-plus" /> Assign responsible person
             </button>
           )}
           {!permissions.isViewer && permissions.canReview && (
@@ -114,7 +118,7 @@ export function IssueDetailClient({
           )}
           {!permissions.isViewer && permissions.canRespond && (
             <button className="btn btn-primary" onClick={() => setModal("respond")}>
-              <i className="ph ph-chat-circle-text" /> Record DRI Response
+              <i className="ph ph-chat-circle-text" /> Record response
             </button>
           )}
           {!permissions.isViewer && permissions.canCorrective && (
@@ -127,14 +131,11 @@ export function IssueDetailClient({
               <i className="ph ph-check-circle" /> Verify &amp; Close
             </button>
           )}
+          {/* No Delete: a Finding is never removed from the app, so every one is followed to verified
+              closure and stays on record (DECISIONS R126). A mistaken one is returned or edited. */}
           {(permissions.isSuperAdmin || permissions.canReview) && (
             <button className="btn btn-secondary" onClick={() => setModal("edit")}>
-              <i className="ph ph-note-pencil" /> Edit Submission
-            </button>
-          )}
-          {permissions.isSuperAdmin && (
-            <button className="btn btn-secondary" onClick={() => setModal("delete")}>
-              <i className="ph ph-trash" /> Delete
+              <i className="ph ph-note-pencil" /> Edit details
             </button>
           )}
         </div>
@@ -222,7 +223,7 @@ export function IssueDetailClient({
               <div>
                 <span className="text-muted">Reported</span>
                 <br />
-                {new Date(issue.reported_at).toLocaleString()}
+                {when(issue.reported_at)}
               </div>
               <div>
                 <span className="text-muted">Reported by</span>
@@ -230,14 +231,14 @@ export function IssueDetailClient({
                 {issue.reporter?.name ?? "—"}
               </div>
               <div>
-                <span className="text-muted">Assigned DRI</span>
+                <span className="text-muted">Responsible person</span>
                 <br />
                 {issue.dri?.name ?? "Unassigned"}
               </div>
               <div>
-                <span className="text-muted">Resolution Date</span>
+                <span className="text-muted">Corrective action recorded</span>
                 <br />
-                {issue.resolution_date ? new Date(issue.resolution_date).toLocaleString() : "Pending"}
+                {issue.resolution_date ? when(issue.resolution_date) : "Pending"}
               </div>
             </div>
           </div>
@@ -263,7 +264,7 @@ export function IssueDetailClient({
 
           {issue.dri_response && (
             <div className="card elev-sm">
-              <div className="card-title">DRI Response</div>
+              <div className="card-title">Response from the responsible person</div>
               <p className="card-body">{issue.dri_response}</p>
             </div>
           )}
@@ -286,7 +287,7 @@ export function IssueDetailClient({
                     <strong style={{ fontWeight: 500 }}>{h.action}</strong>
                   </div>
                   <div className="text-muted" style={{ fontSize: 11.5, margin: "2px 0" }}>
-                    {new Date(h.occurred_at).toLocaleString()} · {h.actor_label}
+                    {when(h.occurred_at)} · {h.actor_label}
                     {h.actor_role && ` (${ROLE_LABELS[h.actor_role]})`}
                   </div>
                   {h.note && <div style={{ fontSize: 12 }}>{h.note}</div>}
@@ -362,7 +363,7 @@ export function IssueDetailClient({
       )}
 
       {modal === "respond" && (
-        <Modal title="Record DRI Response" onClose={closeModal} onConfirm={() => submitDriResponseAction(issue.id, note, note)}>
+        <Modal title="Record response" onClose={closeModal} onConfirm={() => submitDriResponseAction(issue.id, note, note)}>
           <div className="dialog-body">
             <div className="field">
               <label>Response</label>
@@ -397,7 +398,7 @@ export function IssueDetailClient({
 
       {modal === "edit" && (
         <Modal
-          title="Edit Submission"
+          title="Edit details"
           onClose={closeModal}
           onConfirm={() => editIssueSubmissionAction(issue.id, editForm.categoryId, editForm.priority as IssuePriority, editForm.description)}
         >
@@ -430,24 +431,6 @@ export function IssueDetailClient({
         </Modal>
       )}
 
-      {modal === "delete" && (
-        <Modal
-          title="Delete Submission"
-          confirmLabel="Delete"
-          onClose={closeModal}
-          onConfirm={async () => {
-            const result = await deleteIssueSubmissionAction(issue.id);
-            if (!result.error) router.push("/issues");
-            return result;
-          }}
-        >
-          <div className="dialog-body">
-            <p style={{ marginTop: 0 }}>
-              Delete submission <strong>{issue.code}</strong> permanently? This removes it from all lists, the map, and reports. This cannot be undone.
-            </p>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }

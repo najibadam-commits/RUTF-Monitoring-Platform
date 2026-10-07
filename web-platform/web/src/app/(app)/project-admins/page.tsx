@@ -25,7 +25,7 @@ export default async function ProjectAdminsPage() {
 
   const programmes: Programme[] = await Promise.all(
     (projects ?? []).map(async (p) => {
-      const [{ data: sites }, users, open, all, closed, dris, sups, { data: lastTxn }] = await Promise.all([
+      const [{ data: sites }, users, open, all, closed, dris, sups, { data: lastTxn }, { data: firstTxn }] = await Promise.all([
         supabase.from("facilities").select("lga_id").eq("project_id", p.id).eq("status", "approved").eq("is_active", true)
           .or("facility_type.neq.health_facility,is_otp_site.eq.true"),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active"),
@@ -36,6 +36,7 @@ export default async function ProjectAdminsPage() {
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active").eq("role", "dri"),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active").eq("role", "tpm_supervisor"),
         supabase.from("stock_transactions").select("txn_date").eq("project_id", p.id).order("txn_date", { ascending: false }).limit(1).maybeSingle(),
+        supabase.from("stock_transactions").select("txn_date").eq("project_id", p.id).order("txn_date").limit(1).maybeSingle(),
       ]);
       return {
         id: p.id,
@@ -50,6 +51,7 @@ export default async function ProjectAdminsPage() {
         facilityUsers: dris.count ?? 0,
         supervisors: sups.count ?? 0,
         lastLedger: lastTxn?.txn_date ?? null,
+        firstLedger: firstTxn?.txn_date ?? null,
       };
     }),
   );

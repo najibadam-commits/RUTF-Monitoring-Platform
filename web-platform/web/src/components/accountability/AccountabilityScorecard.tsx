@@ -306,7 +306,8 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
     m,
     label: new Date(`${m}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", timeZone: "UTC" }),
     raised: rows.filter((r) => r.reported_at.startsWith(m)).length,
-    closed: rows.filter((r) => r.status === "verified_closed" && r.resolution_date?.startsWith(m)).length,
+    // By the date a supervisor verified and closed it (the history entry), as the monthly report counts.
+    closed: rows.filter((r) => r.closed_at?.startsWith(m)).length,
   }));
   const trendMax = Math.max(1, ...trend.flatMap((t) => [t.raised, t.closed]));
 
@@ -324,7 +325,7 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
     { label: "Accountability score", value: all.score === null ? "—" : `${all.score}`, sub: g.label, icon: g.icon, tone: g.color, unit: "/ 100" },
     { label: "Findings raised", value: all.raised.toLocaleString("en-GB"), sub: `${trend[5].raised} this month`, icon: "ph-flag" },
     { label: "Verified & closed", value: `${pct(all.closed, all.raised)}%`, sub: `${all.closed.toLocaleString("en-GB")} of ${all.raised.toLocaleString("en-GB")}`, icon: "ph-seal-check" },
-    { label: "Median days to resolve", value: fmtDays(all.medianDays), sub: "From raised to corrective action", icon: "ph-timer" },
+    { label: "Median days to corrective action", value: fmtDays(all.medianDays), sub: "From raised to action recorded; closure times are on the Corrective Action Tracker", icon: "ph-timer" },
     { label: `Open past ${targetDays} days`, value: all.pastTarget.toLocaleString("en-GB"), sub: `of ${all.open.toLocaleString("en-GB")} still open`, icon: "ph-hourglass-medium", warn: all.pastTarget > 0 },
   ] as { label: string; value: string; sub: string; icon: string; warn?: boolean; tone?: string; unit?: string }[];
 
