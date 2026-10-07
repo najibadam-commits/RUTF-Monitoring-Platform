@@ -43,11 +43,12 @@ Move the mouse slowly and let each screen settle for a second before you speak a
 | 9 | 2:15–2:30 | **Programme Reporting** → **Open the September 2026 report**. Scroll once; point at **Print / save as PDF** (don't print). | "Every month, a one-page programme report is written from live data — ready to print for the State, the LGAs and UNICEF. No spreadsheets to compile." |
 | 10 | 2:30–2:50 | **Data Access Requests** (point at the two waiting requests — don't approve), then **Programme Administrators** → **Bringing another state on**. | "Data leaves the platform only with approval, scoped and downloadable once. And it's ready to scale: another state comes on in five steps, with no new software. From the store shelf to the child — every sachet accounted for." |
 
-**Optional phone clip (15 s, recorded on the phone):** Android's screen recorder (swipe down →
-**Screen record**) on the RUTF-DTAP app: Home showing **Everything is synced**, turn on airplane
-mode, record a **Daily Dispensing** entry, show **1 entry is on this phone, waiting to sync**, turn
-airplane mode off. Insert after shot 2 with: "Facility staff record on a phone that works without a
-signal; entries wait safely and sync by themselves."
+**No phone clip in this version:** the video covers the web platform, as the stakeholder demo does.
+A clip of the Android field app recording offline is added once the app is completed after the
+review.
+
+**Optional title cards:** open on slide 1 of *RUTF-DTAP Demo Slides* for 3 s before shot 1, and end
+on slide 14 for 3 s after shot 10 (record the slides in Present mode the same way).
 
 ## After recording
 

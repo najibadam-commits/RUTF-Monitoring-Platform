@@ -6,7 +6,15 @@ and what the panel should see. Figures quoted are from the demo data (marked DUM
 little every night as the automatic checks run — read them off the screen, don't memorise them.
 
 **The story in one line:** every sachet is recorded at every hand-over, checked automatically,
-followed to verified closure, and reported — on one trusted record, even where there's no signal.
+followed to verified closure, and reported — on one trusted record.
+
+**This demonstration is of the web platform.** The Android field app (offline recording) is
+completed after this stakeholder review, then its screenshots and user acceptance testing follow.
+
+**Slides:** *RUTF-DTAP Demo Slides* (https://claude.ai/artifact/DEhWg5scEdVYN8dNrpbXT2 — 14 slides, speaker notes on each; download as PowerPoint or PDF from the deck). Open with
+slides 1–4 (cover, why it matters, how it works, today's route), switch to the live platform for
+steps 1–10, and close with slides 11–14 (demonstration figures, safeguards, next steps,
+questions). Slides 5–10 carry the same screens as stills if the network fails.
 
 ---
 
@@ -16,13 +24,13 @@ followed to verified closure, and reported — on one trusted record, even where
 | --- | --- |
 | | Present from the **production build**, not the dev server: screens open in 1–4 s instead of compiling on first visit. In `web-platform\web` run `npm.cmd run demo` (builds, then serves http://localhost:3001; keep that window open), and present from **http://localhost:3001**. Run it again after any code change. The dev server on :3000 can stay open for editing. |
 | | Signed in as **Super Admin** in the browser you'll present from; a second tab signed in as the **DUMMY Viewer** (zainab.mohammed@rutf-demo.example) if you'll show data requests from both sides. |
-| | Phone: **RUTF-DTAP 1.1** installed (GitHub release `v1.1-proposal`), signed in as a DUMMY facility user, ledger downloaded. |
+| | Slides open in a second window (Present mode), on slide 1. |
 | | Data access requests reset: in `web-platform\tools\db` run `node seed-demo-download-requests.js` (two requests waiting to approve live). |
 | | Phone sync reports refreshed: in `web-platform\tools\db` run `node seed-demo-sync-status.js` (reports age; after 3 days a phone shows as "not syncing"). |
 | | Nightly checks paused: in `web-platform\tools\db` run `node demo-pause-checks.js --pause` (the DUMMY ledger ends 30 Sept, so each night the checks flag every OTP site for late reporting in the new month; this pauses them and removes only those after-ledger Findings). `node demo-pause-checks.js` alone shows the state. |
 | | Monthly Programme Report: open it once and press **Print / save as PDF** to check the print view. |
 | | Browser zoom 100 %, window at least 1366 px wide; close other tabs and notifications. |
-| | Know your fallback: if the network drops, the phone app still works offline — that is part of the story. |
+| | Know your fallback: if the network drops, present slides 5–10 (stills of each screen) or play the backup video (`docs/DEMO_VIDEO.md`). |
 
 ---
 
@@ -37,20 +45,17 @@ followed to verified closure, and reported — on one trusted record, even where
 
 **Proof:** the five steps and the six built-in safeguards on the page.
 
-## 2. Recording at the facility, even offline — 3 min
+## 2. Phones that record offline — 1 min
 
-**Screen:** the phone app.
+**Screen:** Administration → **Offline Sync Health** (web).
 
-1. Show the sign-in: *"Works offline… syncs when you're back online."*
-2. Home: **"✓ Everything is synced"**, the facility card with **stock on hand**, the action buttons
-   (Receive Stock, Daily Dispensing, Stock Count, Record Loss).
-3. Turn on **airplane mode**, record a **Daily Dispensing** entry → Home now says *"1 entry is on
-   this phone, waiting to sync"*.
-4. Turn airplane mode off → it syncs by itself.
+1. **Syncing well** (about 86 %), and the phones **failing**, **waiting more than a day** or **not
+   syncing**: each a call to make.
+2. The four steps: record without a signal, kept safely on the phone, sends itself when online,
+   reported here.
 
-**Say:** facility staff record where the RUTF is, not where the signal is. Nothing is lost.
-**Proof (web):** Administration → **Offline Sync Health** shows the phone, its app version and last
-sync.
+**Say:** facility staff will record where the RUTF is, not where the signal is; the platform already
+shows which phones need a call. The Android field app is completed after this review.
 
 ## 3. One trusted record — 2 min
 
@@ -157,7 +162,7 @@ and for the next state tomorrow."
 
 | Question | Where to show it |
 | --- | --- |
-| What if there's no network? | Phone in airplane mode (step 2); Offline Sync Health. |
+| What if there's no network? | The field app records offline and syncs by itself (completed after this review); Offline Sync Health shows each phone's last sync and anything waiting (step 2). |
 | Can someone change the figures afterwards? | Stock Ledger integrity line; Audit Trail (Administration). |
 | Can a Finding be deleted or quietly dropped? | No: there is no Delete in the app, and the database refuses it for every role (permissions test: 202 of 202). A mistaken Finding is returned for correction or edited, with its history; a fix that doesn't hold goes to **Reopen case**. |
 | Who decides the limits? | Master Data → Thresholds (variance, short-dispensing, 30-day target); Settings → go-live readiness. |
