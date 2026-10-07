@@ -58,9 +58,11 @@ sync.
 
 1. The supply-chain totals: State store → LGA stores → OTP sites.
 2. Click the tile **Under 1 month of stock** → the list filters.
-3. Open an LGA store: **Months of stock**, **Last 30 days** movement, and the **Ledger integrity**
-   line — *entries are never edited or deleted*.
-4. Point at a lot with an expiry warning.
+3. Open an LGA store (e.g. **Dutsi LGA Nutrition Store**): **Months of stock**, **Last 30 days**
+   movement, **Month by month** (count against ledger), and the **Ledger integrity** line —
+   *entries are never edited or deleted*.
+4. Back to the list, click the tile **Holding expired stock** → open **Babbanduhu Health Clinic**
+   (Malumfashi): lot DUMMY-RUTF-2401 shows **Expired 2026-08-31** with sachets still on hand.
 
 **Then:** **Transfers** → **Delivered in full** (about 98 %); click **Received with a discrepancy**
 and follow a transfer's **Finding** link.
@@ -74,7 +76,8 @@ and follow a transfer's **Finding** link.
 1. **Needs attention:** the month's figures turned into actions, critical first (critical Findings,
    expired stock, Findings past target, low stock…). Each button goes to where it's fixed.
 2. The compact KPI rows: stock position, last-mile dispensing, reporting, Findings.
-3. **Findings pipeline:** from awaiting review to verified & closed, in one bar.
+3. **Findings pipeline:** from awaiting review to verified & closed, with reopened cases in red, in
+   one bar.
 
 **Then:** **Findings Register** → the strip **What is being found** (late reporting, stock variance,
 short dispensing, transfer mismatch…) — the robot icon marks automatic checks.
@@ -86,8 +89,8 @@ supervision visit as it's recorded. Nobody has to go looking for problems.
 
 **Screen:** Overview → **Corrective Action Tracker**.
 
-1. The four stages in colour: **Assigned** (blue) → **Being addressed** (orange) → **Action
-   recorded** (green) → **Verified & closed** (black).
+1. The five stages in colour, on one row: **Assigned** (blue) → **Being addressed** (orange) →
+   **Action recorded** (green) → **Verified & closed** (black), and **Reopen case** (red).
 2. Filter **LGA = Daura**, tick **Past target only** → *"this is the list for Monday's meeting."*
 3. Click a person in **Who holds the open actions** → their board.
 4. Open a card → the Finding's full history.
@@ -156,6 +159,7 @@ and for the next state tomorrow."
 | --- | --- |
 | What if there's no network? | Phone in airplane mode (step 2); Offline Sync Health. |
 | Can someone change the figures afterwards? | Stock Ledger integrity line; Audit Trail (Administration). |
+| Can a Finding be deleted or quietly dropped? | No: there is no Delete in the app, and the database refuses it for every role (permissions test: 202 of 202). A mistaken Finding is returned for correction or edited, with its history; a fix that doesn't hold goes to **Reopen case**. |
 | Who decides the limits? | Master Data → Thresholds (variance, short-dispensing, 30-day target); Settings → go-live readiness. |
 | Is child data collected? | No — aggregate tallies only; Governance on the landing page; DPIA draft. |
 | How does it fit DHIS2? | DHIS2 Triangulation; monthly extract upload. |
