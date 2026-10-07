@@ -101,6 +101,25 @@ export function UsersTable({
   const activeRecently = users.filter((u) => u.status === "active" && u.last_login && now - Date.parse(u.last_login) < 30 * 86_400_000).length;
   const activeCount = users.filter((u) => u.status === "active").length;
 
+  // Coverage (DECISIONS R121): every store and OTP site needs an active facility user, and every LGA
+  // a supervisor for its stores and one for its OTP sites.
+  const activeUsers = users.filter((u) => u.status === "active");
+  const staffed = new Set(activeUsers.filter((u) => u.role === "dri" && u.facility_id).map((u) => u.facility_id!));
+  const unstaffed = facilities.filter((f) => !staffed.has(f.id));
+  const covered = (level: "stores" | "otp_sites") => {
+    const set = new Set<string>();
+    for (const u of activeUsers) if (u.role === "tpm_supervisor" && u.supervision_level === level) for (const l of supervisedLgas[u.id] ?? []) set.add(l);
+    return set;
+  };
+  const storeCovered = covered("stores");
+  const otpCovered = covered("otp_sites");
+  const lgasWith = (pred: (f: FacilityOption) => boolean) => new Set(facilities.filter(pred).map((f) => f.lga_id));
+  const storeLgas = lgasWith((f) => f.facility_type !== "health_facility");
+  const otpLgas = lgasWith((f) => f.facility_type === "health_facility");
+  const storeGaps = [...storeLgas].filter((l) => !storeCovered.has(l));
+  const otpGaps = [...otpLgas].filter((l) => !otpCovered.has(l));
+  const lgaLabel = (id: string) => lgas.find((l) => l.id === id)?.name ?? "an LGA";
+
   /** Where an account works: its facility, supervised LGAs, managed state, or the whole platform. */
   function areaOf(u: Profile) {
     if (u.role === "dri") return u.facility_id ? (facilityNames[u.facility_id] ?? "Facility") : "No facility assigned";
@@ -192,6 +211,36 @@ export function UsersTable({
             </button>
           );
         })}
+      </div>
+
+      <div className="card elev-sm" style={{ padding: "12px 14px", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div className="card-title" style={{ fontSize: 14 }}>Coverage</div>
+          <span className="kpi-sub">Every facility has someone recording for it, and every LGA someone checking it.</span>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 240px), 1fr))", gap: 10 }}>
+          {[
+            { label: "Stores and OTP sites with a facility user", done: facilities.length - unstaffed.length, of: facilities.length,
+              gap: unstaffed.length ? `${unstaffed.slice(0, 3).map((f) => f.name).join(", ")}${unstaffed.length > 3 ? ` and ${unstaffed.length - 3} more` : ""} have none` : "All staffed" },
+            { label: "LGAs with a stores supervisor", done: storeLgas.size - storeGaps.length, of: storeLgas.size,
+              gap: storeGaps.length ? `${storeGaps.slice(0, 3).map(lgaLabel).join(", ")}${storeGaps.length > 3 ? ` and ${storeGaps.length - 3} more` : ""} have none` : "All covered" },
+            { label: "LGAs with an OTP-sites supervisor", done: otpLgas.size - otpGaps.length, of: otpLgas.size,
+              gap: otpGaps.length ? `${otpGaps.slice(0, 3).map(lgaLabel).join(", ")}${otpGaps.length > 3 ? ` and ${otpGaps.length - 3} more` : ""} have none` : "All covered" },
+          ].map((c) => {
+            const full = c.of > 0 && c.done === c.of;
+            return (
+              <div key={c.label} style={{ border: "1px solid var(--color-divider)", borderRadius: 10, padding: "8px 10px" }}>
+                <div className="kpi-label">
+                  <i className={`ph-fill ${full ? "ph-check-circle" : "ph-warning"}`} aria-hidden="true" style={{ color: full ? "var(--status-resolved)" : "var(--priority-high)" }} /> {c.label}
+                </div>
+                <div className="kpi-value" style={{ fontSize: 18 }}>
+                  {c.done.toLocaleString("en-GB")}<span className="kpi-unit"> / {c.of.toLocaleString("en-GB")}</span>
+                </div>
+                <div className="kpi-sub" style={{ color: full ? undefined : "var(--priority-high)" }}>{c.gap}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div className="filter-bar">
