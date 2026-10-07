@@ -14,7 +14,7 @@ followed to verified closure, and reported — on one trusted record, even where
 
 | ✔ | Check |
 | --- | --- |
-| | Dev server running: the **"RUTF dev server"** window is open and http://localhost:3000 loads. If not, in `web-platform\web` run `npm.cmd run dev -- --webpack`. |
+| | Present from the **production build**, not the dev server: screens open in 1–4 s instead of compiling on first visit. In `web-platform\web` run `npm.cmd run demo` (builds, then serves http://localhost:3001; keep that window open), and present from **http://localhost:3001**. Run it again after any code change. The dev server on :3000 can stay open for editing. |
 | | Signed in as **Super Admin** in the browser you'll present from; a second tab signed in as the **DUMMY Viewer** (zainab.mohammed@rutf-demo.example) if you'll show data requests from both sides. |
 | | Phone: **RUTF-DTAP 1.1** installed (GitHub release `v1.1-proposal`), signed in as a DUMMY facility user, ledger downloaded. |
 | | Data access requests reset: in `web-platform\tools\db` run `node seed-demo-download-requests.js` (two requests waiting to approve live). |
@@ -28,7 +28,7 @@ followed to verified closure, and reported — on one trusted record, even where
 
 ## 1. The platform at a glance — 1 min
 
-**Screen:** landing page `http://localhost:3000` → scroll to **How it works** and **Governance**.
+**Screen:** landing page `http://localhost:3001` → scroll to **How it works** and **Governance**.
 
 - "One chain of custody, from the State store to the child": State store → LGA store → OTP →
   supervision → Findings.
