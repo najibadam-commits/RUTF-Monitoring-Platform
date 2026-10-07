@@ -16,6 +16,8 @@ export const metadata: Metadata = { title: "Last-Mile Dispensing" };
 // only — no child-level data (brief §10).
 
 const TREND_MONTHS = 6;
+/** A ration size this far from the state median is called unusual (DECISIONS R114) — [VALIDATE]. */
+const RATION_BAND = 0.25;
 
 type Flagged = "short" | "over" | "vf" | "novisit" | "ok";
 
@@ -105,11 +107,31 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
     return qs ? `/otp-dispensing?${qs}` : "/otp-dispensing";
   }
 
+  // Sachets per child visit: the ration actually handed out, and OTP sites far from the norm.
+  const perVisit = (r: FacilityMetric) => (r.children_seen > 0 ? r.sachets_dispensed / r.children_seen : null);
+  const rations = rows.map(perVisit).filter((v): v is number => v !== null).sort((a, b) => a - b);
+  const medianRation = rations.length ? rations[Math.floor((rations.length - 1) / 2)] : null;
+  const unusual = (r: FacilityMetric) => {
+    const v = perVisit(r);
+    return v !== null && medianRation !== null && Math.abs(v - medianRation) > RATION_BAND * medianRation;
+  };
+  const unusualCount = rows.filter(unusual).length;
+
+  // Register check results at the latest visit, in bands.
+  const vfBands = [
+    { key: "low", label: `Below ${vfMin.toFixed(2)}`, meaning: "The register shows fewer sachets than the app: possible over-reporting in the app", n: rows.filter((r) => r.last_vf !== null && Number(r.last_vf) < vfMin).length, color: "var(--priority-high)" },
+    { key: "ok", label: `${vfMin.toFixed(2)}–${vfMax.toFixed(2)}`, meaning: "Register and app agree", n: rows.filter((r) => r.last_vf !== null && !vfOut(r)).length, color: "var(--status-resolved)" },
+    { key: "high", label: `Above ${vfMax.toFixed(2)}`, meaning: "The register shows more than the app: under-reporting or a parallel supply", n: rows.filter((r) => r.last_vf !== null && Number(r.last_vf) > vfMax).length, color: "var(--priority-critical)" },
+    { key: "none", label: "Not checked yet", meaning: "No supervision visit recorded", n: rows.filter((r) => r.last_vf === null).length, color: "var(--color-neutral-400)" },
+  ];
+  const vfTotal = Math.max(1, rows.length);
+
   const reach = [
     { label: "Children seen", value: fmt(sum(rows, "children_seen")), sub: "Child visits in the OTP registers", icon: "ph-baby" },
     { label: "New admissions", value: fmt(sum(rows, "new_admissions")), sub: "Children newly admitted for SAM treatment", icon: "ph-user-plus" },
     { label: "Sachets dispensed", value: fmt(dispensed), sub: `of ${fmt(prescribed)} prescribed`, icon: "ph-package" },
     { label: "Dispensed against prescribed", value: delivered === null ? "—" : `${fmt(delivered, 1)}%`, sub: `On track within ±${shortLimit}% of 100%`, icon: "ph-hand-heart" },
+    { label: "Sachets per child visit", value: medianRation === null ? "—" : fmt(medianRation, 1), sub: unusualCount ? `${fmt(unusualCount)} OTP sites more than ${RATION_BAND * 100}% from it` : `Median across OTP sites; none unusual`, icon: "ph-scales" },
   ];
   const tiles: Flagged[] = ["ok", "short", "vf", "over", "novisit"];
 
@@ -152,7 +174,25 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
         })}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: 14, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))", gap: 12, alignItems: "start" }}>
+        <div className="card elev-sm" style={{ padding: "12px 14px", gap: 8 }}>
+          <div className="card-title" style={{ fontSize: 14 }}>Register check results</div>
+          <div className="kpi-sub">The supervisor&apos;s count of the paper register ÷ the app&apos;s dispensing, at each OTP site&apos;s latest visit.</div>
+          <div style={{ display: "flex", height: 12, borderRadius: 6, overflow: "hidden", background: "var(--color-neutral-100)" }} aria-hidden="true">
+            {vfBands.map((b) => b.n > 0 && <span key={b.key} style={{ width: `${(b.n * 100) / vfTotal}%`, background: b.color }} />)}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {vfBands.map((b) => (
+              <div key={b.key} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12.5 }}>
+                <span style={{ width: 10, height: 10, borderRadius: 2, background: b.color, flex: "none", marginTop: 4 }} />
+                <span style={{ flex: 1 }}>
+                  <strong style={{ fontWeight: 600 }}>{b.label}</strong> <span className="text-muted">· {b.meaning}</span>
+                </span>
+                <strong>{fmt(b.n)}</strong>
+              </div>
+            ))}
+          </div>
+        </div>
         <div className="card elev-sm">
           <div className="card-title">Children reached, last {TREND_MONTHS} months</div>
           <div className="text-muted" style={{ fontSize: 12 }}>Children seen each month; the figure under each month is the share of prescribed sachets dispensed.</div>
@@ -209,7 +249,7 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
           <thead>
             <tr>
               <th>OTP site</th><th>Status</th><th style={{ textAlign: "right" }}>Children seen</th><th style={{ textAlign: "right" }}>New admissions</th>
-              <th style={{ textAlign: "right" }}>Prescribed</th><th style={{ textAlign: "right" }}>Dispensed</th>
+              <th style={{ textAlign: "right" }}>Prescribed</th><th style={{ textAlign: "right" }}>Dispensed</th><th style={{ textAlign: "right" }}>Per visit</th>
               <th style={{ textAlign: "right" }}>Short</th><th style={{ textAlign: "right" }}>Register check</th>
             </tr>
           </thead>
@@ -232,6 +272,9 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
                   <td style={{ textAlign: "right" }}>{fmt(r.new_admissions)}</td>
                   <td style={{ textAlign: "right" }}>{fmt(r.sachets_prescribed)}</td>
                   <td style={{ textAlign: "right" }}>{fmt(r.sachets_dispensed)}</td>
+                  <td style={{ textAlign: "right" }} title={unusual(r) ? `More than ${RATION_BAND * 100}% from the median of ${medianRation === null ? "—" : fmt(medianRation, 1)}` : undefined}>
+                    {perVisit(r) === null ? "—" : unusual(r) ? <Flag level="warning">{fmt(perVisit(r), 1)}</Flag> : fmt(perVisit(r), 1)}
+                  </td>
                   <td style={{ textAlign: "right" }}>
                     {r.short_pct === null ? "—" : short(r) || overDispensed(r) ? <Flag level="warning">{fmt(r.short_pct, 1)}%</Flag> : `${fmt(r.short_pct, 1)}%`}
                   </td>
@@ -242,7 +285,7 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
                 </tr>
               );
             })}
-            {shown.length === 0 && <tr><td colSpan={8} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No OTP sites for these filters.</td></tr>}
+            {shown.length === 0 && <tr><td colSpan={9} className="text-muted" style={{ textAlign: "center", padding: 24 }}>No OTP sites for these filters.</td></tr>}
           </tbody>
         </table>
       </div>
