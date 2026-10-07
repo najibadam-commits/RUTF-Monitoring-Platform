@@ -789,10 +789,6 @@ export interface Database {
         Args: { p_issue_id: string; p_comment: string };
         Returns: Database["public"]["Tables"]["issues"]["Row"];
       };
-      delete_issue_submission: {
-        Args: { p_issue_id: string };
-        Returns: void;
-      };
       get_state_boundaries: {
         Args: Record<string, never>;
         Returns: { id: string; name: string; code: string | null; geojson: GeoJSON.Geometry }[];

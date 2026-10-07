@@ -108,8 +108,9 @@ export async function editIssueSubmissionAction(
   return {};
 }
 
-/** Findings are never deleted from the app (DECISIONS R126): every one is followed to verified
- *  closure and stays on record. Kept as a refusal so an old client can't remove one. */
+/** Findings are never deleted (DECISIONS R126, R129): every one is followed to verified closure and
+ *  stays on record; the database no longer allows a delete either (migration 0123). Kept as a
+ *  refusal so an old client gets a clear message. */
 export async function deleteIssueSubmissionAction(issueId: string): Promise<ActionResult> {
   void issueId;
   await getCurrentProfile();

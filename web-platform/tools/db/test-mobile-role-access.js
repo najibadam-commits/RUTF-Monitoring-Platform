@@ -136,7 +136,7 @@ function check(area, role, what, expected, actual) {
       driRespond:        { super_admin: "allowed", project_admin: "denied", state_coordinator: "denied", tpm_supervisor: "denied", dri: "allowed" },
       approveAssign:     { super_admin: "allowed", project_admin: "allowed", state_coordinator: "allowed", tpm_supervisor: "denied", dri: "denied" },
       attendanceInsert:  { super_admin: "denied", project_admin: "denied", state_coordinator: "denied", tpm_supervisor: "allowed", dri: "denied" },
-      deleteFinding:     { super_admin: "allowed", project_admin: "denied", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
+      deleteFinding:     { super_admin: "denied",  project_admin: "denied", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
     };
 
     for (const role of ROLES) {
@@ -172,7 +172,7 @@ function check(area, role, what, expected, actual) {
           await attempt(`select approve_and_assign_finding($1, $2, 'ok')`, [I1, u("dri")]));
         check("B. write", role, "insert Field Monitor attendance", EXPECT.attendanceInsert[role],
           await attempt(`insert into field_monitor_attendance (field_monitor_id, attendance_date, captured_at, lat, lng, selfie_storage_path, assignment_location_storage_path, device_id) values ($1, current_date, now(), 10, 10, 'x', 'y', 'rbac-test')`, [u(role)]));
-        check("B. admin", role, "delete a Finding (admin-only)", EXPECT.deleteFinding[role],
+        check("B. admin", role, "delete a Finding (never: migration 0123)", EXPECT.deleteFinding[role],
           await attempt(`delete from issues where id = $1`, [I4], { rowsMustChange: true }));
 
         // Privilege escalation via the profile row must never work for anyone.
