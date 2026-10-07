@@ -298,6 +298,62 @@ async function FacilityLedger({
   const voidedCount = ledger.filter((t) => t.status === "voided").length;
   const withEvidence = new Set(ledger.filter((t) => t.submission_local_id && photoUrls[t.submission_local_id]).map((t) => t.submission_local_id)).size;
   const submissions = new Set(ledger.map((t) => t.submission_local_id ?? t.id)).size;
+
+  // Balance over the last 90 days (DECISIONS R113): the closing balance of each day, carried
+  // forward, with the physical counts marked.
+  const DAYS = 90;
+  const chartStart = new Date(Date.parse(today) - (DAYS - 1) * 86_400_000).toISOString().slice(0, 10);
+  const closingByDay = new Map<string, number>();
+  let opening = 0;
+  for (const t of ledger) {
+    if (t.txn_date < chartStart) opening = t.runningBalance;
+    else closingByDay.set(t.txn_date, t.runningBalance);
+  }
+  const series: { day: string; balance: number }[] = [];
+  let carry = opening;
+  for (let i = 0; i < DAYS; i++) {
+    const day = new Date(Date.parse(chartStart) + i * 86_400_000).toISOString().slice(0, 10);
+    carry = closingByDay.get(day) ?? carry;
+    series.push({ day, balance: carry });
+  }
+  const countsByDay = new Map<string, { counted: number; ledger: number }>();
+  for (const t of ledger) {
+    if (t.txn_type !== "physical_count" || t.status === "voided") continue;
+    const c = countsByDay.get(t.txn_date) ?? { counted: 0, ledger: t.runningBalance };
+    c.counted += t.quantity_sachets;
+    c.ledger = t.runningBalance;
+    countsByDay.set(t.txn_date, c);
+  }
+  const chartMax = Math.max(1, ...series.map((x) => x.balance), ...[...countsByDay.values()].map((c) => c.counted));
+  const X = (i: number) => (i / (DAYS - 1)) * 600;
+  const Y = (v: number) => 130 - (Math.max(0, v) / chartMax) * 120;
+  const line = series.map((x, i) => `${X(i).toFixed(1)},${Y(x.balance).toFixed(1)}`).join(" ");
+
+  // Month by month, last 6 months: opening, movements, closing and the month-end count.
+  const monthKeys = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(Date.UTC(Number(today.slice(0, 4)), Number(today.slice(5, 7)) - 1 - (5 - i), 1));
+    return d.toISOString().slice(0, 7);
+  });
+  const monthly = monthKeys.map((key) => {
+    const live = ledger.filter((t) => t.status !== "voided");
+    const before = live.filter((t) => t.txn_date < `${key}-01`);
+    const inMonth = live.filter((t) => t.txn_date.startsWith(key));
+    const sumOf = (types: TxnType[]) => inMonth.filter((t) => types.includes(t.txn_type)).reduce((n, t) => n + t.quantity_sachets, 0);
+    const counts = [...countsByDay].filter(([d]) => d.startsWith(key)).sort((a, b) => a[0].localeCompare(b[0]));
+    const lastCount = counts.length ? counts[counts.length - 1][1] : null;
+    return {
+      key,
+      label: new Date(`${key}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" }),
+      opening: before.length ? before[before.length - 1].runningBalance : 0,
+      received: sumOf(["receipt"]),
+      out: sumOf(["issue", "dispensed"]),
+      lost: sumOf(["loss_damaged", "loss_expired", "loss_other"]),
+      adjusted: inMonth.filter((t) => t.txn_type === "adjustment").reduce((n, t) => n + signedQuantity(t), 0),
+      closing: inMonth.length ? inMonth[inMonth.length - 1].runningBalance : before.length ? before[before.length - 1].runningBalance : 0,
+      count: lastCount,
+      any: inMonth.length > 0,
+    };
+  }).filter((m) => m.any || m.opening !== 0);
   // Who voided what (migration 0109), and where each submission's void button goes: its first row on this page.
   const voiders = [...new Set(ledger.map((t) => t.voided_by).filter((v): v is string => !!v))];
   const { data: voiderRows } = voiders.length ? await supabase.from("profiles").select("id, name").in("id", voiders) : { data: [] };
@@ -365,6 +421,70 @@ async function FacilityLedger({
             </div>
           );
         })}
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: 12, alignItems: "start" }}>
+        <div className="card elev-sm" style={{ padding: "12px 14px", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8 }}>
+            <div className="card-title" style={{ fontSize: 14 }}>Balance, last {DAYS} days</div>
+            <span className="kpi-sub"><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: "var(--color-accent-800)", marginRight: 4 }} />physical count</span>
+          </div>
+          <svg viewBox="0 0 600 150" role="img" style={{ width: "100%", height: 150 }}
+            aria-label={`Balance from ${fmt(series[0].balance)} on ${series[0].day} to ${fmt(series[series.length - 1].balance)} today; highest ${fmt(chartMax)} sachets`}>
+            <line x1="0" y1="130" x2="600" y2="130" stroke="var(--color-divider)" />
+            <polygon points={`0,130 ${line} 600,130`} fill="color-mix(in srgb, var(--color-accent-500) 14%, transparent)" />
+            <polyline points={line} fill="none" stroke="var(--color-accent-600)" strokeWidth="2" />
+            {series.map((x, i) => countsByDay.has(x.day) && (
+              <circle key={x.day} cx={X(i)} cy={Y(countsByDay.get(x.day)!.counted)} r="4" fill="var(--color-accent-800)" stroke="#fff" strokeWidth="1.5">
+                <title>{`${x.day}: counted ${fmt(countsByDay.get(x.day)!.counted)}, ledger ${fmt(countsByDay.get(x.day)!.ledger)}`}</title>
+              </circle>
+            ))}
+            <text x="2" y="12" fontSize="11" fill="var(--color-neutral-600)">{fmt(chartMax)}</text>
+            <text x="2" y="146" fontSize="11" fill="var(--color-neutral-600)">{series[0].day}</text>
+            <text x="598" y="146" fontSize="11" fill="var(--color-neutral-600)" textAnchor="end">today</text>
+          </svg>
+        </div>
+
+        <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
+          <div style={{ padding: "12px 14px 0" }}>
+            <div className="card-title" style={{ fontSize: 14 }}>Month by month</div>
+            <div className="kpi-sub">What came in and went out, and how the month-end count compared with the ledger.</div>
+          </div>
+          <table className="table" style={{ marginTop: 6, fontSize: 12.5 }}>
+            <thead>
+              <tr>
+                <th>Month</th><th style={{ textAlign: "right" }}>Opening</th><th style={{ textAlign: "right" }}>In</th>
+                <th style={{ textAlign: "right" }}>Out</th><th style={{ textAlign: "right" }}>Lost</th><th style={{ textAlign: "right" }}>Closing</th>
+                <th style={{ textAlign: "right" }}>Count vs ledger</th>
+              </tr>
+            </thead>
+            <tbody>
+              {monthly.map((m) => {
+                const diff = m.count ? m.count.counted - m.count.ledger : null;
+                const pct = m.count && m.count.ledger ? Math.abs((diff! * 100) / m.count.ledger) : null;
+                return (
+                  <tr key={m.key}>
+                    <td style={{ whiteSpace: "nowrap" }}>{m.label}</td>
+                    <td style={{ textAlign: "right" }}>{fmt(m.opening)}</td>
+                    <td style={{ textAlign: "right", color: m.received ? "var(--status-resolved)" : undefined }}>{m.received ? `+${fmt(m.received)}` : "—"}</td>
+                    <td style={{ textAlign: "right" }}>{m.out ? `−${fmt(m.out)}` : "—"}</td>
+                    <td style={{ textAlign: "right", color: m.lost ? "var(--priority-critical)" : undefined }}>
+                      {m.lost ? `−${fmt(m.lost)}` : "—"}
+                      {m.adjusted !== 0 && <div className="text-muted" style={{ fontSize: 11 }}>adj. {m.adjusted > 0 ? "+" : ""}{fmt(m.adjusted)}</div>}
+                    </td>
+                    <td style={{ textAlign: "right", fontWeight: 600 }}>{fmt(m.closing)}</td>
+                    <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+                      {diff === null ? <span className="text-muted">No count</span>
+                        : diff === 0 ? <span style={{ color: "var(--status-resolved)" }}><i className="ph-fill ph-check-circle" aria-hidden="true" /> Matches</span>
+                        : <span style={{ color: pct !== null && pct > 5 ? "var(--priority-high)" : "var(--color-neutral-700)", fontWeight: pct !== null && pct > 5 ? 600 : 400 }}>{diff > 0 ? "+" : ""}{fmt(diff)} ({pct?.toFixed(1)}%)</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+              {monthly.length === 0 && <tr><td colSpan={7} className="text-muted" style={{ textAlign: "center", padding: 16 }}>No ledger entries yet.</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="text-muted" style={{ fontSize: 12.5, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
