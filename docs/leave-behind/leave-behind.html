@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>RUTF-DTAP leave-behind</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #123b73; --blue: #1677d2; --green: #2e9b62; --orange: #e8590c;
+    --ink: #1a202c; --muted: #5a6475; --line: #dfe5ee; --tint: #f3f7fc;
+  }
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--ink); font-family: Inter, system-ui, sans-serif; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 210mm; height: 297mm; padding: 11mm 12mm 9mm; display: flex; flex-direction: column; gap: 4.2mm; overflow: hidden; }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 6mm; padding-bottom: 3mm; border-bottom: 2px solid var(--navy); }
+  .brand { display: flex; align-items: center; gap: 3mm; }
+  .brand h1 { margin: 0; font-size: 17pt; font-weight: 800; color: var(--navy); letter-spacing: -0.01em; }
+  .brand p { margin: 0.4mm 0 0; font-size: 8pt; color: var(--muted); }
+  .pill { font-size: 7.6pt; font-weight: 600; color: var(--navy); background: var(--tint); border: 1px solid var(--line); border-radius: 99px; padding: 1.4mm 3mm; white-space: nowrap; }
+
+  .hero h2 { margin: 0; font-size: 19pt; line-height: 1.15; font-weight: 800; letter-spacing: -0.015em; }
+  .hero h2 em { font-style: normal; color: var(--blue); }
+  .hero p { margin: 2mm 0 0; font-size: 9.2pt; line-height: 1.5; color: #333c4a; max-width: 178mm; }
+
+  .chain { display: flex; align-items: stretch; gap: 1.6mm; }
+  .chain div { flex: 1; text-align: center; font-size: 7.6pt; font-weight: 600; color: var(--navy); background: var(--tint); border: 1px solid var(--line); border-radius: 2mm; padding: 1.8mm 1mm; position: relative; }
+  .chain div small { display: block; font-weight: 400; color: var(--muted); font-size: 6.8pt; margin-top: 0.4mm; }
+  .chain div:last-child { background: var(--green); color: #fff; border-color: var(--green); }
+  .chain div:last-child small { color: #e3f5ea; }
+
+  .cols { display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 5mm; }
+  h3 { margin: 0 0 2mm; font-size: 8pt; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); }
+  .does { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2.2mm; }
+  .does li { display: grid; grid-template-columns: 6mm 1fr; gap: 2mm; font-size: 8.3pt; line-height: 1.4; }
+  .does .n { width: 6mm; height: 6mm; border-radius: 50%; background: var(--navy); color: #fff; font-weight: 700; font-size: 7.5pt; display: grid; place-items: center; }
+  .does b { display: block; font-size: 8.8pt; }
+  .does span { color: #3d4757; }
+  .does i { font-style: normal; color: var(--muted); font-size: 7.4pt; }
+
+  .shots { display: flex; flex-direction: column; gap: 2.4mm; }
+  figure { margin: 0; }
+  figure img { width: 100%; display: block; border: 1px solid var(--line); border-radius: 1.6mm; }
+  figcaption { font-size: 7pt; color: var(--muted); margin-top: 0.8mm; }
+
+  .figures { background: var(--navy); color: #fff; border-radius: 2.4mm; padding: 3.2mm 4mm; }
+  .figures h3 { color: #9cc8f5; margin-bottom: 2.2mm; }
+  .figs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3mm; }
+  .figs b { display: block; font-size: 15pt; font-weight: 800; letter-spacing: -0.01em; }
+  .figs span { display: block; font-size: 7pt; line-height: 1.3; color: #d6e3f5; margin-top: 0.4mm; }
+
+  .safe { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2mm 4mm; }
+  .safe div { font-size: 7.9pt; line-height: 1.35; padding-left: 4mm; position: relative; }
+  .safe div::before { content: ""; position: absolute; left: 0; top: 1.2mm; width: 2mm; height: 2mm; border-radius: 50%; background: var(--green); }
+  .safe b { font-weight: 600; }
+
+  .scale { display: flex; align-items: center; gap: 3mm; background: var(--tint); border: 1px solid var(--line); border-radius: 2.4mm; padding: 2.6mm 4mm; font-size: 8pt; line-height: 1.4; }
+  .scale ol { display: flex; gap: 3mm; margin: 0; padding: 0; list-style: none; counter-reset: s; flex: 1; }
+  .scale li { flex: 1; counter-increment: s; font-size: 7.4pt; color: #3d4757; }
+  .scale li::before { content: counter(s); display: inline-grid; place-items: center; width: 4mm; height: 4mm; border-radius: 50%; background: var(--blue); color: #fff; font-weight: 700; font-size: 6.6pt; margin-right: 1mm; }
+  .scale strong { color: var(--navy); white-space: nowrap; }
+
+  footer { margin-top: auto; display: flex; justify-content: space-between; gap: 6mm; font-size: 6.8pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 2mm; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <div class="brand">
+      <svg width="42" height="42" viewBox="0 0 48 48" aria-hidden="true">
+        <path d="M24 3 6 9v14c0 11 7.6 19.3 18 22 10.4-2.7 18-11 18-22V9L24 3Z" fill="#123b73"/>
+        <path d="M24 7.4 10 12.1V23c0 8.8 5.8 15.6 14 18 8.2-2.4 14-9.2 14-18V12.1L24 7.4Z" fill="#fff"/>
+        <path d="M24 35V22" stroke="#2e9b62" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M24 26c-6.5 0-9.5-4-9.5-9 5.5 0 9.5 3 9.5 9Z" fill="#2e9b62"/>
+        <path d="M24 26c6.5 0 9.5-4 9.5-9-5.5 0-9.5 3-9.5 9Z" fill="#3fb874"/>
+        <circle cx="24" cy="15" r="3.2" fill="#2e9b62"/>
+      </svg>
+      <div>
+        <h1>RUTF-DTAP Monitoring Platform</h1>
+        <p>Ready-to-Use Therapeutic Food · Digital Traceability &amp; Accountability Platform</p>
+      </div>
+    </div>
+    <div class="pill">Pilot: all LGAs in Katsina State</div>
+  </header>
+
+  <section class="hero">
+    <h2>Every sachet of RUTF <em>tracked, verified and accounted for</em>, from the State store to the child.</h2>
+    <p>One trusted record of every hand-over in the government supply chain. Discrepancies are found automatically,
+      every one is followed by a named person to verified closure, and the State, LGAs and partners get the same
+      evidence, even where there is no network signal.</p>
+  </section>
+
+  <section class="chain" aria-label="Chain of custody">
+    <div>State store<small>issues by lot &amp; expiry</small></div>
+    <div>LGA stores<small>receipt confirmed</small></div>
+    <div>OTP sites<small>daily dispensing</small></div>
+    <div>Supervision<small>GPS-verified visits</small></div>
+    <div>Findings<small>raised automatically</small></div>
+    <div>Verified closure<small>within 30 days</small></div>
+  </section>
+
+  <section class="cols">
+    <div>
+      <h3>What the platform does</h3>
+      <ol class="does">
+        <li><span class="n">1</span><div><b>Records every movement, offline</b><span>Facility staff record receipts, daily dispensing, counts and losses on an Android phone that works without signal and syncs itself.</span> <i>Offline Sync Health</i></div></li>
+        <li><span class="n">2</span><div><b>Keeps one ledger that can't be rewritten</b><span>Balances are computed from entries by lot and expiry, never typed in; an entry is never edited or deleted, only voided with a reason.</span> <i>Stock Ledger</i></div></li>
+        <li><span class="n">3</span><div><b>Finds problems automatically</b><span>Every night the ledger is checked against the programme's thresholds: stock variance, short-dispensing, transfer shortfalls, late reporting, expiry.</span> <i>Findings Register</i></div></li>
+        <li><span class="n">4</span><div><b>Follows each one to verified closure</b><span>Every Finding has an owner and a 30-day target, and a supervisor verifies the fix. LGAs are scored on closure and timeliness.</span> <i>Corrective Action Tracker, Scorecard</i></div></li>
+        <li><span class="n">5</span><div><b>Checks the last mile and the national system</b><span>Sachets dispensed against prescribed, supervisors' register checks, and DHIS2 monthly reports set beside the ledger.</span> <i>Last-Mile Dispensing, DHIS2</i></div></li>
+        <li><span class="n">6</span><div><b>Reports the month in one page</b><span>A Monthly Programme Report written from live data, ready to print for the State, LGAs and UNICEF.</span> <i>Programme Reporting</i></div></li>
+      </ol>
+    </div>
+    <div class="shots">
+      <figure>
+        <img src="../screenshots/02-overview-dashboard.png" alt="Overview Dashboard">
+        <figcaption>Overview Dashboard: what needs attention first, and stock at every level.</figcaption>
+      </figure>
+      <figure>
+        <img src="../screenshots/06-corrective-action-tracker.png" alt="Corrective Action Tracker">
+        <figcaption>Corrective Action Tracker: every Finding by stage until verified closed.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="figures">
+    <h3>In the pilot demonstration · September 2026</h3>
+    <div class="figs">
+      <div><b>307</b><span>stores and OTP sites in 34 LGAs on one ledger</span></div>
+      <div><b>98.0%</b><span>of transfers delivered in full; shortfalls raised</span></div>
+      <div><b>97.5%</b><span>of supervision visits GPS-verified on site</span></div>
+      <div><b>90.8%</b><span>of DHIS2 reports agree with the ledger</span></div>
+      <div><b>100%</b><span>of Findings raised by automatic checks</span></div>
+      <div><b>20.9 d</b><span>median from Finding to verified closure</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h3>Built-in safeguards</h3>
+    <div class="safe">
+      <div><b>Role-based access</b> enforced by the database for web, app and API; 202 of 202 role checks pass.</div>
+      <div><b>No child-level data:</b> aggregate OTP tallies only. Designed for the NDPA 2023.</div>
+      <div><b>Nothing deleted:</b> ledger entries are voided with a reason; Findings stay on record.</div>
+      <div><b>Data leaves by approval only:</b> scoped to the requester, downloadable once, on record.</div>
+      <div><b>Full Audit Trail</b> written by the database itself: who changed what, and when.</div>
+      <div><b>Findings are for review, not accusation:</b> the score shows where support is needed.</div>
+    </div>
+  </section>
+
+  <section class="scale">
+    <strong>Ready for the next state</strong>
+    <ol>
+      <li>Create the programme</li>
+      <li>Load the facility registry</li>
+      <li>Confirm the thresholds</li>
+      <li>Invite the teams</li>
+      <li>Install the app</li>
+    </ol>
+    <strong>No new software.</strong>
+  </section>
+
+  <footer>
+    <span>Figures are from the platform's demonstration data (marked DUMMY) and illustrate how it works; they are not programme results.</span>
+    <span>RUTF-DTAP · October 2026</span>
+  </footer>
+</div>
+</body>
+</html>
