@@ -78,14 +78,16 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   }));
   const trendMax = Math.max(1, ...trend.map((t) => t.soh ?? 0));
 
-  // The Findings pipeline in the Corrective Action Tracker's stage colours (R104).
+  // The Findings pipeline in the Corrective Action Tracker's stage colours (R104), with reopened
+  // cases as their own red stage, as on the tracker (R133).
   const n = (...ss: IssueStatus[]) => ss.reduce((t, st) => t + (byStatus[st] ?? 0), 0);
   const pipeline = [
     { key: "review", label: "Awaiting review", n: n("new", "pending_review", "returned_for_correction"), color: "var(--color-neutral-500)", href: "/issues?status=pending_review" },
-    { key: "assigned", label: "Assigned to facility", n: n("assigned", "reopened"), color: "var(--stage-assigned)", href: "/issues?status=assigned" },
+    { key: "assigned", label: "Assigned to facility", n: n("assigned"), color: "var(--stage-assigned)", href: "/issues?status=assigned" },
     { key: "addressing", label: "Being addressed", n: n("in_progress"), color: "var(--stage-addressing)", href: "/issues?status=in_progress" },
     { key: "recorded", label: "Action recorded", n: n("resolved"), color: "var(--stage-recorded)", href: "/issues?status=resolved" },
     { key: "closed", label: "Verified & closed", n: n("verified_closed"), color: "var(--stage-closed)", href: "/issues?status=verified_closed" },
+    { key: "reopened", label: "Reopen case", n: n("reopened"), color: "var(--stage-reopened)", href: "/issues?status=reopened" },
   ];
   const pipelineTotal = pipeline.reduce((t, st) => t + st.n, 0);
   const ago = (iso: string) => {

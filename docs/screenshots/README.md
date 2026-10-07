@@ -12,7 +12,7 @@ are demo data: they illustrate the platform, not real programme results.
 | `03-situation-map.png` | Situation Map | Every store and OTP site on the map, with LGAs shaded by open Findings, low stock or risk. |
 | `04-findings-register.png` | Findings Register | Every discrepancy, raised automatically from the ledger and supervision visits, with its owner and status until verified closure. |
 | `05-finding-detail.png` | Finding detail | One Finding's evidence and full history: raised by an automatic check, approved, assigned, and followed to closure. |
-| `06-corrective-action-tracker.png` | Corrective Action Tracker | Every approved Finding by stage (Assigned, Being addressed, Action recorded, Verified & closed), oldest and late first, against a 30-day target. |
+| `06-corrective-action-tracker.png` | Corrective Action Tracker | Every approved Finding by stage (Assigned, Being addressed, Action recorded, Verified & closed, and reopened cases in red), oldest and late first, against a 30-day target. |
 | `07-accountability-scorecard.png` | Accountability Scorecard | A simple, transparent score for each LGA (half closure, half timeliness), with its six-month trend. |
 | `08-stock-ledger-store.png` | Stock Ledger, one store | Balances computed from entries, never typed in: lots and expiry, month-by-month reconciliation, and an integrity line (entries never edited or deleted). |
 | `09-transfers.png` | Transfers | The chain of custody for every shipment: delivered in full, in transit, and any shortfall raised as a Finding. |
