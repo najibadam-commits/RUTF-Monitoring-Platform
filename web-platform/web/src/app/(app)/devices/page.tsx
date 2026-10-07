@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/supabase/dal";
 import { canAccessDevices, ROLE_LABELS } from "@/lib/rbac";
 import { getProgrammeLgas } from "@/lib/queries/lookups";
-import { Flag, SummaryTiles, fmt, type SP } from "@/components/reports/ReportShell";
+import { Flag, fmt, type SP } from "@/components/reports/ReportShell";
 import type { Database } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Offline Sync Health" };
@@ -13,6 +13,17 @@ export const metadata: Metadata = { title: "Offline Sync Health" };
 // Offline Sync Health (brief M6, sync-failure monitoring): every facility user and supervisor with the
 // latest report from their phone — sync_health() (migration 0108). Each sync run reports what is
 // still waiting and why; a morning digest notifies administrators when something is stuck.
+// DECISIONS R118: how offline recording works, clickable status tiles, app versions.
+
+/** The Android build pilot phones should run (android/app/build.gradle.kts versionName). */
+const CURRENT_APP = "1.1";
+
+const STEPS = [
+  { icon: "ph-wifi-slash", title: "Record without a signal", body: "Stock and dispensing are saved on the phone at the facility." },
+  { icon: "ph-lock-key", title: "Kept safely on the phone", body: "Nothing is lost while it waits, even if the app is closed." },
+  { icon: "ph-arrows-clockwise", title: "Sends itself when online", body: "Each record goes once; a repeat is recognised and ignored." },
+  { icon: "ph-gauge", title: "Reported here", body: "Every sync tells the platform what is still waiting, and why." },
+];
 
 type Row = Database["public"]["Functions"]["sync_health"]["Returns"][number];
 type Status = Row["status"];
@@ -21,7 +32,7 @@ const STATUS: Record<Status, { label: string; level?: "warning" | "critical"; he
   failing: { label: "Failing", level: "critical", help: "A submission keeps failing to sync" },
   stuck: { label: "Waiting > 1 day", level: "warning", help: "Records have waited more than a day" },
   not_syncing: { label: "Not syncing", level: "warning", help: "No sync report for several days" },
-  no_report: { label: "Older app", help: "Recording, but the app version doesn't report sync status" },
+  no_report: { label: "No sync report", help: "Records arrive, but no phone has reported its sync status (older app, or entered another way)" },
   never: { label: "Not started", help: "Nothing recorded or synced yet" },
   ok: { label: "OK", help: "Synced, nothing waiting" },
 };
@@ -64,6 +75,12 @@ export default async function DevicesPage({ searchParams }: { searchParams: Prom
     .filter((r) => (!status || r.status === status) && (!who || r.role === who) && (!sp.lga || r.lga_id === sp.lga))
     .sort((a, b) => ORDER.indexOf(a.status) - ORDER.indexOf(b.status) || a.name.localeCompare(b.name));
   const nameOf = Object.fromEntries(all.map((r) => [r.profile_id, r.name]));
+  const reporting = all.filter((r) => r.device_id);
+  const versions = new Map<string, number>();
+  for (const r of reporting) versions.set(r.app_version ?? "unknown", (versions.get(r.app_version ?? "unknown") ?? 0) + 1);
+  const versionRows = [...versions].sort((a, b) => b[1] - a[1]);
+  const onCurrent = reporting.filter((r) => r.app_version === CURRENT_APP).length;
+  const healthy = reporting.length ? (count("ok") * 100) / reporting.length : null;
   const href = (s: Status | null) => `/devices?${new URLSearchParams({ ...(s ? { status: s } : {}), ...(who ? { who } : {}), ...(sp.lga ? { lga: sp.lga } : {}) })}`;
 
   return (
@@ -78,13 +95,63 @@ export default async function DevicesPage({ searchParams }: { searchParams: Prom
       </div>
       {error && <p style={{ color: "var(--priority-critical)" }}>Sync status couldn&apos;t be loaded.</p>}
 
-      <SummaryTiles items={[
-        { label: "Device users", value: fmt(all.length), sub: `${fmt(all.filter((r) => r.role === "dri").length)} facility users, ${fmt(all.filter((r) => r.role === "tpm_supervisor").length)} supervisors` },
-        { label: "Failing", value: fmt(count("failing")), sub: STATUS.failing.help },
-        { label: "Waiting > 1 day", value: fmt(count("stuck")), sub: STATUS.stuck.help },
-        { label: "Not syncing", value: fmt(count("not_syncing")), sub: STATUS.not_syncing.help },
-        { label: "OK", value: fmt(count("ok")), sub: `${fmt(count("never"))} not started · ${fmt(count("no_report"))} on an older app` },
-      ]} />
+      <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10 }}>
+        {STEPS.map((st, i) => (
+          <li key={st.title} className="card elev-sm" style={{ padding: "10px 12px", display: "flex", gap: 10, alignItems: "flex-start" }}>
+            <span style={{ width: 28, height: 28, borderRadius: 8, display: "grid", placeItems: "center", background: "var(--color-accent-100)", color: "var(--color-accent-700)", flex: "none" }}>
+              <i className={`ph-fill ${st.icon}`} aria-hidden="true" style={{ fontSize: 15 }} />
+            </span>
+            <span>
+              <span style={{ display: "block", fontWeight: 600, fontSize: 12.5 }}>{i + 1}. {st.title}</span>
+              <span className="kpi-sub" style={{ display: "block" }}>{st.body}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      <div className="kpi-row">
+        <div className="card elev-sm kpi-card">
+          <div className="kpi-label"><i className="ph-fill ph-check-circle" aria-hidden="true" style={{ color: "var(--status-resolved)" }} /> Syncing well</div>
+          <div className="kpi-value">{healthy === null ? "—" : `${Math.round(healthy)}%`}</div>
+          <div className="kpi-sub">{reporting.length ? `${fmt(count("ok"))} of ${fmt(reporting.length)} reporting phones` : "No phone has reported yet"}</div>
+        </div>
+        {(["failing", "stuck", "not_syncing", "no_report", "never"] as Status[]).map((k) => {
+          const active = status === k;
+          const m = STATUS[k];
+          return (
+            <Link key={k} href={active ? href(null) : href(k)} className="card elev-sm kpi-card" aria-pressed={active} title={m.help}
+              style={{ textDecoration: "none", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
+              <div className="kpi-label">
+                <i className={`ph-fill ${m.level === "critical" ? "ph-warning-octagon" : m.level === "warning" ? "ph-warning" : "ph-minus-circle"}`} aria-hidden="true"
+                  style={{ color: count(k) && m.level ? (m.level === "critical" ? "var(--priority-critical)" : "var(--priority-high)") : "var(--color-neutral-500)" }} /> {m.label}
+              </div>
+              <div className="kpi-value">{fmt(count(k))}</div>
+              <div className="kpi-sub">{active ? "Filtered · click to clear" : m.help}</div>
+            </Link>
+          );
+        })}
+      </div>
+
+      <div className="card elev-sm" style={{ padding: "10px 14px", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div className="card-title" style={{ fontSize: 13.5 }}>App versions on reporting phones</div>
+          <span className="kpi-sub">
+            {fmt(all.length)} device users: {fmt(all.filter((r) => r.role === "dri").length)} facility users, {fmt(all.filter((r) => r.role === "tpm_supervisor").length)} supervisors
+          </span>
+        </div>
+        {reporting.length ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, fontSize: 12.5 }}>
+            {versionRows.map(([v, n]) => (
+              <span key={v} className="tag tag-outline" style={{ fontSize: 12, borderColor: v === CURRENT_APP ? "var(--status-resolved)" : undefined }}>
+                App {v} <strong style={{ marginLeft: 4 }}>{fmt(n)}</strong>{v === CURRENT_APP ? " · current" : ""}
+              </span>
+            ))}
+            <span className="kpi-sub" style={{ alignSelf: "center" }}>{fmt(onCurrent)} of {fmt(reporting.length)} on the current build ({CURRENT_APP})</span>
+          </div>
+        ) : (
+          <div className="kpi-sub">No phone has reported yet. Install the current build ({CURRENT_APP}) on pilot phones; each phone appears here after its first sync.</div>
+        )}
+      </div>
 
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
         <select className="input" name="status" defaultValue={status ?? ""} aria-label="Status" style={{ maxWidth: 190 }}>
