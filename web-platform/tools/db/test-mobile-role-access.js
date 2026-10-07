@@ -203,7 +203,7 @@ function check(area, role, what, expected, actual) {
     await pg.query(`update profiles set project_id = $2 where id = any($1)`, [[u("project_admin"), u("dri")], P]);
     const kt = await one(`select l.id lga, w.id ward, st_y(st_pointonsurface(w.geom))::numeric(9,6) lat,
                                  st_x(st_pointonsurface(w.geom))::numeric(9,6) lng
-                            from lgas l join wards w on w.lga_id = l.id where w.geom is not null limit 1`);
+                            from lgas l join wards w on w.lga_id = l.id where w.geom is not null and not st_isempty(w.geom) limit 1`);
     const fac = async (type, name, supplier) =>
       (await one(`insert into facilities (project_id, facility_type, name, lga_id, ward_id, supplied_by_facility_id, is_otp_site)
                   values ($1, $2, $3, $4, $5, $6, $7) returning id`,

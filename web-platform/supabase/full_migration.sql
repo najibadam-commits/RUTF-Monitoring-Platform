@@ -8120,3 +8120,33 @@ select regexp_replace(facility_code, '-\d{3,}$', ''), max(substring(facility_cod
 from facilities where facility_code is not null
 group by 1
 on conflict (prefix) do update set last_number = greatest(facility_id_counters.last_number, excluded.last_number);
+
+-- ===== 0122_revoke_truncate.sql =====
+-- RUTF Monitoring Platform — migration 0122 (defence in depth, docs/PERMISSIONS_REVIEW.md P8)
+-- Supabase's default grants give the API roles TRUNCATE, TRIGGER and REFERENCES on every table in
+-- public. TRUNCATE bypasses row-level security, so a role holding it could empty audit_log or the
+-- ledger outright. PostgREST cannot issue TRUNCATE, so it is not reachable through the API today,
+-- but the API roles have no use for these privileges: take them away now and for future tables.
+-- SELECT / INSERT / UPDATE / DELETE stay as they are — the RLS policies rely on them.
+-- PostGIS's spatial_ref_sys, geometry_columns and geography_columns are owned by supabase_admin,
+-- so postgres cannot revoke on them (Postgres reports a notice and skips them); spatial_ref_sys is
+-- a public catalogue of coordinate systems, the other two are views. The default-privileges
+-- change covers tables created by postgres, which is the role every migration runs as.
+
+revoke truncate, trigger, references on all tables in schema public from anon, authenticated;
+
+alter default privileges in schema public revoke truncate, trigger, references on tables from anon, authenticated;
+
+-- ===== 0123_findings_never_deleted.sql =====
+-- RUTF Monitoring Platform — migration 0123
+-- Findings are never deleted (DECISIONS R129). The app lost its Delete button in R126; this closes
+-- the two ways left to delete one through the API, both Super Admin only since 0007/0009:
+--   • the delete_issue_submission() function, and
+--   • the issues_delete row-level security policy (a DELETE on issues straight through the API).
+-- With no DELETE policy, row-level security refuses every delete on issues for signed-in users, so
+-- every Finding is followed to verified closure and stays on record with its history. A mistaken
+-- one is returned for correction or edited. Administrator scripts on the database connection
+-- (e.g. removing DUMMY demo data) are not affected.
+
+drop policy if exists issues_delete on issues;
+drop function if exists delete_issue_submission(uuid);
