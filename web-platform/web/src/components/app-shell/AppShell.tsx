@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { logout } from "@/lib/actions/auth";
 import { NAV_ITEMS, ROLE_LABELS, NAV_SECTION_LABELS, visibleNavItemsFor, type NavSection } from "@/lib/rbac";
 import type { Profile } from "@/lib/supabase/dal";
@@ -32,6 +32,32 @@ const VIEW_TITLES: Record<string, string> = {
 const SECTION_ORDER: NavSection[] = ["overview", "stock", "supervision", "analytics", "reporting", "administration"];
 
 const SIDEBAR_COLLAPSE_KEY = "tpm.sidebar.collapsed";
+
+// The collapsed sidebar is remembered in localStorage and read as an external store, so the first
+// paint matches the server (expanded) and the saved choice applies straight after. If storage is
+// blocked (private browsing) the choice is kept in memory for this session instead.
+const COLLAPSE_EVENT = "tpm-sidebar-collapse";
+let collapsedInMemory: boolean | null = null;
+function readCollapsed() {
+  if (collapsedInMemory !== null) return collapsedInMemory;
+  try {
+    return localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+function writeCollapsed(next: boolean) {
+  try {
+    localStorage.setItem(SIDEBAR_COLLAPSE_KEY, next ? "1" : "0");
+  } catch {
+    collapsedInMemory = next;
+  }
+  window.dispatchEvent(new Event(COLLAPSE_EVENT));
+}
+function subscribeCollapsed(onChange: () => void) {
+  window.addEventListener(COLLAPSE_EVENT, onChange);
+  return () => window.removeEventListener(COLLAPSE_EVENT, onChange);
+}
 
 function initials(name: string) {
   return name
@@ -67,32 +93,14 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
 
   const navItems = visibleNavItemsFor(profile.role);
   const [signingOut, setSigningOut] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    try {
-      setCollapsed(localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === "1");
-    } catch {
-      // Private-browsing / storage-blocked — fall back to expanded.
-    }
-  }, []);
-
-  // Close the mobile drawer on every route change so navigating never leaves it stuck open.
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+  const collapsed = useSyncExternalStore(subscribeCollapsed, readCollapsed, () => false);
+  // The mobile drawer remembers the page it was opened on, so navigating closes it and never
+  // leaves it stuck open.
+  const [drawerOpenOn, setDrawerOpenOn] = useState<string | null>(null);
+  const mobileOpen = drawerOpenOn === pathname;
 
   function toggleCollapsed() {
-    setCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(SIDEBAR_COLLAPSE_KEY, next ? "1" : "0");
-      } catch {
-        // Ignore — collapse still works for this session, just won't persist.
-      }
-      return next;
-    });
+    writeCollapsed(!collapsed);
   }
 
   const sectionsWithItems = SECTION_ORDER.map((section) => ({
@@ -104,7 +112,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
     <div className="app-root" style={{ display: "flex", height: "100vh", background: "var(--color-bg)", color: "var(--color-text)", fontFamily: "var(--font-body)", fontSize: 14 }}>
       <div
         className={`app-sidebar-backdrop${mobileOpen ? " open" : ""}`}
-        onClick={() => setMobileOpen(false)}
+        onClick={() => setDrawerOpenOn(null)}
         aria-hidden="true"
       />
 
@@ -211,7 +219,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
           <button
             type="button"
             className="app-hamburger"
-            onClick={() => setMobileOpen(true)}
+            onClick={() => setDrawerOpenOn(pathname)}
             aria-label="Open navigation menu"
             style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text)", padding: 4, lineHeight: 0, alignItems: "center" }}
           >

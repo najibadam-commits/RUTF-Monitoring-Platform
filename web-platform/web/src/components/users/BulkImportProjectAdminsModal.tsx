@@ -84,7 +84,7 @@ export function BulkImportProjectAdminsModal({ admins, onClose }: { admins: Prof
     });
   }, [rawRows, mapping, existingEmails]);
 
-  const validRows = preview?.filter((r) => !r.error) ?? [];
+  const validRows = useMemo(() => preview?.filter((r) => !r.error) ?? [], [preview]);
   const invalidRows = preview?.filter((r) => r.error) ?? [];
   const projectCount = useMemo(() => new Set(validRows.map((r) => r.projectName.trim().toLowerCase())).size, [validRows]);
 

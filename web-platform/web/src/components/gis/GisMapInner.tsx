@@ -126,7 +126,9 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
   });
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedLga, setSelectedLga] = useState<{ id: string; name: string } | null>(null);
-  const [wardsUnavailable, setWardsUnavailable] = useState(false);
+  // The LGA whose ward lookup came back empty, so the note only shows while that LGA is selected.
+  const [wardsMissingFor, setWardsMissingFor] = useState<string | null>(null);
+  const wardsUnavailable = selectedLga !== null && wardsMissingFor === selectedLga.id;
   const [facilityMeasure, setFacilityMeasure] = useState<FacilityMeasure>("risk");
   const [shadeBy, setShadeBy] = useState<ShadeBy>("findings");
   const [lgaLayerVersion, setLgaLayerVersion] = useState(0);
@@ -299,12 +301,12 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
       wardLayerRef.current = null;
     }
     if (selectedLga) {
-      setWardsUnavailable(false);
+      const lgaId = selectedLga.id;
       const supabase = createClient();
-      supabase.rpc("get_ward_boundaries", { p_lga_id: selectedLga.id }).then(({ data }) => {
+      supabase.rpc("get_ward_boundaries", { p_lga_id: lgaId }).then(({ data }) => {
         if (cancelled || !mapRef.current) return;
         if (!data || data.length === 0) {
-          setWardsUnavailable(true);
+          setWardsMissingFor(lgaId);
           return;
         }
         const fc = {
@@ -318,8 +320,6 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         const bounds = wardLayerRef.current.getBounds();
         if (bounds.isValid()) mapRef.current.fitBounds(bounds, { padding: [24, 24] });
       });
-    } else {
-      setWardsUnavailable(false);
     }
     return () => {
       cancelled = true;
