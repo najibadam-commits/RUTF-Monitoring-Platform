@@ -18,6 +18,7 @@ followed to verified closure, and reported — on one trusted record, even where
 | | Signed in as **Super Admin** in the browser you'll present from; a second tab signed in as the **DUMMY Viewer** (zainab.mohammed@rutf-demo.example) if you'll show data requests from both sides. |
 | | Phone: **RUTF-DTAP 1.1** installed (GitHub release `v1.1-proposal`), signed in as a DUMMY facility user, ledger downloaded. |
 | | Data access requests reset: in `web-platform\tools\db` run `node seed-demo-download-requests.js` (two requests waiting to approve live). |
+| | Phone sync reports refreshed: in `web-platform\tools\db` run `node seed-demo-sync-status.js` (reports age; after 3 days a phone shows as "not syncing"). |
 | | Monthly Programme Report: open it once and press **Print / save as PDF** to check the print view. |
 | | Browser zoom 100 %, window at least 1366 px wide; close other tabs and notifications. |
 | | Know your fallback: if the network drops, the phone app still works offline — that is part of the story. |
@@ -161,4 +162,5 @@ and for the next state tomorrow."
 ## After the demo
 
 - Reset the data access requests: `node seed-demo-download-requests.js` (in `web-platform\tools\db`).
-- Nothing else changes the demo data except the nightly checks.
+- Nothing else changes the demo data except the nightly checks (and the phone reports ageing).
+- Before real pilot data: `node seed-demo-sync-status.js --remove` and `node seed-demo-download-requests.js --remove`, with the rest of the DUMMY data.
