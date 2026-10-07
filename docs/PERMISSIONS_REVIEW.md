@@ -45,6 +45,7 @@ node test-mobile-role-access.js    # every role tried against every rule (rolled
 | P5 | No audit trail for changes to reference data, user access or ledger status (brief §10). | Medium | `audit_log` with triggers on facilities, lots, dosing rules, thresholds, profiles, supervisor LGAs, DHIS2 reports, and status changes on ledger rows and transfers. Readable by Super Admin and Project Admin (web: Administration → Audit Trail). |
 | P6 | `in_scope()` treats a non-Super-Admin with no project as unscoped (inherited TPM rule). | Medium | Not changed (the TPM Project Admin flow relies on it). Audit check 6 lists any such account; every pilot account must be assigned to *Katsina RUTF Pilot*. |
 | P7 | Devices page was sample data; no visibility of phones that stop syncing. | Medium | Offline Sync Health (real data, see §5). |
+| P8 | Supabase's default grants gave `anon` and `authenticated` TRUNCATE, TRIGGER and REFERENCES on every `public` table, including `audit_log`. TRUNCATE bypasses RLS; PostgREST can't issue it, so not reachable through the API, but the API roles shouldn't hold it. | Low | Migration 0122: revoked on all `public` tables and by default for future ones; SELECT/INSERT/UPDATE/DELETE unchanged. PostGIS's `spatial_ref_sys`, `geometry_columns` and `geography_columns` (owned by `supabase_admin`) can't be changed by `postgres` and keep them. |
 
 ## 4. Accounts
 
