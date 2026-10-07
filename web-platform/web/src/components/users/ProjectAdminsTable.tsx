@@ -21,6 +21,10 @@ export type Programme = {
   sites: number;
   users: number;
   openFindings: number;
+  closedPct?: number | null;
+  facilityUsers?: number;
+  supervisors?: number;
+  lastLedger?: string | null;
 };
 
 // Bringing another state on: what the platform already supports, step by step (DECISIONS R96).
@@ -91,18 +95,26 @@ export function ProjectAdminsTable({ admins, programmes = [] }: { admins: Admin[
                 </div>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))", gap: 8 }}>
               {[
-                { label: "LGAs", value: g.lgas },
-                { label: "Stores & OTP sites", value: g.sites },
-                { label: "Active users", value: g.users },
-                { label: "Open Findings", value: g.openFindings },
+                { label: "LGAs", value: g.lgas.toLocaleString("en-GB") },
+                { label: "Stores & OTP sites", value: g.sites.toLocaleString("en-GB") },
+                { label: "Active users", value: g.users.toLocaleString("en-GB"), sub: g.facilityUsers !== undefined ? `${g.facilityUsers} facility · ${g.supervisors} supervisors` : undefined },
+                { label: "Open Findings", value: g.openFindings.toLocaleString("en-GB") },
+                { label: "Findings closed", value: g.closedPct === null || g.closedPct === undefined ? "—" : `${g.closedPct}%`, sub: "verified by a supervisor" },
               ].map((x) => (
                 <div key={x.label}>
-                  <div style={{ fontFamily: "var(--font-heading)", fontSize: 20, fontWeight: 700 }}>{x.value.toLocaleString("en-GB")}</div>
-                  <div className="text-muted" style={{ fontSize: 11.5 }}>{x.label}</div>
+                  <div className="kpi-value" style={{ fontSize: 18 }}>{x.value}</div>
+                  <div className="kpi-sub">{x.label}</div>
+                  {x.sub && <div className="kpi-sub" style={{ fontSize: 10.5 }}>{x.sub}</div>}
                 </div>
               ))}
+            </div>
+            <div className="kpi-sub" style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <i className={`ph-fill ${g.lastLedger ? "ph-pulse" : "ph-circle-dashed"}`} aria-hidden="true" style={{ color: g.lastLedger ? "var(--status-resolved)" : "var(--color-neutral-500)" }} />
+              {g.lastLedger
+                ? <>Live: last ledger entry {new Date(`${g.lastLedger}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" })}</>
+                : "No ledger entries yet"}
             </div>
           </div>
         ))}

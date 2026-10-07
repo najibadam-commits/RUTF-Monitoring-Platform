@@ -25,11 +25,17 @@ export default async function ProjectAdminsPage() {
 
   const programmes: Programme[] = await Promise.all(
     (projects ?? []).map(async (p) => {
-      const [{ data: sites }, users, open] = await Promise.all([
+      const [{ data: sites }, users, open, all, closed, dris, sups, { data: lastTxn }] = await Promise.all([
         supabase.from("facilities").select("lga_id").eq("project_id", p.id).eq("status", "approved").eq("is_active", true)
           .or("facility_type.neq.health_facility,is_otp_site.eq.true"),
         supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active"),
         supabase.from("issues").select("id", { count: "exact", head: true }).eq("project_id", p.id).in("status", OPEN_STATUSES),
+        // Programme health (DECISIONS R123): closure, the team's make-up and the latest ledger entry.
+        supabase.from("issues").select("id", { count: "exact", head: true }).eq("project_id", p.id),
+        supabase.from("issues").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "verified_closed"),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active").eq("role", "dri"),
+        supabase.from("profiles").select("id", { count: "exact", head: true }).eq("project_id", p.id).eq("status", "active").eq("role", "tpm_supervisor"),
+        supabase.from("stock_transactions").select("txn_date").eq("project_id", p.id).order("txn_date", { ascending: false }).limit(1).maybeSingle(),
       ]);
       return {
         id: p.id,
@@ -40,6 +46,10 @@ export default async function ProjectAdminsPage() {
         sites: (sites ?? []).length,
         users: users.count ?? 0,
         openFindings: open.count ?? 0,
+        closedPct: all.count ? Math.round(((closed.count ?? 0) * 100) / all.count) : null,
+        facilityUsers: dris.count ?? 0,
+        supervisors: sups.count ?? 0,
+        lastLedger: lastTxn?.txn_date ?? null,
       };
     }),
   );
