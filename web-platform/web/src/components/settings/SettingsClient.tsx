@@ -22,7 +22,17 @@ const STATE_STYLE: Record<ReadinessItem["state"], { label: string; icon: string;
   decision: { label: "Programme decision", icon: "ph-users-three", color: "var(--color-accent-700)" },
 };
 
-export function SettingsClient({ settings, readiness = [] }: { settings: Settings; readiness?: ReadinessItem[] }) {
+// Security and data protection, as checked in the permissions review (docs/PERMISSIONS_REVIEW.md, 3 Oct 2026).
+const SAFEGUARDS = [
+  { icon: "ph-lock-key", text: "Row-level security on every table: the database decides who sees what, for the web, the app and the API alike" },
+  { icon: "ph-user-minus", text: "No data or function open to signed-out users" },
+  { icon: "ph-folder-lock", text: "All four file stores (photos, evidence) private" },
+  { icon: "ph-users-three", text: "Every role tried against every rule: 202 of 202 checks pass" },
+  { icon: "ph-baby", text: "No child or caregiver names or IDs: aggregate OTP tallies only" },
+  { icon: "ph-clock-counter-clockwise", text: "Changes to accounts, reference data and ledger status written to the Audit Trail by the database" },
+];
+
+export function SettingsClient({ settings, readiness = [], automatic }: { settings: Settings; readiness?: ReadinessItem[]; automatic?: { lastAuto: string | null; lastWeek: number } }) {
   const [saved, setSaved] = useState<string | null>(settings.email_from_address);
   const [sender, setSender] = useState(settings.email_from_address ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -102,12 +112,37 @@ export function SettingsClient({ settings, readiness = [] }: { settings: Setting
       })()}
 
       <div className="card elev-sm" style={{ gap: 8 }}>
-        <div className="card-title">Running automatically</div>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div className="card-title">Running automatically</div>
+          {automatic && (
+            <span className="kpi-sub" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <i className="ph-fill ph-pulse" aria-hidden="true" style={{ color: automatic.lastAuto ? "var(--status-resolved)" : "var(--color-neutral-500)" }} />
+              {automatic.lastAuto
+                ? <>Last automatic Finding {new Date(automatic.lastAuto).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · {automatic.lastWeek.toLocaleString("en-GB")} in the last 7 days</>
+                : "No automatic Finding raised yet"}
+            </span>
+          )}
+        </div>
         <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.7 }}>
           <li>Every night (02:30 WAT) each store&apos;s and OTP site&apos;s ledger is checked against the thresholds, and each supervision visit is checked as it is recorded; discrepancies become Findings.</li>
           <li>Each morning (07:00 WAT) administrators get a digest of phones that have stopped syncing.</li>
           <li>Review decisions send in-app notifications and emails to the people involved.</li>
           <li>Every change to facilities, lots, rules, thresholds, accounts and ledger status is written to the Audit Trail.</li>
+        </ul>
+      </div>
+
+      <div className="card elev-sm" style={{ gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+          <div className="card-title">Security and data protection</div>
+          <span className="kpi-sub">As checked in the permissions review, 3 Oct 2026 · re-run after every change to the database</span>
+        </div>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: "6px 16px" }}>
+          {SAFEGUARDS.map((g) => (
+            <li key={g.text} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 12.5 }}>
+              <i className={`ph-fill ${g.icon}`} aria-hidden="true" style={{ color: "var(--status-resolved)", fontSize: 15, marginTop: 2, flex: "none" }} />
+              <span>{g.text}</span>
+            </li>
+          ))}
         </ul>
       </div>
 

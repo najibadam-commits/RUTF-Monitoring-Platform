@@ -14,17 +14,24 @@ export const metadata: Metadata = { title: "Settings" };
 /** The Android build pilot phones should run (android/app/build.gradle.kts versionName). */
 const CURRENT_APP = "1.1";
 
+/** The time "now" for the last-7-days count — read once per request (a server component). */
+const requestTime = () => Date.now();
+
 export default async function SettingsPage() {
   const profile = await getCurrentProfile();
   if (!canAccessSettings(profile.role)) redirect("/dashboard");
 
   const supabase = await createClient();
-  const [{ data: settings }, dummyFacilities, dummyUsers, allUsers, { data: devices }] = await Promise.all([
+  const weekAgo = new Date(requestTime() - 7 * 86_400_000).toISOString();
+  const [{ data: settings }, dummyFacilities, dummyUsers, allUsers, { data: devices }, { data: lastAuto }, autoWeek] = await Promise.all([
     supabase.from("settings").select("*").eq("id", 1).single(),
     supabase.from("facilities").select("id", { count: "exact", head: true }).not("dummy_fields", "is", null),
     supabase.from("profiles").select("id", { count: "exact", head: true }).ilike("name", "%(DUMMY)%"),
     supabase.from("profiles").select("id", { count: "exact", head: true }).eq("status", "active"),
     supabase.rpc("sync_health"),
+    // Live proof the automatic checks run (DECISIONS R124).
+    supabase.from("issues").select("reported_at").eq("auto_generated", true).order("reported_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("issues").select("id", { count: "exact", head: true }).eq("auto_generated", true).gte("reported_at", weekAgo),
   ]);
 
   if (!settings) redirect("/dashboard");
@@ -62,7 +69,11 @@ export default async function SettingsPage() {
     { title: "Data protection sign-off", state: "decision", detail: "DPIA draft for the Data Protection Officer; retention periods to set (NDPA 2023)" },
     { title: "User acceptance testing", state: "decision", detail: "UAT script ready for the State team to run and sign" },
     { title: "Release signing key for the Android app", state: "decision", detail: "Created and held by the programme, for the production build" },
+    { title: "Permissions review", state: "done", detail: "Every role tried against every rule: 202 of 202 checks pass (docs/PERMISSIONS_REVIEW.md)" },
   ];
 
-  return <SettingsClient settings={settings} readiness={readiness} />;
+  return (
+    <SettingsClient settings={settings} readiness={readiness}
+      automatic={{ lastAuto: lastAuto?.reported_at ?? null, lastWeek: autoWeek.count ?? 0 }} />
+  );
 }
