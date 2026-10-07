@@ -8,7 +8,6 @@ import { getFindingTargetDays } from "@/lib/queries/issues";
 import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { PriorityTag } from "@/components/ui/Tags";
 import { RealtimeRefresher } from "@/components/realtime/RealtimeRefresher";
-import { STATUS_COLOR } from "@/lib/constants";
 import type { IssuePriority, IssueStatus } from "@/lib/types/database";
 
 export const metadata: Metadata = { title: "Corrective Action Tracker" };
@@ -46,12 +45,15 @@ type Row = {
 const SELECT =
   "id, code, status, priority, reported_at, resolution_date, lga_id, finding:finding_types(label), category:categories(name), facility:facilities(name), lga:lgas(name), ward_ref:wards(name), dri:profiles!issues_assigned_dri_fkey(name)";
 
-// Stage colours (DECISIONS R104): blue, orange, green, black — tokens in globals.css.
+// Stage colours (DECISIONS R104, R133): blue, orange, green, black, and red for a reopened case —
+// tokens in globals.css. A Finding the supervisor could not verify (status "reopened") has its own
+// stage, so it stands out until the responsible person acts on it again.
 const COLUMNS: { key: string; title: string; hint: string; statuses: IssueStatus[]; icon: string; color: string }[] = [
-  { key: "assigned", title: "Assigned to facility", hint: "Waiting for the responsible person to respond", statuses: ["assigned", "reopened"], icon: "ph-user-focus", color: "var(--stage-assigned)" },
+  { key: "assigned", title: "Assigned to facility", hint: "Awaiting the facility's response", statuses: ["assigned"], icon: "ph-user-focus", color: "var(--stage-assigned)" },
   { key: "in_progress", title: "Being addressed", hint: "Corrective action under way", statuses: ["in_progress"], icon: "ph-wrench", color: "var(--stage-addressing)" },
-  { key: "resolved", title: "Action recorded", hint: "Waiting for a supervisor to verify", statuses: ["resolved"], icon: "ph-clipboard-text", color: "var(--stage-recorded)" },
+  { key: "resolved", title: "Action recorded", hint: "Awaiting supervisor verification", statuses: ["resolved"], icon: "ph-clipboard-text", color: "var(--stage-recorded)" },
   { key: "closed", title: "Verified & closed", hint: `In the last ${RECENT_DAYS} days`, statuses: ["verified_closed"], icon: "ph-seal-check", color: "var(--stage-closed)" },
+  { key: "reopened", title: "Reopen case", hint: "Fix not verified: needs action again", statuses: ["reopened"], icon: "ph-arrow-counter-clockwise", color: "var(--stage-reopened)" },
 ];
 
 const PRIORITY_RANK: Record<IssuePriority, number> = { critical: 0, high: 1, medium: 2, low: 3 };
@@ -122,7 +124,7 @@ export default async function ActionTrackerPage({ searchParams }: { searchParams
   const ownerNames = [...owners.keys()].sort((a, b) => a.localeCompare(b));
 
   const stats = [
-    { label: "Open corrective actions", value: open.length.toLocaleString("en-GB"), sub: "Assigned, being addressed or awaiting verification", icon: "ph-flag" },
+    { label: "Open corrective actions", value: open.length.toLocaleString("en-GB"), sub: "Assigned, being addressed, awaiting verification or reopened", icon: "ph-flag" },
     { label: `Past the ${targetDays}-day target`, value: pastTarget.toLocaleString("en-GB"), sub: open.length ? `${Math.round((pastTarget * 100) / open.length)}% of open actions` : "None open", icon: "ph-hourglass-medium", tone: pastTarget ? "var(--priority-high)" : undefined },
     { label: `Closed in the last ${RECENT_DAYS} days`, value: closed.length.toLocaleString("en-GB"), sub: onTime === null ? "None closed yet" : `${onTime}% within the target`, icon: "ph-seal-check", tone: closed.length ? "var(--status-resolved)" : undefined },
     { label: "Median days to close", value: medianClose === null ? "—" : String(medianClose), sub: `Findings closed in the last ${RECENT_DAYS} days`, icon: "ph-timer" },
@@ -177,8 +179,8 @@ export default async function ActionTrackerPage({ searchParams }: { searchParams
         ))}
       </div>
 
-      {/* Four stages side by side where the screen allows (R104); they wrap two-up, then one-up. */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))", gap: 10, alignItems: "start" }}>
+      {/* Five stages on one row where the screen allows (R104, R133); they wrap three, two, then one across. */}
+      <div className="stage-board">
         {COLUMNS.map((col) => {
           const all = col.key === "closed" ? closed : open.filter((r) => col.statuses.includes(r.status));
           // Open stages: past target first, then priority, then oldest. Closed: most recent first.
@@ -186,29 +188,26 @@ export default async function ActionTrackerPage({ searchParams }: { searchParams
           const color = col.color;
           const moreHref = col.key === "closed" ? "/issues?status=verified_closed" : `/issues?status=${col.statuses[0]}`;
           return (
-            <section key={col.key} aria-label={col.title} style={{ background: `color-mix(in srgb, ${color} 6%, var(--color-neutral-100))`, borderRadius: "var(--radius-lg)", padding: 8, display: "flex", flexDirection: "column", gap: 6, minWidth: 0 }}>
-              <div style={{ padding: "8px 8px 6px", borderRadius: 8, background: color, color: "#fff" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <i className={`ph-fill ${col.icon}`} aria-hidden="true" style={{ fontSize: 15 }} />
-                  <h3 style={{ fontSize: 13, margin: 0, flex: 1, color: "#fff" }}>{col.title}</h3>
-                  <span style={{ fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700 }}>{all.length.toLocaleString("en-GB")}</span>
+            <section key={col.key} aria-label={col.title} style={{ background: `color-mix(in srgb, ${color} 6%, var(--color-neutral-100))`, borderRadius: "var(--radius-lg)", padding: 6, display: "flex", flexDirection: "column", gap: 5, minWidth: 0 }}>
+              <div style={{ padding: "6px 8px 5px", borderRadius: 7, background: color, color: "#fff", minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 5, minWidth: 0 }}>
+                  <i className={`ph-fill ${col.icon}`} aria-hidden="true" style={{ fontSize: 14, flex: "none" }} />
+                  <h3 style={{ fontSize: 12.5, margin: 0, flex: 1, minWidth: 0, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{col.title}</h3>
+                  <span style={{ fontFamily: "var(--font-heading)", fontSize: 15, fontWeight: 700, flex: "none" }}>{all.length.toLocaleString("en-GB")}</span>
                 </div>
-                <div style={{ fontSize: 11, marginTop: 1, opacity: 0.9 }}>{col.hint}</div>
+                <div style={{ fontSize: 10.5, marginTop: 1, opacity: 0.9, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }} title={col.hint}>{col.hint}</div>
               </div>
               {cards.slice(0, PER_COLUMN).map((r) => {
                 const days = age(r);
                 const isLate = col.key !== "closed" && late(r);
                 return (
                   <Link key={r.id} href={`/issues/${r.id}`} className="card elev-sm"
-                    style={{ padding: "8px 9px", gap: 3, textDecoration: "none", color: "inherit", borderLeft: `4px solid ${color}`, background: `color-mix(in srgb, ${color} 5%, var(--color-surface))` }}>
+                    style={{ padding: "7px 8px", gap: 2, textDecoration: "none", color: "inherit", borderLeft: `4px solid ${color}`, background: `color-mix(in srgb, ${color} 5%, var(--color-surface))` }}>
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 6 }}>
                       <span style={{ fontFamily: "var(--font-heading)", fontSize: 11, color: "var(--color-neutral-700)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{r.code}</span>
                       {(r.priority === "critical" || r.priority === "high") && <PriorityTag priority={r.priority} />}
                     </div>
-                    <div style={{ fontSize: 12.5, fontWeight: 600 }}>
-                      {r.finding?.label ?? r.category?.name ?? "Finding"}
-                      {r.status === "reopened" && <span style={{ color: STATUS_COLOR.reopened, fontWeight: 600, fontSize: 11.5 }}> · Reopened</span>}
-                    </div>
+                    <div style={{ fontSize: 12, fontWeight: 600 }}>{r.finding?.label ?? r.category?.name ?? "Finding"}</div>
                     <div className="text-muted" style={{ fontSize: 11.5, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                       {r.facility?.name ?? "—"}{r.lga?.name ? ` · ${r.lga.name}` : ""}
                     </div>

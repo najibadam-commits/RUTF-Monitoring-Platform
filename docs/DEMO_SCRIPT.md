@@ -91,6 +91,8 @@ supervision visit as it's recorded. Nobody has to go looking for problems.
 2. Filter **LGA = Daura**, tick **Past target only** → *"this is the list for Monday's meeting."*
 3. Click a person in **Who holds the open actions** → their board.
 4. Open a card → the Finding's full history.
+5. The red **Reopen case** stage: a fix the supervisor could not verify at the follow-up visit goes back to
+   the responsible person, with the reason in its history (four DUMMY cases, one in Daura).
 
 **Say:** findings are for review, not accusation — but every one has an owner and a deadline
 (30 days) until a supervisor verifies it closed.
@@ -163,6 +165,7 @@ and for the next state tomorrow."
 ## After the demo
 
 - Reset the data access requests: `node seed-demo-download-requests.js` (in `web-platform\tools\db`).
+- Put the reopened cases back, if wanted: `node seed-demo-reopened.js --remove` (in `web-platform\tools\db`).
 - Turn the nightly checks back on: `node demo-pause-checks.js --resume` (in `web-platform\tools\db`).
 - Nothing else changes the demo data except the nightly checks (and the phone reports ageing).
 - Before real pilot data: `node seed-demo-sync-status.js --remove` and `node seed-demo-download-requests.js --remove`, with the rest of the DUMMY data.
