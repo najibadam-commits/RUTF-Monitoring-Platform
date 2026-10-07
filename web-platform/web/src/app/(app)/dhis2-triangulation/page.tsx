@@ -106,6 +106,26 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
     return { label: new Date(`${trendMonths[i].key}-01T00:00:00Z`).toLocaleString("en-GB", { month: "short", timeZone: "UTC" }), n: rs.length, pct: rs.length ? (ok * 100) / rs.length : null };
   });
 
+  // DHIS2 against the ledger, one dot per OTP site (DECISIONS R115).
+  const points = rows.filter((r) => r.dhis2_distributed !== null);
+  const scatterMax = Math.max(1, ...points.flatMap((r) => [Number(r.dhis2_distributed), Number(r.ledger_distributed)]));
+  const SX = (v: number) => 40 + (v / scatterMax) * 350;
+  const SY = (v: number) => 230 - (v / scatterMax) * 210;
+
+  // Repeat differences: OTP sites over the limit in several of the last six months.
+  const REPEAT_MIN = 3;
+  const repeats = new Map<string, { id: string; name: string; lga: string; months: number; latest: number | null }>();
+  results.forEach((res) => {
+    for (const r of byLgaFilter((res.data ?? []) as Row[])) {
+      const d = diff(r);
+      const e = repeats.get(r.facility_id) ?? { id: r.facility_id, name: r.facility_name, lga: r.lga_id, months: 0, latest: null };
+      if (d !== null && Math.abs(d) > LIMIT) e.months += 1;
+      e.latest = d;
+      repeats.set(r.facility_id, e);
+    }
+  });
+  const repeatRows = [...repeats.values()].filter((e) => e.months >= REPEAT_MIN).sort((a, b) => b.months - a.months || Math.abs(b.latest ?? 0) - Math.abs(a.latest ?? 0));
+
   const byLga = new Map<string, Row[]>();
   for (const r of rows) byLga.set(r.lga_id, [...(byLga.get(r.lga_id) ?? []), r]);
   const lgaRows = [...byLga]
@@ -218,6 +238,63 @@ export default async function Dhis2TriangulationPage({ searchParams }: { searchP
               {lgaRows.length === 0 && <tr><td colSpan={4} className="text-muted" style={{ textAlign: "center", padding: 16 }}>No DHIS2 reports.</td></tr>}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 380px), 1fr))", gap: 12, alignItems: "start" }}>
+        <div className="card elev-sm" style={{ padding: "12px 14px", gap: 6 }}>
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 8, flexWrap: "wrap" }}>
+            <div className="card-title" style={{ fontSize: 14 }}>DHIS2 against the ledger</div>
+            <span className="kpi-sub" style={{ display: "inline-flex", gap: 10 }}>
+              {(["ok", "higher", "lower", "other"] as Flagged[]).map((k) => (
+                <span key={k}><span style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: COLOR[STATUS[k].level], marginRight: 3 }} />
+                  {k === "ok" ? "matches" : k === "higher" ? "DHIS2 higher" : k === "lower" ? "DHIS2 lower" : "other differs"}</span>
+              ))}
+            </span>
+          </div>
+          <svg viewBox="0 0 400 260" role="img" style={{ width: "100%", maxHeight: 280 }}
+            aria-label={`${points.length} OTP sites: sachets distributed per DHIS2 against the ledger for ${month.label}; on the diagonal they agree`}>
+            <line x1={SX(0)} y1={SY(0)} x2={SX(scatterMax)} y2={SY(scatterMax)} stroke="var(--color-neutral-400)" strokeDasharray="4 4" />
+            <line x1={SX(0)} y1={SY(0)} x2={SX(scatterMax)} y2={SY(0)} stroke="var(--color-divider)" />
+            <line x1={SX(0)} y1={SY(0)} x2={SX(0)} y2={SY(scatterMax)} stroke="var(--color-divider)" />
+            {points.map((r) => {
+              const f = flagOf(r);
+              return (
+                <circle key={r.facility_id} cx={SX(Number(r.ledger_distributed))} cy={SY(Number(r.dhis2_distributed))} r={f === "ok" ? 2.5 : 3.5}
+                  fill={COLOR[STATUS[f].level]} fillOpacity={f === "ok" ? 0.55 : 0.9} stroke="#fff" strokeWidth="0.8">
+                  <title>{`${r.facility_name}: DHIS2 ${fmt(Number(r.dhis2_distributed))}, ledger ${fmt(Number(r.ledger_distributed))}`}</title>
+                </circle>
+              );
+            })}
+            <text x={SX(scatterMax)} y="252" fontSize="10.5" textAnchor="end" fill="var(--color-neutral-600)">ledger: {fmt(scatterMax)} sachets →</text>
+            <text x="4" y="14" fontSize="10.5" fill="var(--color-neutral-600)">DHIS2 ↑</text>
+            <text x={SX(scatterMax) - 4} y={SY(scatterMax) + 14} fontSize="10.5" textAnchor="end" fill="var(--color-neutral-500)">agreement</text>
+          </svg>
+          <div className="kpi-sub">Each dot is an OTP site&apos;s sachets distributed in {month.label}: across, the ledger; up, DHIS2. On the dashed line they agree; hover a dot for the figures.</div>
+        </div>
+
+        <div className="card elev-sm" style={{ padding: 0, overflowX: "auto" }}>
+          <div style={{ padding: "12px 14px 0" }}>
+            <div className="card-title" style={{ fontSize: 14 }}>Repeat differences</div>
+            <div className="kpi-sub">OTP sites over {LIMIT}% apart in {REPEAT_MIN} or more of the last {TREND_MONTHS} months — a reporting habit to fix, not a one-off slip.</div>
+          </div>
+          <table className="table" style={{ marginTop: 6 }}>
+            <thead><tr><th>OTP site</th><th style={{ textAlign: "right" }}>Months apart</th><th style={{ textAlign: "right" }}>Latest</th></tr></thead>
+            <tbody>
+              {repeatRows.slice(0, 10).map((e) => (
+                <tr key={e.id}>
+                  <td>
+                    <FacilityLink id={e.id} name={e.name} />
+                    <div className="text-muted" style={{ fontSize: 11.5 }}>{lgaName[e.lga] ?? "—"}</div>
+                  </td>
+                  <td style={{ textAlign: "right" }}><Flag level="warning">{e.months} of {TREND_MONTHS}</Flag></td>
+                  <td style={{ textAlign: "right" }}>{e.latest === null ? "—" : `${e.latest > 0 ? "+" : ""}${fmt(e.latest, 1)}%`}</td>
+                </tr>
+              ))}
+              {repeatRows.length === 0 && <tr><td colSpan={3} className="text-muted" style={{ textAlign: "center", padding: 16 }}>No OTP site differs repeatedly.</td></tr>}
+            </tbody>
+          </table>
+          {repeatRows.length > 10 && <div className="text-muted" style={{ fontSize: 12, padding: "8px 14px 12px" }}>The 10 most persistent of {fmt(repeatRows.length)}.</div>}
         </div>
       </div>
 
