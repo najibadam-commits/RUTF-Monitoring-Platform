@@ -32,7 +32,7 @@ node test-mobile-role-access.js    # every role tried against every rule (rolled
 | Views keep RLS (`security_invoker`) | audit-permissions | ✅ |
 | Storage buckets private | audit-permissions | ✅ 4 of 4 private |
 | Every active account (except Super Admin) has a project | audit-permissions | ✅ all |
-| Per-role reads and writes on Findings, reference data, ledger, visits, DHIS2, audit trail, sync | test-mobile-role-access | ✅ 202/202 |
+| Per-role reads and writes on Findings, reference data, ledger, visits, DHIS2, audit trail, sync | test-mobile-role-access | ✅ 208/208 (re-run 8 Oct 2026 with 0122 and 0123: Finding delete and TRUNCATE refused for every role) |
 
 ## 3. Findings and fixes (migration 0108)
 

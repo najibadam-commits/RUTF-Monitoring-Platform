@@ -27,7 +27,7 @@ const SAFEGUARDS = [
   { icon: "ph-lock-key", text: "Row-level security on every table: the database decides who sees what, for the web, the app and the API alike" },
   { icon: "ph-user-minus", text: "No data or function open to signed-out users" },
   { icon: "ph-folder-lock", text: "All four file stores (photos, evidence) private" },
-  { icon: "ph-users-three", text: "Every role tried against every rule: 202 of 202 checks pass" },
+  { icon: "ph-users-three", text: "Every role tried against every rule: 208 of 208 checks pass" },
   { icon: "ph-baby", text: "No child or caregiver names or IDs: aggregate OTP tallies only" },
   { icon: "ph-clock-counter-clockwise", text: "Changes to accounts, reference data and ledger status written to the Audit Trail by the database" },
 ];

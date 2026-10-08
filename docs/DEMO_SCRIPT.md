@@ -164,7 +164,7 @@ and for the next state tomorrow."
 | --- | --- |
 | What if there's no network? | The field app records offline and syncs by itself (completed after this review); Offline Sync Health shows each phone's last sync and anything waiting (step 2). |
 | Can someone change the figures afterwards? | Stock Ledger integrity line; Audit Trail (Administration). |
-| Can a Finding be deleted or quietly dropped? | No: there is no Delete in the app, and the database refuses it for every role (permissions test: 202 of 202). A mistaken Finding is returned for correction or edited, with its history; a fix that doesn't hold goes to **Reopen case**. |
+| Can a Finding be deleted or quietly dropped? | No: there is no Delete in the app, and the database refuses it for every role (permissions test: 208 of 208). A mistaken Finding is returned for correction or edited, with its history; a fix that doesn't hold goes to **Reopen case**. |
 | Who decides the limits? | Master Data → Thresholds (variance, short-dispensing, 30-day target); Settings → go-live readiness. |
 | Is child data collected? | No — aggregate tallies only; Governance on the landing page; DPIA draft. |
 | How does it fit DHIS2? | DHIS2 Triangulation; monthly extract upload. |

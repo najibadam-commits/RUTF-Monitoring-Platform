@@ -127,6 +127,14 @@ function check(area, role, what, expected, actual) {
       finally { await pg.query("rollback to savepoint attempt"); await pg.query("release savepoint attempt"); }
     }
 
+    // TRUNCATE bypasses row-level security, so the API roles must not hold it (migration 0122,
+    // permissions review P8). Counted as refused only when the database says permission denied,
+    // so an unrelated error can't pass for a refusal. Rolled back like every attempt.
+    async function attemptTruncate(table) {
+      const r = await attempt(`truncate ${table}`);
+      return r === "denied" && !/permission denied/i.test(lastDenial) ? `error: ${lastDenial}` : r;
+    }
+
     // Expected server behaviour per role (mirrors web rbac.ts; see DECISIONS.md #31).
     const EXPECT = {
       visibleFindings:   { super_admin: 4, project_admin: 3, state_coordinator: 3, tpm_supervisor: 3, dri: 1 },
@@ -318,6 +326,7 @@ function check(area, role, what, expected, actual) {
           await attempt(`insert into dhis2_reports (project_id, facility_id, period, sachets_distributed) values ($1, $2, date_trunc('month', now())::date, 1)`, [P, OTP1]));
         check("D. hardening", role, "send a notification/email via create_notification", "denied",
           await attempt(`select create_notification($1, 'x', 'x', null, null)`, [u("super_admin")]));
+        check("D. hardening", role, "TRUNCATE the audit trail (never: migration 0122)", "denied", await attemptTruncate("audit_log"));
         check("D. hardening", role, "sees the audit trail", EXPECT_D.auditVisible[role],
           Number((await one(`select count(*)::int n from audit_log where table_name = 'facilities' and row_id = $1::text`, [OTP2])).n) > 0);
         check("D. hardening", role, "report_sync_status from own device", "allowed",
@@ -365,6 +374,7 @@ function check(area, role, what, expected, actual) {
     check("D. hardening", "anon", "signed out: call rutf_kpis", "denied", await attempt(`select rutf_kpis('2026-09-01', '2026-09-30')`));
     check("D. hardening", "anon", "signed out: call ledger_balance", "denied", await attempt(`select ledger_balance($1, null, current_date)`, [LST1]));
     check("D. hardening", "anon", "signed out: call create_notification", "denied", await attempt(`select create_notification($1, 'x', 'x', null, null)`, [u("super_admin")]));
+    check("D. hardening", "anon", "signed out: TRUNCATE the audit trail", "denied", await attemptTruncate("audit_log"));
     await pg.query("reset role");
     await pg.query("rollback to savepoint anon_ctx"); await pg.query("release savepoint anon_ctx");
   } finally {

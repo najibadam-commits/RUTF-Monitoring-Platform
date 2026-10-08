@@ -205,7 +205,7 @@ existing RBAC helpers) rather than introducing new patterns.
 | Test case | Expected result | Status |
 |---|---|---|
 | Catalogue audit (`tools/db/audit-permissions.js`) | RLS on every table; no signed-out policies or functions; definer `search_path`; `security_invoker` views; private buckets; every account in a project | ✅ no problems (before 0108: 27 SECURITY DEFINER functions callable signed out) |
-| Role-access matrix incl. section D (0108) | 202 checks across 5 roles + signed out | ✅ `node tools/db/test-mobile-role-access.js` 202/202 |
+| Role-access matrix incl. section D (0108) | 208 checks across 5 roles + signed out | ✅ `node tools/db/test-mobile-role-access.js` 208/208 (8 Oct 2026) |
 | Facility user can't read the supplier's ledger or balance; Receive Stock pre-fill via `incoming_transfer_lines` (own facility only) | 0 rows / 0 balance; 1 line; 0 for another facility | ✅ section D |
 | Direct ledger insert / void, direct visit insert | Denied for every role | ✅ section D |
 | `create_notification` called directly (any role, signed out) | Denied; review RPCs that use it still work | ✅ section B + D |
@@ -363,3 +363,11 @@ existing RBAC helpers) rather than introducing new patterns.
 | Master Data facility list, Finding detail | Ward name followed by its Ward ID | ✅ typecheck + lint; ⏳ browser check |
 | LGA ID (R80) | Daura → KT-DAU in Master Data and on the Finding page | ✅ typecheck + lint; ⏳ browser check |
 | State ID (R81) | "State ID KT" on the Finding page; "Katsina (KT)" in the map's state filter | ✅ typecheck + lint; ⏳ browser check |
+
+# API roles: no TRUNCATE, no Finding delete (R136, R129, R139)
+
+| Check | Expected | Status |
+|---|---|---|
+| Delete a Finding, every role (0123) | denied | ✅ 5/5 |
+| TRUNCATE the audit trail, every role and signed out (0122) | denied with "permission denied" | ✅ 6/6 |
+| Role access with 0122 and 0123 | 208/208 | ✅ 8 Oct 2026 |

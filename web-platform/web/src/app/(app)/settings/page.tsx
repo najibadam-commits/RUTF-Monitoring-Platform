@@ -69,7 +69,7 @@ export default async function SettingsPage() {
     { title: "Data protection sign-off", state: "decision", detail: "DPIA draft for the Data Protection Officer; retention periods to set (NDPA 2023)" },
     { title: "User acceptance testing", state: "decision", detail: "UAT script ready for the State team to run and sign" },
     { title: "Release signing key for the Android app", state: "decision", detail: "Created and held by the programme, for the production build" },
-    { title: "Permissions review", state: "done", detail: "Every role tried against every rule: 202 of 202 checks pass (docs/PERMISSIONS_REVIEW.md)" },
+    { title: "Permissions review", state: "done", detail: "Every role tried against every rule: 208 of 208 checks pass (docs/PERMISSIONS_REVIEW.md)" },
   ];
 
   return (
