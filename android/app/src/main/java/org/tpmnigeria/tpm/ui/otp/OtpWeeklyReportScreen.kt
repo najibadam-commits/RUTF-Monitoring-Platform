@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -52,10 +53,11 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
 /**
- * The weekly OTP site report (RUTF DECISIONS R147–R149). The figures are calculated live on the
- * server from the site's records — the officer reviews them, explains every flagged issue, confirms
- * and submits to the State Coordinator; nothing is typed in. A returned report shows the
- * coordinator's note; an approved one can only change by an amendment, with a reason.
+ * The weekly OTP site report (RUTF DECISIONS R147–R149, R153). The figures are calculated live on
+ * the server from the site's records — the officer reviews them, explains every flagged issue,
+ * corrects a figure only with a reason (kept with the calculated value), confirms and submits to
+ * the State Coordinator. A returned report shows the coordinator's note; an approved or rejected
+ * one can only change by an amendment, with a reason.
  */
 @Composable
 fun OtpWeeklyReportScreen(onExit: () -> Unit) {
@@ -116,18 +118,19 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
         TpmCard(blueprint = true) {
             Text(
                 when (status) {
-                    "submitted" -> "Submitted: waiting for the State Coordinator"; "approved" -> "Approved"
-                    "returned" -> "Returned for revision"; else -> if (r.bool("amendment")) "Amendment draft" else "Draft: not submitted"
+                    "submitted" -> "Submitted: waiting for the State Coordinator"; "under_review" -> "Under review by the State Coordinator"
+                    "approved" -> "Approved"; "returned" -> "Returned for correction"; "rejected" -> "Rejected"
+                    else -> if (r.bool("amendment")) "Amendment draft" else "Draft: not submitted"
                 },
                 style = MaterialTheme.typography.titleMedium,
-                color = when (status) { "approved" -> OtpGreen; "returned" -> OtpRed; "submitted" -> OtpAmber; else -> TpmColors.Text },
+                color = when (status) { "approved" -> OtpGreen; "returned", "rejected" -> OtpRed; "submitted", "under_review" -> OtpAmber; else -> TpmColors.Text },
             )
             ReviewRow("Due", r.str("due").orEmpty())
             r.obj("last_decision")?.let { d ->
-                ReviewRow(if (d.str("decision") == "approved") "Approved by" else "Returned by", "${d.str("by")}")
+                ReviewRow(when (d.str("decision")) { "approved" -> "Approved by"; "rejected" -> "Rejected by"; else -> "Returned by" }, "${d.str("by")}")
                 d.str("note")?.let { Text("“$it”", style = MaterialTheme.typography.bodyMedium) }
             }
-            Text("Calculated live from this site's records: nothing to type in. Review, explain anything flagged, then submit.",
+            Text("Calculated live from this site's records. Review it, explain anything flagged, correct a figure only with a reason, then submit.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
         }
 
@@ -157,6 +160,19 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                 ReviewRow("J. IYCF / health education", if (j?.str("status") == "none_recorded") "no sessions recorded" else
                     "${j?.str("sessions")} sessions, ${j?.str("total_participants") ?: "—"} participants")
             }
+            s.obj("L")?.let { l ->
+                val v = l.obj("visits"); val rutf = l.obj("rutf"); val rec = l.obj("recovery"); val ref = l.obj("referrals"); val ap = l.obj("appointments")
+                TpmCard {
+                    Text("L. Visits and follow-up", style = MaterialTheme.typography.titleMedium)
+                    ReviewRow("Visits", "admission ${v?.str("admission")}, 2nd ${v?.str("second")}, 3rd ${v?.str("third")}, 4th or later ${v?.str("fourth_or_later")} · absent ${v?.str("absent")}")
+                    ReviewRow("RUTF at visits", "${rutf?.str("given")} packets given / ${rutf?.str("recommended")} recommended · ${rutf?.str("visits_differing")} visit(s) differed · none recommended at ${rutf?.str("visits_withheld")}")
+                    ReviewRow("Since the previous visit", "improved ${rec?.str("improved")}, no change ${rec?.str("unchanged")}, worse ${rec?.str("deteriorated")}")
+                    ReviewRow("Referrals", "made ${ref?.str("made")} · open at the end of the week ${ref?.str("open_at_week_end")}")
+                    ReviewRow("Scheduled visits", "due ${ap?.str("due_in_week")}, attended ${ap?.str("attended")}, missed ${ap?.str("missed")} · overdue at the end of the week ${ap?.str("overdue_at_week_end")}")
+                    ReviewRow("Incomplete records", "RUTF photos to send ${l.str("awaiting_photo")} · admission visits not recorded ${l.str("admission_visit_missing")}")
+                }
+            }
+            CorrectionsCard(r, s, editable, onChanged = { reload++ })
         }
 
         // K. Issues and explanations.
@@ -175,7 +191,7 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
         }
 
         if (editable) {
-            if (r.bool("amendment")) TpmTextField(label = "Reason for amending the approved report", value = amendmentReason, onValueChange = { amendmentReason = it })
+            if (r.bool("amendment")) TpmTextField(label = "Reason for the amendment", value = amendmentReason, onValueChange = { amendmentReason = it })
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Checkbox(checked = confirmed, onCheckedChange = { confirmed = it })
                 Text("I have reviewed this report against the site's records")
@@ -209,8 +225,8 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                         }
                     })
             }
-        } else if (status == "approved") {
-            TpmButton(text = "Amend this approved report", variant = TpmButtonVariant.Ghost, fullWidth = true, onClick = {
+        } else if (r.bool("can_amend") || status == "approved") {
+            TpmButton(text = if (status == "rejected") "Start a new version (amendment)" else "Amend this approved report", variant = TpmButtonVariant.Ghost, fullWidth = true, onClick = {
                 scope.launch {
                     when (val res = repo.reportStartAmendment(r.str("report_id").orEmpty())) {
                         is OtpResult.Ok -> reload++
@@ -220,5 +236,81 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
             })
         }
         Text("Versions: ${r.arr("versions").size} · every submission and decision is kept.", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+    }
+}
+
+/** The figures that may be corrected, with their place in the report. */
+private val CORRECTABLE = listOf(
+    "B.SAM.total" to "B. Under treatment at the start", "C.SAM.total" to "C. New cases",
+    "D.SAM.in.total" to "D. Transfers in", "D.SAM.out.total" to "D. Transfers out",
+    "E.SAM.cured.total" to "E. Cured", "E.SAM.defaulted.total" to "E. Defaulted", "E.SAM.died.total" to "E. Died",
+    "E.SAM.non_recovered.total" to "E. Non-recovered", "E.SAM.absent.total" to "E. Absent",
+    "F.SAM.actual.total" to "F. Under treatment at the end",
+    "G.received" to "G. RUTF received (sachets)", "G.dispensed" to "G. RUTF dispensed (sachets)", "G.losses" to "G. RUTF losses (sachets)",
+    "I.total.total" to "I. Children screened", "J.sessions" to "J. Sessions", "J.total_participants" to "J. Participants",
+    "L.visits.admission" to "L. Admission visits", "L.visits.second" to "L. Second visits", "L.visits.third" to "L. Third visits",
+    "L.visits.fourth_or_later" to "L. Fourth or later visits", "L.visits.absent" to "L. Absences", "L.rutf.given" to "L. RUTF packets given",
+    "L.referrals.made" to "L. Referrals made",
+)
+
+private fun valueAt(sections: JsonObject, path: String): String? {
+    val parts = path.split(".")
+    var node: JsonObject? = sections
+    parts.dropLast(1).forEach { node = node?.obj(it) }
+    return node?.str(parts.last())
+}
+
+private val WHOLE_NUMBER = Regex("^-?\\d*$")
+
+/**
+ * Corrections (web 0128): a calculated figure may be corrected only with a reason. The calculated
+ * value, the corrected value, who and when are kept, and the State Coordinator sees each one.
+ * Fixing the source record (a visit, a stock entry) is still the first choice: the report recalculates.
+ */
+@Composable
+private fun CorrectionsCard(report: JsonObject, sections: JsonObject, editable: Boolean, onChanged: () -> Unit) {
+    val repo = remember { OtpRepository() }
+    val scope = rememberCoroutineScope()
+    val adjustments = report.arr("adjustments").objects()
+    var path by remember { mutableStateOf<String?>(null) }
+    var value by remember { mutableStateOf("") }
+    var reason by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    if (!editable && adjustments.isEmpty()) return
+    val labels = CORRECTABLE.toMap()
+    TpmCard {
+        Text("Corrections", style = MaterialTheme.typography.titleMedium)
+        if (adjustments.isEmpty()) Text("None. Correct the source record first if you can: the report recalculates.",
+            style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        adjustments.forEach { a ->
+            val p = a.str("path").orEmpty()
+            ReviewRow(labels[p] ?: p, "calculated ${a.str("original")} → corrected ${a.str("adjusted")} · ${a.str("reason")} (${a.str("by")})")
+            if (editable) TpmButton(text = "Remove", variant = TpmButtonVariant.Ghost, onClick = {
+                scope.launch {
+                    when (val r = repo.reportAdjust(report.str("report_id").orEmpty(), p, null, "Correction removed")) {
+                        is OtpResult.Ok -> onChanged()
+                        is OtpResult.Error -> error = r.message
+                    }
+                }
+            })
+        }
+        if (editable) {
+            TpmDropdown(label = "Figure to correct", selected = path, options = CORRECTABLE.map { it.first }, onSelect = { path = it; value = "" },
+                labelFor = { "${labels[it]} (now ${valueAt(sections, it) ?: "—"})" })
+            if (path != null) {
+                TpmTextField(label = "Corrected value", value = value, onValueChange = { if (it.matches(WHOLE_NUMBER)) value = it }, keyboardType = KeyboardType.Number)
+                TpmTextField(label = "Reason (required)", value = reason, onValueChange = { reason = it })
+                TpmButton(text = "Save the correction", enabled = value.toDoubleOrNull() != null && reason.isNotBlank(), onClick = {
+                    error = null
+                    scope.launch {
+                        when (val r = repo.reportAdjust(report.str("report_id").orEmpty(), path!!, value.toDouble(), reason.trim())) {
+                            is OtpResult.Ok -> { path = null; value = ""; reason = ""; onChanged() }
+                            is OtpResult.Error -> error = r.message
+                        }
+                    }
+                })
+            }
+        }
+        error?.let { Text(it, color = OtpRed, style = MaterialTheme.typography.bodySmall) }
     }
 }

@@ -21,6 +21,7 @@ const SITES = 20, APPROVE = 12, RETURN = 2;
     if (remove) {
       const reps = (await pg.query(`select distinct r.id from otp_weekly_reports r join otp_weekly_report_versions v on v.report_id = r.id
         where v.comments::text like '%(DUMMY)%'`)).rows.map((x) => x.id);
+      await pg.query(`delete from otp_weekly_report_adjustments where report_id = any($1)`, [reps]);
       const v = await pg.query(`delete from otp_weekly_report_versions where report_id = any($1)`, [reps]);
       const r = await pg.query(`delete from otp_weekly_reports where id = any($1)`, [reps]);
       const n = await pg.query(`delete from notifications where type = 'weekly_report' and user_id in (select id from profiles where name like '%(DUMMY)%')`);

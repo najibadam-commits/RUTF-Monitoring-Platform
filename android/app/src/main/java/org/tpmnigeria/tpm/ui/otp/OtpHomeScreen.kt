@@ -10,12 +10,17 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import kotlinx.serialization.json.JsonObject
+import org.tpmnigeria.tpm.data.OtpRepository
+import org.tpmnigeria.tpm.data.OtpResult
+import org.tpmnigeria.tpm.data.obj
 import org.tpmnigeria.tpm.ui.components.TpmButton
 import org.tpmnigeria.tpm.ui.components.TpmButtonVariant
 import org.tpmnigeria.tpm.ui.components.TpmCard
@@ -38,9 +43,13 @@ fun OtpHomeScreen(
     onWeeklyReport: () -> Unit,
     onMnp: () -> Unit,
     onIycf: () -> Unit,
+    onVisits: () -> Unit,
     onExit: () -> Unit,
 ) {
+    val repo = remember { OtpRepository() }
     var code by remember { mutableStateOf("") }
+    var counts by remember { mutableStateOf<JsonObject?>(null) }
+    LaunchedEffect(Unit) { counts = (repo.myVisits() as? OtpResult.Ok)?.data?.obj("counts") }
     val clean = code.trim().uppercase()
     val valid = CHILD_ID.matches(clean)
     BackHandler(onBack = onExit)
@@ -57,8 +66,14 @@ fun OtpHomeScreen(
             style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted,
         )
 
+        TpmCard {
+            Text("Visits and tasks", style = MaterialTheme.typography.titleMedium)
+            VisitsSummary(counts)
+            TpmButton(text = "Open visits and tasks", onClick = onVisits, variant = TpmButtonVariant.Secondary, fullWidth = true)
+        }
+
         TpmCard(blueprint = true) {
-            Text("Returning child", style = MaterialTheme.typography.titleMedium)
+            Text("Find existing child", style = MaterialTheme.typography.titleMedium)
             TpmTextField(label = "Child ID (from the caregiver's card)", value = code, onValueChange = { code = it.uppercase() },
                 placeholder = "e.g. KT-DAU-26-00042")
             if (code.isNotBlank() && !valid) {
@@ -68,8 +83,8 @@ fun OtpHomeScreen(
         }
 
         TpmCard {
-            Text("New child", style = MaterialTheme.typography.titleMedium)
-            Text("Screen the child first. If they meet the OTP criteria you can register them and the Child ID is issued.",
+            Text("Register new child", style = MaterialTheme.typography.titleMedium)
+            Text("First visit: screen the child. If they meet the OTP criteria you register them, the Child ID is issued, and you record the admission visit with the RUTF given.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
             TpmButton(text = "Screen a child", onClick = onScreenChild, variant = TpmButtonVariant.Secondary, fullWidth = true, blueprint = true)
         }

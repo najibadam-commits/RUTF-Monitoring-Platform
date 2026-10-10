@@ -11,7 +11,13 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import io.github.jan.supabase.storage.storage
 import org.tpmnigeria.tpm.data.remote.Supabase
+import java.io.File
+import java.util.UUID
+
+/** Private bucket for the photos of RUTF given at OTP visits (web migration 0128). */
+const val OTP_RUTF_EVIDENCE_BUCKET = "otp-rutf-evidence"
 
 /**
  * The Digital OTP Admission Card (RUTF DECISIONS R142–R145): every call goes to the database's
@@ -54,6 +60,36 @@ class OtpRepository {
     suspend fun recordOutcome(body: JsonObject) = call("otp_record_outcome", p(body))
     suspend fun ration(weightKg: Double) = call("otp_ration", buildJsonObject { put("p_weight_kg", weightKg) })
 
+    // Follow-up (web migration 0128; DECISIONS R150–R153): the visits list (Child IDs only), the
+    // next visit, referrals and the photo of the RUTF given.
+    suspend fun myVisits() = call("otp_my_visits", buildJsonObject { })
+    suspend fun reschedule(body: JsonObject) = call("otp_reschedule_visit", p(body))
+    suspend fun refer(body: JsonObject) = call("otp_refer_child", p(body))
+    suspend fun updateReferral(referralId: String, status: String, note: String?) = call("otp_update_referral", buildJsonObject {
+        put("p_referral_id", referralId); put("p_status", status); put("p_note", note.orEmpty())
+    })
+
+    /**
+     * Uploads the photo of the RUTF given to the private bucket under the visit's folder
+     * ({site}/{visit}/), attaches it to the visit (which completes it) and deletes the file from
+     * the phone. The officer has confirmed that no child or caregiver is in the photo.
+     */
+    suspend fun uploadRutfPhoto(visitId: String, folder: String, localPath: String): OtpResult {
+        val file = File(localPath)
+        if (!file.exists()) return OtpResult.Error("The photo file is missing: take it again.")
+        val path = folder.trimEnd('/') + "/" + UUID.randomUUID() + ".jpg"
+        return try {
+            Supabase.client.storage.from(OTP_RUTF_EVIDENCE_BUCKET).upload(path, file.readBytes()) { upsert = false }
+            call("otp_attach_visit_photo", buildJsonObject {
+                put("p_visit_id", visitId); put("p_storage_path", path); put("p_no_people_confirmed", true)
+            }).also { if (it is OtpResult.Ok) file.delete() }
+        } catch (e: RestException) {
+            OtpResult.Error(e.error)
+        } catch (e: Exception) {
+            OtpResult.Error("No connection. The photo is still on this screen: try again when you're online.")
+        }
+    }
+
     // Weekly OTP Site Report (web migration 0126; DECISIONS R149). Calculated live on the server.
     suspend fun reportOpen(weekStart: String) = call("otp_report_open", buildJsonObject { put("p_week_start", weekStart) })
     suspend fun reportSaveComments(reportId: String, comments: JsonObject) =
@@ -63,6 +99,10 @@ class OtpRepository {
         if (!amendmentReason.isNullOrBlank()) put("p_amendment_reason", amendmentReason)
     })
     suspend fun reportStartAmendment(reportId: String) = call("otp_report_start_amendment", buildJsonObject { put("p_report_id", reportId) })
+    /** Corrects one figure of the draft with a reason (value null removes the correction). */
+    suspend fun reportAdjust(reportId: String, path: String, value: Double?, reason: String) = call("otp_report_adjust", buildJsonObject {
+        put("p_report_id", reportId); put("p_path", path); put("p_value", value); put("p_reason", reason)
+    })
     suspend fun recordMnpStock(body: JsonObject) = call("otp_record_mnp_stock", p(body))
     suspend fun recordMnpDoses(body: JsonObject) = call("otp_record_mnp_doses", p(body))
     suspend fun recordIycfSession(body: JsonObject) = call("otp_record_iycf_session", p(body))

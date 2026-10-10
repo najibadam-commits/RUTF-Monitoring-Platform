@@ -99,6 +99,10 @@ weight. **Open:** weight precision at band edges (Q4), visit interval and so the
 | F1 | Weight below admission weight → arrange home visit or refer to inpatient care. | Alert at the visit; action recorded | Ready |
 | F2 | Weight does not change by the 4th visit → arrange home visit or refer to inpatient care. | Alert at visit 4; action recorded | Ready (definition of "no change", Q14) |
 | F3 | Each visit records weight, weight loss Y/N, no change Y/N, height, WFH, MUAC, oedema, diarrhoea/vomiting/fever/cough days, appetite (RUTF test good/poor/refused), temperature, respiratory rate, dehydration, pallor/anaemia, superficial infection, action/medication, RUTF packets, outcome, examiner initials. | Visit form = card page 2 | Ready |
+| F4 | *(follow-up, migration 0128)* Each visit is compared with the previous visit and the admission: weight, MUAC, WFH, oedema grade — better / same / worse. | Shown to the officer; counted in the weekly report (section L) | Ready — **direction only**; "sustained weight gain" / "no change" await Q14 |
+| F5 | *(G4 applied at follow-up)* Severe oedema (+++) or a poor / refused appetite test at a visit → stabilisation care. | No RUTF recommended; referral prompted; RUTF only with the reason and the authorising clinician; no routine visit scheduled | Ready |
+| F6 | *(follow-up)* Next visit a week after each visit; none while a referral is open, when discharge criteria are met, or at the defaulter count. | Appointment scheduled automatically; rescheduling needs a reason | Ready (interval: Q12) |
+| F7 | *(the request of 10 Oct)* About three visits are expected; a fourth is exceptional. | Rule-set setting `expected_visits`, **empty**: when set, later visits go to clinical review and no RUTF is recommended | **NEEDS DECISION (Q23)** |
 
 ## 8. Discharge as cured (6–59 months) — source G7
 
@@ -149,6 +153,7 @@ an authorised confirmation.
 | Q20 | Which OTP site in each LGA is the **Apex** centre, and which are satellites? | Distribution and reporting |
 | Q21 | **Child ID format** per LGA (e.g. `KT-DAU-26-00042`: state, LGA, year, number) — and is the number per LGA or per OTP site? | Child ID |
 | Q22 | **Who signs off** the clinical rules (State Nutrition Officer? a UNICEF nutrition specialist?), and who may **authorise** prescriptions, overrides and discharge at the site (the OTP Officer, or a clinician)? | Authorisation |
+| Q23 | The enhancement request expects **about three OTP visits** and an exceptional fourth; the booklet requires a **minimum stay of 8 weeks** for MUAC admissions (G7 D1) and the card has **12 visit columns**. How many visits are expected, for which admission criteria, and what happens after that number (clinical review, referral, continue)? | Expected visits; clinical review; no RUTF beyond the expected visits |
 
 ## 11. Decisions outside the clinical rules
 

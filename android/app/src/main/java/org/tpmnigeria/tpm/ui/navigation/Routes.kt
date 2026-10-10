@@ -52,6 +52,10 @@ object Routes {
     const val OtpWeeklyReport = "otpWeeklyReport"
     const val OtpMnp = "otpMnp"
     const val OtpIycf = "otpIycf"
+    // Follow-up (web 0128): the visits list (Child IDs only) and a visit's RUTF photo.
+    const val OtpTasks = "otpTasks"
+    const val OtpPhotoPattern = "otpPhoto/{visitId}/{childCode}?folder={folder}"
+    fun otpPhoto(visitId: String, childCode: String, folder: String) = "otpPhoto/$visitId/$childCode?folder=${android.net.Uri.encode(folder)}"
 
     const val FinalVerifyWizardPattern = "finalVerifyWizard?issueId={issueId}"
     fun finalVerifyWizard(issueId: String? = null) = if (issueId != null) "finalVerifyWizard?issueId=$issueId" else "finalVerifyWizard"

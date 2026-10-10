@@ -9,25 +9,44 @@ import { WeeklyReportDecision } from "@/components/reports/WeeklyReportDecision"
 
 export const metadata: Metadata = { title: "Weekly OTP Report" };
 
-// One weekly OTP report (DECISIONS R148): the submitted version's sections A–K exactly as
-// calculated and submitted, the data-quality issues with the officer's explanations, every
-// version with its decision, and — for the State Coordinator — approve or return. Aggregate only.
+// One weekly OTP report (DECISIONS R148, R153): the submitted version's sections A–L exactly as
+// calculated and submitted (with any figure the officer corrected, its calculated value and the
+// reason), the data-quality issues with the officer's explanations, every version with its
+// decision, and — for the State Coordinator — approve, return or reject. Opening a submitted
+// report marks it "under review". Aggregate only.
 
 type BySex = { M: number; F: number; total: number };
 type Issue = { code: string; severity: "blocking" | "warning" | "info"; section: string; message: string };
 // The engine's JSON (otp_weekly_report_compute), read field by field with optional chaining.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type EngineJson = Record<string, any>;
+type Adjustment = { path: string; calculated: number | null; original_when_corrected: number | null; adjusted: number; reason: string; by: string; at: string };
 type Version = {
-  version: number; data: EngineJson; issues: Issue[]; comments: Record<string, string>; amendment: boolean; amendment_reason: string | null;
-  submitted_by: string; submitted_at: string; decision: string | null; decision_note: string | null; decided_by: string | null; decided_at: string | null;
+  version: number; data: EngineJson; issues: Issue[]; comments: Record<string, string>; adjustments: Adjustment[]; amendment: boolean; amendment_reason: string | null;
+  submitted_by: string; submitted_at: string; review_started_by: string | null; review_started_at: string | null;
+  decision: string | null; decision_note: string | null; decided_by: string | null; decided_at: string | null;
 };
-type Report = { report_id: string; status: string; amendment: boolean; week_start: string; week_end: string; facility: string; lga: string; can_decide: boolean; versions: Version[] };
+type Report = {
+  report_id: string; status: string; amendment: boolean; week_start: string; week_end: string; facility: string; lga: string;
+  can_decide: boolean; can_start_review: boolean; versions: Version[];
+};
 
 const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 const fmtTime = (d: string) => new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" });
 const n = (v: unknown) => (v === null || v === undefined ? "—" : Number(v).toLocaleString("en-GB"));
-const STATUS_LABEL: Record<string, string> = { submitted: "Waiting for review", approved: "Approved", returned: "Returned for revision", draft: "Draft" };
+const STATUS_LABEL: Record<string, string> = {
+  submitted: "Waiting for review", under_review: "Under review", approved: "Approved", returned: "Returned for correction", rejected: "Rejected", draft: "Draft",
+};
+const DECISION_LABEL: Record<string, string> = { approved: "Approved", returned: "Returned", rejected: "Rejected" };
+// Where a corrected figure sits in the report, in words.
+const FIGURE_LABEL: Record<string, string> = {
+  "B.SAM.total": "B. Under treatment at the start", "C.SAM.total": "C. New cases", "D.SAM.in.total": "D. Transfers in", "D.SAM.out.total": "D. Transfers out",
+  "E.SAM.cured.total": "E. Cured", "E.SAM.defaulted.total": "E. Defaulted", "E.SAM.died.total": "E. Died", "E.SAM.non_recovered.total": "E. Non-recovered",
+  "E.SAM.absent.total": "E. Absent", "F.SAM.actual.total": "F. Under treatment at the end", "G.received": "G. RUTF received", "G.dispensed": "G. RUTF dispensed",
+  "G.losses": "G. RUTF losses", "I.total.total": "I. Children screened", "J.sessions": "J. Sessions", "J.total_participants": "J. Participants",
+  "L.visits.admission": "L. Admission visits", "L.visits.second": "L. Second visits", "L.visits.third": "L. Third visits",
+  "L.visits.fourth_or_later": "L. Fourth or later visits", "L.visits.absent": "L. Absences", "L.rutf.given": "L. RUTF packets given", "L.referrals.made": "L. Referrals made",
+};
 const OUTCOMES: [string, string][] = [
   ["cured", "Cured"], ["non_recovered", "Non-recovered"], ["died", "Death"], ["defaulted", "Defaulter"],
   ["transferred_inpatient", "Transferred to inpatient care"], ["refused_inpatient", "Refused inpatient care"], ["absent", "Absentees (still under treatment)"],
@@ -84,10 +103,11 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
         <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
           {r.lga} LGA · {fmtDay(r.week_start)} – {fmtDay(r.week_end)} · <b>{STATUS_LABEL[r.status] ?? r.status}</b> · version {v.version}
           {v.amendment ? " (amendment)" : ""} submitted by {v.submitted_by} on {fmtTime(v.submitted_at)}
+          {v.review_started_at ? ` · review started by ${v.review_started_by} on ${fmtTime(v.review_started_at)}` : ""}
         </p>
       </div>
 
-      {r.can_decide && <WeeklyReportDecision reportId={r.report_id} unexplainedBlocking={unexplained} />}
+      {r.can_decide && <WeeklyReportDecision reportId={r.report_id} unexplainedBlocking={unexplained} startReview={r.can_start_review} />}
 
       {/* K first: the issues and the officer's explanations, which the decision turns on. */}
       <Section letter="K" title="Data-quality checks and the officer's comments">
@@ -109,6 +129,26 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
         {v.comments?.general && <div style={{ fontSize: 13 }}><b>General comment:</b> {v.comments.general}</div>}
         {v.amendment_reason && <div style={{ fontSize: 13 }}><b>Reason for amendment:</b> {v.amendment_reason}</div>}
       </Section>
+
+      {(v.adjustments ?? []).length > 0 && (
+        <Section letter="✎" title="Figures corrected by the OTP Officer"
+          note="The report shows the corrected figure; the calculated figure from the site's records and the reason are kept here. Fixing the source record is preferred, as the report then recalculates.">
+          <table className="table">
+            <thead><tr><th>Figure</th><th style={{ textAlign: "right" }}>Calculated</th><th style={{ textAlign: "right" }}>Corrected</th><th>Reason</th><th>By</th></tr></thead>
+            <tbody>
+              {v.adjustments.map((a) => (
+                <tr key={a.path}>
+                  <td>{FIGURE_LABEL[a.path] ?? a.path}</td>
+                  <td style={{ textAlign: "right" }}>{n(a.calculated)}</td>
+                  <td style={{ textAlign: "right" }}><b>{n(a.adjusted)}</b></td>
+                  <td style={{ fontSize: 13 }}>{a.reason}</td>
+                  <td className="text-muted" style={{ fontSize: 12.5 }}>{a.by} · {fmtTime(a.at)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Section>
+      )}
 
       <Section letter="A" title="Reporting information">
         <table className="table"><tbody>
@@ -202,16 +242,47 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
         </Section>
       </div>
 
+      <Section letter="L" title="Visits, follow-up and referrals"
+        note={<>RUTF recommended is from the 92 g ration table at each visit&apos;s weight; none is recommended while a referral is open or with severe oedema or a poor appetite (booklet G4).
+          &ldquo;Since the previous visit&rdquo; is the direction of change in the measurements, not a clinical judgement (RULEBOOK Q14).</>}>
+        {!s.L ? <div className="text-muted" style={{ fontSize: 13 }}>Not in this version (submitted before follow-up was recorded).</div> : (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 16 }}>
+            <table className="table"><tbody>
+              {[["Admission visits", s.L.visits?.admission], ["Second visits", s.L.visits?.second], ["Third visits", s.L.visits?.third],
+                ["Fourth or later visits", s.L.visits?.fourth_or_later], ["Absences", s.L.visits?.absent]]
+                .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
+            </tbody></table>
+            <table className="table"><tbody>
+              {[["RUTF packets recommended", s.L.rutf?.recommended], ["RUTF packets given", s.L.rutf?.given], ["Visits where given ≠ recommended", s.L.rutf?.visits_differing],
+                ["Visits with none recommended", s.L.rutf?.visits_withheld], ["Given with a clinician's authorisation", s.L.rutf?.given_while_withheld]]
+                .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
+            </tbody></table>
+            <table className="table"><tbody>
+              {[["Improved since the previous visit", s.L.recovery?.improved], ["No change", s.L.recovery?.unchanged], ["Worse", s.L.recovery?.deteriorated],
+                ["Referrals made", s.L.referrals?.made], ["Referrals open at the end of the week", s.L.referrals?.open_at_week_end]]
+                .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
+            </tbody></table>
+            <table className="table"><tbody>
+              {[["Scheduled visits due", s.L.appointments?.due_in_week], ["Attended", s.L.appointments?.attended], ["Missed", s.L.appointments?.missed],
+                ["Overdue at the end of the week", s.L.appointments?.overdue_at_week_end], ["RUTF photos not yet sent", s.L.awaiting_photo],
+                ["Admission visits not recorded", s.L.admission_visit_missing]]
+                .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
+            </tbody></table>
+          </div>
+        )}
+      </Section>
+
       <Section letter="·" title="Versions">
         <table className="table">
-          <thead><tr><th>Version</th><th>Submitted</th><th>Decision</th><th>Note</th></tr></thead>
+          <thead><tr><th>Version</th><th>Submitted</th><th>Decision</th><th>Note</th><th style={{ textAlign: "right" }}>Corrections</th></tr></thead>
           <tbody>
             {r.versions.map((x) => (
               <tr key={x.version}>
                 <td>{x.version}{x.amendment ? " (amendment)" : ""}</td>
                 <td>{x.submitted_by} · {fmtTime(x.submitted_at)}</td>
-                <td>{x.decision ? `${x.decision === "approved" ? "Approved" : "Returned"} by ${x.decided_by} · ${fmtTime(x.decided_at!)}` : <span className="text-muted">Waiting</span>}</td>
+                <td>{x.decision ? `${DECISION_LABEL[x.decision] ?? x.decision} by ${x.decided_by} · ${fmtTime(x.decided_at!)}` : <span className="text-muted">{x.review_started_at ? "Under review" : "Waiting"}</span>}</td>
                 <td style={{ fontSize: 13 }}>{x.decision_note ?? "—"}</td>
+                <td style={{ textAlign: "right" }}>{(x.adjustments ?? []).length || "—"}</td>
               </tr>
             ))}
           </tbody>

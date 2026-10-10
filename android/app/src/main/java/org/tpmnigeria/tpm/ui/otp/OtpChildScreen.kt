@@ -51,8 +51,9 @@ import java.util.UUID
 
 /**
  * The digital OTP Admission Card for one child, opened by Child ID (RULEBOOK §4–§8): details,
- * the current admission, visits with the RUTF ration, routine medication due, the discharge check
- * and the outcome. Everything comes from otp_child_lookup() — only the OTP Officer at the child's
+ * the current admission, the next step and next visit, referrals, the comparison with the previous
+ * visit and the admission, progress since admission, visits with the RUTF recommended and given
+ * (and its photo), routine medication due, the discharge check and the outcome. Everything comes from otp_child_lookup() — only the OTP Officer at the child's
  * site gets it — and nothing is kept on the phone. Screenshots are blocked while it is open.
  */
 @Composable
@@ -120,18 +121,38 @@ fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onExit: (
                 if (rt.bool("ok")) ReviewRow("RUTF ration", "${rt.str("packets_per_week")} packets a week (${rt.str("packets_per_day")} a day) · ${rt.str("source")}")
                 else Text(rt.str("reason").orEmpty(), color = OtpAmber, style = MaterialTheme.typography.bodySmall)
             }
-            if (active) TpmButton(text = "Record a visit", onClick = { onRecordVisit(c.str("child_code").orEmpty()) }, fullWidth = true, blueprint = true)
+            if (active) {
+                val admissionVisit = c.obj("next_step")?.str("step") == "admission_visit"
+                TpmButton(text = if (admissionVisit) "Record the admission visit (RUTF given)" else "Record a follow-up visit",
+                    onClick = { onRecordVisit(c.str("child_code").orEmpty()) }, fullWidth = true, blueprint = true)
+            }
         }
 
-        // Visits (card C2).
+        // What happens next, the next visit and any referral (web migration 0128).
+        if (active) NextStepCard(c, onChanged = { reload++ })
+        if (active) ReferralCard(c, onChanged = { reload++ })
+        c.obj("latest_comparison")?.takeIf { it.str("basis") == "compared" }?.let { ComparisonCard(it) }
+        TrajectoryCard(c.arr("trajectory"))
+
+        // Visits (card C2): RUTF given against what the ration table recommended.
         val visits = c.arr("visits").objects()
         if (visits.isNotEmpty()) TpmCard {
             Text("Visits", style = MaterialTheme.typography.titleMedium)
             visits.forEach { v ->
+                val rutf = when (v.str("ration_status")) {
+                    "withheld" -> "RUTF ${v.str("rutf_dispensed") ?: "—"} given · none recommended" + (v.str("dispense_authorised_by")?.let { " (authorised by $it)" } ?: "")
+                    "no_rule" -> "RUTF ${v.str("rutf_dispensed") ?: "—"} given · no ration rule for this weight"
+                    else -> "RUTF ${v.str("rutf_dispensed") ?: "—"} given / ${v.str("rutf_prescribed") ?: "—"} recommended"
+                }
                 val line = if (v.str("attended") == "false") "Absent"
-                else "${v.str("weight_kg")} kg · MUAC ${v.str("muac_cm") ?: "—"} · oedema ${v.str("oedema") ?: "—"} · RUTF ${v.str("rutf_dispensed") ?: "—"}/${v.str("rutf_prescribed") ?: "—"}"
-                ReviewRow("Visit ${v.str("visit_number")} · ${v.str("visit_on")}", line)
+                else "${v.str("weight_kg")} kg · MUAC ${v.str("muac_cm") ?: "—"} · oedema ${v.str("oedema") ?: "—"} · $rutf"
+                val kind = if (v.str("visit_kind") == "admission") "Admission visit" else "Visit ${v.str("visit_number")}"
+                ReviewRow("$kind · ${v.str("visit_on")}" + if (v.str("photos")?.let { it != "0" } == true) " · photo ✓" else "", line)
                 v.arr("alerts").strings().forEach { Text("⚠ $it", color = OtpAmber, style = MaterialTheme.typography.bodySmall) }
+                if (v.str("record_status") == "awaiting_photo") {
+                    val folder = "${adm?.str("facility_id")}/${v.str("id")}/"
+                    RutfPhotoCapture(v.str("id").orEmpty(), folder, v.str("rutf_dispensed"), onDone = { toast.show("Photo sent: the visit is complete"); reload++ })
+                }
             }
         }
 

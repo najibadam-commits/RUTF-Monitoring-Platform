@@ -12,7 +12,9 @@ export const metadata: Metadata = { title: "OTP Caseload" };
 // each OTP centre and LGA for (opening caseload, admissions, exits by outcome, closing caseload,
 // RUTF), admissions by sex and age group, and screening outcomes. No child is named or listed:
 // a child's record is opened only by an OTP Officer, in the app, by entering the Child ID.
-// otp_aggregates() hides counts from 1 to (min cell − 1).
+// otp_aggregates() hides counts from 1 to (min cell − 1). Follow-up (migration 0128): visits by
+// number, the direction of change since the previous visit, referrals and overdue visits, from
+// otp_followup_aggregates(), with the same hiding and no totals of split figures.
 
 type Cohort = {
   opening: number; admissions: number; new_cases: number; cured: number; defaulted: number; died: number;
@@ -38,6 +40,15 @@ const PATHWAY: Record<string, string> = {
   correct_inputs: "Measurements to correct",
 };
 const AGES = ["6-11", "12-23", "24-59"] as const;
+type FollowUp = { min_cell_count: number; counts: Record<string, number | null>; suppressed: boolean; rutf_packets: { recommended: number; given: number } };
+const FOLLOW_UP: [string, string][] = [
+  ["admission_visits", "Admission visits"], ["visit_2", "Second visits"], ["visit_3", "Third visits"], ["visit_4_plus", "Fourth or later visits"], ["absences", "Absences"],
+];
+const DIRECTION: [string, string][] = [["improved", "Improved since the previous visit"], ["unchanged", "No change"], ["deteriorated", "Worse"]];
+const SAFETY: [string, string][] = [
+  ["rutf_withheld", "Visits with no RUTF recommended (referral or G4 rule)"], ["referrals_made", "Referrals made"],
+  ["referrals_open", "Referrals open now"], ["visits_overdue_now", "Scheduled visits overdue now"], ["awaiting_photo", "Visits waiting for the RUTF photo"],
+];
 
 export default async function OtpCaseloadPage({ searchParams }: { searchParams: Promise<SP> }) {
   await getCurrentProfile();
@@ -45,11 +56,14 @@ export default async function OtpCaseloadPage({ searchParams }: { searchParams: 
   const supabase = await createClient();
   // The caseload runs in real time, so the current month is the default (not the ledger's month).
   const month = monthOf(/^\d{4}-\d{2}$/.test(sp.month ?? "") ? sp.month! : new Date().toISOString().slice(0, 7));
-  const [lgas, agg, rules] = await Promise.all([
+  const [lgas, agg, rules, follow] = await Promise.all([
     getProgrammeLgas(supabase),
     supabase.rpc("otp_aggregates", { p_start: month.start, p_end: month.end, p_lga_id: sp.lga || null }),
     supabase.rpc("otp_ration", { p_weight_kg: null }),
+    supabase.rpc("otp_followup_aggregates", { p_start: month.start, p_end: month.end, p_lga_id: sp.lga || null }),
   ]);
+  const fu = follow.data as unknown as FollowUp | null;
+  const fcell = (k: string) => { const v = fu?.counts?.[k]; return v === null ? `<${fu?.min_cell_count ?? 5}` : fmt(v ?? 0); };
   const a = agg.data as unknown as Aggregates | null;
   const r = rules.data as unknown as { rule_set?: string; rule_status?: string } | null;
   const lgaName = sp.lga ? lgas.find((l) => l.id === sp.lga)?.name : null;
@@ -148,6 +162,34 @@ export default async function OtpCaseloadPage({ searchParams }: { searchParams: 
           <div className="kpi-sub">Children under treatment at the end of the month, with their ration, are the basis of next month&apos;s RUTF request (allocation guidance §1, §6).</div>
         </div>
       </div>
+
+      {fu && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 16, alignItems: "start" }}>
+          <div className="card elev-sm" style={{ gap: 8 }}>
+            <div className="card-title">Follow-up visits</div>
+            <div className="kpi-sub">Visits in {month.label}, by visit number. Children are seen weekly until the discharge criteria are met: there is no fixed number of visits.</div>
+            <table className="table"><tbody>
+              {FOLLOW_UP.map(([k, label]) => <tr key={k}><td>{label}</td><td style={{ textAlign: "right" }}>{fcell(k)}</td></tr>)}
+            </tbody></table>
+          </div>
+          <div className="card elev-sm" style={{ gap: 8 }}>
+            <div className="card-title">Recovery: direction of change</div>
+            <div className="kpi-sub">Each visit&apos;s weight, MUAC, oedema and WFH against the previous visit. A direction only: what counts as recovery is set by the clinical authority (RULEBOOK Q14).</div>
+            <table className="table"><tbody>
+              {DIRECTION.map(([k, label]) => <tr key={k}><td>{label}</td><td style={{ textAlign: "right" }}>{fcell(k)}</td></tr>)}
+            </tbody></table>
+            <div className="kpi-sub">RUTF packets at visits: {fmt(fu.rutf_packets.given)} given, {fmt(fu.rutf_packets.recommended)} recommended.</div>
+          </div>
+          <div className="card elev-sm" style={{ gap: 8 }}>
+            <div className="card-title">Referrals and follow-up</div>
+            <div className="kpi-sub">Referrals stop the RUTF recommendation and routine visits until their result is recorded.</div>
+            <table className="table"><tbody>
+              {SAFETY.map(([k, label]) => <tr key={k}><td>{label}</td><td style={{ textAlign: "right" }}>{fcell(k)}</td></tr>)}
+            </tbody></table>
+            {fu.suppressed && <div className="kpi-sub">&ldquo;&lt;{fu.min_cell_count}&rdquo;: a small count, hidden. No totals are shown for these figures, so a hidden one can&apos;t be worked out.</div>}
+          </div>
+        </div>
+      )}
     </ReportShell>
   );
 }

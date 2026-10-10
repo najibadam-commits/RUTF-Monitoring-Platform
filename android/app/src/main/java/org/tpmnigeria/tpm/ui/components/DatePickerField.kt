@@ -45,6 +45,8 @@ fun DatePickerField(
     date: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
+    /** false (default): today or earlier, for things that happened; true: today or later, for appointments. */
+    future: Boolean = false,
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val shape = RoundedCornerShape(TpmRadius.small)
@@ -74,7 +76,7 @@ fun DatePickerField(
             selectableDates = object : SelectableDates {
                 override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                     val candidate = Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate()
-                    return !candidate.isAfter(today)
+                    return if (future) !candidate.isBefore(today) else !candidate.isAfter(today)
                 }
             },
         )

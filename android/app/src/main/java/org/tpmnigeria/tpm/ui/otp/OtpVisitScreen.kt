@@ -27,6 +27,8 @@ import org.tpmnigeria.tpm.data.OtpRepository
 import org.tpmnigeria.tpm.data.OtpResult
 import org.tpmnigeria.tpm.data.arr
 import org.tpmnigeria.tpm.data.bool
+import org.tpmnigeria.tpm.data.obj
+import org.tpmnigeria.tpm.data.objects
 import org.tpmnigeria.tpm.data.str
 import org.tpmnigeria.tpm.data.strings
 import org.tpmnigeria.tpm.ui.components.TpmButton
@@ -35,15 +37,20 @@ import org.tpmnigeria.tpm.ui.components.TpmCard
 import org.tpmnigeria.tpm.ui.components.TpmTextField
 import org.tpmnigeria.tpm.ui.navigation.RegisterHeaderBack
 import org.tpmnigeria.tpm.ui.stock.NumberField
+import org.tpmnigeria.tpm.ui.stock.ReviewRow
 import org.tpmnigeria.tpm.ui.theme.TpmColors
 import org.tpmnigeria.tpm.ui.theme.TpmSpacing
 import java.util.UUID
 
 /**
- * A follow-up visit (card C2). The ration is read from the 92 g table at this visit's weight
- * (RULEBOOK §6) and shown as the weight is typed; the database applies it, the card's alerts
- * (weight below admission weight, no change by the 4th visit, severe oedema, poor appetite,
- * consecutive absences) and the dispensing check (a different quantity needs a reason).
+ * A visit (card C2): the admission visit (the RUTF given on the day of admission, measurements
+ * from the admission) or a follow-up. The last measurements are shown first so the officer can
+ * compare. The ration is read from the 92 g table at this visit's weight (RULEBOOK §6) and shown
+ * as the weight is typed; the database applies it, compares the visit with the previous one and
+ * the admission, applies the card's and booklet's rules (no RUTF recommended while a referral is
+ * open, or with severe oedema or a poor appetite: G4), checks the RUTF given (a different quantity
+ * needs a reason; RUTF when none is recommended needs the authorising clinician), and schedules
+ * the next visit. A visit where RUTF was given is complete once its photo is sent (web 0128).
  */
 @Composable
 fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
@@ -77,7 +84,26 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
     var saved by remember { mutableStateOf<JsonObject?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
+    var authorisedBy by remember { mutableStateOf("") }
+    var card by remember { mutableStateOf<JsonObject?>(null) }
+    var photoSent by remember { mutableStateOf(false) }
     val clientId = remember { UUID.randomUUID().toString() }
+
+    // The child's card: is this the admission visit, what was measured last, is a referral open?
+    LaunchedEffect(childCode) {
+        when (val r = repo.lookup(childCode)) {
+            is OtpResult.Ok -> card = r.data
+            is OtpResult.Error -> error = r.message
+        }
+    }
+    val admissionVisit = card?.obj("next_step")?.str("step") == "admission_visit"
+    val openReferral = card?.arr("referrals")?.objects()?.any { it.str("status") in setOf("referred", "arrived") } == true
+    val adm = card?.obj("admission")
+    LaunchedEffect(admissionVisit) {
+        if (admissionVisit && weight.isBlank()) adm?.let { a ->
+            weight = a.str("weight_kg").orEmpty(); muac = a.str("muac_cm").orEmpty(); oedema = a.str("oedema") ?: "absent"
+        }
+    }
 
     // The ration for the typed weight, from the table (after a short pause in typing).
     LaunchedEffect(weight) {
@@ -86,26 +112,69 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
         delay(500)
         ration = (repo.ration(w) as? OtpResult.Ok)?.data
         val perWeek = ration?.takeIf { it.bool("ok") }?.str("packets_per_week")
-        if (perWeek != null && dispensed.isBlank()) dispensed = perWeek
+        if (perWeek != null && dispensed.isBlank() && !openReferral && oedema != "+++" && appetite !in setOf("poor", "refused")) dispensed = perWeek
     }
+    // No RUTF is recommended while a referral is open, or with severe oedema or a poor appetite (G4).
+    val withheld = when {
+        openReferral -> "the child is referred and the result is not recorded yet"
+        oedema == "+++" -> "severe oedema (+++): refer to stabilisation care (G4)"
+        appetite == "poor" || appetite == "refused" -> "poor or refused appetite test: refer to stabilisation care (G4)"
+        else -> null
+    }
+    // Nothing is pre-filled when none is recommended: the officer enters 0, or what a clinician authorised.
+    LaunchedEffect(withheld) { if (withheld != null && dispensed == ration?.str("packets_per_week")) dispensed = "" }
 
     val yesNo = listOf(false, true)
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TpmSpacing.space4),
         verticalArrangement = Arrangement.spacedBy(TpmSpacing.space3),
     ) {
-        Text("Visit · $childCode", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text((if (admissionVisit) "Admission visit · " else "Visit · ") + childCode, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         val done = saved
         if (done != null) {
             TpmCard(blueprint = true) {
-                Text("Visit ${done.str("visit_number")} recorded", style = MaterialTheme.typography.titleMedium, color = OtpGreen)
+                Text((if (done.str("visit_kind") == "admission") "Admission visit" else "Visit ${done.str("visit_number")}") + " recorded",
+                    style = MaterialTheme.typography.titleMedium, color = OtpGreen)
+                ReviewRow("RUTF", when (done.str("ration_status")) {
+                    "withheld" -> "${done.str("rutf_given")} given · none recommended: ${done.str("withheld_reason")}"
+                    "no_rule" -> "${done.str("rutf_given")} given · no ration rule for this weight"
+                    null -> "Absent: none given"
+                    else -> "${done.str("rutf_given")} given / ${done.obj("ration")?.str("packets_per_week")} recommended"
+                })
+                done.obj("next_step")?.let { ReviewRow("Next step", it.str("message").orEmpty()) }
+                ReviewRow("Next visit", done.str("next_visit_due") ?: "not scheduled")
                 BulletList("Alerts", done.arr("alerts").strings(), OtpAmber)
+            }
+            done.obj("recovery")?.takeIf { it.str("basis") == "compared" }?.let { ComparisonCard(it, "Compared with the previous visit") }
+            if (done.str("record_status") == "awaiting_photo" && !photoSent) {
+                RutfPhotoCapture(done.str("visit_id").orEmpty(), done.str("photo_folder").orEmpty(), done.str("rutf_given"), onDone = { photoSent = true })
+                Text("The visit stays incomplete until the photo is sent. You can also send it later from Visits and tasks.",
+                    style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            } else if (photoSent) {
+                Text("Photo sent: the visit is complete.", color = OtpGreen, style = MaterialTheme.typography.bodyMedium)
             }
             TpmButton(text = "Back to the card", onClick = onDone, fullWidth = true)
             return@Column
         }
 
-        ChoiceField("Did the child attend?", listOf(true, false), attended, { attended = it }) { if (it) "Attended" else "Absent" }
+        // The last measurements, to compare before entering the new ones.
+        card?.let { c ->
+            val last = c.arr("visits").objects().lastOrNull { it.str("attended") != "false" }
+            TpmCard {
+                Text(if (last != null) "Last visit (${last.str("visit_on")})" else "At admission (${adm?.str("admitted_on")})",
+                    style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+                val src = last ?: adm
+                Text("${src?.str("weight_kg") ?: "—"} kg · MUAC ${src?.str("muac_cm") ?: "—"} cm · oedema ${src?.str("oedema") ?: "—"}" +
+                    (last?.let { " · RUTF ${it.str("rutf_dispensed") ?: "—"} given" } ?: ""), style = MaterialTheme.typography.bodyMedium)
+                if (last != null) Text("At admission: ${adm?.str("weight_kg") ?: "—"} kg · MUAC ${adm?.str("muac_cm") ?: "—"} cm · oedema ${adm?.str("oedema") ?: "—"}",
+                    style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+                c.obj("next_visit")?.let { Text("Visit ${it.str("visit_number")} was due ${it.str("due_on")}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted) }
+            }
+            if (admissionVisit) Text("The admission visit records the RUTF given today; the measurements are the admission's.",
+                style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        }
+
+        if (!admissionVisit) ChoiceField("Did the child attend?", listOf(true, false), attended, { attended = it }) { if (it) "Attended" else "Absent" }
         if (attended) {
             DecimalField(label = "Weight (kg)", value = weight, onValueChange = { weight = it })
             ration?.let {
@@ -130,23 +199,37 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
             ChoiceField("Palmar pallor / anaemia", yesNo, pallor, { pallor = it }) { if (it) "Yes" else "No" }
             ChoiceField("Superficial infection", yesNo, infection, { infection = it }) { if (it) "Yes" else "No" }
             TpmTextField(label = "Action / medication required (details)", value = actionDetails, onValueChange = { actionDetails = it }, singleLine = false, minLines = 2)
-            NumberField(label = "RUTF packets dispensed", value = dispensed, onValueChange = { dispensed = it })
-            val perWeek = ration?.takeIf { it.bool("ok") }?.str("packets_per_week")?.toIntOrNull()
+            if (withheld != null) Text("No RUTF recommended: $withheld. Give RUTF only if a clinician authorises it.",
+                color = OtpRed, style = MaterialTheme.typography.bodyMedium)
+            NumberField(label = "RUTF packets given", value = dispensed, onValueChange = { dispensed = it })
+            val perWeek = ration?.takeIf { it.bool("ok") && withheld == null }?.str("packets_per_week")?.toIntOrNull()
+            val noRecommendation = withheld != null || ration?.bool("ok") == false
             val differs = perWeek != null && dispensed.toIntOrNull() != null && dispensed.toIntOrNull() != perWeek
             if (differs) TpmTextField(label = "Why it differs from the ration ($perWeek)", value = dispenseNote, onValueChange = { dispenseNote = it })
+            if (noRecommendation && (dispensed.toIntOrNull() ?: 0) > 0) {
+                TpmTextField(label = "Reason RUTF is given", value = dispenseNote, onValueChange = { dispenseNote = it })
+                TpmTextField(label = "Clinician who authorised it (name and title)", value = authorisedBy, onValueChange = { authorisedBy = it })
+            }
+            if ((dispensed.toIntOrNull() ?: 0) > 0) Text("After saving, take a photo of the RUTF given (sachets only).",
+                style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
             TpmTextField(label = "Examiner's initials", value = initials, onValueChange = { initials = it })
         }
 
-        val ready = !attended || (weight.toDoubleOrNull() != null && (dispenseNote.isNotBlank() ||
-            ration?.takeIf { it.bool("ok") }?.str("packets_per_week")?.toIntOrNull().let { it == null || dispensed.toIntOrNull() == it }))
+        val given = dispensed.toIntOrNull()
+        val noRec = withheld != null || ration?.bool("ok") == false
+        val ready = card != null && (!attended || (weight.toDoubleOrNull() != null && given != null && when {
+            noRec -> given == 0 || (dispenseNote.isNotBlank() && authorisedBy.isNotBlank())
+            else -> dispenseNote.isNotBlank() || ration?.takeIf { it.bool("ok") }?.str("packets_per_week")?.toIntOrNull().let { it == null || given == it }
+        }))
         TpmButton(
-            text = if (busy) "Saving…" else if (attended) "Record the visit" else "Record the absence",
+            text = if (busy) "Saving…" else if (admissionVisit) "Record the admission visit" else if (attended) "Record the visit" else "Record the absence",
             enabled = ready && !busy, fullWidth = true, blueprint = true,
             onClick = {
                 busy = true; error = null
                 scope.launch {
                     val body = buildJsonObject {
-                        put("child_code", childCode); put("attended", attended); put("client_id", clientId)
+                        put("child_code", childCode); put("attended", attended || admissionVisit); put("client_id", clientId)
+                        if (admissionVisit) put("admission_visit", true)
                         if (attended) {
                             weight.toDoubleOrNull()?.let { put("weight_kg", it) }; height.toDoubleOrNull()?.let { put("height_cm", it) }
                             muac.toDoubleOrNull()?.let { put("muac_cm", it) }; oedema?.let { put("oedema", it) }
@@ -158,6 +241,7 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
                             if (actionDetails.isNotBlank()) { put("action_required", true); put("action_details", actionDetails.trim()) }
                             dispensed.toIntOrNull()?.let { put("rutf_dispensed", it) }
                             if (dispenseNote.isNotBlank()) put("dispense_note", dispenseNote.trim())
+                            if (authorisedBy.isNotBlank()) put("dispense_authorised_by", authorisedBy.trim())
                             if (initials.isNotBlank()) put("examiner_initials", initials.trim())
                         }
                     }

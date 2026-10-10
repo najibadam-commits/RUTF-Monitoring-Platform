@@ -63,6 +63,8 @@ import org.tpmnigeria.tpm.ui.otp.OtpVisitScreen
 import org.tpmnigeria.tpm.ui.otp.OtpIycfScreen
 import org.tpmnigeria.tpm.ui.otp.OtpMnpScreen
 import org.tpmnigeria.tpm.ui.otp.OtpWeeklyReportScreen
+import org.tpmnigeria.tpm.ui.otp.OtpPhotoScreen
+import org.tpmnigeria.tpm.ui.otp.OtpVisitsListScreen
 import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
 import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
 import org.tpmnigeria.tpm.ui.stock.MyStockScreen
@@ -309,6 +311,7 @@ fun AppNavHost(session: AppSession) {
                                 onWeeklyReport = { navController.navigate(Routes.OtpWeeklyReport) },
                                 onMnp = { navController.navigate(Routes.OtpMnp) },
                                 onIycf = { navController.navigate(Routes.OtpIycf) },
+                                onVisits = { navController.navigate(Routes.OtpTasks) },
                                 onExit = { navController.popBackStack() },
                             )
                         }
@@ -341,6 +344,24 @@ fun AppNavHost(session: AppSession) {
                     }
                     composable(Routes.OtpIycf) {
                         RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpIycfScreen(onExit = { navController.popBackStack() }) }
+                    }
+                    composable(Routes.OtpTasks) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpVisitsListScreen(
+                                onOpenChild = { navController.navigate(Routes.otpChild(it)) },
+                                onPhoto = { visitId, folder, code -> navController.navigate(Routes.otpPhoto(visitId, code, folder)) },
+                                onExit = { navController.popBackStack() },
+                            )
+                        }
+                    }
+                    composable(Routes.OtpPhotoPattern, arguments = listOf(
+                        navArgument("visitId") { type = NavType.StringType }, navArgument("childCode") { type = NavType.StringType },
+                        navArgument("folder") { type = NavType.StringType; defaultValue = "" },
+                    )) { entry ->
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpPhotoScreen(entry.arguments?.getString("visitId").orEmpty(), entry.arguments?.getString("folder").orEmpty(),
+                                entry.arguments?.getString("childCode").orEmpty(), onExit = { navController.popBackStack() })
+                        }
                     }
                     composable(Routes.StockCount) {
                         RequireAccess(stockAllowed, { navController.popBackStack() }) {
@@ -433,6 +454,8 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.OtpHome -> "OTP Admission Card"
     route == Routes.OtpScreening -> "Screening"
     route.startsWith("otpChild") -> "Child's Card"
+    route == Routes.OtpTasks -> "Visits and Tasks"
+    route.startsWith("otpPhoto") -> "RUTF Photo"
     route.startsWith("otpVisit") -> "OTP Visit"
     route == Routes.OtpWeeklyReport -> "Weekly OTP Report"
     route == Routes.OtpMnp -> "MNP"

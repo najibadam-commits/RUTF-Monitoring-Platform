@@ -115,7 +115,7 @@ const check = (area, what, expected, actual) => {
     await as(sc.id, async () => {
       const ov = await call(`select otp_reports_overview(current_date - 7)`);
       check("overview", "every OTP site in the state is expected", true, ov.expected > 100);
-      check("overview", "one report waiting for review", 1, ov.submitted);
+      check("overview", "the test site's report is waiting for review", "submitted", (ov.sites.find((x) => x.facility_id === officer.facility_id) || {}).status);
       check("overview", "no child data in the overview", false, JSON.stringify(ov).includes("(DUMMY)") && JSON.stringify(ov).includes("child_name"));
       check("return", "returning needs a note", true, String(await call(`select otp_report_decide($1, 'returned', '')`, [lastReportId])).includes("needs correcting"));
       const ret = await call(`select otp_report_decide($1, 'returned', 'Recount the MNP (DUMMY)')`, [lastReportId]);

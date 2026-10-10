@@ -27,6 +27,10 @@ const pick = (arr, s) => arr[Math.floor(draw(s) * arr.length)];
     if (remove) {
       const kids = (await pg.query(`select c.id from otp_children c join otp_child_identity i on i.child_id = c.id where i.child_name like '%(DUMMY)%'`)).rows.map((r) => r.id);
       const adm = (await pg.query(`select id from otp_admissions where child_id = any($1)`, [kids])).rows.map((r) => r.id);
+      // Follow-up records first (migration 0128; seed-demo-otp-followup.js --remove also deletes the photo files).
+      await pg.query(`delete from otp_visit_photos where visit_id in (select id from otp_visits where admission_id = any($1))`, [adm]);
+      await pg.query(`delete from otp_referrals where admission_id = any($1)`, [adm]);
+      await pg.query(`delete from otp_appointments where admission_id = any($1)`, [adm]);
       const m = await pg.query(`delete from otp_medications where admission_id = any($1)`, [adm]);
       const v = await pg.query(`delete from otp_visits where admission_id = any($1)`, [adm]);
       await pg.query(`update otp_screenings set child_id = null where child_id = any($1)`, [kids]);
