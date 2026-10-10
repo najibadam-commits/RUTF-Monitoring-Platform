@@ -210,6 +210,11 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("report L", "section L counts the second visit", 1, rep.sections.L.visits.second);
       check("report L", "recommended vs given", "21/21", `${rep.sections.L.rutf.recommended}/${rep.sections.L.rutf.given}`);
       check("report L", "improved since the previous visit", 1, rep.sections.L.recovery.improved);
+      const cats = rep.sections.C.SAM.categories || {};
+      check("report W3", "admission categories present (new case, relapse, readmission, returned defaulter, from stabilisation, others)", 6, Object.keys(cats).length);
+      const admitted = (await sys(`select count(*)::int n from otp_admissions where facility_id = $1 and admitted_on between $2::date and $2::date + 6 and admission_type <> 'transfer_from_otp'`, [officer.facility, week])).n;
+      check("report W3", "the categories add up to the week's admissions", admitted, Object.values(cats).reduce((t, c) => t + c.total, 0));
+      check("report W3", "referrals to stabilisation and others present", "others,to_stabilisation", Object.keys(rep.sections.E.SAM.referred || {}).sort().join(","));
       check("correction", "a reason is required", true, has(await call(`select otp_report_adjust($1, 'L.visits.second', 2, '')`, [repId]), "reason"));
       check("correction", "section A cannot be corrected", true, has(await call(`select otp_report_adjust($1, 'A.facility', 1, 'x')`, [repId]), "cannot be corrected"));
       check("correction", "a count cannot be negative", true, has(await call(`select otp_report_adjust($1, 'L.visits.second', -1, 'x')`, [repId]), "negative"));

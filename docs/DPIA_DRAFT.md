@@ -1,130 +1,226 @@
 # Data Protection Impact Assessment — draft for the DPO
 
 **System:** RUTF-DTAP Monitoring Platform (web + Android), Katsina RUTF pilot
-**Law:** Nigeria Data Protection Act 2023 (NDPA) and the NDPC's implementing guidance [DPO: confirm the current directive]
-**Status:** DRAFT prepared from the system as built (milestone M6, 3 Oct 2026). Items marked
-**[DPO]** need the Data Protection Officer's decision; items marked **[PROG]** need the programme lead.
-This draft describes what the system actually stores and who can see it, so the DPO can assess
-it — it is not itself the assessment.
-
-> **REVISION NEEDED (10 Oct 2026) [DPO] [PROG].** Sections 2 and 6 below describe the platform as
-> aggregate-only. Since migration 0124 (DECISIONS R142–R145) the **Digital OTP Admission Card**
-> holds **child-level data**: each admitted child's name, sex, age or date of birth, caregiver's name,
-> address and mobile number, and their clinical record (measurements, medication, RUTF, outcome).
-> **Children and caregivers are now data subjects**, and part of the data is health data. The
-> controls as built: the details can be opened only by the OTP Officer at the child's OTP site and
-> only by entering the Child ID (database-enforced; every lookup logged in `otp_access_log`); the
-> tables have no API access at all, only checked functions; everyone else, including administrators,
-> sees totals by sex, age group and place, with counts of 1–4 hidden and complementary suppression;
-> the Audit Trail records which fields changed, never the values; the phone shows the details on
-> screen only, never stores them, and blocks screenshots. To decide: lawful basis for health data,
-> caregiver consent and the notice given, retention period, whether HIV/ART status is recorded
-> (RULEBOOK G2), access by the State team for clinical oversight, and breach procedure.
+**Law:** Nigeria Data Protection Act 2023 (NDPA) and the NDPC's implementing guidance (the General
+Application and Implementation Directive) [DPO: confirm the current instruments and section numbers]
+**Status:** DRAFT, revision 2 (10 Oct 2026), prepared from the system as built (migrations up to
+0130). Revision 1 (3 Oct) described an aggregate-only platform; since the **Digital OTP Admission
+Card** (DECISIONS R142–R157) the platform holds **child-level health data**, so this revision
+replaces it. Items marked **[DPO]** need the Data Protection Officer's decision; **[PROG]** the
+programme lead's. This draft describes what the system actually stores, who can see it and how it
+is protected, so the DPO can assess it — it is not itself the assessment, and the platform should
+not hold real children's data until it is signed off (§11).
 
 ---
 
-## 1. Purpose and lawful basis
+## 1. Why a DPIA is required
 
-The platform tracks RUTF (ready-to-use therapeutic food) from the State store to OTP sites:
-receipts, issues, daily dispensing totals, stock counts, losses, supervision visits, and Findings
-for review where the figures don't agree. Its purpose is to make sure RUTF reaches malnourished
-children and to detect loss and diversion early.
+The NDPA requires an impact assessment before processing that is likely to result in a high risk
+to data subjects [DPO: confirm the section]. This processing is high risk because it involves:
 
-- **Data subjects:** government and programme staff who use the system (facility users,
-  supervisors, reviewers, administrators). **No child or caregiver is a data subject** — see §2.
-- **Lawful basis [DPO]:** proposed — a task carried out in the public interest / in the exercise
-  of official authority, for health-programme staff acting in their official role.
-  Consent is not proposed as the basis for staff data.
+- **children** (6–59 months) — data subjects who cannot consent for themselves;
+- **health data** (malnutrition status, measurements, oedema, medication, referrals, outcomes) —
+  sensitive personal data under the NDPA;
+- **identifying details** of children and their caregivers (names, address, mobile number);
+- a programme population that is **vulnerable** (households with severely malnourished children);
+- storage **outside Nigeria** (§7).
 
-## 2. Child-level data — designed out
+## 2. The processing in brief
 
-| Control | How it is enforced |
-| --- | --- |
-| No child or caregiver names, phone numbers, IDs or per-child rows | There is no field for them anywhere. OTP data is one row per facility per day: new admissions, children seen, sachets prescribed, sachets dispensed (`otp_daily_dispensing`). Supervisors recount period **totals** from the register (`otp_verifications`). |
-| Register-page photos | Optional. The app requires the user to confirm that every child and caregiver name is covered before the photo is accepted; training (docs/training) repeats it. **Residual risk:** a user could still photograph an uncovered page — see §7. |
-| No photos of children | Instructed in the app and training; camera-only capture into private buckets. |
-| Free-text notes (loss reason, adjustment note, visit notes, Finding descriptions) | Instructed not to contain names. **Residual risk** — see §7. |
-| Small numbers | Daily tallies at one OTP can be small (1–4 children). These figures are shown only to signed-in staff with a role in the programme; there are **no public displays** of child counts. Any future public or partner-facing output must suppress cells < 5 (brief §10). |
+The platform tracks RUTF (ready-to-use therapeutic food) from the State store to OTP sites and to
+each child, so that RUTF reaches malnourished children and loss or diversion is detected early.
 
-## 3. Personal data the system processes
+| Part | What it does | Personal data |
+| --- | --- | --- |
+| Supply chain (since M1) | Receipts, issues, dispensing totals, stock counts, losses, transfers, supervision visits, Findings | Staff only (§4.1) |
+| **Digital OTP Admission Card** (0124) | Screening, registration with a Child ID, admission, routine medication, outcome | **Children and caregivers** (§4.2) |
+| **Follow-up** (0128–0130) | Weekly visits compared with the admission and the previous visit, RUTF recommended and given, next-visit scheduling, referrals, a photo of the RUTF given | Children (clinical); photos of sachets only |
+| **Weekly OTP Site Report** (0126) | A weekly summary per OTP site, reviewed by the OTP Officer and approved by the State Coordinator | Aggregates by site, sex and age group (§6, risk R5) |
 
-| Data | Where | About whom | Why |
+## 3. Data subjects
+
+| Who | Roughly how many (pilot) | Relationship |
+| --- | --- | --- |
+| Children 6–59 months screened at OTP sites | All screened; only those **admitted** are identified | Beneficiaries |
+| Caregivers of admitted children | One per admitted child | Beneficiaries' representatives |
+| Programme and government staff (OTP Officers, LGA and State Nutrition Officers, supervisors, State Coordinators, administrators) | Several hundred accounts | Users |
+
+A child who is screened but **not admitted** is recorded only as an anonymous screening (sex, age
+in months, measurements, result), with no name and no Child ID.
+
+## 4. Personal data processed
+
+### 4.1 Staff
+
+| Data | Where | Why |
+| --- | --- | --- |
+| Name, email, phone (optional), role, facility / LGA / state assignment | `profiles`, Supabase Auth | Sign-in, access control, notifications |
+| Initials | Finding IDs | Finding reference numbers |
+| GPS of a supervision visit (lat/lng, accuracy, distance) | `monitoring_visits` | Evidence the visit took place |
+| **Selfie at the facility** | `visit-evidence` bucket | Evidence of presence — **[DPO]: facial image; is it necessary, or do GPS and stock photos suffice?** |
+| Attendance selfies, GPS, device id captured before their removal (R50, R51) | `field_monitor_attendance`, `attendance-evidence` | No new data; kept until the retention decision |
+| Device identifier, model, OS and app version | ledger, dispensing, visits, `device_sync_status` | Idempotent sync, sync monitoring |
+| Sync error messages (first line, ≤ 300 characters, tokens stripped) | `sync_failures` | Support |
+| Who did what and when | `audit_log`, `issue_history`, `recorded_by` | Accountability |
+| Photos of waybills, stock cards, stock (incidental signatures) | `ledger-evidence`, `visit-evidence` | Evidence for receipts, counts and losses |
+
+### 4.2 Children and caregivers
+
+| Data | Where | Sensitive? | Why |
 | --- | --- | --- | --- |
-| Name, email, phone (optional), role, facility / LGA assignment | `profiles`, Supabase Auth | All users | Sign-in, access control, notifications |
-| Initials | `issue_id_counters`, Finding IDs | Users who register Findings | Finding reference numbers |
-| GPS location of a supervision visit (lat/lng, accuracy, distance from facility) | `monitoring_visits` | Supervisors | Evidence the visit took place at the facility |
-| **Selfie at the facility** | `visit-evidence` bucket | Supervisors | Evidence of presence (brief §8) — **[DPO]: facial image; assess whether a selfie is necessary or whether GPS + stock photos suffice** |
-| ~~Attendance selfie, GPS, device id~~ — **removed from the app and the web** (DECISIONS R50, R51); earlier records stay in `field_monitor_attendance` / `attendance-evidence`, no longer shown anywhere, until the retention decision | `field_monitor_attendance`, `attendance-evidence` bucket | Supervisors | No new data |
-| Device identifier (Android ID), device model, OS and app version | `stock_transactions`, `otp_daily_dispensing`, `monitoring_visits`, `device_sync_status` | All device users | Idempotent sync, sync-failure monitoring |
-| Sync error messages (first line only, ≤ 300 characters, tokens stripped) | `sync_failures` | Device users | Support when records don't sync |
-| Who did what, when (actor id, old/new values) | `audit_log`, `issue_history`, ledger `recorded_by` | All users | Accountability, audit trail (brief §10) |
-| Photos of waybills, stock cards, stock | `ledger-evidence`, `visit-evidence` buckets | Incidental (signatures on waybills) | Evidence for receipts, counts and losses |
+| **Child ID** (DTAP-KTS-MTZ-0001245), written on the caregiver's paper card | `otp_children` | Pseudonym | Finds the record at each visit without a name search |
+| Child's **name**; caregiver's **name**, **physical address**, **mobile number** | `otp_child_identity` (a separate table) | Identifying | Identify the child; home visits and tracing defaulters (card C1) |
+| Sex, date of birth (if known), age at registration, OTP site, LGA, state | `otp_children` | — | Eligibility (6–59 months), reporting by sex and age group |
+| Screening and admission measurements: weight, height/length, MUAC, oedema grade, WFH, medical complications, appetite test; admission type and source, readmission / relapse, walking distance | `otp_screenings`, `otp_admissions` | **Health** | Pathway decision (booklet G1–G5) |
+| Visit records: measurements, illness history (days of diarrhoea, vomiting, fever, cough), temperature, respiratory rate, dehydration, pallor, infection, actions, RUTF recommended and given, the reason when they differ, alerts, the comparison with earlier visits | `otp_visits` | **Health** | Treatment, ration, recovery monitoring (G6, C2) |
+| Routine medication given (as entered; doses not calculated) | `otp_medications` | **Health** | Card G6 |
+| Referrals: date, reason, rule that prompted it, destination, status and note | `otp_referrals` | **Health** | Stabilisation care or a doctor (G4; Q23) |
+| Appointments: due dates, attended / missed / rescheduled with the reason | `otp_appointments` | — | Weekly follow-up, defaulter tracing |
+| Outcome: cured, defaulted, died, non-recovered, transferred, refused inpatient care, with the reason | `otp_admissions` | **Health** | Programme outcomes |
+| **Photo of the RUTF given** — sachets only; the officer confirms no child or caregiver is in it | `otp-rutf-evidence` bucket, `otp_visit_photos` | Not intended to be personal (risk R4) | Evidence the RUTF was handed over |
+| Access log: who opened which child's record, registered, transferred or referred, and each view of the visits list | `otp_access_log` | — | Accountability for access to child data |
 
-## 4. Who can see what (access control)
+**Not recorded:** HIV test or ART status (the paper card has fields for them; the app has none —
+RULEBOOK G2, **[DPO][PROG] confirm they stay off**), photos of children, ethnicity, religion,
+household income, GPS of homes.
 
-Enforced in the database by row-level security on every table, so it applies equally to the web,
-the app and the API. Reviewed in M6 — see `docs/PERMISSIONS_REVIEW.md`.
+## 5. Lawful basis [DPO]
 
-| Role | Sees |
-| --- | --- |
-| Facility user | Their own facility only (stock, dispensing, its Findings) — offline too |
-| Supervisor | Facilities in their LGAs and level; visits they recorded |
-| State Coordinator (reviewer) | The project's data; Findings to review; Offline Sync Health |
-| Project Admin | The project's data, user management, DHIS2 upload, audit trail |
-| Super Admin | Everything; reference data sign-off |
-| Viewer | Read-only dashboards; no administration; exports only through approval |
+| Data | Proposed basis | Note |
+| --- | --- | --- |
+| Staff data | Public interest / exercise of official authority — staff acting in their official role | Consent not proposed for staff |
+| Children's and caregivers' personal data | Public interest in health — the State's nutrition programme (CMAM) | [DPO] confirm |
+| Children's **health** data | The NDPA condition for health care and public health processing by health professionals under a duty of confidentiality [DPO: confirm the section and whether the OTP Officer's professional duty meets it] | Sensitive personal data |
+| Children (under 18) | Processing through the **caregiver** as the person with parental responsibility; the caregiver is told and may object (§9) | [DPO] decide whether **consent** of the caregiver is also required, or a **notice** suffices with the public-health basis |
 
-- Photos are in **private** buckets, served only through short-lived signed links.
-- Nothing is callable without signing in (verified by `tools/db/audit-permissions.js`).
-- Exports go through the existing download-request approval. **Exception to review [DPO]:** the
-  Risk-Based Planner CSV (facility names, risk scores, supervisor names) is downloaded directly
-  by admins and supervisors.
+**Proposed caregiver notice** (to be read out at registration and printed on the back of the paper
+card; Hausa translation needed) [PROG]:
 
-## 5. Storage, security, backup
+> "To treat your child, the OTP Officer records your child's name, age, measurements and treatment,
+> and your name, address and phone number, in the State nutrition programme's secure system. Only
+> the OTP Officer at this clinic can see your child's details, using the number on this card. Others
+> in the programme see only totals, never names. The record is kept for [retention, §8]. You can ask
+> the OTP Officer to see or correct it, or to stop being contacted by phone. Treatment does not
+> depend on agreeing to phone contact."
+
+## 6. Who can see what
+
+Enforced **in the database**, not only in the screens: the child tables have row-level security
+with no policies and every API privilege revoked, so they can be reached only through checked
+functions; tests (`tools/db/test-otp-registry.js` 56 checks, `test-otp-followup.js` 108,
+`test-mobile-role-access.js` 208) confirm each refusal.
+
+| Who | Child's and caregiver's details | Clinical record of a child | Aggregates |
+| --- | --- | --- | --- |
+| **OTP Officer** at the child's current OTP site | **Yes, only by entering the Child ID**; each opening logged | Yes, same way | Yes |
+| OTP Officer at another site | No (only after a transfer to their site) | No | Yes |
+| OTP Officer's **visits and tasks list** | **Child IDs only** — no names, caregivers, addresses or phones; each view logged | Due dates, visit numbers, referral status | — |
+| LGA / State Nutrition Officers, supervisors | No | No | Yes |
+| **State Coordinator** | No | No | Yes, including the weekly site reports (R5) and counts of visits waiting for a photo; cannot correct report figures or clinical records |
+| Project Admin, Super Admin (in the app) | No | No | Yes; the super administrator may view RUTF photos (sachets) for audit |
+| **Holders of the database service key** (platform maintainers) | Technically yes, outside the app | Technically yes | — (risk R7) |
+
+Other controls:
+
+- **Aggregates** hide counts of 1–4 (`otp_min_cell_count`, default 5) with complementary
+  suppression, and give no totals for split figures from which a hidden count could be worked out.
+- The **Audit Trail** records which child fields changed, never the values.
+- **On the phone:** child details are shown on screen only and never stored (no local database,
+  cache or sync queue); screenshots and screen recording are blocked on these screens
+  (FLAG_SECURE); the RUTF photo is deleted from the phone once sent. The OTP screens work only
+  online (the user's decision, 10 Oct).
+- **Photos** are in private buckets, uploaded only to an own-site visit waiting for its photo,
+  shown only through short-lived signed links, and can't be changed or deleted by users.
+- Nothing is callable without signing in (`tools/db/audit-permissions.js`).
+
+## 7. Storage, security, transfers
 
 | Item | Current state | Action |
 | --- | --- | --- |
-| Hosting | Supabase (managed Postgres + storage), web on Vercel | **[DPO]** confirm hosting region and whether the NDPA cross-border transfer rules apply |
+| Hosting | Supabase (managed Postgres and storage), **region eu-central-1 (Frankfurt, Germany)**; web on Vercel | **[DPO] cross-border transfer:** health data of Nigerian children is stored in the EU. Confirm the NDPA transfer basis (adequacy of the destination, or appropriate safeguards / the provider's data processing agreement), or **[PROG]** move to a region the DPO approves before real children are registered |
+| Processor agreements | Supabase, Vercel, Resend (email) | **[PROG]** sign / file each provider's DPA; list them as processors |
 | Encryption | TLS in transit; provider encryption at rest | — |
-| Phone storage | Records wait in the app's private storage until synced; photos in the app's private files | **[PROG]** require a screen lock on programme phones |
-| Backups | Provider daily backups (plan-dependent) | **[PROG]** confirm the plan includes point-in-time recovery for the pilot |
-| Keys | Service keys only on the server and admin workstations, never in the app or repository | — |
-| Email | Notification emails via Resend; contain the notification text only (no link since migration 0110), no child data | Sender is set in Settings → Notifications (migration 0111); set the programme's verified domain before go-live |
+| Phones | No child data stored; supply-chain records wait in the app's private storage until synced | **[PROG]** screen lock required on programme phones; sign out when a phone changes hands |
+| Backups | Provider daily backups (plan-dependent) | **[PROG]** confirm point-in-time recovery; backups contain child data and follow the same retention |
+| Keys | Service keys only on the server and administrators' workstations, never in the app or repository | **[PROG]** name the key holders; rotate on staff change |
+| Email | Notifications contain text only, never child data | Verified sender domain before go-live |
+| Demo data | DUMMY accounts and DUMMY children (names end "(DUMMY)") exist in the same database for the demo | **[PROG]** remove them before real children are registered (`seed-demo-*.js --remove`) |
 
-## 6. Retention [DPO]
+## 8. Retention [DPO]
 
-Nothing is deleted automatically today. Proposed:
+Nothing is deleted automatically today; **automatic deletion is not built yet [PROG]**.
 
 | Data | Proposed retention |
 | --- | --- |
-| Ledger, transfers, dispensing totals, visits, Findings, audit trail | Life of the programme + 5 years (financial / supply audit) |
-| Evidence photos (waybills, stock cards, register pages, stock) | 2 years after the visit/record, then delete |
-| Selfies (visit, and attendance records captured before removal) | 90 days, then delete |
+| Child's and caregiver's **identifying details** (`otp_child_identity`) | **2 years after the last discharge**, then deleted; the Child ID and the clinical record remain, no longer identifiable to the programme |
+| Clinical record, appointments, referrals, outcomes (pseudonymous after the above) | Life of the programme + 5 years (programme evaluation, audit) |
+| RUTF photos | 1 year after the visit |
+| Access log | 2 years |
+| Anonymous screenings | Life of the programme |
+| Weekly reports (aggregates) | Life of the programme + 5 years |
+| Ledger, transfers, dispensing totals, supervision visits, Findings, audit trail | Life of the programme + 5 years |
+| Evidence photos (waybills, stock cards, register pages, stock) | 2 years |
+| Selfies (visit; attendance records from before their removal) | 90 days |
 | Sync error messages | 180 days after resolution |
-| Accounts of people who leave | Deactivate on departure (they can no longer sign in); names stay on the records they made |
+| Accounts of people who leave | Deactivated on departure; names stay on the records they made |
 
-## 7. Risks and mitigations
+## 9. Rights of data subjects
 
-| Risk | Likelihood / impact | Mitigation in place | Further action |
-| --- | --- | --- | --- |
-| Child names captured in a register photo | Medium / High | Names-covered confirmation; optional photo; private bucket; training | **[DPO]** consider removing register-page photos entirely; reviewers to report and delete any uncovered photo |
-| Names typed into free-text notes | Low / High | Training; neutral prompts | Periodic review of notes by the Project Admin |
-| A lost or stolen phone with unsynced records | Medium / Low | No child data on the phone; account can be deactivated centrally | Screen lock; sync daily |
-| Over-broad access by misconfiguration | Low / Medium | RLS on every table; automated permissions audit; role-access test (202 checks) | Re-run both before go-live and after every migration |
-| An account with no project assigned sees every project | Low / Medium | Only one project today | Audit flags any such account; assign every account to the pilot |
-| Findings perceived as accusations | Medium / Medium | Neutral wording; Findings go to the reviewer first | Training |
-| Supervisor location tracking beyond purpose | Low / Medium | GPS only at visit submission, not continuous | — |
+| Right | How it would work | Gap |
+| --- | --- | --- |
+| Be informed | The caregiver notice (§5) at registration | **[PROG]** approve the text and translation |
+| Access | The caregiver asks the OTP Officer, who opens the record with the Child ID and reads it out or prints it | No print/export of one child's record yet |
+| Correction | The OTP Officer corrects a wrong measurement through a new visit; **identity details (name, address, phone) cannot yet be corrected in the app** | **[PROG]** build a correction function (logged, value-free audit) before go-live |
+| Object / restrict (e.g. no phone contact) | The officer removes the mobile number | Needs the correction function above |
+| Erasure | Limited while the programme must keep treatment records; the identity details go at the end of retention (§8) | **[DPO]** decide how an erasure request during treatment is handled |
+| Complaint | To the programme, then the NDPC | **[PROG]** name the contact on the notice |
 
-## 8. Breach handling [DPO]
+## 10. Risks and mitigations
 
-Proposed: anyone who suspects a breach reports it to the Project Admin the same day; the Project
-Admin deactivates affected accounts and rotates keys if needed, records the incident, and informs
-the DPO, who decides on notification to the NDPC within the statutory deadline (72 hours — [DPO] confirm) and to data
-subjects where required. The audit trail and Supabase logs support the investigation.
+| # | Risk | Likelihood / impact | In place | Further action |
+| --- | --- | --- | --- | --- |
+| R1 | An OTP Officer opens records without need, or shares a child's details | Medium / High | Only own site; only by Child ID; every opening logged | **[PROG]** monthly review of `otp_access_log` by the State Nutrition Officer; confidentiality undertaking in training |
+| R2 | A signed-in phone is lost or left unattended and someone opens records with a Child ID from a card | Low / High | Nothing stored; screenshots blocked; account deactivated centrally | Screen lock; automatic sign-out after inactivity **[PROG] — not built yet** |
+| R3 | The paper card (Child ID) is lost or seen by others | Medium / Low | The Child ID alone reveals nothing without an OTP Officer's account at that site | Tell caregivers the card number is private |
+| R4 | A person appears in an RUTF photo | Low / Medium | Sachets only; officer confirms no people; private bucket; only the site and the super administrator can view | Periodic spot-check by the super administrator; delete and retrain if found |
+| R5 | **Small numbers in a site's weekly report** (e.g. "1 girl cured") let a coordinator identify a child in a small community | Medium / Medium | Only the State Coordinator and administrators see site reports; no names | **[DPO]** accept as necessary for programme management, or suppress small cells in the State view |
+| R6 | Names or health details typed into free text (reasons, notes, referral notes, report comments) | Medium / Medium | Prompts ask for facts, not names | Training; periodic review |
+| R7 | Database service-key holders can read everything outside the app | Low / High | Keys only with named maintainers, never in the app | Name the holders, rotate on staff change, log their access |
+| R8 | Health data stored outside Nigeria | Certain / Medium | Provider security | §7 decision before real data |
+| R9 | Identity details kept longer than needed | Certain (no deletion yet) / Medium | — | Build the §8 deletion before the first retention date |
+| R10 | Wrong clinical rules harm a child (e.g. a missed referral) | Low / High | Rules from the approved booklet only; unclear cases go to clinical review; the rule set stays a draft until signed off | Clinical sign-off of the rule set (RULEBOOK Q22) |
+| R11 | DUMMY demo data mixed with real data | Medium / Low | DUMMY names and accounts are labelled | Remove before go-live (§7) |
+| R12 | Over-broad access by a future change | Low / High | Database-enforced access; automated tests | Re-run the three test suites after every migration |
+| R13 | Supervisor location or facial images used beyond purpose | Low / Medium | GPS only at submission; selfies private | §4.1 selfie decision |
 
-## 9. Sign-off
+## 11. Before real children are registered (checklist)
+
+1. **[DPO]** Decide the lawful basis and whether caregiver consent is needed (§5).
+2. **[PROG]** Approve the caregiver notice and its Hausa translation (§5).
+3. **[DPO]** Decide the cross-border transfer, or move the hosting region (§7).
+4. **[PROG]** File the processors' DPAs (§7).
+5. **[DPO]** Approve retention (§8); **[PROG]** build automatic deletion of identity details.
+6. **[PROG]** Build identity correction in the app (§9).
+7. **[PROG]** Build automatic sign-out on the OTP screens after inactivity (R2).
+8. **[PROG]** Set up the monthly access-log review (R1) and name the service-key holders (R7).
+9. **[DPO]** Decide on small numbers in the State Coordinator's site reports (R5).
+10. **[PROG]** Remove the DUMMY demo data (R11).
+11. **[DPO][PROG]** Confirm HIV / ART status stays off the app (§4.2).
+12. Clinical sign-off of the rule set (RULEBOOK Q22).
+
+## 12. Breach handling [DPO]
+
+Proposed: anyone who suspects a breach (a lost phone, a shared screen, a photo with a person, an
+unexpected access in the log) reports it to the Project Admin the same day. The Project Admin
+deactivates affected accounts and rotates keys if needed, records the incident, and informs the DPO.
+The DPO decides on notification to the NDPC within **72 hours** of becoming aware [DPO: confirm]
+and, where the breach is likely to put children or caregivers at high risk, informs the caregivers
+through their OTP Officer. The access log, audit trail and provider logs support the investigation.
+
+## 13. Sign-off
 
 | Role | Name | Decision | Date |
 | --- | --- | --- | --- |
 | Data Protection Officer | | | |
 | Programme lead | | | |
+| Clinical authority (rule set) | | | |

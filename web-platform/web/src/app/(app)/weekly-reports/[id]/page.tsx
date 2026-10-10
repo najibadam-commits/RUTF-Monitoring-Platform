@@ -186,6 +186,12 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
             </tbody>
           </table>
         </Section>
+        {s.C?.SAM?.categories && (
+          <Section letter="C" title="Admissions by category" note="Each admission counted once, in the first category that applies; together they make the week's admissions (transfers in are in D). Categories added in answer to W3.">
+            <SexTable rows={[["New cases", s.C.SAM.categories.new_case], ["Relapse", s.C.SAM.categories.relapse], ["Readmission", s.C.SAM.categories.readmission],
+              ["Returned defaulters", s.C.SAM.categories.returned_defaulter], ["From stabilisation care", s.C.SAM.categories.from_stabilisation], ["Others", s.C.SAM.categories.others]]} />
+          </Section>
+        )}
         <Section letter="D" title="Transfers between OTP sites" note="Not counted as admissions or discharges; the child keeps one Child ID and history.">
           <SexTable rows={[["SAM transferred in", s.D?.SAM?.in], ["SAM transferred out", s.D?.SAM?.out], ["HR MAM", null, NA]]} />
         </Section>
@@ -193,6 +199,12 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
 
       <Section letter="E" title="Discharges and other outcomes (SAM)" note="An absence is not a default: a child becomes a defaulter after 3 consecutive absences, when the outcome is recorded. Cured only when every discharge criterion is met and confirmed. HR MAM: not applicable.">
         <SexTable rows={OUTCOMES.map(([k, label]) => [label, s.E?.SAM?.[k]] as [string, BySex])} />
+        {s.E?.SAM?.referred && (
+          <>
+            <div className="kpi-sub">Referrals made this week (not exits: the child stays under treatment until an outcome is recorded):</div>
+            <SexTable rows={[["Referred to stabilisation care", s.E.SAM.referred.to_stabilisation], ["Referred elsewhere (a doctor, another facility)", s.E.SAM.referred.others]]} />
+          </>
+        )}
       </Section>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: 16, alignItems: "start" }}>

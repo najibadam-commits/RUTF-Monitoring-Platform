@@ -143,7 +143,14 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                 Text("Caseload (SAM)", style = MaterialTheme.typography.titleMedium)
                 ReviewRow("B. At the start", "${bSam?.str("total")} (boys ${bSam?.str("M")}, girls ${bSam?.str("F")})")
                 ReviewRow("C. New cases", "${c?.str("total")} · 6–23 m: ${c?.str("M_6_23")} boys, ${c?.str("F_6_23")} girls · 24–59 m: ${c?.str("M_24_59")} boys, ${c?.str("F_24_59")} girls")
+                c?.obj("categories")?.let { k ->
+                    ReviewRow("C. By category", "new ${k.obj("new_case")?.str("total")}, relapse ${k.obj("relapse")?.str("total")}, readmission ${k.obj("readmission")?.str("total")}, " +
+                        "returned defaulters ${k.obj("returned_defaulter")?.str("total")}, from stabilisation ${k.obj("from_stabilisation")?.str("total")}, others ${k.obj("others")?.str("total")}")
+                }
                 ReviewRow("D. Transfers", "in ${d?.obj("in")?.str("total")}, out ${d?.obj("out")?.str("total")}")
+                e?.obj("referred")?.let { rf ->
+                    ReviewRow("E. Referred this week", "to stabilisation ${rf.obj("to_stabilisation")?.str("total")}, elsewhere ${rf.obj("others")?.str("total")} (still under treatment)")
+                }
                 ReviewRow("E. Outcomes", "cured ${e?.obj("cured")?.str("total")}, non-recovered ${e?.obj("non_recovered")?.str("total")}, died ${e?.obj("died")?.str("total")}, defaulted ${e?.obj("defaulted")?.str("total")}, absent ${e?.obj("absent")?.str("total")}")
                 val calc = f?.obj("calculated")?.str("total"); val actual = f?.obj("actual")?.str("total")
                 ReviewRow("F. At the end", "$actual" + if (calc == actual) " ✓ reconciled" else " ✗ calculated $calc")
