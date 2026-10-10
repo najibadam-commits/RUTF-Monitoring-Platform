@@ -182,6 +182,7 @@ export type NavKey =
   | "reportingCompleteness"
   | "otpDispensing"
   | "otpCaseload"
+  | "clinicalRules"
   | "weeklyReports"
   | "supervision"
   | "dhis2Triangulation";
@@ -218,6 +219,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "otpDispensing", label: "Last-Mile Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
   // OTP Caseload (DECISIONS R143): aggregates from the Digital OTP Admission Card; no child records.
   { key: "otpCaseload", label: "OTP Caseload", href: "/otp-caseload", icon: "ph-baby", section: "stock" },
+  { key: "clinicalRules", label: "Clinical Rules", href: "/clinical-rules", icon: "ph-first-aid-kit", section: "stock" },
   { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },

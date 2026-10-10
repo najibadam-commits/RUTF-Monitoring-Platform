@@ -54,20 +54,20 @@ fun OtpMnpScreen(onExit: () -> Unit) {
     var sachets by remember { mutableStateOf("") }
     var negative by remember { mutableStateOf(false) }
     var note by remember { mutableStateOf("") }
-    var dose by remember { mutableStateOf<Int?>(null) }
+    var event by remember { mutableStateOf<String?>(null) }
     var children by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var busy by remember { mutableStateOf(false) }
     val kinds = listOf("receipt", "distributed", "loss", "adjustment", "physical_count")
     fun kindLabel(k: String) = when (k) {
-        "receipt" -> "Received"; "distributed" -> "Distributed"; "loss" -> "Lost or damaged"
+        "receipt" -> "Received"; "distributed" -> "Distributed (other than children started below)"; "loss" -> "Lost or damaged"
         "adjustment" -> "Adjustment (with reason)"; else -> "Physical count (what is on the shelf)"
     }
 
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TpmSpacing.space4),
         verticalArrangement = Arrangement.spacedBy(TpmSpacing.space3)) {
         Text("MNP (micronutrient powders)", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-        Text("Stock is counted in sachets; doses are the number of children who received each dose. They are recorded separately.",
+        Text("A child whose MUAC is yellow gets 3 boxes (90 sachets) at once, for 3 months, and comes back after 3 months. Stock is counted in sachets (150 a carton, 30 a box).",
             style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
         DatePickerField(label = "Date", date = date, onDateChange = { date = it })
         error?.let { Text(it, color = OtpRed, style = MaterialTheme.typography.bodyMedium) }
@@ -98,17 +98,20 @@ fun OtpMnpScreen(onExit: () -> Unit) {
         }
 
         TpmCard {
-            Text("Doses given", style = MaterialTheme.typography.titleMedium)
-            ChoiceField("Dose", listOf(1, 2, 3), dose, { dose = it }) { when (it) { 1 -> "1st"; 2 -> "2nd"; else -> "3rd" } }
-            NumberField(label = "Children who received it", value = children, onValueChange = { children = it })
-            TpmButton(text = "Record the doses", fullWidth = true, enabled = !busy && dose != null && children.toIntOrNull() != null, onClick = {
+            Text("Children", style = MaterialTheme.typography.titleMedium)
+            ChoiceField("What happened", listOf("started", "follow_up"), event, { event = it }) { if (it == "started") "Started on MNP (3 boxes each)" else "Back for the 3-month follow-up" }
+            NumberField(label = "Number of children", value = children, onValueChange = { children = it })
+            if (event == "started") children.toIntOrNull()?.let {
+                Text("${it * 90} sachets (${it * 3} boxes) go out of stock automatically.", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            }
+            TpmButton(text = "Record the children", fullWidth = true, enabled = !busy && event != null && children.toIntOrNull() != null, onClick = {
                 busy = true; error = null
                 scope.launch {
                     val body = buildJsonObject {
-                        put("given_on", date.toString()); put("dose_number", dose!!); put("children", children.toInt()); put("client_id", UUID.randomUUID().toString())
+                        put("given_on", date.toString()); put("event", event!!); put("children", children.toInt()); put("client_id", UUID.randomUUID().toString())
                     }
                     when (val r = repo.recordMnpDoses(body)) {
-                        is OtpResult.Ok -> { toast.show("Dose $dose: $children children recorded"); children = "" }
+                        is OtpResult.Ok -> { toast.show(if (event == "started") "$children child(ren) started on MNP" else "$children child(ren) back for follow-up"); children = "" }
                         is OtpResult.Error -> error = r.message
                     }
                     busy = false

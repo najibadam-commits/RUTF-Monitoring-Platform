@@ -73,7 +73,8 @@ const check = (area, what, expected, actual) => {
       check("forms", "MNP receipt recorded", true, !String(await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "receipt", sachets: 300 })])).startsWith("error"));
       check("forms", "MNP distribution recorded", true, !String(await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "distributed", sachets: 120 })])).startsWith("error"));
       check("forms", "an MNP adjustment needs a reason", true, String(await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "adjustment", sachets: -5 })])).includes("reason"));
-      check("forms", "MNP 1st-dose children recorded", true, !String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: d, dose_number: 1, children: 12 })])).startsWith("error"));
+      check("forms", "MNP: 1 child started (3 boxes at once)", true, !String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: d, event: "started", children: 1 })])).startsWith("error"));
+      check("forms", "MNP: 2 children back for the 3-month follow-up", true, !String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: d, event: "follow_up", children: 2 })])).startsWith("error"));
       check("forms", "IYCF: a total that is not the sum of the groups is refused (W8)", true, String(await call(`select otp_record_iycf_session($1::jsonb)`, [JSON.stringify({ held_on: d, kind: "iycf_support_group", pregnant_women: 6, breastfeeding_women: 9, total_participants: 14 })])).includes("must equal"));
       check("forms", "IYCF session recorded", true, !String(await call(`select otp_record_iycf_session($1::jsonb)`, [JSON.stringify({ held_on: d, kind: "iycf_support_group", pregnant_women: 6, breastfeeding_women: 9 })])).startsWith("error"));
       check("forms", "a future date is refused", true, String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: "2099-01-01", dose_number: 1, children: 1 })])).includes("future"));
@@ -81,18 +82,19 @@ const check = (area, what, expected, actual) => {
       const last = await call(`select otp_report_open($1::date)`, [iso(lastWeek)]);
       lastReportId = last.report_id;
       const H = last.sections.H;
-      check("MNP", "expected closing = received − distributed", 180, H.expected_closing);
-      check("MNP", "1st dose children = 12", 12, H.doses.dose_1);
-      check("MNP", "pack size not configured -> flagged, no cartons invented", true, last.issues.some((i) => i.code === "mnp_pack_size"));
+      check("MNP", "the child started took 90 sachets out of stock: closing = 300 − 120 − 90", 90, H.expected_closing);
+      check("MNP", "children started = 1, back for follow-up = 2", "1/2", `${H.children.started}/${H.children.follow_up}`);
+      check("MNP", "pack: 150 a carton, 30 a box, 3 boxes a child (W6)", "150/30/3", `${H.pack.sachets_per_carton}/${H.pack.sachets_per_box}/${H.pack.boxes_per_child}`);
+      check("MNP", "pack size configured -> no pack-size note", false, last.issues.some((i) => i.code === "mnp_pack_size"));
       check("IYCF", "total attendance = pregnant + breastfeeding + other (W8: 6 + 9)", 15, last.sections.J.total_participants);
       const G = last.sections.G;
       check("RUTF", "expected closing = opening + received − dispensed − issued − losses + adjustments", G.expected_closing,
         G.opening + G.received - G.dispensed - G.issued - G.losses + G.adjustments);
       const blocking = last.issues.filter((i) => i.severity === "blocking");
       // Make sure there is a blocking issue to explain: add a physical MNP count that does not match.
-      await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "physical_count", sachets: 170 })]);
+      await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "physical_count", sachets: 80 })]);
       const last2 = await call(`select otp_report_open($1::date)`, [iso(lastWeek)]);
-      check("MNP", "count 170 vs expected 180 -> blocking discrepancy of −10", -10, last2.sections.H.discrepancy);
+      check("MNP", "count 80 vs expected 90 -> blocking discrepancy of −10", -10, last2.sections.H.discrepancy);
       const codes = last2.issues.filter((i) => i.severity === "blocking").map((i) => i.code);
       check("submit", "submission without explanations is refused", true,
         String(await call(`select otp_report_submit($1, '{}'::jsonb, true)`, [lastReportId])).includes("Explain each flagged issue"));

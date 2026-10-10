@@ -228,11 +228,13 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
             </tbody>
           </table>
         </Section>
-        <Section letter="H" title="MNP stock and distribution" note="Doses are children reached, not stock units.">
+        <Section letter="H" title="MNP stock and distribution" note="A child whose MUAC is yellow gets 3 boxes (90 sachets) at once, for 3 months, and comes back after 3 months. 150 sachets a carton, 5 boxes of 30. Children are counted, not stock units.">
           {s.H?.status === "not_recorded" ? <div className="text-muted" style={{ fontSize: 13 }}>Not recorded: no MNP stock or doses recorded at this site yet (not zero).</div> : (
             <table className="table"><tbody>
               {[["Opening balance (sachets)", s.H?.opening], ["Received", s.H?.received], ["Distributed", s.H?.distributed], ["Lost", s.H?.losses], ["Adjustments", s.H?.adjustments], ["Expected closing", s.H?.expected_closing],
-                ["Physical count", s.H?.physical_count], ["Discrepancy", s.H?.discrepancy], ["1st dose (children)", s.H?.doses?.dose_1], ["2nd dose (children)", s.H?.doses?.dose_2], ["3rd dose (children)", s.H?.doses?.dose_3]]
+                ["Physical count", s.H?.physical_count], ["Discrepancy", s.H?.discrepancy],
+                ...(s.H?.children ? [["Children started on MNP (3 boxes each)", s.H.children.started], ["Children back for the 3-month follow-up", s.H.children.follow_up], ["Children due back this week", s.H.children.due_back_this_week]]
+                  : [["1st dose (children)", s.H?.doses?.dose_1], ["2nd dose (children)", s.H?.doses?.dose_2], ["3rd dose (children)", s.H?.doses?.dose_3]])]
                 .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
             </tbody></table>
           )}

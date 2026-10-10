@@ -139,16 +139,16 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("visits list", "the child appears under needs a decision", "refer", (list.needs_decision.find((x) => x.child_code === code) || {}).step);
     });
 
-    // The programme's rule (Q23, migration 0129): 3 visits expected, a 4th only when recovery is not
-    // good, beyond it a referral to a doctor is suggested (RUTF still recommended).
+    // The programme's rule (10 Oct, migration 0132): weekly follow-up up to 12 weeks until recovery;
+    // beyond 12 weeks a referral to a doctor is suggested (RUTF still recommended).
     const rs = (await one(`select params from otp_rule_sets where version = '2026-10-draft'`)).params;
-    check("expected visits", "rule set: 3 expected, 4 at most", "3/4", `${rs.expected_visits}/${rs.max_visits}`);
-    const at4 = await one(`select otp_recovery_assessment($1, 4, '{"weight_kg": 7.4}') r`, [admId]);
-    check("expected visits", "visit 4 is marked exceptional", true, at4.r.flags.some((f) => f.code === "exceptional_visit"));
-    const at5 = await one(`select otp_recovery_assessment($1, 5, '{"weight_kg": 7.4}') r`, [admId]);
-    const f5 = at5.r.flags.find((f) => f.code === "beyond_max_visits");
-    check("expected visits", "beyond visit 4: refer to a doctor", "refer", f5 && f5.action);
-    check("expected visits", "beyond visit 4: RUTF still recommended (a suggestion)", false, f5 && f5.withhold_ration);
+    check("12 weeks", "rule set: weekly, up to 12 weeks; the visit-count rule off", "7/12/null", `${rs.visit_interval_days}/${rs.max_weeks}/${rs.max_visits}`);
+    const wk11 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', current_date + 56)) r`, [admId]);
+    check("12 weeks", "week 11: no referral flag", false, wk11.r.flags.some((f) => f.code === "beyond_max_weeks"));
+    const wk13 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', current_date + 70)) r`, [admId]);
+    const f13 = wk13.r.flags.find((f) => f.code === "beyond_max_weeks");
+    check("12 weeks", "beyond 12 weeks: refer to a doctor", "refer", f13 && f13.action);
+    check("12 weeks", "beyond 12 weeks: RUTF still recommended (a suggestion)", false, f13 && f13.withhold_ration);
 
     // ── Referral ──
     let refId;
@@ -257,13 +257,42 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       await v({ admission_visit: true, rutf_dispensed: 25 });
       await v({ visit_on: await day(-14), weight_kg: 9.2, muac_cm: 11.3, rutf_dispensed: 25 });
       const third = await v({ visit_on: await day(-7), weight_kg: 9.4, muac_cm: 11.4, rutf_dispensed: 25 });
-      check("pathway", "not recovered by visit 3 -> exceptional 4th visit scheduled", "exceptional_visit", third.next_step.step);
-      check("pathway", "the 4th visit is due a week later", today, third.next_visit_due);
+      check("pathway", "not recovered by week 2 -> treatment continues weekly", true, third.next_step.step === "continue" && third.next_step.message.includes("of up to 12"));
+      check("pathway", "the next visit is due a week later", today, third.next_visit_due);
       const fourth = await v({ visit_on: today, weight_kg: 9.5, muac_cm: 11.4, rutf_dispensed: 28 });
-      check("pathway", "visit 4 carries the exceptional-visit note", true, fourth.recovery.flags.some((f) => f.code === "exceptional_visit"));
-      check("pathway", "RUTF still recommended at visit 4", "recommended", fourth.ration_status);
-      check("pathway", "after visit 4 without recovery: refer to see a doctor", true, fourth.next_step.step === "refer" && fourth.next_step.message.includes("doctor"));
-      check("pathway", "no routine 5th visit is scheduled", null, fourth.next_visit_due);
+      check("pathway", "visit 4 is no longer the last (no 3/4-visit rule)", "continue", fourth.next_step.step);
+      check("pathway", "a 5th visit is scheduled", true, !!fourth.next_visit_due);
+    });
+    // 12 weeks without recovery: admitted 12 weeks ago, the latest visit today -> refer to a doctor.
+    await pg.query(`update otp_admissions set admitted_on = current_date - 84 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
+    await as(officer.id, async () => {
+      const look = await call(`select otp_child_lookup($1)`, [code3]);
+      check("pathway", "12 weeks without recovery -> refer to see a doctor", true, look.next_step.step === "refer" && look.next_step.message.includes("12 weeks"));
+    });
+
+    // MNP (W6, 10 Oct): MUAC yellow -> 3 boxes (90 sachets) at once, back after 3 months.
+    await as(officer.id, async () => {
+      const mam = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "M", age_months: 20, weight_kg: 8.5, height_cm: 76, muac_cm: 12.0, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
+      check("MNP", "MUAC yellow -> MNP: 3 boxes, 90 sachets, 3 months", "3/90/3", mam.mnp && `${mam.mnp.boxes}/${mam.mnp.sachets}/${mam.mnp.months}`);
+      check("MNP", "the advice names MNP and the 3-month follow-up", true, has(mam.next_action, "MNP") && has(mam.next_action, "after 3 months"));
+      const green = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "M", age_months: 20, weight_kg: 9.5, height_cm: 80, muac_cm: 13.2, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
+      check("MNP", "MUAC green -> no MNP", undefined, green.mnp);
+    });
+
+    // The clinical rules are approved only by a State Nutrition Officer (Q22, 10 Oct).
+    const sno = await one(`select p.id from profiles p join facilities f on f.id = p.facility_id where p.role = 'dri' and p.status = 'active' and f.facility_type = 'state_store' order by (p.name like '%(DUMMY)%') desc limit 1`);
+    await as(officer.id, async () => {
+      check("rules", "everyone signed in can read the rules", "2026-10-draft", (await call(`select otp_rules_view()`)).version);
+      check("rules", "an OTP Officer cannot approve them", true, has(await call(`select otp_rule_set_approve('2026-10-draft', true, null)`), "Only the State Nutrition Officer"));
+    });
+    if (coordinator) await as(coordinator.id, async () => {
+      check("rules", "a State Coordinator cannot approve them", true, has(await call(`select otp_rule_set_approve('2026-10-draft', true, null)`), "Only the State Nutrition Officer"));
+    });
+    if (sno) await as(sno.id, async () => {
+      check("rules", "the State Nutrition Officer may approve", true, (await call(`select otp_rules_view()`)).can_approve);
+      check("rules", "approval needs the review confirmed", true, has(await call(`select otp_rule_set_approve('2026-10-draft', false, null)`), "Confirm"));
+      const ok = await call(`select otp_rule_set_approve('2026-10-draft', true, 'Reviewed (DUMMY)')`);
+      check("rules", "approved, in force from today (rolled back)", "approved", ok.status);
     });
 
     // Regression: the existing visit test path (first follow-up = visit 2 without an admission visit) still works.

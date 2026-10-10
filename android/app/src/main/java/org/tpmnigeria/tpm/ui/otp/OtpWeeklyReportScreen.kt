@@ -162,7 +162,7 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                     (if (g?.str("dispensed_status") == "missing") "missing" else "${g?.str("dispensed")}") +
                     ", expected ${g?.str("expected_closing")} sachets · count ${g?.str("physical_count") ?: "pending"}")
                 ReviewRow("H. MNP", if (h?.str("status") == "not_recorded") "not recorded" else
-                    "expected ${h?.str("expected_closing")} sachets · doses 1st ${h?.obj("doses")?.str("dose_1")}, 2nd ${h?.obj("doses")?.str("dose_2")}, 3rd ${h?.obj("doses")?.str("dose_3")}")
+                    "expected ${h?.str("expected_closing")} sachets · children started ${h?.obj("children")?.str("started") ?: "—"}, back for follow-up ${h?.obj("children")?.str("follow_up") ?: "—"} (due back ${h?.obj("children")?.str("due_back_this_week") ?: "—"})")
                 ReviewRow("I. MUAC screened", "${i?.obj("total")?.str("total")} (red ${i?.obj("red")?.str("total")}, yellow ${i?.obj("yellow")?.str("total")}, green ${i?.obj("green")?.str("total")})")
                 ReviewRow("J. IYCF / health education", if (j?.str("status") == "none_recorded") "no sessions recorded" else
                     "${j?.str("sessions")} sessions, ${j?.str("total_participants") ?: "—"} participants")

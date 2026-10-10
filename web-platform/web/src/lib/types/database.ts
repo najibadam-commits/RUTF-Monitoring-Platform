@@ -836,6 +836,8 @@ export interface Database {
       otp_report_get: { Args: { p_report_id: string }; Returns: Json };
       otp_report_decide: { Args: { p_report_id: string; p_decision: string; p_note: string | null }; Returns: Json };
       otp_report_start_review: { Args: { p_report_id: string }; Returns: Json };
+      otp_rules_view: { Args: Record<string, never>; Returns: Json };
+      otp_rule_set_approve: { Args: { p_version: string; p_confirm: boolean; p_note: string | null }; Returns: Json };
       otp_followup_aggregates: {
         Args: { p_start: string; p_end: string; p_lga_id?: string | null; p_facility_id?: string | null };
         Returns: Json;

@@ -66,7 +66,7 @@ val PATHWAY_LABEL = mapOf(
     "otp" to "Admit to the Outpatient Therapeutic Programme",
     "stabilisation" to "Refer to stabilisation care",
     "inpatient_paediatric" to "Refer to inpatient paediatric care",
-    "nutrition_advice" to "Moderate: nutrition advice or SFP",
+    "nutrition_advice" to "Moderate: MNP (if MUAC yellow) and nutrition advice",
     "praise_advice" to "Normal: praise and advise",
     "clinical_review" to "Refer for clinical review",
     "incomplete" to "More information needed",
