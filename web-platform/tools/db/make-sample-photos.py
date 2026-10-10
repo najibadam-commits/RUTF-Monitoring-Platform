@@ -115,4 +115,18 @@ for name, (top, bottom), shirt in (
     stamp(img, "SAMPLE IMAGE  -  selfie")
     img.save(os.path.join(OUT, name), quality=88)
 
+# RUTF sachets given at an OTP visit (seed-demo-otp-followup.js): packets only, no people.
+img = Image.new("RGB", (960, 720), (236, 231, 220))
+d = ImageDraw.Draw(img)
+d.rectangle([0, 396, 960, 720], fill=(196, 168, 128))                                       # table
+for r in range(3):
+    for c in range(7):
+        x, y = 90 + c * 115 + (r % 2) * 20, 150 + r * 130
+        d.rounded_rectangle([x, y, x + 95, y + 120], radius=10, fill=(250, 250, 248), outline=(180, 40, 40), width=4)
+        d.rectangle([x + 8, y + 20, x + 87, y + 55], fill=(200, 45, 45))
+        d.text((x + 18, y + 28), "RUTF", font=font(22, True), fill="white")
+        d.text((x + 22, y + 70), "92 g", font=font(18), fill=(90, 90, 90))
+stamp(img, "SAMPLE IMAGE  -  RUTF sachets (no people)")
+img.save(os.path.join(OUT, "rutf_sachets.jpg"), quality=85)
+
 print("wrote", sorted(os.listdir(OUT)))

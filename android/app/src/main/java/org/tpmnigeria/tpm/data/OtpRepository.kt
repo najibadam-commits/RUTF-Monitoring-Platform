@@ -63,6 +63,12 @@ class OtpRepository {
     // Follow-up (web migration 0128; DECISIONS R150–R153): the visits list (Child IDs only), the
     // next visit, referrals and the photo of the RUTF given.
     suspend fun myVisits() = call("otp_my_visits", buildJsonObject { })
+    /** Active OTP sites in the officer's state (web 0129), as {"value": [{id, name, lga}]}. */
+    suspend fun transferDestinations() = call("otp_transfer_destinations", buildJsonObject { })
+    suspend fun transfer(childCode: String, toFacilityId: String, reason: String) = call("otp_transfer_child", buildJsonObject {
+        put("p_child_code", childCode); put("p_to_facility", toFacilityId); put("p_reason", reason)
+    })
+    suspend fun readmit(body: JsonObject) = call("otp_readmit_child", p(body))
     suspend fun reschedule(body: JsonObject) = call("otp_reschedule_visit", p(body))
     suspend fun refer(body: JsonObject) = call("otp_refer_child", p(body))
     suspend fun updateReferral(referralId: String, status: String, note: String?) = call("otp_update_referral", buildJsonObject {

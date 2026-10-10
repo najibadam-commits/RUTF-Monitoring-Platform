@@ -29,7 +29,7 @@ import org.tpmnigeria.tpm.ui.navigation.RegisterHeaderBack
 import org.tpmnigeria.tpm.ui.theme.TpmColors
 import org.tpmnigeria.tpm.ui.theme.TpmSpacing
 
-/** Child ID as issued by the server: STATE-LGA-YY-NNNNN (e.g. KT-DAU-26-00042), or without the year. */
+/** Child ID as issued by the server, in the Beneficiary Card's format DTAP-STATE-LGA-NNNNNNN (e.g. DTAP-KTS-DAU-0000042); older IDs (KT-DAU-26-00042) still open. */
 private val CHILD_ID = Regex("""^[A-Z0-9]{2,6}(-[A-Z0-9]{2,6})+-\d{4,8}$""")
 
 /**
@@ -75,9 +75,9 @@ fun OtpHomeScreen(
         TpmCard(blueprint = true) {
             Text("Find existing child", style = MaterialTheme.typography.titleMedium)
             TpmTextField(label = "Child ID (from the caregiver's card)", value = code, onValueChange = { code = it.uppercase() },
-                placeholder = "e.g. KT-DAU-26-00042")
+                placeholder = "e.g. DTAP-KTS-DAU-0000042")
             if (code.isNotBlank() && !valid) {
-                Text("A Child ID looks like KT-DAU-26-00042.", style = MaterialTheme.typography.bodySmall, color = OtpAmber)
+                Text("A Child ID looks like DTAP-KTS-DAU-0000042.", style = MaterialTheme.typography.bodySmall, color = OtpAmber)
             }
             TpmButton(text = "Open the child's card", onClick = { onOpenChild(clean) }, enabled = valid, fullWidth = true)
         }

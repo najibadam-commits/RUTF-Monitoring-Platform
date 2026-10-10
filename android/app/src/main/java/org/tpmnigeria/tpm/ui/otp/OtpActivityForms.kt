@@ -30,6 +30,7 @@ import org.tpmnigeria.tpm.ui.components.TpmTextField
 import org.tpmnigeria.tpm.ui.navigation.LocalToast
 import org.tpmnigeria.tpm.ui.navigation.RegisterHeaderBack
 import org.tpmnigeria.tpm.ui.stock.NumberField
+import org.tpmnigeria.tpm.ui.stock.ReviewRow
 import org.tpmnigeria.tpm.ui.theme.TpmColors
 import org.tpmnigeria.tpm.ui.theme.TpmSpacing
 import java.time.LocalDate
@@ -138,7 +139,7 @@ fun OtpIycfScreen(onExit: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TpmSpacing.space4),
         verticalArrangement = Arrangement.spacedBy(TpmSpacing.space3)) {
         Text("IYCF / health education session", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-        Text("One entry per session. Count the participants at the session: the groups below may overlap, so they are not added up.",
+        Text("One entry per session. The groups do not overlap; the total is the attendance (a woman who comes twice counts twice).",
             style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
         DatePickerField(label = "Date", date = date, onDateChange = { date = it })
         TpmDropdown(label = "Session", selected = kind, options = listOf("iycf_support_group", "health_education"), onSelect = { kind = it },
@@ -147,15 +148,18 @@ fun OtpIycfScreen(onExit: () -> Unit) {
         NumberField(label = "Pregnant women", value = pregnant, onValueChange = { pregnant = it })
         NumberField(label = "Breastfeeding women", value = breastfeeding, onValueChange = { breastfeeding = it })
         NumberField(label = "Other women", value = other, onValueChange = { other = it })
-        NumberField(label = "Total participants at the session", value = total, onValueChange = { total = it })
+        // W8: with the groups entered, the total is their sum; otherwise enter the attendance.
+        val groupSum = listOf(pregnant, breastfeeding, other).mapNotNull { it.toIntOrNull() }.takeIf { it.isNotEmpty() }?.sum()
+        if (groupSum != null) ReviewRow("Total attendance", "$groupSum")
+        else NumberField(label = "Total attendance at the session", value = total, onValueChange = { total = it })
         error?.let { Text(it, color = OtpRed, style = MaterialTheme.typography.bodyMedium) }
-        TpmButton(text = "Record the session", fullWidth = true, blueprint = true, enabled = !busy && kind != null && total.toIntOrNull() != null, onClick = {
+        TpmButton(text = "Record the session", fullWidth = true, blueprint = true, enabled = !busy && kind != null && (groupSum != null || total.toIntOrNull() != null), onClick = {
             busy = true; error = null
             scope.launch {
                 val body = buildJsonObject {
                     put("held_on", date.toString()); put("kind", kind!!); if (topic.isNotBlank()) put("topic", topic.trim())
                     pregnant.toIntOrNull()?.let { put("pregnant_women", it) }; breastfeeding.toIntOrNull()?.let { put("breastfeeding_women", it) }
-                    other.toIntOrNull()?.let { put("other_women", it) }; put("total_participants", total.toInt()); put("client_id", UUID.randomUUID().toString())
+                    other.toIntOrNull()?.let { put("other_women", it) }; put("total_participants", groupSum ?: total.toInt()); put("client_id", UUID.randomUUID().toString())
                 }
                 when (val r = repo.recordIycfSession(body)) {
                     is OtpResult.Ok -> { toast.show("Session recorded"); onExit() }

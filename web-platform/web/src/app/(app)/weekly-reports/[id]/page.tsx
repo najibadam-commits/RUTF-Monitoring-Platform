@@ -228,14 +228,14 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 420px), 1fr))", gap: 16, alignItems: "start" }}>
-        <Section letter="I" title="MUAC screening" note="Screening events at the OTP site this week, by the colour the rules computed; children screened are not all enrolled.">
+        <Section letter="I" title="MUAC screening (6–59 months)" note={<>Screening events of children 6–59 months at the OTP site this week, by the colour the rules computed; a child screened twice counts twice (W7). Children screened are not all enrolled.{s.I?.outside_6_59 ? ` Screenings of other ages, not counted: ${s.I.outside_6_59}.` : ""}</>}>
           <SexTable rows={[["Green (over 12.5 cm)", s.I?.green], ["Yellow (11.5–12.5 cm)", s.I?.yellow], ["Red (under 11.5 cm)", s.I?.red], ["On a cut-off (clinical review)", s.I?.boundary], ["Total screened", s.I?.total]]} />
         </Section>
-        <Section letter="J" title="IYCF support groups and health education" note="As recorded per session. The categories are not added up: they may overlap (W8).">
+        <Section letter="J" title="IYCF support groups and health education" note="As recorded per session. Pregnant, breastfeeding and other women do not overlap; the total is the attendance, so a woman who comes twice counts twice (W8).">
           {s.J?.status === "none_recorded" ? <div className="text-muted" style={{ fontSize: 13 }}>No sessions recorded this week.</div> : (
             <table className="table"><tbody>
               {[["Sessions held", s.J?.sessions], ["IYCF support groups", s.J?.support_groups], ["Health education", s.J?.health_education], ["Pregnant women reached", s.J?.pregnant_women],
-                ["Breastfeeding women reached", s.J?.breastfeeding_women], ["Other women reached", s.J?.other_women], ["Total participants (as counted)", s.J?.total_participants]]
+                ["Breastfeeding women reached", s.J?.breastfeeding_women], ["Other women reached", s.J?.other_women], ["Total attendance", s.J?.total_participants]]
                 .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
             </tbody></table>
           )}
@@ -254,7 +254,7 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
             </tbody></table>
             <table className="table"><tbody>
               {[["RUTF packets recommended", s.L.rutf?.recommended], ["RUTF packets given", s.L.rutf?.given], ["Visits where given ≠ recommended", s.L.rutf?.visits_differing],
-                ["Visits with none recommended", s.L.rutf?.visits_withheld], ["Given with a clinician's authorisation", s.L.rutf?.given_while_withheld]]
+                ["Visits with none recommended", s.L.rutf?.visits_withheld], ["Given anyway, with the OTP Officer's reason", s.L.rutf?.given_while_withheld]]
                 .map(([k, val]) => <tr key={k as string}><td>{k as string}</td><td style={{ textAlign: "right" }}>{n(val)}</td></tr>)}
             </tbody></table>
             <table className="table"><tbody>

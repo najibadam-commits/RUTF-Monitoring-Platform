@@ -327,7 +327,8 @@ fun AppNavHost(session: AppSession) {
                     composable(Routes.OtpChildPattern, arguments = listOf(navArgument("childCode") { type = NavType.StringType })) { entry ->
                         val code = entry.arguments?.getString("childCode").orEmpty()
                         RequireAccess(otpAllowed, { navController.popBackStack() }) {
-                            OtpChildScreen(code, onRecordVisit = { navController.navigate(Routes.otpVisit(it)) }, onExit = { navController.popBackStack() })
+                            OtpChildScreen(code, onRecordVisit = { navController.navigate(Routes.otpVisit(it)) },
+                                onReadmit = { navController.navigate(Routes.otpReadmit(it)) }, onExit = { navController.popBackStack() })
                         }
                     }
                     composable(Routes.OtpVisitPattern, arguments = listOf(navArgument("childCode") { type = NavType.StringType })) { entry ->
@@ -344,6 +345,16 @@ fun AppNavHost(session: AppSession) {
                     }
                     composable(Routes.OtpIycf) {
                         RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpIycfScreen(onExit = { navController.popBackStack() }) }
+                    }
+                    composable(Routes.OtpReadmitPattern, arguments = listOf(navArgument("childCode") { type = NavType.StringType })) { entry ->
+                        val code = entry.arguments?.getString("childCode").orEmpty()
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpScreeningScreen(
+                                readmitCode = code,
+                                onRegistered = { navController.navigate(Routes.otpChild(it)) { popUpTo(Routes.OtpHome) } },
+                                onExit = { navController.popBackStack() },
+                            )
+                        }
                     }
                     composable(Routes.OtpTasks) {
                         RequireAccess(otpAllowed, { navController.popBackStack() }) {
@@ -455,6 +466,7 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.OtpScreening -> "Screening"
     route.startsWith("otpChild") -> "Child's Card"
     route == Routes.OtpTasks -> "Visits and Tasks"
+    route.startsWith("otpReadmit") -> "Re-admission"
     route.startsWith("otpPhoto") -> "RUTF Photo"
     route.startsWith("otpVisit") -> "OTP Visit"
     route == Routes.OtpWeeklyReport -> "Weekly OTP Report"

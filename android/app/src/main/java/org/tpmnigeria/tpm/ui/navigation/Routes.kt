@@ -42,7 +42,7 @@ object Routes {
     fun driRespondWizard(issueId: String? = null) = if (issueId != null) "driRespondWizard?issueId=$issueId" else "driRespondWizard"
 
     // Digital OTP Admission Card (OTP Officers at an OTP site; RUTF DECISIONS R145). Child IDs are
-    // letters, digits and hyphens only (e.g. KT-DAU-26-00042), so they need no escaping.
+    // letters, digits and hyphens only (e.g. DTAP-KTS-DAU-0000042), so they need no escaping.
     const val OtpHome = "otpHome"
     const val OtpScreening = "otpScreening"
     const val OtpChildPattern = "otpChild/{childCode}"
@@ -54,6 +54,8 @@ object Routes {
     const val OtpIycf = "otpIycf"
     // Follow-up (web 0128): the visits list (Child IDs only) and a visit's RUTF photo.
     const val OtpTasks = "otpTasks"
+    const val OtpReadmitPattern = "otpReadmit/{childCode}"
+    fun otpReadmit(childCode: String) = "otpReadmit/$childCode"
     const val OtpPhotoPattern = "otpPhoto/{visitId}/{childCode}?folder={folder}"
     fun otpPhoto(visitId: String, childCode: String, folder: String) = "otpPhoto/$visitId/$childCode?folder=${android.net.Uri.encode(folder)}"
 

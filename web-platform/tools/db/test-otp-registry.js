@@ -92,7 +92,7 @@ const check = (area, what, expected, actual) => {
         String(await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: (await r({ ...base, muac_cm: 12.0 })).screening_id, child_name: "Test Child (DUMMY)", sex: "F" })])).includes("not eligible"));
       const reg = await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: ok.screening_id, child_name: "Amina Test (DUMMY)", caregiver_name: "Hauwa Test (DUMMY)", sex: "F", admission_source: "community" })]);
       code = reg.child_code;
-      check("register", "Child ID issued in the LGA format", true, /^[A-Z]{2}-[A-Z0-9]+-\d{2}-\d{5}$/.test(code));
+      check("register", "Child ID in the Beneficiary Card format (DTAP-KTS-MTZ-0001245)", true, /^DTAP-[A-Z]{2,3}-[A-Z0-9]{3}-\d{7}$/.test(code));
       check("register", "ration at 7.2 kg = 21 packets a week (G6 X3)", 21, reg.ration.packets_per_week);
       check("register", "amoxicillin is due at admission", true, reg.due_medications.some((m) => m.medication === "amoxicillin"));
       check("register", "vitamin A shown as awaiting sign-off", true, reg.due_medications.some((m) => m.medication === "vitamin_a" && m.pending_rule));

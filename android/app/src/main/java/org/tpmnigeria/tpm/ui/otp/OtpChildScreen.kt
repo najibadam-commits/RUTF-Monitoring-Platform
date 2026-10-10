@@ -57,7 +57,7 @@ import java.util.UUID
  * site gets it — and nothing is kept on the phone. Screenshots are blocked while it is open.
  */
 @Composable
-fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onExit: () -> Unit) {
+fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onReadmit: (String) -> Unit, onExit: () -> Unit) {
     val repo = remember { OtpRepository() }
     val toast = LocalToast.current
     val scope = rememberCoroutineScope()
@@ -158,6 +158,13 @@ fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onExit: (
 
         if (active) MedicationCard(c, onRecorded = { reload++ })
         if (active) DischargeCard(c, onDone = { toast.show("Outcome recorded"); reload++ })
+        if (active) TransferCard(c, onTransferred = { toast.show("Transferred: the receiving OTP site continues the treatment"); onExit() })
+        // A closed admission: the child can come back on the same Child ID (returned defaulter, back
+        // from stabilisation care, or a relapse), after a new screening at this site.
+        if (adm != null && !active && adm.str("outcome") != "transferred_otp" && adm.str("outcome") != "died") {
+            TpmButton(text = "Re-admit this child (screen first)", onClick = { onReadmit(c.str("child_code").orEmpty()) },
+                variant = TpmButtonVariant.Secondary, fullWidth = true)
+        }
     }
 }
 

@@ -49,7 +49,7 @@ import java.util.UUID
  * as the weight is typed; the database applies it, compares the visit with the previous one and
  * the admission, applies the card's and booklet's rules (no RUTF recommended while a referral is
  * open, or with severe oedema or a poor appetite: G4), checks the RUTF given (a different quantity
- * needs a reason; RUTF when none is recommended needs the authorising clinician), and schedules
+ * needs a reason; RUTF when none is recommended needs the OTP Officer's reason, Q22), and schedules
  * the next visit. A visit where RUTF was given is complete once its photo is sent (web 0128).
  */
 @Composable
@@ -84,7 +84,6 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
     var saved by remember { mutableStateOf<JsonObject?>(null) }
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    var authorisedBy by remember { mutableStateOf("") }
     var card by remember { mutableStateOf<JsonObject?>(null) }
     var photoSent by remember { mutableStateOf(false) }
     val clientId = remember { UUID.randomUUID().toString() }
@@ -199,7 +198,7 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
             ChoiceField("Palmar pallor / anaemia", yesNo, pallor, { pallor = it }) { if (it) "Yes" else "No" }
             ChoiceField("Superficial infection", yesNo, infection, { infection = it }) { if (it) "Yes" else "No" }
             TpmTextField(label = "Action / medication required (details)", value = actionDetails, onValueChange = { actionDetails = it }, singleLine = false, minLines = 2)
-            if (withheld != null) Text("No RUTF recommended: $withheld. Give RUTF only if a clinician authorises it.",
+            if (withheld != null) Text("No RUTF recommended: $withheld. As the OTP Officer you may still give RUTF, with the reason.",
                 color = OtpRed, style = MaterialTheme.typography.bodyMedium)
             NumberField(label = "RUTF packets given", value = dispensed, onValueChange = { dispensed = it })
             val perWeek = ration?.takeIf { it.bool("ok") && withheld == null }?.str("packets_per_week")?.toIntOrNull()
@@ -207,8 +206,7 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
             val differs = perWeek != null && dispensed.toIntOrNull() != null && dispensed.toIntOrNull() != perWeek
             if (differs) TpmTextField(label = "Why it differs from the ration ($perWeek)", value = dispenseNote, onValueChange = { dispenseNote = it })
             if (noRecommendation && (dispensed.toIntOrNull() ?: 0) > 0) {
-                TpmTextField(label = "Reason RUTF is given", value = dispenseNote, onValueChange = { dispenseNote = it })
-                TpmTextField(label = "Clinician who authorised it (name and title)", value = authorisedBy, onValueChange = { authorisedBy = it })
+                TpmTextField(label = "Reason RUTF is given (you authorise it as the OTP Officer)", value = dispenseNote, onValueChange = { dispenseNote = it })
             }
             if ((dispensed.toIntOrNull() ?: 0) > 0) Text("After saving, take a photo of the RUTF given (sachets only).",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
@@ -218,7 +216,7 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
         val given = dispensed.toIntOrNull()
         val noRec = withheld != null || ration?.bool("ok") == false
         val ready = card != null && (!attended || (weight.toDoubleOrNull() != null && given != null && when {
-            noRec -> given == 0 || (dispenseNote.isNotBlank() && authorisedBy.isNotBlank())
+            noRec -> given == 0 || dispenseNote.isNotBlank()
             else -> dispenseNote.isNotBlank() || ration?.takeIf { it.bool("ok") }?.str("packets_per_week")?.toIntOrNull().let { it == null || given == it }
         }))
         TpmButton(
@@ -241,7 +239,6 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
                             if (actionDetails.isNotBlank()) { put("action_required", true); put("action_details", actionDetails.trim()) }
                             dispensed.toIntOrNull()?.let { put("rutf_dispensed", it) }
                             if (dispenseNote.isNotBlank()) put("dispense_note", dispenseNote.trim())
-                            if (authorisedBy.isNotBlank()) put("dispense_authorised_by", authorisedBy.trim())
                             if (initials.isNotBlank()) put("examiner_initials", initials.trim())
                         }
                     }

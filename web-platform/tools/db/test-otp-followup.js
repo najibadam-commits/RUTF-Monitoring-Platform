@@ -127,8 +127,8 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("next step", "no automatic recovery after three visits", false, v3.discharge_check.can_discharge_as_cured);
 
       // Visit 4 (exceptional): severe oedema -> stabilisation (G4): no RUTF recommended, no routine visit.
-      check("withhold", "RUTF without a clinician's authorisation -> refused", true,
-        has(await visit({ visit_on: today, weight_kg: 7.2, muac_cm: 11.2, oedema: "+++", appetite_test: "good", rutf_dispensed: 21, dispense_note: "x" }), "clinician who authorised"));
+      check("withhold", "RUTF when none is recommended, without a reason -> refused", true,
+        has(await visit({ visit_on: today, weight_kg: 7.2, muac_cm: 11.2, oedema: "+++", appetite_test: "good", rutf_dispensed: 21 }), "reason recorded"));
       const v4 = await visit({ visit_on: today, weight_kg: 7.2, muac_cm: 11.2, oedema: "+++", appetite_test: "good", rutf_dispensed: 0 });
       check("withhold", "severe oedema at visit 4 -> RUTF withheld", "withheld", v4.ration_status);
       check("withhold", "nothing recommended is stored", null, (await sys(`select rutf_prescribed from otp_visits where id = $1`, [v4.visit_id])).rutf_prescribed);
@@ -139,13 +139,16 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("visits list", "the child appears under needs a decision", "refer", (list.needs_decision.find((x) => x.child_code === code) || {}).step);
     });
 
-    // A configured expected number of visits flags later visits for clinical review (Q23; empty today).
-    await pg.query(`update otp_rule_sets set params = params || '{"expected_visits": 3}' where version = '2026-10-draft'`);
-    const beyond = await one(`select otp_recovery_assessment($1, 5, '{"weight_kg": 7.4}') r`, [admId]);
-    check("expected visits", "when set to 3, visit 5 is sent for clinical review", true, beyond.r.flags.some((f) => f.code === "beyond_expected_visits" && f.withhold_ration));
-    await pg.query(`update otp_rule_sets set params = params || '{"expected_visits": null}' where version = '2026-10-draft'`);
-    const none = await one(`select otp_recovery_assessment($1, 5, '{"weight_kg": 7.4}') r`, [admId]);
-    check("expected visits", "not set (Q23): no flag", false, none.r.flags.some((f) => f.code === "beyond_expected_visits"));
+    // The programme's rule (Q23, migration 0129): 3 visits expected, a 4th only when recovery is not
+    // good, beyond it a referral to a doctor is suggested (RUTF still recommended).
+    const rs = (await one(`select params from otp_rule_sets where version = '2026-10-draft'`)).params;
+    check("expected visits", "rule set: 3 expected, 4 at most", "3/4", `${rs.expected_visits}/${rs.max_visits}`);
+    const at4 = await one(`select otp_recovery_assessment($1, 4, '{"weight_kg": 7.4}') r`, [admId]);
+    check("expected visits", "visit 4 is marked exceptional", true, at4.r.flags.some((f) => f.code === "exceptional_visit"));
+    const at5 = await one(`select otp_recovery_assessment($1, 5, '{"weight_kg": 7.4}') r`, [admId]);
+    const f5 = at5.r.flags.find((f) => f.code === "beyond_max_visits");
+    check("expected visits", "beyond visit 4: refer to a doctor", "refer", f5 && f5.action);
+    check("expected visits", "beyond visit 4: RUTF still recommended (a suggestion)", false, f5 && f5.withhold_ration);
 
     // ── Referral ──
     let refId;
@@ -236,12 +239,37 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("review", "the amendment keeps the correction", 1, reopened.adjustments.length);
     });
 
+    // The programme's pathway (Q23): a child recovering steadily but not yet meeting the discharge
+    // criteria gets an exceptional 4th visit after visit 3, then a referral to a doctor is suggested.
+    let code3;
+    await as(officer.id, async () => {
+      const scr = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "F", age_months: 30, weight_kg: 9.0, height_cm: 82, muac_cm: 11.2, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
+      code3 = (await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: scr.screening_id, child_name: "Hafsat Pathway (DUMMY)", sex: "F", confirm_not_duplicate: true })])).child_code;
+    });
+    await pg.query(`update otp_admissions set admitted_on = current_date - 21 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
+    await as(officer.id, async () => {
+      const v = (p) => call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: code3, appetite_test: "good", oedema: "absent", ...p })]);
+      await v({ admission_visit: true, rutf_dispensed: 25 });
+      await v({ visit_on: await day(-14), weight_kg: 9.2, muac_cm: 11.3, rutf_dispensed: 25 });
+      const third = await v({ visit_on: await day(-7), weight_kg: 9.4, muac_cm: 11.4, rutf_dispensed: 25 });
+      check("pathway", "not recovered by visit 3 -> exceptional 4th visit scheduled", "exceptional_visit", third.next_step.step);
+      check("pathway", "the 4th visit is due a week later", today, third.next_visit_due);
+      const fourth = await v({ visit_on: today, weight_kg: 9.5, muac_cm: 11.4, rutf_dispensed: 28 });
+      check("pathway", "visit 4 carries the exceptional-visit note", true, fourth.recovery.flags.some((f) => f.code === "exceptional_visit"));
+      check("pathway", "RUTF still recommended at visit 4", "recommended", fourth.ration_status);
+      check("pathway", "after visit 4 without recovery: refer to see a doctor", true, fourth.next_step.step === "refer" && fourth.next_step.message.includes("doctor"));
+      check("pathway", "no routine 5th visit is scheduled", null, fourth.next_visit_due);
+    });
+
     // Regression: the existing visit test path (first follow-up = visit 2 without an admission visit) still works.
     await as(officer.id, async () => {
       const scr = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "M", age_months: 20, weight_kg: 8.0, height_cm: 75, muac_cm: 11.1, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
       const reg = await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: scr.screening_id, child_name: "Musa Regress (DUMMY)", sex: "M", confirm_not_duplicate: true })]);
-      const r = await call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: reg.child_code, weight_kg: 8.1, muac_cm: 11.2, oedema: "absent", rutf_dispensed: 21 })]);
+      const r = await call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: reg.child_code, weight_kg: 8.1, muac_cm: 11.2, oedema: "+++", rutf_dispensed: 21, dispense_note: "Caregiver travels to the hospital tomorrow (DUMMY)" })]);
       check("regression", "a follow-up without an admission visit is visit 2", 2, r.visit_number);
+      check("authorise", "the OTP Officer may give RUTF when none is recommended, with the reason (Q22)", "withheld/21", `${r.ration_status}/${r.rutf_given}`);
+      const auth = await sys(`select dispense_authorised_by a from otp_visits where id = $1`, [r.visit_id]);
+      check("authorise", "the officer is recorded as the authoriser", true, String(auth.a).endsWith("(OTP Officer)"));
     });
   } finally {
     await pg.query("rollback");

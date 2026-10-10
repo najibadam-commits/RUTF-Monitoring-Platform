@@ -411,3 +411,64 @@ fun VisitsSummary(counts: JsonObject?) {
     Text(if (parts.isEmpty()) "Nothing overdue or pending." else parts.joinToString(" · "),
         style = MaterialTheme.typography.bodyMedium, color = if (parts.isEmpty()) OtpGreen else OtpAmber)
 }
+
+/**
+ * Transfer to another OTP site in the state (booklet G5 T3): same Child ID and history; the current
+ * admission closes as "transferred to another OTP site" and the receiving site continues it, with
+ * the next visit's due date. After the transfer this officer can no longer open the record.
+ */
+@Composable
+fun TransferCard(card: JsonObject, onTransferred: () -> Unit) {
+    val repo = remember { OtpRepository() }
+    val scope = rememberCoroutineScope()
+    var open by remember { mutableStateOf(false) }
+    var sites by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
+    var filter by remember { mutableStateOf("") }
+    var chosen by remember { mutableStateOf<JsonObject?>(null) }
+    var reason by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+
+    if (!open) {
+        TpmButton(text = "Transfer to another OTP site", variant = TpmButtonVariant.Ghost, fullWidth = true, onClick = {
+            open = true
+            scope.launch {
+                when (val r = repo.transferDestinations()) {
+                    is OtpResult.Ok -> sites = (r.data["value"] as? JsonArray)?.objects().orEmpty()
+                    is OtpResult.Error -> error = r.message
+                }
+            }
+        })
+        return
+    }
+    TpmCard {
+        Text("Transfer to another OTP site", style = MaterialTheme.typography.titleMedium)
+        Text("The child keeps the Child ID and history. The receiving site continues the treatment; you will no longer be able to open this record.",
+            style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        TpmTextField(label = "Find the OTP site (name or LGA)", value = filter, onValueChange = { filter = it; chosen = null })
+        val q = filter.trim().lowercase()
+        val matches = if (q.length < 2) emptyList() else sites.filter { (it.str("name").orEmpty() + " " + it.str("lga").orEmpty()).lowercase().contains(q) }.take(8)
+        matches.forEach { s ->
+            Text("${s.str("name")} · ${s.str("lga")}", style = MaterialTheme.typography.bodyMedium,
+                color = if (chosen?.str("id") == s.str("id")) OtpGreen else TpmColors.Text,
+                modifier = Modifier.fillMaxWidth().clickable { chosen = s; filter = s.str("name").orEmpty() }.padding(vertical = TpmSpacing.space1))
+        }
+        if (q.length >= 2 && matches.isEmpty() && chosen == null) Text("No OTP site matches.", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        chosen?.let { ReviewRow("Receiving OTP site", "${it.str("name")} (${it.str("lga")})") }
+        TpmTextField(label = "Reason (required)", value = reason, onValueChange = { reason = it })
+        Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space2)) {
+            TpmButton(text = if (busy) "Transferring…" else "Transfer", enabled = chosen != null && reason.isNotBlank() && !busy, onClick = {
+                busy = true; error = null
+                scope.launch {
+                    when (val r = repo.transfer(card.str("child_code").orEmpty(), chosen!!.str("id").orEmpty(), reason.trim())) {
+                        is OtpResult.Ok -> onTransferred()
+                        is OtpResult.Error -> error = r.message
+                    }
+                    busy = false
+                }
+            })
+            TpmButton(text = "Cancel", variant = TpmButtonVariant.Ghost, onClick = { open = false })
+        }
+        error?.let { Text(it, color = OtpRed, style = MaterialTheme.typography.bodySmall) }
+    }
+}

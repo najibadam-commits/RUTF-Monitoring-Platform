@@ -47,10 +47,12 @@ import java.util.UUID
  * the database's engine (otp_screen) decides the classification and pathway from the approved
  * rules and never guesses: missing or implausible inputs block the decision, and the booklet's
  * open points go to clinical review. Only a child whose pathway is OTP can be registered, and the
- * Child ID is issued by the server.
+ * Child ID is issued by the server. With [readmitCode], the screening is for a child already
+ * registered whose last admission is closed: they are re-admitted on the same Child ID as a
+ * returned defaulter, from stabilisation care, or a relapse (a new case), never registered again.
  */
 @Composable
-fun OtpScreeningScreen(onRegistered: (String) -> Unit, onExit: () -> Unit) {
+fun OtpScreeningScreen(onRegistered: (String) -> Unit, onExit: () -> Unit, readmitCode: String? = null) {
     val repo = remember { OtpRepository() }
     val toast = LocalToast.current
     val scope = rememberCoroutineScope()
@@ -102,7 +104,7 @@ fun OtpScreeningScreen(onRegistered: (String) -> Unit, onExit: () -> Unit) {
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TpmSpacing.space4),
         verticalArrangement = Arrangement.spacedBy(TpmSpacing.space3),
     ) {
-        Text("Screening", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(if (readmitCode != null) "Screening for re-admission · $readmitCode" else "Screening", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         Text("Children 6–59 months. Measure MUAC on the left arm to 0.1 cm; check both feet for pitting oedema for 3 seconds.",
             style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
 
@@ -134,7 +136,9 @@ fun OtpScreeningScreen(onRegistered: (String) -> Unit, onExit: () -> Unit) {
         result?.let { PathwayResultCard(it) }
 
         val screeningId = result?.str("screening_id")
-        if (result?.str("pathway") == "otp" && screeningId != null) {
+        if (readmitCode != null && screeningId != null) {
+            ReadmitForm(readmitCode, screeningId, result?.str("pathway").orEmpty(), onReadmitted = { toast.show("Re-admitted: $readmitCode"); onRegistered(readmitCode) })
+        } else if (result?.str("pathway") == "otp" && screeningId != null) {
             Text("Register the child", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
             Text("These details are seen only by the OTP Officer at this site, by entering the Child ID.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
@@ -193,5 +197,48 @@ fun OtpScreeningScreen(onRegistered: (String) -> Unit, onExit: () -> Unit) {
         } else if (result != null && result?.str("pathway") != "otp") {
             TpmButton(text = "Done", onClick = onExit, variant = TpmButtonVariant.Secondary, fullWidth = true)
         }
+    }
+}
+
+/**
+ * Re-admission on the same Child ID (web otp_readmit_child): a new case (relapse) must meet the
+ * OTP criteria; a returned defaulter or a child from stabilisation care continues treatment unless
+ * the screening sends them to stabilisation care.
+ */
+@Composable
+private fun ReadmitForm(childCode: String, screeningId: String, pathway: String, onReadmitted: () -> Unit) {
+    val repo = remember { OtpRepository() }
+    val scope = rememberCoroutineScope()
+    var type by remember { mutableStateOf<String?>(null) }
+    var busy by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
+    val allowed = when (type) {
+        null -> false
+        "new_case" -> pathway == "otp"
+        else -> pathway !in setOf("stabilisation", "incomplete", "correct_inputs")
+    }
+    TpmCard {
+        Text("Re-admit $childCode", style = MaterialTheme.typography.titleMedium)
+        TpmDropdown(label = "Type of admission", selected = type, options = listOf("returned_defaulter", "from_stabilisation", "new_case"),
+            onSelect = { type = it }, labelFor = {
+                when (it) { "returned_defaulter" -> "Returned defaulter (continues treatment)"; "from_stabilisation" -> "Back from stabilisation care"; else -> "Relapse: a new case" }
+            })
+        if (type == "new_case" && pathway != "otp") Text("A relapse is admitted only if the screening meets the OTP criteria.", color = OtpRed, style = MaterialTheme.typography.bodySmall)
+        if (type != null && type != "new_case" && pathway == "stabilisation") Text("The screening sends the child to stabilisation care: refer them instead.", color = OtpRed, style = MaterialTheme.typography.bodySmall)
+        TpmButton(text = if (busy) "Re-admitting…" else "Re-admit on the same Child ID", enabled = allowed && !busy, fullWidth = true, onClick = {
+            busy = true; error = null
+            scope.launch {
+                val body = buildJsonObject {
+                    put("child_code", childCode); put("admission_type", type!!); put("screening_id", screeningId)
+                    put("readmission", true); put("relapse", type == "new_case")
+                }
+                when (val r = repo.readmit(body)) {
+                    is OtpResult.Ok -> onReadmitted()
+                    is OtpResult.Error -> error = r.message
+                }
+                busy = false
+            }
+        })
+        error?.let { Text(it, color = OtpRed, style = MaterialTheme.typography.bodySmall) }
     }
 }

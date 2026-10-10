@@ -48,12 +48,15 @@ const check = (area, what, expected, actual) => {
     const iso = (d) => d; // dates kept as text (a JS Date would shift them by the UTC+1 offset)
 
     let lastReportId;
+    // New cases admitted at the site this week, counted directly (the demo seeds move admission dates).
+    const expectedNew = (await one(`select count(*)::int n from otp_admissions where facility_id = $1 and admission_type = 'new_case'
+      and admitted_on between lower(otp_week_of(current_date)) and lower(otp_week_of(current_date)) + 6`, [officer.facility_id])).n;
     await as(officer.id, async () => {
       const cur = await call(`select otp_report_open($1::date)`, [iso(thisWeek)]);
       check("week", "the week starts on a Monday", 1, new Date(cur.week_start + "T00:00:00Z").getUTCDay());
       check("week", "the week ends 6 days later", true, (new Date(cur.week_end) - new Date(cur.week_start)) / 86400000 === 6);
       const B = cur.sections.B.SAM, C = cur.sections.C.SAM, F = cur.sections.F.SAM;
-      check("caseload", "new cases this week = the DUMMY admissions (3)", 3, C.total);
+      check("caseload", `new cases this week = the site's new-case admissions (${expectedNew})`, expectedNew, C.total);
       check("caseload", "new cases by sex add up", C.total, C.M + C.F);
       check("caseload", "new cases by age group add up", C.total, C.M_6_23 + C.M_24_59 + C.F_6_23 + C.F_24_59 + C.outside_6_59);
       check("caseload", "calculated closing = actual closing", F.actual.total, F.calculated.total);
@@ -71,7 +74,8 @@ const check = (area, what, expected, actual) => {
       check("forms", "MNP distribution recorded", true, !String(await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "distributed", sachets: 120 })])).startsWith("error"));
       check("forms", "an MNP adjustment needs a reason", true, String(await call(`select otp_record_mnp_stock($1::jsonb)`, [JSON.stringify({ movement_date: d, kind: "adjustment", sachets: -5 })])).includes("reason"));
       check("forms", "MNP 1st-dose children recorded", true, !String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: d, dose_number: 1, children: 12 })])).startsWith("error"));
-      check("forms", "IYCF session recorded", true, !String(await call(`select otp_record_iycf_session($1::jsonb)`, [JSON.stringify({ held_on: d, kind: "iycf_support_group", pregnant_women: 6, breastfeeding_women: 9, total_participants: 14 })])).startsWith("error"));
+      check("forms", "IYCF: a total that is not the sum of the groups is refused (W8)", true, String(await call(`select otp_record_iycf_session($1::jsonb)`, [JSON.stringify({ held_on: d, kind: "iycf_support_group", pregnant_women: 6, breastfeeding_women: 9, total_participants: 14 })])).includes("must equal"));
+      check("forms", "IYCF session recorded", true, !String(await call(`select otp_record_iycf_session($1::jsonb)`, [JSON.stringify({ held_on: d, kind: "iycf_support_group", pregnant_women: 6, breastfeeding_women: 9 })])).startsWith("error"));
       check("forms", "a future date is refused", true, String(await call(`select otp_record_mnp_doses($1::jsonb)`, [JSON.stringify({ given_on: "2099-01-01", dose_number: 1, children: 1 })])).includes("future"));
 
       const last = await call(`select otp_report_open($1::date)`, [iso(lastWeek)]);
@@ -80,7 +84,7 @@ const check = (area, what, expected, actual) => {
       check("MNP", "expected closing = received − distributed", 180, H.expected_closing);
       check("MNP", "1st dose children = 12", 12, H.doses.dose_1);
       check("MNP", "pack size not configured -> flagged, no cartons invented", true, last.issues.some((i) => i.code === "mnp_pack_size"));
-      check("IYCF", "categories not summed; total as recorded (14)", 14, last.sections.J.total_participants);
+      check("IYCF", "total attendance = pregnant + breastfeeding + other (W8: 6 + 9)", 15, last.sections.J.total_participants);
       const G = last.sections.G;
       check("RUTF", "expected closing = opening + received − dispensed − issued − losses + adjustments", G.expected_closing,
         G.opening + G.received - G.dispensed - G.issued - G.losses + G.adjustments);
