@@ -32,7 +32,14 @@ private val CHILD_ID = Regex("""^[A-Z0-9]{2,6}(-[A-Z0-9]{2,6})+-\d{4,8}$""")
  * entering the Child ID from their card; a new child starts with screening.
  */
 @Composable
-fun OtpHomeScreen(onScreenChild: () -> Unit, onOpenChild: (String) -> Unit, onExit: () -> Unit) {
+fun OtpHomeScreen(
+    onScreenChild: () -> Unit,
+    onOpenChild: (String) -> Unit,
+    onWeeklyReport: () -> Unit,
+    onMnp: () -> Unit,
+    onIycf: () -> Unit,
+    onExit: () -> Unit,
+) {
     var code by remember { mutableStateOf("") }
     val clean = code.trim().uppercase()
     val valid = CHILD_ID.matches(clean)
@@ -65,6 +72,14 @@ fun OtpHomeScreen(onScreenChild: () -> Unit, onOpenChild: (String) -> Unit, onEx
             Text("Screen the child first. If they meet the OTP criteria you can register them and the Child ID is issued.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
             TpmButton(text = "Screen a child", onClick = onScreenChild, variant = TpmButtonVariant.Secondary, fullWidth = true, blueprint = true)
+        }
+        TpmCard {
+            Text("Weekly report and activities", style = MaterialTheme.typography.titleMedium)
+            Text("The weekly report is calculated from this site's records: review it and submit it to the State Coordinator.",
+                style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            TpmButton(text = "Weekly OTP report", onClick = onWeeklyReport, fullWidth = true, blueprint = true)
+            TpmButton(text = "MNP stock and doses", onClick = onMnp, variant = TpmButtonVariant.Secondary, fullWidth = true)
+            TpmButton(text = "IYCF / health education session", onClick = onIycf, variant = TpmButtonVariant.Secondary, fullWidth = true)
         }
         Text("Needs a connection: Child IDs are issued by the server so two phones never give the same one.",
             style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)

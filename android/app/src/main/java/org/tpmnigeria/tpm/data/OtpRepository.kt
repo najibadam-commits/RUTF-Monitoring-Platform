@@ -29,7 +29,15 @@ class OtpRepository {
 
     private suspend fun call(fn: String, params: JsonObject): OtpResult = try {
         val result = postgrest.rpc(fn, params)
-        OtpResult.Ok(json.parseToJsonElement(result.data).jsonObject)
+        // Functions return an object, a single value (an id) or nothing.
+        val body = result.data.trim()
+        OtpResult.Ok(
+            when {
+                body.isEmpty() || body == "null" -> JsonObject(emptyMap())
+                body.startsWith("{") -> json.parseToJsonElement(body).jsonObject
+                else -> JsonObject(mapOf("value" to json.parseToJsonElement(body)))
+            },
+        )
     } catch (e: RestException) {
         OtpResult.Error(e.error)
     } catch (e: Exception) {
@@ -45,6 +53,19 @@ class OtpRepository {
     suspend fun recordMedication(body: JsonObject) = call("otp_record_medication", p(body))
     suspend fun recordOutcome(body: JsonObject) = call("otp_record_outcome", p(body))
     suspend fun ration(weightKg: Double) = call("otp_ration", buildJsonObject { put("p_weight_kg", weightKg) })
+
+    // Weekly OTP Site Report (web migration 0126; DECISIONS R149). Calculated live on the server.
+    suspend fun reportOpen(weekStart: String) = call("otp_report_open", buildJsonObject { put("p_week_start", weekStart) })
+    suspend fun reportSaveComments(reportId: String, comments: JsonObject) =
+        call("otp_report_save_comments", buildJsonObject { put("p_report_id", reportId); put("p_comments", comments) })
+    suspend fun reportSubmit(reportId: String, comments: JsonObject, amendmentReason: String?) = call("otp_report_submit", buildJsonObject {
+        put("p_report_id", reportId); put("p_comments", comments); put("p_confirm_reviewed", true)
+        if (!amendmentReason.isNullOrBlank()) put("p_amendment_reason", amendmentReason)
+    })
+    suspend fun reportStartAmendment(reportId: String) = call("otp_report_start_amendment", buildJsonObject { put("p_report_id", reportId) })
+    suspend fun recordMnpStock(body: JsonObject) = call("otp_record_mnp_stock", p(body))
+    suspend fun recordMnpDoses(body: JsonObject) = call("otp_record_mnp_doses", p(body))
+    suspend fun recordIycfSession(body: JsonObject) = call("otp_record_iycf_session", p(body))
 }
 
 sealed interface OtpResult {

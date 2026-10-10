@@ -831,6 +831,10 @@ export interface Database {
         Args: { p_weight_kg: number | null; p_rule_set_id?: string | null };
         Returns: Json;
       };
+      // Weekly OTP Site Report (migration 0126).
+      otp_reports_overview: { Args: { p_week_start: string; p_lga_id?: string | null }; Returns: Json };
+      otp_report_get: { Args: { p_report_id: string }; Returns: Json };
+      otp_report_decide: { Args: { p_report_id: string; p_decision: string; p_note: string | null }; Returns: Json };
       facility_metrics: {
         Args: { p_start: string; p_end: string };
         Returns: {

@@ -57,6 +57,12 @@ export function canAccessSettings(role: UserRole) {
 /** Super Admin and Project Admin review/decide requests here (Project Admin scoped to their own
  *  project — see migration 0036/DECISIONS.md #23); Viewer tracks their own — see
  *  download-requests/page.tsx. */
+/** Weekly OTP Site Reports (DECISIONS R148): the State Coordinator reviews and approves;
+ *  administrators see them. OTP Officers prepare and submit theirs in the app. */
+export function canAccessWeeklyReports(role: UserRole) {
+  return role === "state_coordinator" || role === "super_admin" || role === "project_admin";
+}
+
 export function canAccessDownloadRequests(role: UserRole) {
   return role === "super_admin" || role === "project_admin" || role === "viewer";
 }
@@ -176,6 +182,7 @@ export type NavKey =
   | "reportingCompleteness"
   | "otpDispensing"
   | "otpCaseload"
+  | "weeklyReports"
   | "supervision"
   | "dhis2Triangulation";
 
@@ -214,6 +221,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },
+  { key: "weeklyReports", label: "Weekly OTP Reports", href: "/weekly-reports", icon: "ph-calendar-check", section: "reporting" },
   { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Access", href: "/users", icon: "ph-users-three", section: "administration" },
@@ -235,6 +243,7 @@ export function visibleNavItemsFor(role: UserRole) {
     if (item.key === "devices") return canAccessDevices(role);
     if (item.key === "auditLog") return canAccessAuditLog(role);
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);
+    if (item.key === "weeklyReports") return canAccessWeeklyReports(role);
     return true;
   });
 }

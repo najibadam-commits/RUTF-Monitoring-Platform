@@ -49,6 +49,9 @@ object Routes {
     fun otpChild(childCode: String) = "otpChild/$childCode"
     const val OtpVisitPattern = "otpVisit/{childCode}"
     fun otpVisit(childCode: String) = "otpVisit/$childCode"
+    const val OtpWeeklyReport = "otpWeeklyReport"
+    const val OtpMnp = "otpMnp"
+    const val OtpIycf = "otpIycf"
 
     const val FinalVerifyWizardPattern = "finalVerifyWizard?issueId={issueId}"
     fun finalVerifyWizard(issueId: String? = null) = if (issueId != null) "finalVerifyWizard?issueId=$issueId" else "finalVerifyWizard"

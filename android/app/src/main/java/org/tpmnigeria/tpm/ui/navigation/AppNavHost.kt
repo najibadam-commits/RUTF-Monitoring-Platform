@@ -60,6 +60,9 @@ import org.tpmnigeria.tpm.ui.otp.OtpChildScreen
 import org.tpmnigeria.tpm.ui.otp.OtpHomeScreen
 import org.tpmnigeria.tpm.ui.otp.OtpScreeningScreen
 import org.tpmnigeria.tpm.ui.otp.OtpVisitScreen
+import org.tpmnigeria.tpm.ui.otp.OtpIycfScreen
+import org.tpmnigeria.tpm.ui.otp.OtpMnpScreen
+import org.tpmnigeria.tpm.ui.otp.OtpWeeklyReportScreen
 import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
 import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
 import org.tpmnigeria.tpm.ui.stock.MyStockScreen
@@ -303,6 +306,9 @@ fun AppNavHost(session: AppSession) {
                             OtpHomeScreen(
                                 onScreenChild = { navController.navigate(Routes.OtpScreening) },
                                 onOpenChild = { navController.navigate(Routes.otpChild(it)) },
+                                onWeeklyReport = { navController.navigate(Routes.OtpWeeklyReport) },
+                                onMnp = { navController.navigate(Routes.OtpMnp) },
+                                onIycf = { navController.navigate(Routes.OtpIycf) },
                                 onExit = { navController.popBackStack() },
                             )
                         }
@@ -326,6 +332,15 @@ fun AppNavHost(session: AppSession) {
                         RequireAccess(otpAllowed, { navController.popBackStack() }) {
                             OtpVisitScreen(code, onDone = { navController.popBackStack() }, onExit = { navController.popBackStack() })
                         }
+                    }
+                    composable(Routes.OtpWeeklyReport) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpWeeklyReportScreen(onExit = { navController.popBackStack() }) }
+                    }
+                    composable(Routes.OtpMnp) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpMnpScreen(onExit = { navController.popBackStack() }) }
+                    }
+                    composable(Routes.OtpIycf) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpIycfScreen(onExit = { navController.popBackStack() }) }
                     }
                     composable(Routes.StockCount) {
                         RequireAccess(stockAllowed, { navController.popBackStack() }) {
@@ -419,6 +434,9 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.OtpScreening -> "Screening"
     route.startsWith("otpChild") -> "Child's Card"
     route.startsWith("otpVisit") -> "OTP Visit"
+    route == Routes.OtpWeeklyReport -> "Weekly OTP Report"
+    route == Routes.OtpMnp -> "MNP"
+    route == Routes.OtpIycf -> "IYCF / Health Education"
     else -> ""
 }
 
