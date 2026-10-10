@@ -6,7 +6,7 @@ import { ActiveStatusTag } from "@/components/ui/Tags";
 import { BulkImportUsersModal } from "./BulkImportUsersModal";
 import { FacilityPicker, type FacilityOption } from "./FacilityPicker";
 import { SupervisorScopePicker, type SupervisionLevel } from "./SupervisorScopePicker";
-import { ASSIGNABLE_ROLES_BY_PROJECT_ADMIN, ASSIGNABLE_ROLES_BY_SUPER_ADMIN, ROLE_LABELS, assignableRolesFor, roleOptionLabel } from "@/lib/rbac";
+import { ASSIGNABLE_ROLES_BY_PROJECT_ADMIN, ASSIGNABLE_ROLES_BY_SUPER_ADMIN, ROLE_LABELS, assignableRolesFor, officerTitle, roleOptionLabel } from "@/lib/rbac";
 import type { Database, UserRole } from "@/lib/types/database";
 import { addUserAction, editUserAction, removeUserAction, resetUserPasswordAction } from "@/lib/actions/users";
 
@@ -204,7 +204,7 @@ export function UsersTable({
               style={{ padding: 12, gap: 4, textAlign: "left", cursor: "pointer", font: "inherit", color: "inherit", outline: active ? "2px solid var(--color-accent-600)" : undefined, outlineOffset: -2 }}>
               <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <i className={`ph-fill ${ROLE_CAN[r].icon}`} aria-hidden="true" style={{ color: "var(--color-accent-600)", fontSize: 16 }} />
-                <strong style={{ fontSize: 13.5, flex: 1 }}>{r === "dri" ? "Facility user (DRI)" : ROLE_LABELS[r]}</strong>
+                <strong style={{ fontSize: 13.5, flex: 1 }}>{ROLE_LABELS[r]}</strong>
                 <span style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700 }}>{roleCounts[r]}</span>
               </span>
               <span className="text-muted" style={{ fontSize: 11.5, lineHeight: 1.4 }}>{ROLE_CAN[r].can}</span>
@@ -247,7 +247,7 @@ export function UsersTable({
         <input className="input" style={{ maxWidth: 260 }} placeholder="Search name, email or phone…" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search users" />
         <select className="input" style={{ maxWidth: 190 }} value={roleFilter} onChange={(e) => setRoleFilter(e.target.value as UserRole | "all")} aria-label="Role">
           <option value="all">All roles</option>
-          {ROLE_ORDER.map((r) => <option key={r} value={r}>{r === "dri" ? "Facility user (DRI)" : ROLE_LABELS[r]}</option>)}
+          {ROLE_ORDER.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
         </select>
         <select className="input" style={{ maxWidth: 160 }} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as "all" | "active" | "inactive")} aria-label="Status">
           <option value="active">Active</option>
@@ -277,7 +277,7 @@ export function UsersTable({
                   <div className="text-muted" style={{ fontSize: 11.5 }}>{u.email}{u.phone ? ` · ${u.phone}` : ""}</div>
                 </td>
                 <td>
-                  <span className="tag tag-accent">{ROLE_LABELS[u.role]}</span>
+                  <span className="tag tag-accent">{u.role === "dri" ? officerTitle(facilities.find((f) => f.id === u.facility_id)?.facility_type) : ROLE_LABELS[u.role]}</span>
                 </td>
                 <td className="text-muted" style={{ fontSize: 12.5, maxWidth: 260 }}>{areaOf(u)}</td>
                 <td>

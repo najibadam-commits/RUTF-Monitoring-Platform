@@ -7,6 +7,20 @@
 This draft describes what the system actually stores and who can see it, so the DPO can assess
 it — it is not itself the assessment.
 
+> **REVISION NEEDED (10 Oct 2026) [DPO] [PROG].** Sections 2 and 6 below describe the platform as
+> aggregate-only. Since migration 0124 (DECISIONS R142–R145) the **Digital OTP Admission Card**
+> holds **child-level data**: each admitted child's name, sex, age or date of birth, caregiver's name,
+> address and mobile number, and their clinical record (measurements, medication, RUTF, outcome).
+> **Children and caregivers are now data subjects**, and part of the data is health data. The
+> controls as built: the details can be opened only by the OTP Officer at the child's OTP site and
+> only by entering the Child ID (database-enforced; every lookup logged in `otp_access_log`); the
+> tables have no API access at all, only checked functions; everyone else, including administrators,
+> sees totals by sex, age group and place, with counts of 1–4 hidden and complementary suppression;
+> the Audit Trail records which fields changed, never the values; the phone shows the details on
+> screen only, never stores them, and blocks screenshots. To decide: lawful basis for health data,
+> caregiver consent and the notice given, retention period, whether HIV/ART status is recorded
+> (RULEBOOK G2), access by the State team for clinical oversight, and breach procedure.
+
 ---
 
 ## 1. Purpose and lawful basis

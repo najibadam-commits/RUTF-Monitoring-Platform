@@ -12,7 +12,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
   super_admin: "Super Admin",
   project_admin: "Project Admin",
   tpm_supervisor: "Supervisor",
-  dri: "DRI",
+  dri: "OTP / Nutrition Officer",
   viewer: "Viewer",
   state_coordinator: "State Coordinator",
 };
@@ -21,7 +21,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
  *  Responsible Individual (DRI)" wording on this first/deliberate reference per Item 8, vs. the
  *  short "DRI" ROLE_LABELS carries for repeated/space-limited display (table badges, tags). */
 export function roleOptionLabel(role: UserRole): string {
-  return role === "dri" ? "Direct Responsible Individual (DRI)" : ROLE_LABELS[role];
+  return ROLE_LABELS[role];
 }
 
 export const ASSIGNABLE_ROLES_BY_SUPER_ADMIN: UserRole[] = [
@@ -94,6 +94,32 @@ export function canEditOrDeleteIssue(role: UserRole) {
   return role === "super_admin";
 }
 
+/** The officer who acts on a Finding, by where they work (DECISIONS R141): the OTP Officer at the
+ *  OTP site (attends the child, fills the card, distributes the RUTF), the LGA Nutrition Officer at
+ *  the LGA Nutrition Store, the State Nutrition Officer at the State Central Medical Store. All
+ *  three are the one role `dri`; where no single level is meant, "Officer". A facility type is
+ *  preferred; a Finding's facility level (category name) also works. */
+export function officerTitle(level?: string | null): string {
+  const l = (level ?? "").toLowerCase();
+  if (l === "state_store" || l.includes("state store")) return "State Nutrition Officer";
+  if (l === "lga_store" || l.includes("lga store")) return "LGA Nutrition Officer";
+  if (l === "health_facility" || l.includes("otp")) return "OTP Officer";
+  return "Officer";
+}
+
+const withArticle = (title: string) => (/^[AEIOU]/.test(title) ? `an ${title}` : `a ${title}`);
+
+/** Older history entries and database messages still say "DRI" or "Direct Responsible
+ *  Individual"; displayed text goes through this, with the right title where it is known. */
+export function officerText(text: string, title = "Officer"): string {
+  return text
+    .replace(/Direct(?:ly)? Responsible Individuals? \(DRIs?\)/g, title)
+    .replace(/Direct(?:ly)? Responsible Individual/g, title)
+    .replace(/\ba DRI\b/g, withArticle(title))
+    .replace(/\bDRIs\b/g, `${title}s`)
+    .replace(/\bDRI\b/g, title);
+}
+
 /** Gates the *legacy* assign-a-DRI action — only ever reachable for a pre-migration Finding
  *  still sitting at status "new" (see DECISIONS.md #22). Every Finding created after the State
  *  Coordinator workflow shipped starts at "pending_review" instead, so this becomes dead for new
@@ -149,6 +175,7 @@ export type NavKey =
   | "stockIntegrity"
   | "reportingCompleteness"
   | "otpDispensing"
+  | "otpCaseload"
   | "supervision"
   | "dhis2Triangulation";
 
@@ -182,6 +209,8 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "stockIntegrity", label: "Stock Reconciliation", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
   { key: "reportingCompleteness", label: "Completeness & Timeliness", href: "/reporting-completeness", icon: "ph-check-square-offset", section: "stock" },
   { key: "otpDispensing", label: "Last-Mile Dispensing", href: "/otp-dispensing", icon: "ph-hand-heart", section: "stock" },
+  // OTP Caseload (DECISIONS R143): aggregates from the Digital OTP Admission Card; no child records.
+  { key: "otpCaseload", label: "OTP Caseload", href: "/otp-caseload", icon: "ph-baby", section: "stock" },
   { key: "supervision", label: "Risk-Based Supervision", href: "/supervision", icon: "ph-clipboard-text", section: "supervision" },
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },

@@ -27,7 +27,7 @@ export async function assignIssueAction(issueId: string, driId: string, note: st
 
 export async function approveAndAssignFindingAction(issueId: string, driId: string, note: string): Promise<ActionResult> {
   await getCurrentProfile();
-  if (!driId) return { error: "Select a DRI to assign this issue to." };
+  if (!driId) return { error: "Select an officer to assign this Finding to." };
   const supabase = await createClient();
   const { error } = await supabase.rpc("approve_and_assign_finding", {
     p_issue_id: issueId,

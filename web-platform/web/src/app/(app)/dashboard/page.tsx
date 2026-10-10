@@ -10,6 +10,7 @@ import { compact } from "@/components/dashboard/Kpi";
 import { AttentionPanel } from "@/components/dashboard/AttentionPanel";
 import { getKpis, latestLedgerMonth, monthOf, previousMonth } from "@/lib/queries/kpis";
 import type { IssueStatus } from "@/lib/types/database";
+import { officerText, officerTitle } from "@/lib/rbac";
 
 export const metadata: Metadata = { title: "Overview Dashboard" };
 
@@ -39,7 +40,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     supabase.from("issues").select("lat, lng, status").not("lat", "is", null).not("lng", "is", null),
     supabase.from("issues").select("id, code, status, auto_generated, reported_at, finding:finding_types(label), category:categories(name), facility:facilities(name)")
       .order("reported_at", { ascending: false }).limit(6),
-    supabase.from("issue_history").select("id, occurred_at, actor_label, action, note, issue:issues(code)")
+    supabase.from("issue_history").select("id, occurred_at, actor_label, action, note, issue:issues(code, facility:facilities(facility_type), category:categories(name))")
       .order("occurred_at", { ascending: false }).limit(8),
     supabase.from("rutf_thresholds").select("value").eq("key", "finding_target_days").limit(1).maybeSingle(),
   ]);
@@ -90,6 +91,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     { key: "reopened", label: "Reopen case", n: n("reopened"), color: "var(--stage-reopened)", href: "/issues?status=reopened" },
   ];
   const pipelineTotal = pipeline.reduce((t, st) => t + st.n, 0);
+  // The officer title for a history entry, from its Finding's facility or level (R141).
+  const historyOfficer = (issue: unknown) => {
+    const i = issue as { facility: { facility_type: string } | null; category: { name: string } | null } | null;
+    return officerTitle(i?.facility?.facility_type ?? i?.category?.name);
+  };
   const ago = (iso: string) => {
     const mins = Math.max(0, Math.round((now - Date.parse(iso)) / 60_000));
     if (mins < 60) return `${mins} min ago`;
@@ -215,7 +221,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <div key={h.id} style={{ display: "flex", gap: 10, padding: "7px 0", borderTop: "1px solid var(--color-divider)" }}>
                 <div className="text-muted" style={{ fontSize: 11, width: 74, flex: "none" }} title={new Date(h.occurred_at).toLocaleString("en-GB")}>{ago(h.occurred_at)}</div>
                 <div style={{ flex: 1, fontSize: 12.5, minWidth: 0 }}>
-                  <strong style={{ fontWeight: 600 }}>{h.action}</strong>{h.note ? <span className="text-muted"> — {h.note}</span> : null}
+                  <strong style={{ fontWeight: 600 }}>{officerText(h.action, historyOfficer(h.issue))}</strong>{h.note ? <span className="text-muted"> — {officerText(h.note, historyOfficer(h.issue))}</span> : null}
                   <div className="text-muted" style={{ fontSize: 11 }}>{(h.issue as unknown as { code: string } | null)?.code} · {h.actor_label}</div>
                 </div>
               </div>

@@ -49,6 +49,8 @@ import org.tpmnigeria.tpm.domain.formatCoords
 import org.tpmnigeria.tpm.domain.model.Issue
 import org.tpmnigeria.tpm.domain.model.IssueStatus
 import org.tpmnigeria.tpm.domain.model.locationLabel
+import org.tpmnigeria.tpm.domain.model.officerText
+import org.tpmnigeria.tpm.domain.model.officerTitle
 import org.tpmnigeria.tpm.domain.priorityLabel
 import org.tpmnigeria.tpm.domain.severityTagVariant
 import org.tpmnigeria.tpm.domain.statusMeta
@@ -170,7 +172,7 @@ private fun EvidenceSection(issue: Issue) {
         // review has nothing to show for them, and empty placeholder rows would just be noise.
         issue.driResponse?.let { r ->
             EvidenceStage(
-                title = "Evidence — DRI Response",
+                title = "Evidence — ${officerTitle(issue.category)} Response",
                 caption = listOf(r.name, r.date).filter { it.isNotBlank() }.joinToString(" · ").ifBlank { null },
                 movPath = r.movPhotoPath,
                 selfiePath = r.selfiePhotoPath,
@@ -263,7 +265,7 @@ private fun GeographicRecordsSection(issue: Issue) {
         Spacer(Modifier.height(TpmSpacing.space2))
         TpmCard(modifier = Modifier.fillMaxWidth()) {
             GeoRow("Finding Discovery Location", issue.gpsIssue.lat, issue.gpsIssue.lng, issue.gpsIssue.accuracyMeters)
-            issue.driResponse?.let { GeoRow("DRI Action / Resolution Location", it.gps.lat, it.gps.lng, it.gps.accuracyMeters) }
+            issue.driResponse?.let { GeoRow("${officerTitle(issue.category)} Action / Resolution Location", it.gps.lat, it.gps.lng, it.gps.accuracyMeters) }
             issue.verification?.let { GeoRow("Final Verification Location", it.gps.lat, it.gps.lng, it.gps.accuracyMeters) }
         }
     }
@@ -296,7 +298,7 @@ private fun CaseHistorySection(issue: Issue) {
                     }
                 }
                 Column(modifier = Modifier.padding(bottom = TpmSpacing.space3)) {
-                    Text(event.event, style = MaterialTheme.typography.bodyLarge)
+                    Text(officerText(event.event, officerTitle(issue.category)), style = MaterialTheme.typography.bodyLarge)
                     Text("${event.user} · ${event.date} ${event.time}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
                     Text(event.location, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
                 }

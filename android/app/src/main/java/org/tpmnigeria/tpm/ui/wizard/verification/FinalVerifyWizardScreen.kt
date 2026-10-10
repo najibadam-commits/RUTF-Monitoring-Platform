@@ -74,7 +74,7 @@ fun FinalVerifyWizardScreen(initialIssueId: String?, onDone: (issueId: String) -
                 scope.launch {
                     val issue = viewModel.submit()
                     if (issue != null) {
-                        toast.show(if (viewModel.confirmed == true) "Finding verified and closed." else "Finding reopened — DRI notified.")
+                        toast.show(if (viewModel.confirmed == true) "Finding verified and closed." else "Finding reopened — officer notified.")
                         onDone(issue.id)
                     }
                 }
@@ -162,7 +162,7 @@ private fun LookUpIssueStep(vm: FinalVerifyWizardViewModel) {
 
         vm.foundIssue?.driResponse?.let { response ->
             Spacer(Modifier.height(16.dp))
-            Text("DRI's Response", style = MaterialTheme.typography.titleSmall, color = TpmColors.TextMuted)
+            Text("Officer's Response", style = MaterialTheme.typography.titleSmall, color = TpmColors.TextMuted)
             TpmCard(modifier = Modifier.fillMaxWidth()) {
                 Text(response.action, style = MaterialTheme.typography.bodyMedium)
                 Text("${response.name} · ${response.designation}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
@@ -175,7 +175,7 @@ private fun LookUpIssueStep(vm: FinalVerifyWizardViewModel) {
 private fun ConfirmResolutionStep(vm: FinalVerifyWizardViewModel, onOpenVoice: () -> Unit) {
     Column {
         Text(
-            "Did the DRI's corrective action adequately resolve the reported finding?",
+            "Did the officer's corrective action adequately resolve the reported finding?",
             style = MaterialTheme.typography.bodyMedium,
         )
         TpmSegmentedControl(
@@ -213,7 +213,7 @@ private fun ReviewStep(vm: FinalVerifyWizardViewModel) {
         if (vm.confirmed == false) {
             Spacer(Modifier.height(8.dp))
             Text(
-                "Reopening will notify the original DRI and return this finding to their response queue.",
+                "Reopening will notify the original officer and return this finding to their response queue.",
                 style = MaterialTheme.typography.bodySmall,
                 color = TpmColors.Accent700,
             )

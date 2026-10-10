@@ -69,7 +69,7 @@ export default async function LoginPage({
           <div className={s.assurances}>
             <span><i className="ph-fill ph-shield-check" aria-hidden="true" /> Role-based access</span>
             <span><i className="ph-fill ph-clock-counter-clockwise" aria-hidden="true" /> Full audit trail</span>
-            <span><i className="ph-fill ph-lock-key" aria-hidden="true" /> No child-level data</span>
+            <span><i className="ph-fill ph-lock-key" aria-hidden="true" /> Child records: OTP Officer only</span>
             <span><i className="ph-fill ph-scales" aria-hidden="true" /> Designed for NDPA 2023</span>
           </div>
           <p className={s.help}>Need access? Ask your programme administrator.</p>

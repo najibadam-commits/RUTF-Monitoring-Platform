@@ -128,7 +128,7 @@ exactly how to improve it. *(The 80/60 bands are for the State team to confirm.)
 **Then:** Supervision → **Risk-Based Supervision** → **Visits verified on site by GPS** (about
 97 %) → **Risk-Based Planner**: what drives each facility's risk score.
 
-**Say:** aggregate figures only — no child's name or ID ever enters the platform.
+**Say:** these are totals: a child's details are seen only by the OTP Officer at the child's OTP site, by entering the Child ID; everyone else sees totals, with small counts hidden (Stock → **OTP Caseload**).
 
 ## 8. The national system tells the same story — 1 min
 
@@ -166,7 +166,7 @@ and for the next state tomorrow."
 | Can someone change the figures afterwards? | Stock Ledger integrity line; Audit Trail (Administration). |
 | Can a Finding be deleted or quietly dropped? | No: there is no Delete in the app, and the database refuses it for every role (permissions test: 208 of 208). A mistaken Finding is returned for correction or edited, with its history; a fix that doesn't hold goes to **Reopen case**. |
 | Who decides the limits? | Master Data → Thresholds (variance, short-dispensing, 30-day target); Settings → go-live readiness. |
-| Is child data collected? | No — aggregate tallies only; Governance on the landing page; DPIA draft. |
+| Is child data collected? | Yes, for treatment only, through the Digital OTP Admission Card: a child's and caregiver's details are seen only by the OTP Officer at the child's OTP site, by entering the Child ID (enforced by the database, every lookup logged, screenshots blocked, nothing kept on the phone). Everyone else sees totals by sex, age and place, with counts under 5 hidden (OTP Caseload). The DPIA is being revised for this. |
 | How does it fit DHIS2? | DHIS2 Triangulation; monthly extract upload. |
 | Can partners get the data? | Data Access Requests (approval, scope, one-time download). |
 | What does go-live need? | Settings → **Go-live readiness** (domain email, clearing demo data, teams, thresholds, DPIA, UAT, signing key). |

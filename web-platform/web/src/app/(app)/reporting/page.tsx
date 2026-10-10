@@ -125,7 +125,7 @@ export default async function ReportingPage() {
           <div className="card-title" style={{ fontSize: 15 }}><i className="ph ph-shield-check" aria-hidden="true" /> How exports protect data</div>
           <ul style={{ margin: 0, paddingLeft: 18, fontSize: 13, lineHeight: 1.6 }}>
             <li>Scoped to your role and area, exactly as on screen</li>
-            <li>No child or caregiver names or IDs exist to export</li>
+            <li>No child or caregiver details can be exported: reports and exports are totals only</li>
             <li>Child counts under 5 shown as &quot;&lt;5&quot;</li>
             <li>Viewers&apos; downloads approved first, then downloaded once</li>
           </ul>

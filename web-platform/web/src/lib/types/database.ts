@@ -822,6 +822,15 @@ export interface Database {
         Args: { p_start: string; p_end: string };
         Returns: Json;
       };
+      // Digital OTP Admission Card (migration 0124): aggregates only; child records are opened in the app.
+      otp_aggregates: {
+        Args: { p_start: string; p_end: string; p_lga_id?: string | null; p_facility_id?: string | null };
+        Returns: Json;
+      };
+      otp_ration: {
+        Args: { p_weight_kg: number | null; p_rule_set_id?: string | null };
+        Returns: Json;
+      };
       facility_metrics: {
         Args: { p_start: string; p_end: string };
         Returns: {

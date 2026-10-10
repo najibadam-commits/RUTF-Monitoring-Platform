@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PRIORITY_COLOR, PRIORITY_LABEL, STATUS_COLOR, STATUS_LABEL, STATUS_ORDER, tagBg } from "@/lib/constants";
 import { lgaId, wardId } from "@/lib/wardId";
-import { ROLE_LABELS } from "@/lib/rbac";
+import { ROLE_LABELS, officerText, officerTitle } from "@/lib/rbac";
 import type { IssuePriority, IssueStatus, UserRole } from "@/lib/types/database";
 import type { IssueWithRelations } from "@/lib/queries/issues";
 import { Modal } from "@/components/ui/Modal";
@@ -65,6 +65,9 @@ export function IssueDetailClient({
   };
 }) {
   const router = useRouter();
+  // The officer for this Finding's level: OTP Officer, LGA or State Nutrition Officer (R141).
+  const officer = officerTitle(issue.facility?.facility_type ?? issue.category?.name);
+  const anOfficer = /^[AEIOU]/.test(officer) ? `an ${officer}` : `a ${officer}`;
   const [modal, setModal] = useState<ModalKind>(null);
   const [note, setNote] = useState("");
   const [driId, setDriId] = useState("");
@@ -103,7 +106,7 @@ export function IssueDetailClient({
         <div style={{ display: "flex", gap: 8, flex: "none", flexWrap: "wrap", justifyContent: "flex-end" }}>
           {!permissions.isViewer && permissions.canAssign && (
             <button className="btn btn-primary" onClick={() => setModal("assign")}>
-              <i className="ph ph-user-plus" /> Assign responsible person
+              <i className="ph ph-user-plus" /> Assign {officer}
             </button>
           )}
           {!permissions.isViewer && permissions.canReview && (
@@ -231,7 +234,7 @@ export function IssueDetailClient({
                 {issue.reporter?.name ?? "—"}
               </div>
               <div>
-                <span className="text-muted">Responsible person</span>
+                <span className="text-muted">{officer}</span>
                 <br />
                 {issue.dri?.name ?? "Unassigned"}
               </div>
@@ -264,7 +267,7 @@ export function IssueDetailClient({
 
           {issue.dri_response && (
             <div className="card elev-sm">
-              <div className="card-title">Response from the responsible person</div>
+              <div className="card-title">Response from the {officer}</div>
               <p className="card-body">{issue.dri_response}</p>
             </div>
           )}
@@ -284,13 +287,13 @@ export function IssueDetailClient({
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-accent)", flex: "none", marginTop: 6 }} />
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div style={{ fontSize: 12.5 }}>
-                    <strong style={{ fontWeight: 500 }}>{h.action}</strong>
+                    <strong style={{ fontWeight: 500 }}>{officerText(h.action, officer)}</strong>
                   </div>
                   <div className="text-muted" style={{ fontSize: 11.5, margin: "2px 0" }}>
                     {when(h.occurred_at)} · {h.actor_label}
                     {h.actor_role && ` (${ROLE_LABELS[h.actor_role]})`}
                   </div>
-                  {h.note && <div style={{ fontSize: 12 }}>{h.note}</div>}
+                  {h.note && <div style={{ fontSize: 12 }}>{officerText(h.note, officer)}</div>}
                 </div>
               </div>
             ))}
@@ -299,12 +302,12 @@ export function IssueDetailClient({
       </div>
 
       {modal === "assign" && (
-        <Modal title="Assign to DRI" confirmLabel="Assign" confirmDisabled={!driId} onClose={closeModal} onConfirm={() => assignIssueAction(issue.id, driId, note)}>
+        <Modal title={`Assign to ${anOfficer}`} confirmLabel="Assign" confirmDisabled={!driId} onClose={closeModal} onConfirm={() => assignIssueAction(issue.id, driId, note)}>
           <div className="dialog-body">
             <div className="field">
-              <label>Assign to a Direct Responsible Individual (DRI)</label>
+              <label>Assign to {anOfficer}</label>
               <select className="input" value={driId} onChange={(e) => setDriId(e.target.value)}>
-                <option value="">Select a DRI…</option>
+                <option value="">Select {anOfficer}…</option>
                 {dris.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -325,11 +328,11 @@ export function IssueDetailClient({
           onConfirm={() => approveAndAssignFindingAction(issue.id, driId, note)}
         >
           <div className="dialog-body">
-            <p style={{ marginTop: 0 }}>Approving routes this Finding straight to the selected DRI, who is notified immediately.</p>
+            <p style={{ marginTop: 0 }}>Approving routes this Finding straight to the selected {officer}, who is notified immediately.</p>
             <div className="field">
-              <label>Assign to a Direct Responsible Individual (DRI)</label>
+              <label>Assign to {anOfficer}</label>
               <select className="input" value={driId} onChange={(e) => setDriId(e.target.value)}>
-                <option value="">Select a DRI…</option>
+                <option value="">Select {anOfficer}…</option>
                 {sectorDris.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}
@@ -338,13 +341,13 @@ export function IssueDetailClient({
               </select>
               {sectorDris.length === 0 && (
                 <div className="text-muted" style={{ fontSize: 12, marginTop: 4 }}>
-                  No DRI is set up for this Finding&apos;s facility level yet — assign one under Users &amp; Access first.
+                  No {officer} is set up for this Finding&apos;s facility level yet — assign one under Users &amp; Access first.
                 </div>
               )}
             </div>
             <div className="field">
               <label>Note (optional)</label>
-              <textarea className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Anything the DRI should know…" />
+              <textarea className="input" value={note} onChange={(e) => setNote(e.target.value)} placeholder={`Anything the ${officer} should know…`} />
             </div>
           </div>
         </Modal>

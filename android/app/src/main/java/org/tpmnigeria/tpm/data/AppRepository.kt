@@ -227,8 +227,8 @@ class AppRepository(
         val existing = issueDao.getById(issueId)?.toDomain() ?: error("Finding $issueId not found")
         val newStatus = if (resolved) IssueStatus.ResolvedPendingVerification else IssueStatus.Ongoing
         val events = buildList {
-            add(HistoryEvent("DRI Response Logged", driName, date.toString(), nowTime(), existing.site))
-            if (resolved) add(HistoryEvent("DRI Marked Resolved", driName, date.toString(), nowTime(), existing.site))
+            add(HistoryEvent("Officer Response Logged", driName, date.toString(), nowTime(), existing.site))
+            if (resolved) add(HistoryEvent("Officer Marked Resolved", driName, date.toString(), nowTime(), existing.site))
         }
         val updated = existing.copy(
             status = newStatus,
@@ -246,7 +246,7 @@ class AppRepository(
                 NotificationEntity(
                     role = UserRole.FieldMonitor, issueId = issueId,
                     title = "Finding awaiting your verification",
-                    body = "DRI marked $issueId as resolved.",
+                    body = "The officer marked $issueId as resolved.",
                     timestampMillis = System.currentTimeMillis(), unread = true,
                 ),
             )

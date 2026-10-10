@@ -482,7 +482,7 @@ export function AccountabilityScorecard({ rows, stats, targetDays, now }: { rows
       <LgaLeague groups={groupBy(rows, (r) => r.lga?.name ?? "No LGA")} targetDays={targetDays} now={now} />
       <ResponsibilityTable title="By facility level" label="Level" groups={groupBy(rows, (r) => r.category?.name ?? "Not set")} targetDays={targetDays} now={now} />
 
-      <ResponsibilityTable title="By responsible person (DRI)" label="DRI" countLabel="Assigned"
+      <ResponsibilityTable title="By officer" label="Officer" countLabel="Assigned"
         groups={groupBy(rows.filter((r) => r.dri), (r) => r.dri!.name)} targetDays={targetDays} now={now} />
     </div>
   );

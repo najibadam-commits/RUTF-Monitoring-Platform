@@ -300,6 +300,8 @@ private fun StockActions(facilityId: String, onStart: (String) -> Unit) {
         add("Receive Stock" to Routes.ReceiveStock)
         if (isStore) add("Issue Stock" to Routes.IssueStock)
         if (isOtp) add("Daily Dispensing" to Routes.DailyDispensing)
+        // The Digital OTP Admission Card (RUTF DECISIONS R145): the OTP Officer at an OTP site.
+        if (isOtp && facility?.facilityType == "health_facility") add(0, "OTP Admission Card" to Routes.OtpHome)
         add("Stock Count" to Routes.StockCount)
         add("Record Loss / Adjustment" to Routes.LossAdjustment)
     }

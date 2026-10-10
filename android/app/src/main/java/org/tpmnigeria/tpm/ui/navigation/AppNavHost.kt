@@ -37,6 +37,8 @@ import kotlinx.coroutines.launch
 import org.tpmnigeria.tpm.BuildConfig
 import org.tpmnigeria.tpm.domain.MobileAccess
 import org.tpmnigeria.tpm.domain.model.UserRole
+import org.tpmnigeria.tpm.domain.model.officerTitle
+import org.tpmnigeria.tpm.ui.LocalReferenceRepository
 import org.tpmnigeria.tpm.session.AppSession
 import org.tpmnigeria.tpm.sync.SyncScheduler
 import org.tpmnigeria.tpm.ui.LocalAppRepository
@@ -54,6 +56,10 @@ import org.tpmnigeria.tpm.ui.screens.MapScreen
 import org.tpmnigeria.tpm.ui.screens.NotificationsScreen
 import org.tpmnigeria.tpm.ui.screens.SyncQueueScreen
 import org.tpmnigeria.tpm.ui.stock.DailyDispensingScreen
+import org.tpmnigeria.tpm.ui.otp.OtpChildScreen
+import org.tpmnigeria.tpm.ui.otp.OtpHomeScreen
+import org.tpmnigeria.tpm.ui.otp.OtpScreeningScreen
+import org.tpmnigeria.tpm.ui.otp.OtpVisitScreen
 import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
 import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
 import org.tpmnigeria.tpm.ui.stock.MyStockScreen
@@ -98,6 +104,12 @@ fun AppNavHost(session: AppSession) {
     // the type-system's nullability catching up with that invariant, not a real "logged out
     // while viewing the app" case.
     val currentUser = session.currentUser.collectAsState().value ?: return
+    // The officer's title follows their facility: OTP / LGA Nutrition / State Nutrition Officer (R141).
+    val references = LocalReferenceRepository.current
+    val ownFacility by remember(currentUser.facilityId) {
+        currentUser.facilityId?.let { references.observeFacility(it) } ?: kotlinx.coroutines.flow.flowOf(null)
+    }.collectAsState(initial = null)
+    val roleLabel = if (currentUser.role == UserRole.Dri) officerTitle(ownFacility?.facilityType) else currentUser.role.label
     val pendingSyncCount by repository.observePendingSyncCount().collectAsState(initial = 0)
     val unreadNotifications by repository.observeNotifications(currentUser.role)
         .map { list -> list.any { it.unread } }
@@ -129,7 +141,7 @@ fun AppNavHost(session: AppSession) {
                         onBack = { headerBackOverride.value?.invoke() ?: navController.popBackStack() },
                         userInitials = userInitials,
                         onAvatarClick = { profileSheetOpen = true },
-                        rolePill = if (currentRoute == Routes.Home) currentUser.role.label else null,
+                        rolePill = if (currentRoute == Routes.Home) roleLabel else null,
                     )
                     if (pendingSyncCount > 0 || isOffline) {
                         SyncBanner(
@@ -283,6 +295,38 @@ fun AppNavHost(session: AppSession) {
                             DailyDispensingScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
                         }
                     }
+                    // The OTP Admission Card: the Home button shows only to OTP Officers at an OTP site;
+                    // the database refuses anyone else (otp_officer_site()), so the route only checks the role.
+                    val otpAllowed = currentUser.role == UserRole.Dri && facilityId != null
+                    composable(Routes.OtpHome) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpHomeScreen(
+                                onScreenChild = { navController.navigate(Routes.OtpScreening) },
+                                onOpenChild = { navController.navigate(Routes.otpChild(it)) },
+                                onExit = { navController.popBackStack() },
+                            )
+                        }
+                    }
+                    composable(Routes.OtpScreening) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpScreeningScreen(
+                                onRegistered = { code -> navController.navigate(Routes.otpChild(code)) { popUpTo(Routes.OtpHome) } },
+                                onExit = { navController.popBackStack() },
+                            )
+                        }
+                    }
+                    composable(Routes.OtpChildPattern, arguments = listOf(navArgument("childCode") { type = NavType.StringType })) { entry ->
+                        val code = entry.arguments?.getString("childCode").orEmpty()
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpChildScreen(code, onRecordVisit = { navController.navigate(Routes.otpVisit(it)) }, onExit = { navController.popBackStack() })
+                        }
+                    }
+                    composable(Routes.OtpVisitPattern, arguments = listOf(navArgument("childCode") { type = NavType.StringType })) { entry ->
+                        val code = entry.arguments?.getString("childCode").orEmpty()
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) {
+                            OtpVisitScreen(code, onDone = { navController.popBackStack() }, onExit = { navController.popBackStack() })
+                        }
+                    }
                     composable(Routes.StockCount) {
                         RequireAccess(stockAllowed, { navController.popBackStack() }) {
                             StockCountScreen(facilityId!!, onDone = backHome, onExit = { navController.popBackStack() })
@@ -369,8 +413,12 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.SyncQueue -> "Sync Queue"
     route.startsWith("issueDetail") -> issueIdArg ?: "Finding"
     route == Routes.NewIssueWizard -> "Register Finding"
-    route.startsWith("driRespondWizard") -> "DRI Response"
+    route.startsWith("driRespondWizard") -> "Officer Response"
     route.startsWith("finalVerifyWizard") -> "Final Verification"
+    route == Routes.OtpHome -> "OTP Admission Card"
+    route == Routes.OtpScreening -> "Screening"
+    route.startsWith("otpChild") -> "Child's Card"
+    route.startsWith("otpVisit") -> "OTP Visit"
     else -> ""
 }
 

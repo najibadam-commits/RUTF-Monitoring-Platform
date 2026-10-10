@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Last-Mile Dispensing" };
 // registers' daily totals — dispensed against prescribed, children seen and new admissions — and
 // the register check (verification factor) at the latest supervision visit. One status per OTP site,
 // status tiles that filter the list (?flag=), a 6-month trend and an LGA roll-up. Aggregate figures
-// only — no child-level data (brief §10).
+// only — no child identified (child records are in the OTP Admission Card, OTP Officer only; R142).
 
 const TREND_MONTHS = 6;
 /** A ration size this far from the state median is called unusual (DECISIONS R114) — [VALIDATE]. */
@@ -138,7 +138,7 @@ export default async function OtpDispensingPage({ searchParams }: { searchParams
   return (
     <ReportShell
       title="Last-Mile Dispensing"
-      intro={<>Did the RUTF reach the children? From the OTP registers&apos; daily totals for {month.label}: sachets dispensed against prescribed, children seen and new admissions, and the supervisor&apos;s register check at the latest visit (register count ÷ app-recorded dispensing; 1.00 is a perfect match, accepted range {vfMin.toFixed(2)}–{vfMax.toFixed(2)}). Aggregate totals only, no child-level data.</>}
+      intro={<>Did the RUTF reach the children? From the OTP registers&apos; daily totals for {month.label}: sachets dispensed against prescribed, children seen and new admissions, and the supervisor&apos;s register check at the latest visit (register count ÷ app-recorded dispensing; 1.00 is a perfect match, accepted range {vfMin.toFixed(2)}–{vfMax.toFixed(2)}). Aggregate totals only; no child is identified.</>}
       monthKey={month.key} lgas={lgas} sp={sp} showLevel={false}
       extraFilters={sp.flag ? <input type="hidden" name="flag" value={sp.flag} /> : undefined}
     >

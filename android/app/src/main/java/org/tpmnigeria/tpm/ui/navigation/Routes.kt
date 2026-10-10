@@ -41,6 +41,15 @@ object Routes {
     const val DriRespondWizardPattern = "driRespondWizard?issueId={issueId}"
     fun driRespondWizard(issueId: String? = null) = if (issueId != null) "driRespondWizard?issueId=$issueId" else "driRespondWizard"
 
+    // Digital OTP Admission Card (OTP Officers at an OTP site; RUTF DECISIONS R145). Child IDs are
+    // letters, digits and hyphens only (e.g. KT-DAU-26-00042), so they need no escaping.
+    const val OtpHome = "otpHome"
+    const val OtpScreening = "otpScreening"
+    const val OtpChildPattern = "otpChild/{childCode}"
+    fun otpChild(childCode: String) = "otpChild/$childCode"
+    const val OtpVisitPattern = "otpVisit/{childCode}"
+    fun otpVisit(childCode: String) = "otpVisit/$childCode"
+
     const val FinalVerifyWizardPattern = "finalVerifyWizard?issueId={issueId}"
     fun finalVerifyWizard(issueId: String? = null) = if (issueId != null) "finalVerifyWizard?issueId=$issueId" else "finalVerifyWizard"
 }

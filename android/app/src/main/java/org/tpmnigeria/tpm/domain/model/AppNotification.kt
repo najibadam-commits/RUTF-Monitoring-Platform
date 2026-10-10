@@ -22,7 +22,7 @@ data class AppNotification(
  */
 enum class UserRole(val dbValue: String, val label: String) {
     FieldMonitor("tpm_supervisor", "Supervisor"),
-    Dri("dri", "DRI"),
+    Dri("dri", "OTP / Nutrition Officer"),
     SuperAdmin("super_admin", "Super Admin"),
     ProjectAdmin("project_admin", "Project Admin"),
     StateCoordinator("state_coordinator", "State Coordinator");

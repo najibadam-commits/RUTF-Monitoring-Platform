@@ -1,0 +1,72 @@
+package org.tpmnigeria.tpm.ui.otp
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import org.tpmnigeria.tpm.ui.components.TpmButton
+import org.tpmnigeria.tpm.ui.components.TpmButtonVariant
+import org.tpmnigeria.tpm.ui.components.TpmCard
+import org.tpmnigeria.tpm.ui.components.TpmTextField
+import org.tpmnigeria.tpm.ui.navigation.RegisterHeaderBack
+import org.tpmnigeria.tpm.ui.theme.TpmColors
+import org.tpmnigeria.tpm.ui.theme.TpmSpacing
+
+/** Child ID as issued by the server: STATE-LGA-YY-NNNNN (e.g. KT-DAU-26-00042), or without the year. */
+private val CHILD_ID = Regex("""^[A-Z0-9]{2,6}(-[A-Z0-9]{2,6})+-\d{4,8}$""")
+
+/**
+ * The OTP Admission Card entry point (OTP Officers at an OTP site). A returning child is opened by
+ * entering the Child ID from their card; a new child starts with screening.
+ */
+@Composable
+fun OtpHomeScreen(onScreenChild: () -> Unit, onOpenChild: (String) -> Unit, onExit: () -> Unit) {
+    var code by remember { mutableStateOf("") }
+    val clean = code.trim().uppercase()
+    val valid = CHILD_ID.matches(clean)
+    BackHandler(onBack = onExit)
+    RegisterHeaderBack(onExit)
+
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(TpmSpacing.space4),
+        verticalArrangement = Arrangement.spacedBy(TpmSpacing.space4),
+    ) {
+        Text("OTP Admission Card", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(
+            "Screen and admit children with severe acute malnutrition, and record each visit against their Child ID. " +
+                "A child's details open only when you enter their Child ID, and are never saved on this phone.",
+            style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted,
+        )
+
+        TpmCard(blueprint = true) {
+            Text("Returning child", style = MaterialTheme.typography.titleMedium)
+            TpmTextField(label = "Child ID (from the caregiver's card)", value = code, onValueChange = { code = it.uppercase() },
+                placeholder = "e.g. KT-DAU-26-00042")
+            if (code.isNotBlank() && !valid) {
+                Text("A Child ID looks like KT-DAU-26-00042.", style = MaterialTheme.typography.bodySmall, color = OtpAmber)
+            }
+            TpmButton(text = "Open the child's card", onClick = { onOpenChild(clean) }, enabled = valid, fullWidth = true)
+        }
+
+        TpmCard {
+            Text("New child", style = MaterialTheme.typography.titleMedium)
+            Text("Screen the child first. If they meet the OTP criteria you can register them and the Child ID is issued.",
+                style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            TpmButton(text = "Screen a child", onClick = onScreenChild, variant = TpmButtonVariant.Secondary, fullWidth = true, blueprint = true)
+        }
+        Text("Needs a connection: Child IDs are issued by the server so two phones never give the same one.",
+            style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+    }
+}

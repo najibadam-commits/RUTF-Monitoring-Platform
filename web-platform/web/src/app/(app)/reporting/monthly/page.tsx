@@ -136,7 +136,7 @@ export default async function MonthlyReportPage({ searchParams }: { searchParams
             <h1 style={{ fontSize: 26, margin: "4px 0 0" }}>Katsina State · {month.label}</h1>
           </div>
           <div className="text-muted" style={{ fontSize: 12, textAlign: "right" }}>
-            Generated {generated}<br />from the RUTF-DTAP Monitoring Platform<br />Aggregate figures only; no child-level data
+            Generated {generated}<br />from the RUTF-DTAP Monitoring Platform<br />Aggregate figures only; no child is identified
           </div>
         </header>
 

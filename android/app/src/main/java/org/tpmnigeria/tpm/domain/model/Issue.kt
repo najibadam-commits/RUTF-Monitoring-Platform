@@ -89,6 +89,35 @@ data class Verification(
     val movPhotoPath: String? = null,
 )
 
+/**
+ * The officer who acts on a Finding, by where they work (RUTF DECISIONS R141): the OTP Officer at
+ * the OTP site (attends the child, fills the card, distributes the RUTF), the LGA Nutrition
+ * Officer at the LGA Nutrition Store, the State Nutrition Officer at the State Central Medical
+ * Store. All three are the one role `dri`; "Officer" where the level isn't known. Takes a facility
+ * type (state_store / lga_store / health_facility) or a Finding's level ("LGA Store", "OTP Site").
+ */
+fun officerTitle(level: String?): String {
+    val l = level.orEmpty().lowercase()
+    return when {
+        l == "state_store" || "state store" in l -> "State Nutrition Officer"
+        l == "lga_store" || "lga store" in l -> "LGA Nutrition Officer"
+        l == "health_facility" || "otp" in l -> "OTP Officer"
+        else -> "Officer"
+    }
+}
+
+/** History written by the server or by earlier app versions may still say "DRI"; displayed history
+ *  text goes through this, with the right title where it is known. */
+fun officerText(text: String, title: String = "Officer"): String {
+    val article = if (title.first().uppercaseChar() in "AEIOU") "an" else "a"
+    return text
+        .replace(Regex("""Direct(?:ly)? Responsible Individuals? \(DRIs?\)"""), title)
+        .replace(Regex("""Direct(?:ly)? Responsible Individual"""), title)
+        .replace(Regex("""\ba DRI\b"""), "$article $title")
+        .replace(Regex("""\bDRIs\b"""), "${title}s")
+        .replace(Regex("""\bDRI\b"""), title)
+}
+
 @Serializable
 data class HistoryEvent(
     val event: String,

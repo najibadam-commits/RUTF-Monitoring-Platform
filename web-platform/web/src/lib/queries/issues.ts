@@ -13,7 +13,7 @@ export const ISSUE_SELECT = `
   reporter:profiles!issues_reported_by_fkey(id, name),
   dri:profiles!issues_assigned_dri_fkey(id, name, phone, email),
   verifier:profiles!issues_verified_by_fkey(id, name),
-  facility:facilities(id, name),
+  facility:facilities(id, name, facility_type),
   finding:finding_types(key, label)
 `;
 
@@ -92,7 +92,7 @@ export type IssueWithRelations = IssueRow & {
   reporter: { id: string; name: string } | null;
   dri: { id: string; name: string; phone: string | null; email: string } | null;
   verifier: { id: string; name: string } | null;
-  facility: { id: string; name: string } | null;
+  facility: { id: string; name: string; facility_type: string } | null;
   finding: { key: string; label: string } | null;
 };
 

@@ -28,7 +28,7 @@ const SAFEGUARDS = [
   { icon: "ph-user-minus", text: "No data or function open to signed-out users" },
   { icon: "ph-folder-lock", text: "All four file stores (photos, evidence) private" },
   { icon: "ph-users-three", text: "Every role tried against every rule: 208 of 208 checks pass" },
-  { icon: "ph-baby", text: "No child or caregiver names or IDs: aggregate OTP tallies only" },
+  { icon: "ph-baby", text: "Child and caregiver details: only the OTP Officer at the child's site, by entering the Child ID; everyone else sees totals, small counts hidden" },
   { icon: "ph-clock-counter-clockwise", text: "Changes to accounts, reference data and ledger status written to the Audit Trail by the database" },
 ];
 

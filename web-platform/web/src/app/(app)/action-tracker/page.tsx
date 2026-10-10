@@ -151,8 +151,8 @@ export default async function ActionTrackerPage({ searchParams }: { searchParams
           <option value="">All LGAs</option>
           {lgas.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
         </select>
-        <select className="input" name="owner" defaultValue={sp.owner ?? ""} aria-label="Responsible person" style={{ maxWidth: 230 }}>
-          <option value="">Every responsible person</option>
+        <select className="input" name="owner" defaultValue={sp.owner ?? ""} aria-label="Officer" style={{ maxWidth: 230 }}>
+          <option value="">Every officer</option>
           {ownerNames.map((n) => <option key={n} value={n}>{n}</option>)}
         </select>
         <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
@@ -242,13 +242,13 @@ export default async function ActionTrackerPage({ searchParams }: { searchParams
         <div style={{ padding: "14px 16px 4px" }}>
           <div className="card-title">Who holds the open actions</div>
           <div className="text-muted" style={{ fontSize: 12 }}>
-            The responsible person (DRI) for each open corrective action{lgaName ? ` in ${lgaName}` : ""}, most past target first. Click a name to see only their actions.
+            The officer responsible for each open corrective action (OTP Officer at an OTP site, LGA or State Nutrition Officer at a store){lgaName ? ` in ${lgaName}` : ""}, most past target first. Click a name to see only their actions.
           </div>
         </div>
         <table className="table">
           <thead>
             <tr>
-              <th>Responsible person</th>
+              <th>Officer</th>
               <th style={{ textAlign: "right" }}>Open</th>
               <th style={{ textAlign: "right" }}>Past target</th>
             </tr>

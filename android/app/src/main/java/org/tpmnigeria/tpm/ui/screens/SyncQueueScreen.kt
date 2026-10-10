@@ -128,7 +128,7 @@ fun SyncQueueScreen() {
 
 private fun submissionTypeLabel(name: String): String = when (name) {
     "NewIssue" -> "New Finding"
-    "DriResponse" -> "DRI Response"
+    "DriResponse" -> "Officer Response"
     "FinalVerification" -> "Final Verification"
     "StockReceipt" -> "Receive Stock"
     "StockIssue" -> "Issue Stock"

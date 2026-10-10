@@ -515,9 +515,9 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           </select>
         </div>
         <div className="field">
-          <label>Assigned to (DRI)</label>
+          <label>Assigned to (officer)</label>
           <select className="input" value={filters.dri} onChange={(e) => setFilters((f) => ({ ...f, dri: e.target.value }))}>
-            <option value={ALL}>All DRIs</option>
+            <option value={ALL}>All officers</option>
             {driNames.map((d) => (
               <option key={d} value={d}>
                 {d}

@@ -28,7 +28,7 @@ const FEATURES = [
   { icon: "ph-seal-check", title: "Accountability Scorecard", body: "Follow-through by LGA and facility: closed on time, overdue and reopened, so performance is visible." },
   { icon: "ph-map-trifold", title: "Overview Dashboard & Situation Map", body: "Stock on hand, stock-outs, expiries and open Findings across every LGA, ward and facility in Katsina." },
   { icon: "ph-intersect", title: "DHIS2 Triangulation", body: "Each facility's DHIS2 monthly report is checked against the ledger, and the largest gaps are flagged first." },
-  { icon: "ph-lock-key", title: "Privacy by design", body: "Aggregate OTP tallies only: no child or caregiver names, IDs or per-child records. Every change is audited." },
+  { icon: "ph-lock-key", title: "Privacy by design", body: "A child's and caregiver's details are seen only by the OTP Officer at the child's OTP site, by entering the Child ID; everyone else sees totals, with small counts hidden. Every change is audited." },
 ] as const;
 
 const HERO_POINTS = [
@@ -43,7 +43,7 @@ const GOVERNANCE = [
   "A supervisor reviews every Finding before anyone is asked to act, and can return it for correction",
   "Transactions are never deleted, only voided with a reason, and every change is in the Audit Trail",
   "Data exports need approval; small counts are suppressed in public views",
-  "Designed for the Nigeria Data Protection Act 2023: aggregate OTP data only, with a data protection impact assessment",
+  "Designed for the Nigeria Data Protection Act 2023: child records for the OTP Officer only, totals for everyone else, with a data protection impact assessment",
 ] as const;
 
 export default async function LandingPage() {

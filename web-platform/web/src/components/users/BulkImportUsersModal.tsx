@@ -46,6 +46,8 @@ function resolveRole(raw: string): UserRole | null {
   if (!norm) return null;
   const byKey = (Object.keys(ROLE_LABELS) as UserRole[]).find((k) => k.toLowerCase() === norm);
   if (byKey) return byKey;
+  // The officer titles (and the old "DRI") all mean the facility officer role (DECISIONS R141).
+  if (["dri", "otp officer", "lga nutrition officer", "state nutrition officer", "nutrition officer", "otp / nutrition officer"].includes(norm)) return "dri";
   const byLabel = (Object.entries(ROLE_LABELS) as [UserRole, string][]).find(([, label]) => label.toLowerCase() === norm);
   return byLabel ? byLabel[0] : null;
 }
@@ -120,7 +122,7 @@ export function BulkImportUsersModal({
       else if (!roleRaw) error = "Missing role";
       else if (!role) error = `Unrecognized role "${roleRaw}"`;
       else if (!assignable.includes(role)) error = `You cannot assign the ${ROLE_LABELS[role]} role`;
-      else if (role === "dri" && !facilityRaw) error = "Facility users need a facility";
+      else if (role === "dri" && !facilityRaw) error = "OTP and Nutrition Officers need a facility";
       else if (role === "dri" && !facilityId) error = `Unknown facility "${facilityRaw}" (use a store or OTP site name, or its national code)`;
 
       if (!error) seenInFile.add(emailLower);
@@ -132,7 +134,7 @@ export function BulkImportUsersModal({
   const invalidRows = preview?.filter((r) => r.error) ?? [];
 
   function downloadTemplate() {
-    const csv = "name,email,phone,role,facility\nJane Doe,jane@example.org,+234 800 000 0000,DRI,Bakori LGA Nutrition Store (DUMMY)\n";
+    const csv = "name,email,phone,role,facility\nJane Doe,jane@example.org,+234 800 000 0000,OTP Officer,Bakori LGA Nutrition Store (DUMMY)\n";
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
