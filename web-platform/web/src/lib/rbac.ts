@@ -206,6 +206,7 @@ export type NavKey =
   | "clinicalRules"
   | "weeklyReports"
   | "lgaReports"
+  | "dataRetention"
   | "supplyRequests"
   | "supervision"
   | "dhis2Triangulation";
@@ -252,6 +253,8 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "lgaReports", label: "LGA Weekly Reports", href: "/lga-reports", icon: "ph-stack", section: "reporting" },
   { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
+  // Automatic deletion at the end of retention (R177; DPIA §8): Super Admin only.
+  { key: "dataRetention", label: "Data Retention", href: "/data-retention", icon: "ph-trash-simple", section: "administration" },
   { key: "users", label: "Users & Access", href: "/users", icon: "ph-users-three", section: "administration" },
   { key: "datasets", label: "Master Data", href: "/data-sets", icon: "ph-database", section: "administration" },
   { key: "projectadmins", label: "Programme Administrators", href: "/project-admins", icon: "ph-identification-badge", section: "administration" },
@@ -270,6 +273,7 @@ export function visibleNavItemsFor(role: UserRole, level: OfficerLevel = null) {
     if (item.key === "settings") return canAccessSettings(role);
     if (item.key === "devices") return canAccessDevices(role);
     if (item.key === "auditLog") return canAccessAuditLog(role);
+    if (item.key === "dataRetention") return role === "super_admin";
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);
     if (item.key === "weeklyReports") return canAccessWeeklyReports(role, level);
     if (item.key === "lgaReports") return canAccessLgaReports(role, level);

@@ -148,7 +148,7 @@ Other controls:
 
 ## 8. Retention [DPO]
 
-Nothing is deleted automatically today; **automatic deletion is not built yet [PROG]**.
+**Automatic deletion is built (11 Oct, R177)**: a nightly job (02:00) applies the periods below — the identity details, RUTF photos, the access log, evidence photos, selfies and sync errors — and deletes photo files through the Storage API; the Super Admin sees what is due and every run on Data Retention, and may set a rule to report only. The periods stay proposals until the DPO approves them.
 
 | Data | Proposed retention |
 | --- | --- |
@@ -187,7 +187,7 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 | R6 | Names or health details typed into free text (reasons, notes, referral notes, report comments) | Medium / Medium | Prompts ask for facts, not names | Training; periodic review |
 | R7 | Database service-key holders can read everything outside the app | Low / High | Keys only with named maintainers, never in the app | Name the holders, rotate on staff change, log their access |
 | R8 | Health data stored outside Nigeria | Certain / Medium | Provider security | §7 decision before real data |
-| R9 | Identity details kept longer than needed | Certain (no deletion yet) / Medium | — | Build the §8 deletion before the first retention date |
+| R9 | Identity details kept longer than needed | Low (automatic deletion, R177) / Medium | Nightly deletion 2 years after the last discharge | DPO approves the periods |
 | R10 | Wrong clinical rules harm a child (e.g. a missed referral) | Low / High | Rules from the approved booklet only; unclear cases go to clinical review; the rule set stays a draft until signed off | Clinical sign-off of the rule set (RULEBOOK Q22) |
 | R11 | DUMMY demo data mixed with real data | Medium / Low | DUMMY names and accounts are labelled | Remove before go-live (§7) |
 | R12 | Over-broad access by a future change | Low / High | Database-enforced access; automated tests | Re-run the three test suites after every migration |
@@ -199,7 +199,7 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 2. **[PROG]** Approve the caregiver notice and its Hausa translation (§5).
 3. **[DPO]** Decide the cross-border transfer, or move the hosting region (§7).
 4. **[PROG]** File the processors' DPAs (§7).
-5. **[DPO]** Approve retention (§8); **[PROG]** build automatic deletion of identity details.
+5. **[DPO]** Approve retention (§8); **[PROG] — done 11 Oct (R177)** automatic deletion (nightly; Data Retention page). Run `tools/db/set-storage-key.js` once so expired photo files are deleted from storage.
 6. **[PROG] — done 11 Oct (R176)** Build identity correction in the app (§9).
 7. **[PROG] — done 11 Oct (R168)** Build automatic sign-out on the OTP screens after inactivity (R2). Built for the whole app: 15 minutes, one-minute warning, not resumed after the app is closed.
 8. **[PROG]** Set up the monthly access-log review (R1) and name the service-key holders (R7).

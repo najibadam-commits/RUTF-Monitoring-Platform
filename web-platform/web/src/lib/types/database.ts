@@ -855,6 +855,10 @@ export interface Database {
       lga_allocation_plan: { Args: Record<string, never>; Returns: Json };
       lga_allocation_issue: { Args: { p: Json }; Returns: Json };
       lga_monthly_overview: { Args: { p_month: string }; Returns: Json };
+      // Retention (0141, R177)
+      retention_overview: { Args: Record<string, never>; Returns: Json };
+      retention_run: { Args: { p_dry_run: boolean }; Returns: Json };
+      retention_set_mode: { Args: { p_key: string; p_mode: string }; Returns: undefined };
       otp_rules_view: { Args: Record<string, never>; Returns: Json };
       otp_rule_set_approve: { Args: { p_version: string; p_confirm: boolean; p_note: string | null }; Returns: Json };
       otp_followup_aggregates: {
