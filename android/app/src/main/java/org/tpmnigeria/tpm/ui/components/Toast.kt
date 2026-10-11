@@ -1,5 +1,6 @@
 package org.tpmnigeria.tpm.ui.components
 
+import androidx.compose.ui.draw.shadow
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -68,13 +69,14 @@ fun TpmToast(message: String?, modifier: Modifier = Modifier) {
     ) {
         Row(
             modifier = Modifier
-                .background(TpmColors.Accent900, RoundedCornerShape(TpmRadius.small))
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .shadow(10.dp, RoundedCornerShape(TpmRadius.pill), ambientColor = TpmColors.Blue.copy(alpha = 0.3f), spotColor = TpmColors.Blue.copy(alpha = 0.3f))
+                .background(TpmColors.Accent900, RoundedCornerShape(TpmRadius.pill))
+                .padding(horizontal = 18.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(Icons.Filled.Check, contentDescription = null, tint = TpmColors.Background, modifier = Modifier.width(14.dp))
             Spacer(Modifier.width(8.dp))
-            Text(message.orEmpty(), color = TpmColors.Background, style = MaterialTheme.typography.bodyMedium)
+            Text(message.orEmpty(), color = TpmColors.White, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

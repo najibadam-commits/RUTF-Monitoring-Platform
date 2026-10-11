@@ -154,7 +154,7 @@ fun LossAdjustmentScreen(facilityId: String, onDone: () -> Unit, onExit: () -> U
                 QuantityInput(label = "Quantity", cartons = vm.cartons, loose = vm.loose, onCartons = { vm.cartons = it }, onLoose = { vm.loose = it }, unitsPerCarton = u)
                 if (onHand != null && vm.type != LossType.Adjustment && vm.magnitude(u) > onHand) {
                     Text("More than the ${fmt(onHand)} sachets of this lot on hand as far as this phone knows.",
-                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                 }
                 DatePickerField(label = "Date", date = vm.date, onDateChange = { vm.date = it })
             }

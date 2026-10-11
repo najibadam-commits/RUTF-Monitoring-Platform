@@ -159,7 +159,7 @@ fun StockCountScreen(facilityId: String, onDone: () -> Unit, onExit: () -> Unit)
                             if (counted != expected) {
                                 val pct = if (expected != 0) " (${"%.1f".format((expected - counted) * 100.0 / expected)}%)" else ""
                                 Text("Difference ${"%+,d".format(counted - expected)}$pct — recorded as an adjustment for your supervisor to confirm.",
-                                    style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                                    style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                             }
                         }
                     }

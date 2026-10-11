@@ -1,5 +1,10 @@
 package org.tpmnigeria.tpm.ui.wizard.common
 
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.draw.shadow
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import org.tpmnigeria.tpm.ui.theme.TpmGradients
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,24 +55,29 @@ fun WizardScaffold(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(4.dp)
-                    .clip(RoundedCornerShape(2.dp))
-                    .background(TpmColors.Neutral200),
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(TpmColors.Accent100),
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(stepIndex.toFloat() / totalSteps.toFloat())
-                        .height(4.dp)
-                        .clip(RoundedCornerShape(2.dp))
-                        .background(TpmColors.Accent),
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(TpmGradients.Button),
                 )
             }
-            Spacer(Modifier.height(6.dp))
-            Text(
-                "Step $stepIndex of $totalSteps · $stepLabel",
-                style = MaterialTheme.typography.bodySmall,
-                color = TpmColors.TextMuted,
-            )
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    "Step $stepIndex of $totalSteps",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TpmColors.Accent700,
+                    modifier = Modifier.background(TpmColors.Accent100, RoundedCornerShape(TpmRadius.pill)).padding(horizontal = 10.dp, vertical = 3.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(stepLabel, style = MaterialTheme.typography.titleSmall, color = TpmColors.Text)
+            }
         }
 
         LazyColumn(
@@ -80,7 +90,13 @@ fun WizardScaffold(
             item { Spacer(Modifier.height(TpmSpacing.space4)) }
         }
 
-        Column(modifier = Modifier.fillMaxWidth().padding(TpmSpacing.space4)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(12.dp, RoundedCornerShape(topStart = TpmRadius.large, topEnd = TpmRadius.large), ambientColor = TpmColors.Blue.copy(alpha = 0.18f), spotColor = TpmColors.Blue.copy(alpha = 0.18f))
+                .background(TpmColors.White, RoundedCornerShape(topStart = TpmRadius.large, topEnd = TpmRadius.large))
+                .padding(TpmSpacing.space4),
+        ) {
             TpmButton(
                 text = if (isSubmitting) "Submitting…" else continueLabel,
                 onClick = onContinue,
@@ -93,7 +109,7 @@ fun WizardScaffold(
                 Text(
                     warningText,
                     style = MaterialTheme.typography.bodySmall,
-                    color = TpmColors.Accent800,
+                    color = TpmColors.Warning,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )

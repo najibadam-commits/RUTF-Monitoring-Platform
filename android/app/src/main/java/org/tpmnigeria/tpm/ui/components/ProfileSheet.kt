@@ -1,5 +1,6 @@
 package org.tpmnigeria.tpm.ui.components
 
+import org.tpmnigeria.tpm.ui.theme.TpmGradients
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -61,13 +62,13 @@ fun ProfileSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = TpmColors.Background,
+        containerColor = TpmColors.White,
         modifier = modifier,
     ) {
         Column(modifier = Modifier.fillMaxWidth().padding(horizontal = TpmSpacing.space4, vertical = TpmSpacing.space2)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    modifier = Modifier.size(44.dp).background(TpmColors.Accent800, CircleShape),
+                    modifier = Modifier.size(48.dp).background(TpmGradients.Button, CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(userInitials, color = TpmColors.Background, style = MaterialTheme.typography.titleMedium)
@@ -133,7 +134,7 @@ fun ProfileSheet(
             },
             confirmButton = {
                 TextButton(onClick = { confirmingClear = false; onClearDeviceAccess() }) {
-                    Text("Clear access", color = TpmColors.Accent800)
+                    Text("Clear access", color = TpmColors.Error)
                 }
             },
             dismissButton = {

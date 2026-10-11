@@ -285,7 +285,7 @@ fun SupervisionVisitScreen(kind: LedgerKind, supervisionLevel: String, onDone: (
                         if (d > VisitThresholds.GEOFENCE_M) "You are about ${fmt(d)} m from the facility's recorded location — more than ${VisitThresholds.GEOFENCE_M} m. The visit will be flagged; recapture at the facility if you can."
                         else "About ${fmt(d)} m from the facility's recorded location.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (d > VisitThresholds.GEOFENCE_M) TpmColors.Accent800 else TpmColors.TextMuted,
+                        color = if (d > VisitThresholds.GEOFENCE_M) TpmColors.Warning else TpmColors.TextMuted,
                     )
                 }
             }
@@ -303,7 +303,7 @@ fun SupervisionVisitScreen(kind: LedgerKind, supervisionLevel: String, onDone: (
             }
             "Register" -> {
                 YesNo("Is the OTP register available?", vm.registerPresent) { vm.registerPresent = it }
-                if (vm.registerPresent == false) Text("A missing register is recorded as a Finding for review.", style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                if (vm.registerPresent == false) Text("A missing register is recorded as a Finding for review.", style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
             }
             "Recount" -> {
                 if (vm.registerPresent == false) {

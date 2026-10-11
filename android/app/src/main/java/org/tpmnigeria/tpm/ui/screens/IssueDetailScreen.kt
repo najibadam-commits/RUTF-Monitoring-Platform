@@ -1,5 +1,6 @@
 package org.tpmnigeria.tpm.ui.screens
 
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -235,8 +236,8 @@ private fun EvidenceTile(label: String, path: String?, placeholderIcon: ImageVec
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(4f / 3f)
-                .clip(RoundedCornerShape(4.dp))
-                .background(TpmColors.Neutral200),
+                .clip(RoundedCornerShape(TpmRadius.small))
+                .background(TpmColors.Accent100),
             contentAlignment = Alignment.Center,
         ) {
             if (model != null) {

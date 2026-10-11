@@ -140,7 +140,7 @@ fun CameraCaptureModal(
                 Text(
                     "Camera permission is required to capture evidence photos.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TpmColors.Accent800,
+                    color = TpmColors.Warning,
                 )
                 Spacer(Modifier.height(TpmSpacing.space3))
                 TpmButton(

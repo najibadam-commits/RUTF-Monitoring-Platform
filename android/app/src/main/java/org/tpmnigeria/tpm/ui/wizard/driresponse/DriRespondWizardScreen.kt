@@ -110,7 +110,7 @@ fun DriRespondWizardScreen(initialIssueId: String?, onDone: (issueId: String) ->
             6 -> ReviewStep(viewModel)
         }
         if (viewModel.submitError != null) {
-            Text(viewModel.submitError.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+            Text(viewModel.submitError.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
         }
     }
 
@@ -155,7 +155,7 @@ private fun LookUpIssueStep(vm: DriRespondWizardViewModel) {
         Spacer(Modifier.height(8.dp))
         TpmButton(text = "Search", icon = Icons.Filled.Search, onClick = { vm.search() }, variant = TpmButtonVariant.Secondary, blueprint = true)
         if (vm.lookupError != null) {
-            Text(vm.lookupError.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+            Text(vm.lookupError.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
         }
         if (vm.foundIssue != null) {
             Text("Found: ${vm.foundIssue!!.id}", style = MaterialTheme.typography.bodyMedium, color = TpmColors.Accent700)

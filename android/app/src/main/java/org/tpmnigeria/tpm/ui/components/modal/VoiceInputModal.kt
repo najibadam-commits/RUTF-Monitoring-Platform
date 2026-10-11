@@ -187,7 +187,7 @@ fun VoiceInputModal(
                 Text(
                     "Microphone permission is required for voice input.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TpmColors.Accent800,
+                    color = TpmColors.Warning,
                 )
                 Spacer(Modifier.height(TpmSpacing.space3))
                 TpmButton(text = "Grant Permission", onClick = { permissionState.launchPermissionRequest() }, blueprint = true, fullWidth = true)
@@ -196,7 +196,7 @@ fun VoiceInputModal(
                 Text(
                     "Microphone access was turned off for this app. Enable it in Settings to use voice input.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TpmColors.Accent800,
+                    color = TpmColors.Warning,
                 )
                 Spacer(Modifier.height(TpmSpacing.space3))
                 TpmButton(
@@ -217,7 +217,7 @@ fun VoiceInputModal(
                 verticalArrangement = Arrangement.Center,
             ) {
                 if (errorText != null) {
-                    Text(errorText.orEmpty(), style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                    Text(errorText.orEmpty(), style = MaterialTheme.typography.bodySmall, color = TpmColors.Error)
                     Spacer(Modifier.height(TpmSpacing.space2))
                 }
                 Box(

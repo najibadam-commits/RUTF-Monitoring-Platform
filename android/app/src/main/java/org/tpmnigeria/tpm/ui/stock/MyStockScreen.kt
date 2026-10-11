@@ -75,12 +75,12 @@ fun MyStockScreen(facilityId: String) {
                 val p = position
                 Text("On hand", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
                 Text(p?.let { "${fmt(it.total)} sachets" } ?: "—", style = MaterialTheme.typography.headlineMedium,
-                    color = if ((p?.total ?: 1) <= 0) TpmColors.Accent800 else MaterialTheme.colorScheme.onSurface)
+                    color = if ((p?.total ?: 1) <= 0) TpmColors.Error else MaterialTheme.colorScheme.onSurface)
                 p?.let { Text("${fmt(maxOf(0, it.total) / u)} cartons", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted) }
                 if ((p?.pendingSubmissions ?: 0) > 0) {
                     Text("Includes ${p!!.pendingSubmissions} entr${if (p.pendingSubmissions == 1) "y" else "ies"} waiting to sync" +
                         if (p.pendingDispensed > 0) " (${fmt(p.pendingDispensed)} sachets dispensed, lot assigned on sync)." else ".",
-                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                 }
             }
         }
@@ -101,7 +101,7 @@ fun MyStockScreen(facilityId: String) {
                             else -> "Expires ${lot.expiryDate}"
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (days <= EXPIRY_WARN_DAYS && lot.projected > 0) TpmColors.Accent800 else TpmColors.TextMuted,
+                        color = if (days <= EXPIRY_WARN_DAYS && lot.projected > 0) TpmColors.Warning else TpmColors.TextMuted,
                     )
                 }
             }
@@ -113,7 +113,7 @@ fun MyStockScreen(facilityId: String) {
             TpmCard(modifier = Modifier.fillMaxWidth()) {
                 Text("${t.code ?: "Transfer"} · ${fmt(t.sachetsIssued)} sachets", style = MaterialTheme.typography.titleSmall)
                 Text("From ${names[t.fromFacilityId] ?: "your supplying store"} · issued ${t.issuedDate} ($age day${if (age == 1L) "" else "s"} ago)",
-                    style = MaterialTheme.typography.bodySmall, color = if (age > 7) TpmColors.Accent800 else TpmColors.TextMuted)
+                    style = MaterialTheme.typography.bodySmall, color = if (age > 7) TpmColors.Warning else TpmColors.TextMuted)
             }
         }
         item {

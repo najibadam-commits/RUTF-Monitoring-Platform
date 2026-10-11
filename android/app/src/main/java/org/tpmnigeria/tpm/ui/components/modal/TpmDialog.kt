@@ -32,7 +32,7 @@ fun TpmDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Surface(
-            color = TpmColors.Surface,
+            color = TpmColors.White,
             shape = RoundedCornerShape(TpmRadius.large),
             modifier = Modifier.fillMaxWidth(),
         ) {

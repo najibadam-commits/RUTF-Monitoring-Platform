@@ -3,11 +3,11 @@
 .page {
   --navy: var(--color-accent-800);
   --blue: var(--color-accent-600);
-  --tone-blue: #1677d2;
+  --tone-blue: var(--brand-blue);
   --tone-green: #2e9b62;
   --tone-purple: #7c4dcc;
   --tone-orange: #ef7d22;
-  --tone-teal: #17917f;
+  --tone-teal: #1a9e8a;
   --gutter: clamp(16px, 4vw, 56px);
   background: var(--color-surface);
   color: var(--color-text);
@@ -18,9 +18,10 @@
 /* ── Header ─────────────────────────────────────────── */
 .header {
   position: sticky; top: 0; z-index: 10;
-  background: color-mix(in srgb, #f1f3f6 96%, transparent); /* very light gray */
+  background: rgba(255, 255, 255, 0.78); /* frosted (glass design, R164) */
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid #e1e5ea;
+  border-bottom: 1px solid rgba(22, 135, 248, 0.10);
 }
 .headerInner {
   max-width: 1240px; margin: 0 auto; padding: 12px var(--gutter);
@@ -39,7 +40,7 @@
   padding: 11px 22px; border-radius: 999px; font-weight: 600; font-size: 14.5px;
   text-decoration: none; transition: background 0.15s, box-shadow 0.15s;
 }
-.btnPrimary { background: var(--blue); color: #fff; box-shadow: 0 4px 14px rgba(22, 119, 210, 0.28); }
+.btnPrimary { background: var(--gradient-primary); color: #fff; box-shadow: 0 6px 18px rgba(22, 135, 248, 0.32); }
 .btnPrimary:hover { background: var(--color-accent-700); }
 .btnOutline { border: 1.5px solid var(--blue); color: var(--navy); background: var(--color-surface); }
 .btnOutline:hover { background: var(--color-accent-100); }
@@ -52,7 +53,7 @@
 
 /* ── Hero ───────────────────────────────────────────── */
 /* The documentary photo fills the hero; a light wash sits only behind the text on the left. */
-.hero { position: relative; overflow: hidden; background: #ecf3fb; min-height: clamp(520px, 66vh, 660px); display: flex; align-items: center; }
+.hero { position: relative; overflow: hidden; background: var(--page-bg); min-height: clamp(520px, 66vh, 660px); display: flex; align-items: center; }
 .heroPhoto {
   position: absolute; inset: 0 0 0 27%;
   background: url(/landing/hero-wide.webp) 42% 30% / cover no-repeat;
@@ -60,8 +61,8 @@
 .heroPhoto::before {
   content: ""; position: absolute; inset: 0;
   background: linear-gradient(90deg,
-    rgba(236, 243, 251, 1) 0%, rgba(236, 243, 251, 0.78) 14%,
-    rgba(236, 243, 251, 0.25) 27%, rgba(236, 243, 251, 0) 36%);
+    rgba(244, 249, 253, 1) 0%, rgba(244, 249, 253, 0.78) 14%,
+    rgba(244, 249, 253, 0.25) 27%, rgba(244, 249, 253, 0) 36%);
 }
 .heroText { position: relative; max-width: 1240px; width: 100%; margin: 0 auto; padding: 56px var(--gutter); }
 .heroText > * { max-width: min(500px, 36vw); }
@@ -115,7 +116,7 @@
 /* ── Why it matters ─────────────────────────────────── */
 .why {
   position: relative; color: #fff; overflow: hidden;
-  background: #0c2850;
+  background: linear-gradient(120deg, #0b3a7d 0%, #0f4ea8 55%, #1264d8 100%);
 }
 .whyPhoto {
   position: absolute; top: 0; right: 0; bottom: 0; aspect-ratio: 524 / 690;

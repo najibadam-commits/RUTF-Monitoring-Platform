@@ -159,7 +159,7 @@ fun IssueStockScreen(facilityId: String, onDone: () -> Unit, onExit: () -> Unit)
                     val onHand = available.firstOrNull { it.lotId == line.lotId }?.projected
                     if (onHand != null && line.sachets(u) > onHand) {
                         Text("Only ${fmt(onHand)} sachets of this lot on hand as far as this phone knows.",
-                            style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                            style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                     }
                 }
                 if (vm.lines.size < availableLots.size) TpmButton(text = "Add another lot", onClick = vm::addLine, variant = TpmButtonVariant.Secondary, fullWidth = true)

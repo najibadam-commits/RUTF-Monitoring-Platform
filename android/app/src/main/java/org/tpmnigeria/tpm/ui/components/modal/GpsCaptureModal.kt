@@ -128,7 +128,7 @@ fun GpsCaptureModal(
                 Text(
                     "Location permission is required to capture GPS for this finding. Grant it to continue.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TpmColors.Accent800,
+                    color = TpmColors.Warning,
                 )
                 Spacer(Modifier.height(TpmSpacing.space3))
                 TpmButton(
@@ -148,7 +148,7 @@ fun GpsCaptureModal(
                 Text("Acquiring GPS signal…", style = MaterialTheme.typography.bodyMedium, color = TpmColors.TextMuted)
             }
             GpsPhase.Error -> Column(modifier = Modifier.fillMaxWidth()) {
-                Text(errorText.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = TpmColors.Accent800)
+                Text(errorText.orEmpty(), style = MaterialTheme.typography.bodyMedium, color = TpmColors.Error)
                 Spacer(Modifier.height(TpmSpacing.space3))
                 TpmButton(text = "Try Again", onClick = { captureRequestId++ }, blueprint = true, fullWidth = true)
             }

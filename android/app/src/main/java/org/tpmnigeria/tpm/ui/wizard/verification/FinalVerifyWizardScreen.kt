@@ -107,7 +107,7 @@ fun FinalVerifyWizardScreen(initialIssueId: String?, onDone: (issueId: String) -
             5 -> ReviewStep(viewModel)
         }
         if (viewModel.submitError != null) {
-            Text(viewModel.submitError.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+            Text(viewModel.submitError.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
         }
     }
 
@@ -142,7 +142,7 @@ private fun LookUpIssueStep(vm: FinalVerifyWizardViewModel) {
         Spacer(Modifier.height(8.dp))
         TpmButton(text = "Search", icon = Icons.Filled.Search, onClick = { vm.search() }, variant = TpmButtonVariant.Secondary, blueprint = true)
         if (vm.lookupError != null) {
-            Text(vm.lookupError.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+            Text(vm.lookupError.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
         }
 
         Spacer(Modifier.height(16.dp))

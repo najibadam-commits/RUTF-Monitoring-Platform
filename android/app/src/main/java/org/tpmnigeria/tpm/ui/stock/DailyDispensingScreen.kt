@@ -125,7 +125,7 @@ fun DailyDispensingScreen(facilityId: String, onDone: () -> Unit, onExit: () -> 
             Text(
                 if (d < p) "${fmt(p - d)} sachets fewer than prescribed — check the register if that's not right."
                 else "${fmt(d - p)} sachets more than prescribed — check the register if that's not right.",
-                style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800,
+                style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning,
             )
         }
         PhotoCaptureStep(

@@ -244,7 +244,7 @@ fun ReceiveStockScreen(facilityId: String, onDone: () -> Unit, onExit: () -> Uni
                 vm.transfer?.let { t ->
                     if (received != t.sachetsIssued) {
                         Text("${fmt(t.sachetsIssued)} sachets were issued — this receipt is ${fmt(received - t.sachetsIssued)} different. It will be recorded as a discrepancy for review.",
-                            style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                            style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                     }
                 }
             }

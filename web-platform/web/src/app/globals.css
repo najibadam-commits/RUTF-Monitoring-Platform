@@ -334,6 +334,8 @@ select.input {
       color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
 }
 .table-actions { display: flex; gap: var(--space-1); justify-content: flex-end; }
+/* A wide table scrolls sideways inside its card instead of widening the page (phones, tablets). */
+.card:has(> .table) { overflow-x: auto; }
 
 /* — app shell (sidebar + mobile drawer) — */
 .app-sidebar {
@@ -384,6 +386,14 @@ select.input {
   .app-collapse-toggle { display: none; }
 }
 
+/* The top bar on a phone: tighter spacing, the title shortens with "…", the role tag (also in the
+   sidebar) is hidden, so the bar never widens the page. */
+@media (max-width: 640px) {
+  .app-topbar { padding: 0 12px !important; gap: 10px !important; }
+  .app-topbar h4 { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-size: 17px; }
+  .app-topbar .tag { display: none; }
+}
+
 /* — login page: enlarged form scale (scoped to the login card only, does not affect
    .field/.input/.btn anywhere else in the app) — */
 .login-form-lg .field > label { font-size: 14px; margin-bottom: 6px; }
@@ -407,6 +417,13 @@ select.input {
 .dialog-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
 .dialog-body { font-size: 14px; color: var(--color-neutral-800); }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+/* Floating panels over a map: frosted glass (the map shows through softly), solid where blur is unsupported. */
+.map-panel {
+  background: rgba(255, 255, 255, 0.82) !important; border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1); backdrop-filter: blur(12px) saturate(1.1);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .map-panel { background: #fff !important; } }
 
 /* — leaflet theme overrides — */
 .leaflet-container { background: var(--color-neutral-200); font-family: var(--font-body); }

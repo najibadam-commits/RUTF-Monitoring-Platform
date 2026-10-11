@@ -604,7 +604,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
           {statuses.map((s) => (
             <button key={s.value} type="button" onClick={() => setFilters((f) => ({ ...f, status: f.status === s.value ? ALL : s.value }))}
               title={filters.status === s.value ? "Show all statuses" : `Show only ${s.label}`}
-              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: filters.status === s.value ? "var(--color-accent-100)" : "none", border: "none", borderRadius: 4, padding: "1px 4px", margin: "0 -4px", cursor: "pointer", color: "inherit", textAlign: "left" }}>
+              style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, background: filters.status === s.value ? "var(--color-accent-100)" : "none", border: "none", borderRadius: 999, padding: "1px 4px", margin: "0 -4px", cursor: "pointer", color: "inherit", textAlign: "left" }}>
               <span style={{ width: 9, height: 9, borderRadius: "50%", background: s.color, flex: "none" }} />
               <span style={{ flex: 1 }}>{s.label}</span>
               <span className="text-muted">{(statusCount.get(s.value) ?? 0).toLocaleString("en-GB")}</span>
@@ -620,7 +620,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
       <div style={{ flex: 1, position: "relative", minWidth: 0 }}>
         <div ref={mapNodeRef} style={{ position: "absolute", inset: 0 }} />
 
-        <div className="card elev-lg" style={{ position: "absolute", left: 12, bottom: 24, zIndex: 500, padding: "10px 14px", gap: 6, maxWidth: "calc(100% - 24px)" }}>
+        <div className="card elev-lg map-panel" style={{ position: "absolute", left: 12, bottom: 24, zIndex: 500, padding: "10px 14px", gap: 6, maxWidth: "calc(100% - 24px)" }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-neutral-700)" }}>
             Situation · {filters.state === ALL ? "All states" : states.find((s) => s.id === filters.state)?.name}
             {filters.lga !== ALL ? ` · ${lgas.find((l) => l.id === filters.lga)?.name ?? ""}` : ""}
@@ -635,7 +635,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
 
         {noResults && (
           <div
-            className="card elev-lg text-muted"
+            className="card elev-lg map-panel text-muted"
             style={{ position: "absolute", top: 16, left: "50%", transform: "translateX(-50%)", padding: "10px 16px", fontSize: 13, zIndex: 500 }}
           >
             No matching records found.
@@ -643,7 +643,7 @@ export function GisMapInner({ issues, facilities, facilityMonth, riskHigh, state
         )}
 
         {selected && (
-          <div className="card elev-lg" style={{ position: "absolute", top: 64, right: 12, width: 300, padding: 14, gap: 10, zIndex: 500 }}>
+          <div className="card elev-lg map-panel" style={{ position: "absolute", top: 64, right: 12, width: 300, padding: 14, gap: 10, zIndex: 500 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <span className="tag tag-outline">{selected.code}</span>
               <button className="btn btn-icon btn-ghost" onClick={() => setSelectedId(null)}>

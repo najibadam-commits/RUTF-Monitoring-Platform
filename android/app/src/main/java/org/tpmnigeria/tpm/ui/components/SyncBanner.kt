@@ -1,5 +1,8 @@
 package org.tpmnigeria.tpm.ui.components
 
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,20 +46,22 @@ fun SyncBanner(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(TpmColors.Accent100)
-            .border(BorderStroke(1.dp, TpmColors.Divider))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 9.dp),
+            .padding(horizontal = 12.dp)
+            .padding(bottom = 8.dp)
+            .background(Color.White.copy(alpha = 0.18f), RoundedCornerShape(TpmRadius.pill))
+            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.35f)), RoundedCornerShape(TpmRadius.pill))
+            .clickable(onClickLabel = "Open the sync queue", onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Filled.Cloud, contentDescription = null, tint = TpmColors.Accent800, modifier = Modifier.size(14.dp))
+        Icon(Icons.Filled.Cloud, contentDescription = null, tint = TpmColors.White, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(8.dp))
         Text(
             text,
             style = MaterialTheme.typography.bodySmall,
-            color = TpmColors.Accent800,
+            color = TpmColors.White,
             modifier = Modifier.weight(1f),
         )
-        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = TpmColors.Accent800, modifier = Modifier.size(14.dp))
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = TpmColors.White, modifier = Modifier.size(16.dp))
     }
 }

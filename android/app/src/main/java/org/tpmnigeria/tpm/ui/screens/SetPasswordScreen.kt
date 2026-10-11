@@ -1,5 +1,11 @@
 package org.tpmnigeria.tpm.ui.screens
 
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import org.tpmnigeria.tpm.ui.components.glass
+import org.tpmnigeria.tpm.ui.components.TpmGradientBackground
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,14 +60,25 @@ fun SetPasswordScreen(session: AppSession) {
     var success by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
+    // Glass design (R164): the sign-in screen's gradient and floating panel.
+    TpmGradientBackground(modifier = Modifier.fillMaxSize()) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
+            .imePadding()
             .padding(horizontal = TpmSpacing.space6),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(Modifier.weight(1f))
+      Column(
+        modifier = Modifier
+            .widthIn(max = 460.dp)
+            .fillMaxWidth()
+            .glass(RoundedCornerShape(TpmRadius.large), elevation = 14.dp, surface = TpmColors.White.copy(alpha = 0.97f))
+            .padding(TpmSpacing.space6),
+        horizontalAlignment = Alignment.CenterHorizontally,
+      ) {
 
         if (success) {
             Text("Password updated successfully.", style = MaterialTheme.typography.headlineSmall, textAlign = TextAlign.Center)
@@ -133,7 +150,7 @@ fun SetPasswordScreen(session: AppSession) {
 
             if (error != null) {
                 Spacer(Modifier.height(TpmSpacing.space2))
-                Text(error.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+                Text(error.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
             }
 
             Spacer(Modifier.height(TpmSpacing.space4))
@@ -174,6 +191,8 @@ fun SetPasswordScreen(session: AppSession) {
             )
         }
 
+      }
         Spacer(Modifier.weight(1.4f))
+    }
     }
 }

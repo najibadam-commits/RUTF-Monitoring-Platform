@@ -101,7 +101,7 @@ fun NewIssueWizardScreen(onDone: (issueId: String) -> Unit, onExit: () -> Unit) 
             6 -> ReviewStep(viewModel)
         }
         if (viewModel.submitError != null) {
-            Text(viewModel.submitError.orEmpty(), color = TpmColors.Accent800, style = MaterialTheme.typography.bodySmall)
+            Text(viewModel.submitError.orEmpty(), color = TpmColors.Error, style = MaterialTheme.typography.bodySmall)
         }
     }
 

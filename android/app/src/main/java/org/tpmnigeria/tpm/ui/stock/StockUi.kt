@@ -159,7 +159,7 @@ fun LotLineEditor(
                 val entered = draft.sachets(unitsPerCarton)
                 if (draft.quantityEntered && entered != ref) {
                     Text("Document says ${"%,d".format(ref)} sachets — difference ${"%+,d".format(entered - ref)}.",
-                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Accent800)
+                        style = MaterialTheme.typography.bodySmall, color = TpmColors.Warning)
                 }
             }
             if (showDamaged) {

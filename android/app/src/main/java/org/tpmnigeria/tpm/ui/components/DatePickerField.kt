@@ -1,5 +1,6 @@
 package org.tpmnigeria.tpm.ui.components
 
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -57,10 +58,11 @@ fun DatePickerField(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(TpmColors.Surface, shape)
+                .background(TpmColors.SurfaceSubtle, shape)
                 .border(androidx.compose.foundation.BorderStroke(1.dp, TpmColors.Divider), shape)
-                .clickable { showDialog = true }
-                .padding(horizontal = 10.dp, vertical = 8.dp),
+                .clickable(onClickLabel = "Choose the date") { showDialog = true }
+                .heightIn(min = 52.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {

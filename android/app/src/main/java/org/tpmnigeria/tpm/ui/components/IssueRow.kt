@@ -1,5 +1,7 @@
 package org.tpmnigeria.tpm.ui.components
 
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -44,12 +46,14 @@ fun IssueRow(
     modifier: Modifier = Modifier,
     line3: String? = null,
 ) {
+    // Glass design (R164): each row is a glass card; the whole card is the touch target.
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .bottomDivider(TpmColors.Divider)
-            .padding(vertical = TpmSpacing.space3, horizontal = TpmSpacing.space1),
+            .padding(bottom = TpmSpacing.space2)
+            .glass(RoundedCornerShape(TpmRadius.medium), elevation = 3.dp)
+            .clickable(onClickLabel = "Open $issueId", onClick = onClick)
+            .padding(vertical = TpmSpacing.space3, horizontal = TpmSpacing.space4),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
