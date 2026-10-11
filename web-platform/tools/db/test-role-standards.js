@@ -271,6 +271,56 @@ const has = (v, s) => JSON.stringify(v).includes(s);
     await as(officer.id, async () => {
       check("E. LGA report", "an OTP Officer cannot see the LGA reports", true, has(await call(`select lga_reports_overview($1::date)`, [rep.ws]), "does not see"));
     });
+
+    // ── F. Need-based quantities, the allocation plan, Apex, monthly figures (0138, R173) ──
+    await as(officer.id, async () => {
+      const form = await call(`select supply_request_form()`);
+      const c = form.calculation;
+      check("F. need", "the OTP form carries the calculation (7 days)", "otp_to_lga/7", `${c.level}/${c.cover_days}`);
+      check("F. need", "suggestion = need − usable stock, in whole cartons", true,
+        c.suggested_qty % 150 === 0 && c.suggested_qty >= Math.max(0, c.need - c.usable_total) && c.suggested_qty < Math.max(0, c.need - c.usable_total) + 150);
+      const other = c.suggested_qty + 300;
+      check("F. need", "a quantity different from the suggestion needs the reason", true,
+        has(await call(`select supply_request_create($1::jsonb)`, [JSON.stringify({ lines: [{ product_id: product, requested_qty: other }] })]), "Say why"));
+      const ok = await call(`select supply_request_create($1::jsonb)`, [JSON.stringify({ lines: [{ product_id: product, requested_qty: other }], justification: "Screening campaign next week (DUMMY)" })]);
+      const saved = await call(`select supply_request_get($1)`, [ok.id]);
+      check("F. need", "the calculation is saved with the request", c.suggested_qty, saved.request.calculation.suggested_qty);
+      check("F. need", "and the suggested quantity on the line", c.suggested_qty, saved.lines[0].suggested_qty);
+    });
+    await as(lgan.id, async () => {
+      const form = await call(`select supply_request_form()`);
+      const c = form.calculation;
+      check("F. need", "the LGA form covers 30 days and every OTP centre", true, c.level === "lga_to_state" && c.cover_days === 30 && c.sites.length > 0);
+      check("F. need", "the LGA counts the centres' stock as well as the store's", c.usable_at_sites + c.usable_at_store, c.usable_total);
+      check("F. need", "the LGA's monthly figures travel with it", true, !!c.month && typeof c.month.patients_end === "number");
+      const plan = await call(`select lga_allocation_plan()`);
+      check("F. allocation", "the plan lists the store's centres with need, stock and gap", true, plan.centres.length > 0 && plan.centres.every((x) => "need" in x && "gap" in x && "suggested" in x));
+      check("F. allocation", "suggested shares never exceed the store's usable stock", true, plan.centres.reduce((a, x) => a + x.suggested, 0) <= Math.max(plan.store_usable, 0));
+      const target = plan.centres.find((x) => x.facility_id === officer.facility) || plan.centres[0];
+      check("F. apex", "the LGA Nutrition Officer marks the Apex centre", target.facility_id, (await call(`select set_apex_otp($1)`, [target.facility_id])).apex);
+      const before = await balance(lgan.facility);
+      const res = await call(`select lga_allocation_issue($1::jsonb)`, [JSON.stringify({ lines: [{ facility_id: target.facility_id, sachets: 300 }], note: "Weekly distribution (DUMMY)", local_id: "TEST-ALLOC-1" })]);
+      check("F. allocation", "issuing the plan records a stock issue", 300, before - (await balance(lgan.facility)));
+      check("F. allocation", "with a transfer per centre", true, !!res.lines[0].transfer_code);
+      check("F. allocation", "issuing again with the same id changes nothing", res.id, (await call(`select lga_allocation_issue($1::jsonb)`, [JSON.stringify({ lines: [{ facility_id: target.facility_id, sachets: 300 }], local_id: "TEST-ALLOC-1" })])).id);
+      check("F. allocation", "more than the store holds is refused", true,
+        has(await call(`select lga_allocation_issue($1::jsonb)`, [JSON.stringify({ lines: [{ facility_id: target.facility_id, sachets: 99999999 }] })]), "Not enough usable stock"));
+      check("F. allocation", "a centre of another LGA is refused", true,
+        has(await call(`select lga_allocation_issue($1::jsonb)`, [JSON.stringify({ lines: [{ facility_id: otherLgan.facility, sachets: 150 }] })]), "not supplied by your store"));
+    });
+    check("F. apex", "one Apex per LGA", 1, Number((await one(`select count(*) n from lga_apex_otp where lga_id = $1`, [officer.lga_id])).n));
+    await as(officer.id, async () => {
+      check("F. apex", "an OTP Officer cannot set the Apex", true, has(await call(`select set_apex_otp($1)`, [officer.facility]), "Only the LGA or State Nutrition Officer"));
+      check("F. allocation", "an OTP Officer cannot plan the distribution", true, has(await call(`select lga_allocation_plan()`), "Only an LGA Nutrition Officer"));
+    });
+    await as(sn.id, async () => {
+      const m = await call(`select lga_monthly_overview(date_trunc('month', current_date - 31)::date)`);
+      check("F. monthly", "the State sees every LGA's monthly figures", true, m.lgas.length > 30);
+    });
+    await as(lgan.id, async () => {
+      const m = await call(`select lga_monthly_overview(date_trunc('month', current_date - 31)::date)`);
+      check("F. monthly", "an LGA Nutrition Officer sees their own LGA only", 1, m.lgas.length);
+    });
   } finally {
     await pg.query("rollback");
     await pg.end();

@@ -82,10 +82,10 @@ val ADMISSION_TYPE_LABEL = mapOf(
 )
 
 val OUTCOME_LABEL = mapOf(
-    "cured" to "Discharged cured",
+    "cured" to "Recovered (discharged cured)",
     "defaulted" to "Defaulted",
     "died" to "Died",
-    "non_recovered" to "Non-recovered",
+    "non_recovered" to "Non-recovered (referred to the clinic)",
     "transferred_inpatient" to "Transferred to inpatient care",
     "refused_inpatient" to "Refused inpatient care",
     "transferred_otp" to "Transferred to another OTP site",

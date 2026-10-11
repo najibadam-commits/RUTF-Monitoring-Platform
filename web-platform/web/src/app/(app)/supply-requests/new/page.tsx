@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile, getOfficerLevel } from "@/lib/supabase/dal";
 import { NewSupplyRequestForm, type SupplyForm } from "@/components/supply/NewSupplyRequestForm";
+import { NeedCalculation } from "@/components/supply/NeedCalculation";
 
 export const metadata: Metadata = { title: "New supply request" };
 
@@ -16,14 +17,17 @@ export default async function NewSupplyRequestPage() {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("supply_request_form");
   return (
-    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16, maxWidth: 900 }}>
+    <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16, maxWidth: 1100 }}>
       <div>
         <Link href="/supply-requests" style={{ fontSize: 12.5 }}><i className="ph ph-arrow-left" /> Supply Requests</Link>
         <h2 style={{ margin: "6px 0 2px" }}>Request stock from the State store</h2>
       </div>
       {error || !data
         ? <div className="card elev-sm" style={{ color: "var(--priority-critical)" }}>{error?.message ?? "The form could not be loaded."}</div>
-        : <NewSupplyRequestForm form={data as unknown as SupplyForm} />}
+        : <>
+            <NewSupplyRequestForm form={data as unknown as SupplyForm} />
+            {(data as unknown as SupplyForm).calculation && <NeedCalculation calc={(data as unknown as SupplyForm).calculation!} />}
+          </>}
     </div>
   );
 }

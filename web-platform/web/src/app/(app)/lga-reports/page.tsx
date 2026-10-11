@@ -59,7 +59,10 @@ export default async function LgaReportsPage({ searchParams }: { searchParams: P
             rejects it; the State Coordinator may query or return it. The statewide report adds up the accepted LGA reports.
           </p>
         </div>
-        {level === "lga" && <OpenLgaReportButton week={week} />}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "flex-start" }}>
+          <Link className="btn btn-secondary" href="/lga-reports/monthly"><i className="ph ph-calendar" /> Monthly figures</Link>
+          {level === "lga" && <OpenLgaReportButton week={week} />}
+        </div>
       </div>
       <form className="filter-bar" method="get">
         <select className="input" name="week" defaultValue={week} aria-label="Reporting week" style={{ maxWidth: 240 }}>

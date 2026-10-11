@@ -77,7 +77,7 @@ quantities are the booklet's own figures (for example 2½ a day → 18 a week).
 
 | ID | Weight (kg) | Packets per day | Packets per week | Status |
 | --- | --- | --- | --- | --- |
-| X0 | ~~3.5 – 3.9~~ | ~~1½~~ | ~~11~~ | **Struck through by hand** — **NEEDS DECISION (Q2)** |
+| X0 | ~~3.5 – 3.9~~ | ~~1½~~ | ~~11~~ | Struck through by hand; Q2 answered (threshold stays < 3.5 kg) — the row stays out of the table until confirmed |
 | X1 | 4.0 – 5.4 | 2 | 14 | Ready |
 | X2 | 5.5 – 6.9 | 2½ | 18 | Ready |
 | X3 | 7.0 – 8.4 | 3 | 21 | Ready |
@@ -97,7 +97,7 @@ weight. **Open:** weight precision at band edges (Q4), visit interval and so the
 | ID | Rule as written (card footnotes) | Digitised as | Status |
 | --- | --- | --- | --- |
 | F1 | Weight below admission weight → arrange home visit or refer to inpatient care. | Alert at the visit; action recorded | Ready |
-| F2 | Weight does not change by the 4th visit → arrange home visit or refer to inpatient care. | Alert at visit 4; action recorded | Ready (definition of "no change", Q14) |
+| F2 | Weight does not change by the 4th visit → arrange home visit or refer to inpatient care. | Alert at visit 4; action recorded | Ready (Q14: weight is not a discharge criterion) |
 | F3 | Each visit records weight, weight loss Y/N, no change Y/N, height, WFH, MUAC, oedema, diarrhoea/vomiting/fever/cough days, appetite (RUTF test good/poor/refused), temperature, respiratory rate, dehydration, pallor/anaemia, superficial infection, action/medication, RUTF packets, outcome, examiner initials. | Visit form = card page 2 | Ready |
 | F4 | *(follow-up, migration 0128)* Each visit is compared with the previous visit and the admission: weight, MUAC, WFH, oedema grade — better / same / worse. | Shown to the officer; counted in the weekly report (section L) | Ready — **direction only**; "sustained weight gain" / "no change" await Q14 |
 | F5 | *(G4 applied at follow-up)* Severe oedema (+++) or a poor / refused appetite test at a visit → stabilisation care. | No RUTF recommended; referral prompted; RUTF only with the reason and the authorising clinician; no routine visit scheduled | Ready |
@@ -112,9 +112,9 @@ an authorised confirmation.
 
 | ID | Admitted on | Cured when (G7) | Status |
 | --- | --- | --- | --- |
-| D1 | MUAC < 11.5 cm | Minimum stay 8 weeks **and** MUAC > 11.5 cm **and** sustained weight gain **and** clinically well | **NEEDS DECISION (Q15, Q16, Q17)** |
-| D2 | Bilateral oedema | MUAC > 11.5 cm **and** no oedema for 2 consecutive visits **and** clinically well | **NEEDS DECISION (Q15, Q17)** |
-| D3 | WFH < −3 Z (if used) | MUAC > 11.5 cm **and** WFH > −2 SD for 2 consecutive visits **and** clinically well | **NEEDS DECISION (Q15, Q17)** |
+| D1 | MUAC < 11.5 cm | Minimum stay 8 weeks **and** MUAC **≥ 13.5 cm** **and** no clinical concern (Q14, Q15, Q17 answered 11 Oct) | Ready — Q16 (minimum stay) still open |
+| D2 | Bilateral oedema | MUAC **≥ 13.5 cm** **and** no oedema for 2 consecutive visits **and** no clinical concern | Ready (Q15, Q17 answered) |
+| D3 | WFH < −3 Z (if used) | MUAC **≥ 13.5 cm** **and** no clinical concern — WFH is not a discharge criterion (Q14) | Ready (Q14, Q15, Q17 answered) |
 | D4 | Other outcomes (C2): **A** absent · **D** defaulter (3 consecutive absences) · **T** transfer to inpatient · **R** refused inpatient care · **X** died · **R** recovered · **NR** non-recovered | Outcome codes | **NEEDS DECISION (Q9, Q18)** |
 
 ## 9. Reporting and allocation — source A1–A6
@@ -123,8 +123,8 @@ an authorised confirmation.
 | --- | --- | --- | --- |
 | A1 | Each OTP centre reports admissions, discharges, current patient load and RUTF stock to its LGA; the LGA combines them (A3). | Generated from the registry, per centre and LGA | Ready |
 | A2 | Monthly figures: patients at start, new admissions, discharged, defaulted / died / transferred / other, remaining at end, RUTF stock (A2). Closing = opening + admissions − discharges − other exits. | Monthly OTP report, computed, with the check | Ready |
-| A3 | LGA requests RUTF on current patients, new and expected admissions, discharges and available stock — not last month's figures alone (A1, A6). Example: need 60 cartons, have 15 → request 45. | Requirement = expected consumption (sum of each child's ration) − usable stock | Ready; buffer stock Q19 |
-| A4 | Each LGA has an **Apex** OTP centre and **satellite** centres; RUTF goes to OTP sites **weekly**, to LGAs **monthly** (A3, A5, A6). | Apex / satellite flag per OTP site | **NEEDS DECISION (Q20)** |
+| A3 | LGA requests RUTF on current patients, new and expected admissions, discharges and available stock — not last month's figures alone (A1, A6). Example: need 60 cartons, have 15 → request 45. | Requirement = expected consumption (sum of each child's ration) − usable stock | **Built (R173)**: suggested quantity = need − usable stock; no buffer (Q19) |
+| A4 | Each LGA has an **Apex** OTP centre and **satellite** centres; RUTF goes to OTP sites **weekly**, to LGAs **monthly** (A3, A5, A6). | Apex / satellite per OTP site; LGA allocation plan | **Built (R173)** |
 
 ---
 
@@ -133,7 +133,7 @@ an authorised confirmation.
 | # | Question | Why it matters |
 | --- | --- | --- |
 | Q1 | MUAC exactly **11.5 cm** and exactly **12.5 cm**: the booklet uses "< 11.5", "> 11.5 and < 12.5", "> 12.5", so both values fall in no class. Which class do they belong to? | Classification and admission |
-| Q2 | The **3.5–3.9 kg** ration row is struck through by hand, and a handwritten note near "> 6 months and < 3.5 kg" may read **4 kg**. Is the stabilisation threshold now **< 4 kg**, and is there no OTP ration below 4 kg? | Who is admitted; the ration table |
+| ~~Q2~~ | **Answered (11 Oct): No** — the stabilisation threshold is **not** changed to 4 kg; it stays **< 3.5 kg** (migration 0139). The struck-through 3.5–3.9 kg ration row is still not in the ration table: a child of 3.5–3.9 kg gets "no ration rule — refer for clinical review" (see X0). Original: is the stabilisation threshold now < 4 kg? | Who is admitted; the ration table |
 | Q3 | Confirm **marasmic kwashiorkor** = (MUAC < 11.5 or WFH < −3 Z) **and** bilateral oedema (any grade) → stabilisation. | Pathway P2 |
 | Q4 | Precision and plausible ranges: weight to **0.1 kg**? height/length to 0.1 cm? MUAC range (e.g. 7–20 cm)? How is a weight between bands handled (e.g. 5.45 kg)? Height or length by age? | Validation and band edges |
 | Q5 | Which centres use **WFH**? WFH needs the **WHO weight-for-height tables** (by sex and height), which are not in the documents: may the app use the official WHO 2006 tables, or will officers enter the Z-score from the chart? | WFH criteria |
@@ -145,13 +145,13 @@ an authorised confirmation.
 | Q11 | **Vitamin A** is struck through by hand. Removed from routine OTP medication? | Medication R2 |
 | ~~Q12~~ | **Answered (10 Oct): weekly, up to 12 weeks until the child recovers** (F7); the ration is the table's weekly packets. Original: **Visit interval**: weekly? Is the ration always issued for one week (packets per week), or for the days until the next visit? | Packets per visit |
 | Q13 | Use the table's **packets per week** as printed (18, 25, 32 — i.e. halves rounded up), confirmed? | Ration quantity |
-| Q14 | **"No change in weight"** and **"sustained weight gain"**: how are they measured (e.g. any gain each visit, gain over 2 visits, a g/kg/day threshold)? | Alerts F2, discharge D1 |
-| Q15 | **Discharge MUAC**: G7 says **> 11.5 cm**, while "normal" is > 12.5 cm (G1). Confirm > 11.5 cm is the cure threshold. | Discharge |
+| ~~Q14~~ | **Answered (11 Oct): discharge is decided on MUAC, not weight** — weight differs by age. The "sustained weight gain" and weight-for-height discharge criteria are removed (0139); weight still sets the ration and the card's "no weight change by visit 4" alert (F2). | Alerts F2, discharge D1 |
+| ~~Q15~~ | **Answered (11 Oct): admission at MUAC < 11.5 cm; discharge at MUAC 13.5 cm or more** (0139: `discharge_muac_at_least` 13.5). | Discharge |
 | Q16 | **Minimum stay 8 weeks** applies to MUAC admissions only (as printed), not to oedema or WFH admissions? | Discharge |
-| Q17 | **"Clinically well"**: which recorded findings define it? | Discharge |
+| ~~Q17~~ | **Answered (11 Oct): Recovered = MUAC 13.5 cm or more with no clinical concern; Non-recovered = MUAC going up and down (e.g. 11.7 then 11.5) — likely an illness: refer to the clinic** (0139: the discharge check lists any concern recorded at the latest visit — oedema, poor appetite, fever, diarrhoea, vomiting, dehydration, pallor, an action required, a fall in MUAC — and the officer confirms; a fall in MUAC between visits is flagged and a referral to the clinic suggested). | Discharge |
 | Q18 | **Non-recovered (NR)** and **non-response**: after how long in treatment? When is "transfer to inpatient" required? | Outcomes |
-| Q19 | Any **buffer / safety stock** for LGA and OTP requests (A6 mentions it without a figure)? | RUTF requirement |
-| Q20 | Which OTP site in each LGA is the **Apex** centre, and which are satellites? | Distribution and reporting |
+| ~~Q19~~ | **Answered (11 Oct): no buffer stock for now** (`supply_buffer_pct` 0, settable later; R173). | RUTF requirement |
+| ~~Q20~~ | **Answered (11 Oct): one Apex OTP centre per LGA**, set by the LGA or State Nutrition Officer (`lga_apex_otp`, R173; DUMMY marks until the real ones are set). | Distribution and reporting |
 | ~~Q21~~ | **Answered (10 Oct, W10): the Beneficiary Card's format, DTAP-KTS-MTZ-0001245, numbered per LGA** (migration 0130). Original: **Child ID format** per LGA (e.g. `KT-DAU-26-00042`: state, LGA, year, number) — and is the number per LGA or per OTP site? | Child ID |
 | ~~Q22~~ | **Answered (10 Oct): the State Nutrition Officer sets the clinical rules** the OTP Officers follow and approves the rule set (web: Clinical Rules; `otp_rule_set_approve`, migration 0132); **the OTP Officer authorises at the site** (RUTF when none is recommended, with the reason; discharge and outcomes). |
 | ~~Q23~~ | **Superseded (10 Oct)** by "weekly up to 12 weeks until recovered" (F7): the 3-visit / exceptional-4th rule is switched off. |

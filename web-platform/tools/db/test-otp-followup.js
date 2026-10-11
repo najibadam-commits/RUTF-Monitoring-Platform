@@ -312,6 +312,41 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       const auth = await sys(`select dispense_authorised_by a from otp_visits where id = $1`, [r.visit_id]);
       check("authorise", "the officer is recorded as the authoriser", true, String(auth.a).endsWith("(OTP Officer)"));
     });
+
+    // ── The clinical answers of 11 Oct (0139, R175): discharge at MUAC 13.5 cm (Q15), on MUAC not
+    // weight (Q14); recovered = 13.5+ and no clinical concern, a falling MUAC is referred (Q17). ──
+    let code4, adm4;
+    await as(officer.id, async () => {
+      const scr = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "M", age_months: 24, weight_kg: 8.6, height_cm: 80, muac_cm: 11.0, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
+      code4 = (await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: scr.screening_id, child_name: "Sani Answers (DUMMY)", sex: "M", confirm_not_duplicate: true })])).child_code;
+    });
+    adm4 = (await one(`select a.id from otp_admissions a join otp_children c on c.id = a.child_id where c.child_code = $1`, [code4])).id;
+    await pg.query(`update otp_admissions set admitted_on = (now() at time zone 'Africa/Lagos')::date - 70 where id = $1`, [adm4]);
+    await as(officer.id, async () => {
+      const v = (p) => call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: code4, appetite_test: "good", oedema: "absent", ...p })]);
+      await v({ admission_visit: true, rutf_dispensed: 25 });
+      await v({ visit_on: await day(-21), weight_kg: 9.0, muac_cm: 11.7, rutf_dispensed: 25 });
+      const fall = await v({ visit_on: await day(-14), weight_kg: 9.2, muac_cm: 11.5, rutf_dispensed: 25 });
+      check("Q17", "MUAC 11.7 then 11.5 is flagged", true, JSON.stringify(fall.recovery.flags).includes("Q17_muac_declining"));
+      check("Q17", "and the next step is a referral to the clinic", "refer", fall.next_step.step);
+      // Referred to the clinic and back (the referral step then clears).
+      const ref = await call(`select otp_refer_child($1::jsonb)`, [JSON.stringify({ child_code: code4, reason: "MUAC falling (DUMMY)", destination_name: "Clinic (DUMMY)" })]);
+      await call(`select otp_update_referral($1, 'returned', 'Treated for malaria (DUMMY)')`, [ref.referral_id]);
+      const v128 = await v({ visit_on: await day(-7), weight_kg: 9.6, muac_cm: 12.8, rutf_dispensed: 28 });
+      const crit128 = v128.next_step && (await call(`select otp_child_lookup($1)`, [code4])).discharge_check;
+      check("Q15", "MUAC 12.8 cm does not meet discharge (13.5 needed)", "not_met",
+        (crit128.criteria.find((c) => c.criterion.startsWith("MUAC")) || {}).state);
+      check("Q14", "no weight-gain criterion any more", false, JSON.stringify(crit128.criteria).toLowerCase().includes("weight gain"));
+      await v({ visit_on: today, weight_kg: 9.9, muac_cm: 13.6, rutf_dispensed: 28 });
+      const chk = (await call(`select otp_child_lookup($1)`, [code4])).discharge_check;
+      check("Q15", "MUAC 13.6 cm meets the discharge MUAC", "met", (chk.criteria.find((c) => c.criterion.startsWith("MUAC")) || {}).state);
+      check("Q17", "no clinical concern is for the officer to confirm", "officer_confirms", (chk.criteria.find((c) => c.criterion.startsWith("No clinical concern")) || {}).state);
+      check("Q17", "discharge as recovered is possible", true, chk.can_discharge_as_cured);
+      check("Q17", "without the confirmation it is refused", true,
+        has(await call(`select otp_record_outcome($1::jsonb)`, [JSON.stringify({ child_code: code4, outcome: "cured" })]), "no clinical concern"));
+      const out = await call(`select otp_record_outcome($1::jsonb)`, [JSON.stringify({ child_code: code4, outcome: "cured", confirm_clinically_well: true })]);
+      check("Q14", "recovered with no weight-gain confirmation", "cured", out.outcome);
+    });
   } finally {
     await pg.query("rollback");
     await pg.end();

@@ -9,6 +9,7 @@ export type SupplyDetail = {
   request: {
     id: string; code: string; level: "otp_to_lga" | "lga_to_state"; status: string; submitted_at: string; needed_by: string | null; justification: string | null;
     decision_note: string | null; from_name: string; from_lga: string; to_name: string; requested_by_name: string | null; reviewed_by_name: string | null;
+    calculation: import("@/components/supply/NeedCalculation").Calculation | null;
   };
   lines: { product_id: string; product: string; unit: string; units_per_carton: number; balance_on_hand: number | null; consumed_30d: number | null; stockout_days: number | null; requested_qty: number; approved_qty: number | null }[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,8 +68,8 @@ export function SupplyRequestActions({ detail }: { detail: SupplyDetail }) {
       <div className="card-title">{detail.can.review ? "Your decision" : detail.can.respond ? "The reviewer has a question" : "Actions"}</div>
       {detail.can.review && (
         <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
-          Check the balance and use at the requesting store against your own stock, then approve (you may approve less, with the reason), query, or
-          reject. Approving moves no stock: record the issue afterwards as usual and it will be linked to this request.
+          Compare the quantity asked with the calculation below (patients, rations and usable stock at every centre) and with your own stock,
+          then approve (you may approve less, with the reason), query, or reject. Approving moves no stock: record the issue afterwards as usual and it will be linked to this request.
         </p>
       )}
       {detail.can.respond && (

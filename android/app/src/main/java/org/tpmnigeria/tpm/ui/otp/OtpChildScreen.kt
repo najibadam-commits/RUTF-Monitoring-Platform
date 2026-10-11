@@ -236,11 +236,9 @@ private fun DischargeCard(card: JsonObject, onDone: () -> Unit) {
     var outcome by remember { mutableStateOf<String?>(null) }
     var reason by remember { mutableStateOf("") }
     var clinicallyWell by remember { mutableStateOf(false) }
-    var weightGain by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     val check = card.obj("discharge_check")
     val canCure = check?.bool("can_discharge_as_cured") == true
-    val muacAdmission = card.obj("admission")?.arr("admission_criteria")?.strings()?.contains("muac") == true
 
     TpmCard {
         Text("Discharge and outcome", style = MaterialTheme.typography.titleMedium)
@@ -263,14 +261,14 @@ private fun DischargeCard(card: JsonObject, onDone: () -> Unit) {
             onSelect = { outcome = it }, labelFor = { OUTCOME_LABEL[it] ?: it })
         if (outcome == "cured") {
             if (!canCure) Text("Not every criterion is met yet: discharge as cured isn't possible.", color = OtpRed, style = MaterialTheme.typography.bodySmall)
-            Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(checked = clinicallyWell, onCheckedChange = { clinicallyWell = it }); Text("The child is clinically well") }
-            if (muacAdmission) Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(checked = weightGain, onCheckedChange = { weightGain = it }); Text("Sustained weight gain") }
+            // Q14/Q17 (11 Oct): discharge is on MUAC (13.5 cm or more), not weight; the officer confirms no clinical concern.
+            Row(verticalAlignment = Alignment.CenterVertically) { Checkbox(checked = clinicallyWell, onCheckedChange = { clinicallyWell = it }); Text("No clinical concern: the child has recovered") }
         } else if (outcome != null) {
             TpmTextField(label = "Reason", value = reason, onValueChange = { reason = it })
         }
         val ready = when (outcome) {
             null -> false
-            "cured" -> canCure && clinicallyWell && (!muacAdmission || weightGain)
+            "cured" -> canCure && clinicallyWell
             else -> reason.isNotBlank()
         }
         TpmButton(text = "Record the outcome", enabled = ready, fullWidth = true, variant = TpmButtonVariant.Secondary, onClick = {
@@ -279,7 +277,7 @@ private fun DischargeCard(card: JsonObject, onDone: () -> Unit) {
                 val body = buildJsonObject {
                     put("child_code", card.str("child_code").orEmpty()); put("outcome", outcome!!)
                     if (reason.isNotBlank()) put("reason", reason.trim())
-                    put("confirm_clinically_well", clinicallyWell); put("confirm_weight_gain", weightGain)
+                    put("confirm_clinically_well", clinicallyWell)
                 }
                 when (val r = repo.recordOutcome(body)) {
                     is OtpResult.Ok -> onDone()

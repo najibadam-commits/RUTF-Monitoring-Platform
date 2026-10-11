@@ -6,6 +6,7 @@ import { getCurrentProfile, getOfficerLevel } from "@/lib/supabase/dal";
 import { canAccessSupplyRequests } from "@/lib/rbac";
 import { SUPPLY_STATUS } from "@/components/supply/supplyStatus";
 import { SupplyRequestActions, type SupplyDetail } from "@/components/supply/SupplyRequestActions";
+import { NeedCalculation } from "@/components/supply/NeedCalculation";
 
 export const metadata: Metadata = { title: "Supply request" };
 
@@ -77,6 +78,9 @@ export default async function SupplyRequestPage({ params }: { params: Promise<{ 
         </table>
         {r.justification && <div style={{ fontSize: 13 }}><span className="text-muted">Why: </span>{r.justification}</div>}
       </div>
+
+      {/* The figures the request was based on, as saved when it was made (R173). */}
+      {r.calculation && <NeedCalculation calc={r.calculation} asked={requested} />}
 
       <div className="card elev-sm" style={{ gap: 8 }}>
         <div className="card-title">Dispatch</div>

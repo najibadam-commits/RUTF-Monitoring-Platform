@@ -35,3 +35,25 @@ export async function actOnSupplyRequestAction(id: string, action: string, note:
   revalidatePath("/supply-requests");
   return {};
 }
+
+/** The LGA Nutrition Officer issues the allocation plan: one stock issue per centre, lots earliest
+ *  expiry first (lga_allocation_issue checks the role, the centres and the usable stock). */
+export async function issueAllocationAction(input: { lines: { facility_id: string; sachets: number }[]; note: string; document_no: string; local_id: string }): Promise<ActionResult> {
+  await getCurrentProfile();
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("lga_allocation_issue", { p: input as unknown as Json });
+  if (error) return { error: error.message };
+  revalidatePath("/supply-requests/allocate");
+  revalidatePath("/supply-requests");
+  return { id: (data as { id: string }).id };
+}
+
+/** Marks the LGA's Apex OTP centre (set_apex_otp: the LGA or State Nutrition Officer, or an administrator). */
+export async function setApexAction(facilityId: string): Promise<ActionResult> {
+  await getCurrentProfile();
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_apex_otp", { p_facility_id: facilityId });
+  if (error) return { error: error.message };
+  revalidatePath("/supply-requests/allocate");
+  return {};
+}

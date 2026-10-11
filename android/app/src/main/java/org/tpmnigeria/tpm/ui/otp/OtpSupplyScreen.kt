@@ -79,7 +79,15 @@ fun OtpSupplyScreen(onExit: () -> Unit) {
 
     LaunchedEffect(reload) {
         error = null
-        when (val f = repo.supplyForm()) { is OtpResult.Ok -> form = f.data; is OtpResult.Error -> error = f.message }
+        when (val f = repo.supplyForm()) {
+            is OtpResult.Ok -> {
+                form = f.data
+                // The calculated suggestion fills the quantity (R173); the officer may change it, with the reason.
+                val per = f.data.arr("products").objects().firstOrNull()?.str("units_per_carton")?.toIntOrNull() ?: 150
+                f.data.obj("calculation")?.str("suggested_qty")?.toIntOrNull()?.let { if (cartons.isBlank()) cartons = ((it + per - 1) / per).toString() }
+            }
+            is OtpResult.Error -> error = f.message
+        }
         when (val l = repo.supplyList()) {
             is OtpResult.Ok -> {
                 requests = l.data.arr("items").objects()
@@ -105,19 +113,38 @@ fun OtpSupplyScreen(onExit: () -> Unit) {
             val product = f.arr("products").objects().firstOrNull()
             val perCarton = product?.str("units_per_carton")?.toIntOrNull() ?: 150
             val sachets = (cartons.toIntOrNull() ?: 0) * perCarton
+            val calc = f.obj("calculation")
+            val site = calc?.obj("site")
+            val suggested = calc?.str("suggested_qty")?.toIntOrNull()
+            val differs = suggested != null && sachets != suggested
             TpmCard(blueprint = true) {
                 Text("New request to ${f.obj("supplier")?.str("name").orEmpty()}", style = MaterialTheme.typography.titleMedium)
                 Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space4)) {
                     ReviewRow("In stock now", "${f.str("balance_on_hand")} sachets")
                     ReviewRow("Used, last 30 days", "${f.str("consumed_30d")} sachets")
                 }
+                if (calc != null && site != null) {
+                    Text("Worked out for the next ${calc.str("cover_days")} days:", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+                    Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space4)) {
+                        ReviewRow("Patients", site.str("patients") ?: "—")
+                        ReviewRow("New / week", site.str("new_per_week") ?: "—")
+                        ReviewRow("Sachets / child / week", site.str("ration_per_patient_week") ?: "—")
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space4)) {
+                        ReviewRow("Need", "${calc.str("need")} sachets")
+                        ReviewRow("Usable stock", "${calc.str("usable_total")}")
+                        ReviewRow("Suggested", "${suggested ?: 0} sachets")
+                    }
+                    if (suggested == 0) Text("Your usable stock already covers the need.", style = MaterialTheme.typography.bodySmall, color = OtpGreen)
+                }
                 NumberField(label = "Cartons needed ($perCarton sachets a carton)", value = cartons, onValueChange = { cartons = it })
                 if (sachets > 0) Text("$sachets sachets", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
                 NumberField(label = "Days out of stock in the last 30 (if any)", value = stockoutDays, onValueChange = { stockoutDays = it })
-                TpmTextField(label = "Why this quantity", value = why, onValueChange = { why = it }, singleLine = false, minLines = 2,
+                if (differs) Text("This differs from the suggestion: say why below.", style = MaterialTheme.typography.bodySmall, color = OtpAmber)
+                TpmTextField(label = if (differs) "Why this quantity (required)" else "Why this quantity", value = why, onValueChange = { why = it }, singleLine = false, minLines = 2,
                     placeholder = "Children on treatment, new admissions, stock-outs…")
                 TpmButton(text = if (busy) "Sending…" else "Send to the LGA Nutrition Officer", fullWidth = true,
-                    enabled = !busy && sachets > 0 && product != null, onClick = {
+                    enabled = !busy && sachets > 0 && product != null && (!differs || why.isNotBlank()), onClick = {
                         busy = true; error = null
                         scope.launch {
                             val body = buildJsonObject {

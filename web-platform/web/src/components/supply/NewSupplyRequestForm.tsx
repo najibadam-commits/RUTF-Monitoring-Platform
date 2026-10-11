@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createSupplyRequestAction } from "@/lib/actions/supplyRequests";
+import type { Calculation } from "@/components/supply/NeedCalculation";
 
 export type SupplyForm = {
   facility: { id: string; name: string; type: string };
@@ -13,6 +14,7 @@ export type SupplyForm = {
   consumed_30d: number;
   products: { id: string; name: string; unit: string; units_per_carton: number }[];
   open_requests: number;
+  calculation?: Calculation;
 };
 
 const fmt = (n: number) => n.toLocaleString("en-GB");
@@ -22,7 +24,11 @@ const fmt = (n: number) => n.toLocaleString("en-GB");
  *  with the request. */
 export function NewSupplyRequestForm({ form }: { form: SupplyForm }) {
   const router = useRouter();
-  const [qty, setQty] = useState<Record<string, string>>({});
+  // The calculated suggestion fills the first commodity (RUTF), in cartons (R173).
+  const suggested = form.calculation?.suggested_qty ?? null;
+  const first = form.products[0];
+  const [qty, setQty] = useState<Record<string, string>>(
+    suggested !== null && first ? { [first.id]: String(Math.ceil(suggested / first.units_per_carton)) } : {});
   const [unit, setUnit] = useState<Record<string, "carton" | "sachet">>({});
   const [stockout, setStockout] = useState<Record<string, string>>({});
   const [justification, setJustification] = useState("");
@@ -38,6 +44,8 @@ export function NewSupplyRequestForm({ form }: { form: SupplyForm }) {
   };
   const monthsCover = form.consumed_30d > 0 ? form.balance_on_hand / form.consumed_30d : null;
   const lines = form.products.map((p) => ({ product_id: p.id, requested_qty: sachets(p), stockout_days: stockout[p.id] ? Number(stockout[p.id]) : null })).filter((l) => l.requested_qty > 0);
+  const total = lines.reduce((a, l) => a + l.requested_qty, 0);
+  const differs = suggested !== null && total !== suggested;
 
   async function submit() {
     setPending(true); setError(null);
@@ -86,15 +94,22 @@ export function NewSupplyRequestForm({ form }: { form: SupplyForm }) {
             <label>Needed by (optional)</label>
             <input className="input" type="date" value={neededBy} onChange={(e) => setNeededBy(e.target.value)} />
           </div>
+          {suggested !== null && (
+            <div style={{ gridColumn: "1 / -1", fontSize: 13 }}>
+              Suggested from the calculation below: <b>{suggested.toLocaleString("en-GB")} sachets</b>
+              {suggested === 0 ? " — the usable stock already covers the need." : ""}
+              {differs ? <span style={{ color: "var(--priority-high)" }}> · you are asking for {total.toLocaleString("en-GB")}: say why below.</span> : null}
+            </div>
+          )}
           <div className="field" style={{ gridColumn: "1 / -1" }}>
-            <label>Why this quantity</label>
+            <label>Why this quantity{differs ? " (required: it differs from the suggestion)" : ""}</label>
             <textarea className="input" value={justification} onChange={(e) => setJustification(e.target.value)}
               placeholder="Caseload, consumption, stock-outs at OTP sites, distance, the next delivery…" />
           </div>
         </div>
         {error && <div role="alert" style={{ color: "var(--priority-critical)", fontSize: 13 }}>{error}</div>}
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-primary" disabled={pending || lines.length === 0} onClick={submit}><i className="ph ph-paper-plane-tilt" /> {pending ? "Sending…" : "Send to the State Nutrition Officer"}</button>
+          <button className="btn btn-primary" disabled={pending || lines.length === 0 || (differs && !justification.trim())} onClick={submit}><i className="ph ph-paper-plane-tilt" /> {pending ? "Sending…" : "Send to the State Nutrition Officer"}</button>
           <Link className="btn btn-secondary" href="/supply-requests">Cancel</Link>
         </div>
       </div>

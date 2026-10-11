@@ -58,7 +58,12 @@ export default async function SupplyRequestsPage({ searchParams }: { searchParam
             Supervisors see the requests in their area and may add technical advice.
           </p>
         </div>
-        {level === "lga" && <Link className="btn btn-primary" href="/supply-requests/new"><i className="ph ph-plus" /> Request from the State store</Link>}
+        {level === "lga" && (
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link className="btn btn-secondary" href="/supply-requests/allocate"><i className="ph ph-truck" /> Distribute to OTP centres</Link>
+            <Link className="btn btn-primary" href="/supply-requests/new"><i className="ph ph-plus" /> Request from the State store</Link>
+          </div>
+        )}
       </div>
 
       <div className="filter-bar" style={{ flexWrap: "wrap", gap: 8 }}>

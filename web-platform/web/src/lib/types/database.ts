@@ -850,6 +850,11 @@ export interface Database {
       lga_report_save_comments: { Args: { p_id: string; p_comments: string }; Returns: undefined };
       lga_report_submit: { Args: { p_id: string; p_comments: string | null; p_confirm_reviewed: boolean; p_amendment_reason?: string | null }; Returns: Json };
       lga_report_act: { Args: { p_id: string; p_action: string; p_note?: string | null }; Returns: Json };
+      // Allocation from need (0138, R173)
+      set_apex_otp: { Args: { p_facility_id: string }; Returns: Json };
+      lga_allocation_plan: { Args: Record<string, never>; Returns: Json };
+      lga_allocation_issue: { Args: { p: Json }; Returns: Json };
+      lga_monthly_overview: { Args: { p_month: string }; Returns: Json };
       otp_rules_view: { Args: Record<string, never>; Returns: Json };
       otp_rule_set_approve: { Args: { p_version: string; p_confirm: boolean; p_note: string | null }; Returns: Json };
       otp_followup_aggregates: {
