@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,6 +68,7 @@ fun LoginScreen(session: AppSession) {
     var successMessage by remember { mutableStateOf<String?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val signedOutForInactivity by session.signedOutForInactivity.collectAsState()
 
     fun submit() {
         if (email.isBlank() || password.isBlank()) {
@@ -152,6 +154,11 @@ fun LoginScreen(session: AppSession) {
                     modifier = Modifier.fillMaxWidth(),
                 )
 
+                if (signedOutForInactivity && error == null) {
+                    Text("You were signed out after 15 minutes without use, to protect children's records. Sign in again to continue.",
+                        color = TpmColors.Accent800, style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.fillMaxWidth().background(TpmColors.Accent100, RoundedCornerShape(10.dp)).padding(10.dp))
+                }
                 error?.let {
                     Text(it, color = TpmColors.Error, style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.fillMaxWidth().background(TpmColors.ErrorBg, RoundedCornerShape(10.dp)).padding(10.dp))

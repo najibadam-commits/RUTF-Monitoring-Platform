@@ -46,6 +46,7 @@ import org.tpmnigeria.tpm.session.AppSession
 import org.tpmnigeria.tpm.sync.SyncScheduler
 import org.tpmnigeria.tpm.ui.LocalAppRepository
 import org.tpmnigeria.tpm.ui.components.BottomNavEntry
+import org.tpmnigeria.tpm.ui.components.InactivityGuard
 import org.tpmnigeria.tpm.ui.components.ProfileSheet
 import org.tpmnigeria.tpm.ui.components.SyncBanner
 import org.tpmnigeria.tpm.ui.components.TpmBottomNav
@@ -431,6 +432,9 @@ fun AppNavHost(session: AppSession) {
                 onClearDeviceAccess = { scope.launch { session.clearDeviceAccess() }; profileSheetOpen = false },
             )
         }
+
+        // Sign-out after 15 minutes without use, with a one-minute warning (DPIA R2, R168).
+        InactivityGuard(session)
       }
     }
 }

@@ -180,7 +180,7 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 | # | Risk | Likelihood / impact | In place | Further action |
 | --- | --- | --- | --- | --- |
 | R1 | An OTP Officer opens records without need, or shares a child's details | Medium / High | Only own site; only by Child ID; every opening logged | **[PROG]** monthly review of `otp_access_log` by the State Nutrition Officer; confidentiality undertaking in training |
-| R2 | A signed-in phone is lost or left unattended and someone opens records with a Child ID from a card | Low / High | Nothing stored; screenshots blocked; account deactivated centrally | Screen lock; automatic sign-out after inactivity **[PROG] — not built yet** |
+| R2 | A signed-in phone is lost or left unattended and someone opens records with a Child ID from a card | Low / High | Nothing stored; screenshots blocked; account deactivated centrally | Screen lock; automatic sign-out after 15 minutes without use, with a one-minute warning **[PROG] — built 11 Oct (DECISIONS R168)** |
 | R3 | The paper card (Child ID) is lost or seen by others | Medium / Low | The Child ID alone reveals nothing without an OTP Officer's account at that site | Tell caregivers the card number is private |
 | R4 | A person appears in an RUTF photo | Low / Medium | Sachets only; officer confirms no people; private bucket; only the site and the super administrator can view | Periodic spot-check by the super administrator; delete and retrain if found |
 | R5 | **Small numbers in a site's weekly report** (e.g. "1 girl cured") let a coordinator identify a child in a small community | Medium / Medium | Only the State Coordinator and administrators see site reports; no names | **[DPO]** accept as necessary for programme management, or suppress small cells in the State view |
@@ -201,7 +201,7 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 4. **[PROG]** File the processors' DPAs (§7).
 5. **[DPO]** Approve retention (§8); **[PROG]** build automatic deletion of identity details.
 6. **[PROG]** Build identity correction in the app (§9).
-7. **[PROG]** Build automatic sign-out on the OTP screens after inactivity (R2).
+7. **[PROG] — done 11 Oct (R168)** Build automatic sign-out on the OTP screens after inactivity (R2). Built for the whole app: 15 minutes, one-minute warning, not resumed after the app is closed.
 8. **[PROG]** Set up the monthly access-log review (R1) and name the service-key holders (R7).
 9. **[DPO]** Decide on small numbers in the State Coordinator's site reports (R5).
 10. **[PROG]** Remove the DUMMY demo data (R11).

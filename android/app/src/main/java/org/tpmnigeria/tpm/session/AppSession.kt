@@ -3,6 +3,7 @@ package org.tpmnigeria.tpm.session
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.SystemClock
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
@@ -82,6 +83,15 @@ class AppSession(
 
     private var pendingRecoveryEmail: String? = null
 
+    /** Last touch or key press in the app, on the monotonic clock (keeps counting while the phone
+     *  sleeps) — see [noteActivity] and the inactivity sign-out (DPIA risk R2, DECISIONS R168). */
+    @Volatile private var lastActivityElapsed = SystemClock.elapsedRealtime()
+
+    /** True once the app has signed the user out for inactivity, until they sign in again —
+     *  the sign-in screen says why. */
+    private val _signedOutForInactivity = MutableStateFlow(false)
+    val signedOutForInactivity: StateFlow<Boolean> = _signedOutForInactivity.asStateFlow()
+
     init {
         restoreCachedProfile()
     }
@@ -115,6 +125,14 @@ class AppSession(
      *  automatically; this just re-fetches the profile row so [currentUser] is populated without
      *  forcing the user through Login again. */
     suspend fun restoreSession() {
+        // A session left unused longer than the inactivity limit is not resumed — the phone may
+        // have been lost or handed on while the app was closed (DPIA R2). The cached profile and
+        // offline credential stay, so the same person can still sign in offline.
+        val lastActivity = prefs.getLong("last_activity_millis", -1L)
+        if (lastActivity > 0L && System.currentTimeMillis() - lastActivity > INACTIVITY_TIMEOUT_MILLIS) {
+            signOutForInactivity()
+            return
+        }
         val userId = auth.currentUserOrNull()?.id
         if (userId != null) {
             loadProfile(userId).onSuccess {
@@ -153,6 +171,8 @@ class AppSession(
                 ?: return Result.failure(IllegalStateException("Sign-in failed — please try again."))
             loadProfile(userId)
                 .onSuccess {
+                    noteActivity()
+                    _signedOutForInactivity.value = false
                     _loggedIn.value = true
                     // The password Supabase Auth just accepted is known-correct right now — this
                     // is the only point at which it's safe to derive a local verification hash
@@ -203,6 +223,8 @@ class AppSession(
             return Result.failure(IllegalStateException("Incorrect password."))
         }
         restoreCachedProfile() // Ensure _currentUser is populated
+        noteActivity()
+        _signedOutForInactivity.value = false
         _loggedIn.value = true
         return Result.success(Unit)
     }
@@ -285,6 +307,8 @@ class AppSession(
         _currentUser.value = null
         _loggedIn.value = false
         _demoOfflineOverride.value = null
+        _signedOutForInactivity.value = false
+        prefs.edit().remove("last_activity_millis").apply()
         // NOTE: We deliberately do not clear the shared preferences here — see clearDeviceAccess
         // for the action that does.
     }
@@ -299,6 +323,29 @@ class AppSession(
     suspend fun clearDeviceAccess() {
         logout()
         prefs.edit().clear().apply()
+    }
+
+    /** Called for every touch and key press (MainActivity.onUserInteraction) and by the
+     *  "Stay signed in" button — restarts the inactivity count. */
+    fun noteActivity() {
+        lastActivityElapsed = SystemClock.elapsedRealtime()
+    }
+
+    /** How long since the user last touched the app. */
+    fun idleMillis(): Long = SystemClock.elapsedRealtime() - lastActivityElapsed
+
+    /** Saves the last-activity time (as wall-clock time, so it survives the app being closed) —
+     *  called when the app goes to the background; [restoreSession] reads it on the next start. */
+    fun persistLastActivity() {
+        if (!_loggedIn.value) return
+        prefs.edit().putLong("last_activity_millis", System.currentTimeMillis() - idleMillis()).apply()
+    }
+
+    /** Automatic sign-out after [INACTIVITY_TIMEOUT_MILLIS] without use (DPIA R2): an ordinary
+     *  [logout] — data waiting to sync stays on the phone and goes up after the next sign-in. */
+    suspend fun signOutForInactivity() {
+        logout()
+        _signedOutForInactivity.value = true
     }
 
     fun setDemoOffline(offline: Boolean?) {
@@ -383,5 +430,11 @@ class AppSession(
 
     companion object {
         private const val OFFLINE_GRACE_PERIOD_MILLIS = 30L * 24 * 60 * 60 * 1000 // 30 days
+
+        /** Sign-out after this long without a touch (DPIA R2, DECISIONS R168). */
+        const val INACTIVITY_TIMEOUT_MILLIS = 15L * 60 * 1000 // 15 minutes
+
+        /** The "Still there?" warning shows for this long before the sign-out. */
+        const val INACTIVITY_WARNING_MILLIS = 60L * 1000 // 1 minute
     }
 }

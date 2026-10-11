@@ -66,6 +66,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /** Every touch and key press restarts the inactivity count (DPIA R2, DECISIONS R168). */
+    override fun onUserInteraction() {
+        super.onUserInteraction()
+        (application as TpmApplication).session.noteActivity()
+    }
+
+    /** Saves when the app was last used, so a session left idle while the app was closed is not
+     *  resumed on the next start (AppSession.restoreSession). */
+    override fun onStop() {
+        super.onStop()
+        (application as TpmApplication).session.persistLastActivity()
+    }
+
     /** singleTask launchMode (see AndroidManifest.xml) routes a re-tapped invitation/reset link
      *  here instead of spawning a second Activity instance while the app is already running. */
     override fun onNewIntent(intent: Intent) {
