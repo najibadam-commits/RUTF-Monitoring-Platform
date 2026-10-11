@@ -77,7 +77,7 @@ quantities are the booklet's own figures (for example 2½ a day → 18 a week).
 
 | ID | Weight (kg) | Packets per day | Packets per week | Status |
 | --- | --- | --- | --- | --- |
-| X0 | ~~3.5 – 3.9~~ | ~~1½~~ | ~~11~~ | Struck through by hand; Q2 answered (threshold stays < 3.5 kg) — the row stays out of the table until confirmed |
+| X0 | ~~3.5 – 3.9~~ | ~~1½~~ | ~~11~~ | Struck through by hand; Q2 answered — threshold stays < 3.5 kg and **the row stays out** (11 Oct): 3.5–3.9 kg → clinical review |
 | X1 | 4.0 – 5.4 | 2 | 14 | Ready |
 | X2 | 5.5 – 6.9 | 2½ | 18 | Ready |
 | X3 | 7.0 – 8.4 | 3 | 21 | Ready |
@@ -133,7 +133,7 @@ an authorised confirmation.
 | # | Question | Why it matters |
 | --- | --- | --- |
 | Q1 | MUAC exactly **11.5 cm** and exactly **12.5 cm**: the booklet uses "< 11.5", "> 11.5 and < 12.5", "> 12.5", so both values fall in no class. Which class do they belong to? | Classification and admission |
-| ~~Q2~~ | **Answered (11 Oct): No** — the stabilisation threshold is **not** changed to 4 kg; it stays **< 3.5 kg** (migration 0139). The struck-through 3.5–3.9 kg ration row is still not in the ration table: a child of 3.5–3.9 kg gets "no ration rule — refer for clinical review" (see X0). Original: is the stabilisation threshold now < 4 kg? | Who is admitted; the ration table |
+| ~~Q2~~ | **Answered (11 Oct): No** — the stabilisation threshold is **not** changed to 4 kg; it stays **< 3.5 kg** (migration 0139). The struck-through 3.5–3.9 kg ration row **stays out** (confirmed 11 Oct): a child of 3.5–3.9 kg gets "no ration rule — refer for clinical review" (see X0). Original: is the stabilisation threshold now < 4 kg? | Who is admitted; the ration table |
 | Q3 | Confirm **marasmic kwashiorkor** = (MUAC < 11.5 or WFH < −3 Z) **and** bilateral oedema (any grade) → stabilisation. | Pathway P2 |
 | Q4 | Precision and plausible ranges: weight to **0.1 kg**? height/length to 0.1 cm? MUAC range (e.g. 7–20 cm)? How is a weight between bands handled (e.g. 5.45 kg)? Height or length by age? | Validation and band edges |
 | Q5 | Which centres use **WFH**? WFH needs the **WHO weight-for-height tables** (by sex and height), which are not in the documents: may the app use the official WHO 2006 tables, or will officers enter the Z-score from the chart? | WFH criteria |
