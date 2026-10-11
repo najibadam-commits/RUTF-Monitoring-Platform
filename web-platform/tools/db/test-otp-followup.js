@@ -35,6 +35,9 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       order by p.name limit 1`);
     const coordinator = await one(`select id from profiles where role = 'state_coordinator' and status = 'active' and managed_state_id = $1 order by (name like '%(DUMMY)%') desc, name limit 1`, [officer.state_id]);
     const supervisor = await one(`select id from profiles where role = 'tpm_supervisor' and status = 'active' and name like '%(DUMMY)%' order by name limit 1`);
+    // The LGA Nutrition Officer of the officer's LGA reviews the OTP reports (0136, R171).
+    const lgan = await one(`select p.id from profiles p join facilities s on s.id = p.facility_id join facilities o on o.lga_id = s.lga_id
+      where p.role = 'dri' and p.status = 'active' and s.facility_type = 'lga_store' and o.id = $1 order by p.name limit 1`, [officer.facility]);
     const other = await one(`select p.id from profiles p join facilities f on f.id = p.facility_id where p.role = 'dri' and p.status = 'active'
       and f.is_otp_site and f.facility_type = 'health_facility' and f.id <> $1 limit 1`, [officer.facility]);
 
@@ -228,10 +231,14 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
     check("correction", "the version's data carries the corrected figure", 2, ver.data.L.visits.second);
     check("correction", "and the calculated figure is kept", 1, ver.adjustments[0].calculated);
     await as(officer.id, async () => {
-      check("review", "the officer cannot decide", true, has(await call(`select otp_report_decide($1, 'approved', null)`, [repId]), "Only the State Coordinator"));
+      check("review", "the officer cannot decide", true, has(await call(`select otp_report_decide($1, 'approved', null)`, [repId]), "Only the LGA Nutrition Officer"));
     });
     if (coordinator) await as(coordinator.id, async () => {
       check("review", "the coordinator cannot correct figures", true, has(await call(`select otp_report_adjust($1, 'L.visits.second', 3, 'x')`, [repId]), "Only an OTP Officer"));
+      check("review", "the coordinator cannot reject (the LGA Nutrition Officer decides)", true, has(await call(`select otp_report_decide($1, 'rejected', 'x')`, [repId]), "Only the LGA Nutrition Officer"));
+    });
+    await as(lgan.id, async () => {
+      check("review", "the LGA Nutrition Officer cannot correct figures", true, has(await call(`select otp_report_adjust($1, 'L.visits.second', 3, 'x')`, [repId]), "Only an OTP Officer"));
       check("review", "opening for review -> under review", "under_review", (await call(`select otp_report_start_review($1)`, [repId])).status);
       const got = await call(`select otp_report_get($1)`, [repId]);
       check("review", "can decide while under review", true, got.can_decide);

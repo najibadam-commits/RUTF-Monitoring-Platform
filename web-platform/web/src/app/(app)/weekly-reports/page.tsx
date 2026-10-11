@@ -2,25 +2,26 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/supabase/dal";
+import { getCurrentProfile, getOfficerLevel } from "@/lib/supabase/dal";
 import { getProgrammeLgas } from "@/lib/queries/lookups";
 import { canAccessWeeklyReports } from "@/lib/rbac";
 
 export const metadata: Metadata = { title: "Weekly OTP Reports" };
 
-// Weekly OTP Reports (DECISIONS R148): the State Coordinator's view of one reporting week across
-// the OTP sites in their state — who has submitted, what is waiting, approved or returned, which
-// sites have unresolved issues or stock discrepancies — and the headline figures. Each OTP
-// Officer's report is calculated live from the site's records (otp_weekly_report_compute, 0126)
-// and submitted from the app; the coordinator opens it here to approve or return it. Aggregate
-// only: no child is named.
+// Weekly OTP Reports (DECISIONS R148, R171): one reporting week across the OTP sites the user
+// may see (otp_reports_overview scopes them: the LGA Nutrition Officer their LGA, Supervisors
+// their LGAs, the State Nutrition Officer and the State Coordinator the state) — who has
+// submitted, what is waiting, queried, accepted or returned, which sites have unresolved issues or
+// stock discrepancies — and the headline figures. Each OTP Officer's report is calculated live
+// from the site's records (otp_weekly_report_compute, 0126) and submitted from the app; the LGA
+// Nutrition Officer accepts it here. Aggregate only: no child is named.
 
 type Site = {
   facility_id: string; facility: string; lga: string; report_id: string | null; status: string; version: number | null;
   amendment: boolean | null; submitted_at: string | null; decided_at: string | null; issues: number; corrections: number; new_cases: string | null; closing: string | null;
 };
 type Overview = {
-  week_start: string; week_end: string; due: string; expected: number; submitted: number; under_review: number; approved: number; returned: number;
+  week_start: string; week_end: string; due: string; expected: number; submitted: number; under_review: number; queried: number; approved: number; returned: number; i_review: boolean;
   rejected: number; not_submitted: number; with_issues: number; with_corrections: number; stock_discrepancies: number;
   totals: { new_cases: number; closing: number; cured: number; screened: number; referrals: number; overdue_visits: number };
   sites: Site[];
@@ -29,7 +30,8 @@ type Overview = {
 const STATUS: Record<string, { label: string; colour: string }> = {
   submitted: { label: "Waiting for review", colour: "var(--stage-addressing)" },
   under_review: { label: "Under review", colour: "var(--stage-addressing)" },
-  approved: { label: "Approved", colour: "var(--stage-recorded)" },
+  queried: { label: "Queried", colour: "var(--priority-high)" },
+  approved: { label: "Accepted", colour: "var(--stage-recorded)" },
   returned: { label: "Returned for correction", colour: "var(--stage-reopened)" },
   rejected: { label: "Rejected", colour: "var(--stage-reopened)" },
   draft: { label: "Draft, not submitted", colour: "var(--color-neutral-600)" },
@@ -46,8 +48,8 @@ function mondays(n: number): string[] {
 const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
 
 export default async function WeeklyReportsPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
-  const profile = await getCurrentProfile();
-  if (!canAccessWeeklyReports(profile.role)) redirect("/dashboard");
+  const [profile, level] = await Promise.all([getCurrentProfile(), getOfficerLevel()]);
+  if (!canAccessWeeklyReports(profile.role, level)) redirect("/dashboard");
   const sp = await searchParams;
   const weeks = mondays(9);
   // Default: the last complete week (reports are submitted after the week ends).
@@ -67,10 +69,11 @@ export default async function WeeklyReportsPage({ searchParams }: { searchParams
 
   const tiles = o ? [
     { key: null, label: "OTP sites expected", value: o.expected, sub: `Due ${fmtDay(o.due)}` },
-    { key: "submitted", label: "Waiting for your review", value: o.submitted, sub: "Submitted by the OTP Officer" },
+    { key: "submitted", label: o.i_review ? "Waiting for your review" : "Waiting for review", value: o.submitted, sub: "Submitted or resubmitted by the OTP Officer" },
     { key: "under_review", label: "Under review", value: o.under_review, sub: "Opened, no decision yet" },
-    { key: "approved", label: "Approved", value: o.approved, sub: "Final, recorded against the coordinator" },
-    { key: "returned", label: "Returned for correction", value: o.returned, sub: "With your comments" },
+    { key: "queried", label: "Queried", value: o.queried ?? 0, sub: "Waiting for the OTP Officer's answer" },
+    { key: "approved", label: "Accepted", value: o.approved, sub: "By the LGA Nutrition Officer" },
+    { key: "returned", label: "Returned for correction", value: o.returned, sub: "With the reviewer's comments" },
     { key: "rejected", label: "Rejected", value: o.rejected, sub: "A new version is needed" },
     { key: "draft", label: "Not submitted", value: o.not_submitted, sub: new Date() > new Date(`${o.due}T23:59:59Z`) ? "Overdue" : "Not yet due" },
     { key: null, label: "With data-quality issues", value: o.with_issues, sub: `${o.stock_discrepancies} with a stock discrepancy · ${o.with_corrections} with corrected figures` },
@@ -82,8 +85,9 @@ export default async function WeeklyReportsPage({ searchParams }: { searchParams
         <h2 style={{ marginBottom: 2 }}>Weekly OTP Reports</h2>
         <p className="text-muted" style={{ fontSize: 13, margin: 0, maxWidth: 860 }}>
           Each OTP site&apos;s weekly report is calculated live from its records (admissions, visits, outcomes, screening, stock, MNP and IYCF sessions),
-          checked for data-quality issues, reviewed (and, with a reason, corrected) by the OTP Officer and submitted from the app. Open a submitted report
-          to review it, then approve it, return it for correction or reject it. Every version is kept. Totals only: no child is named.
+          checked for data-quality issues, reviewed (and, with a reason, corrected) by the OTP Officer and submitted from the app. The LGA Nutrition Officer
+          opens a submitted report to accept it, query it, return it for correction or reject it; the State Coordinator may query or return it. Accepted
+          reports are combined into the <Link href="/lga-reports">LGA weekly report</Link>. Every version is kept. Totals only: no child is named.
         </p>
       </div>
       <form className="filter-bar" method="get" style={{ flexWrap: "wrap" }}>
@@ -152,7 +156,7 @@ export default async function WeeklyReportsPage({ searchParams }: { searchParams
                       <td style={{ textAlign: "right" }}>{s.new_cases ?? "—"}</td>
                       <td style={{ textAlign: "right" }}>{s.closing ?? "—"}</td>
                       <td className="text-muted" style={{ fontSize: 12.5 }}>{s.submitted_at ? new Date(s.submitted_at).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" }) : "—"}</td>
-                      <td>{s.report_id && s.version ? <Link href={`/weekly-reports/${s.report_id}`}>{s.status === "submitted" || s.status === "under_review" ? "Review" : "Open"}</Link> : null}</td>
+                      <td>{s.report_id && s.version ? <Link href={`/weekly-reports/${s.report_id}`}>{o.i_review && (s.status === "submitted" || s.status === "under_review") ? "Review" : "Open"}</Link> : null}</td>
                     </tr>
                   );
                 })}

@@ -132,7 +132,8 @@ function check(what, expected, actual) {
     // 6. Who sees the visit.
     const seen = async (u) => (await as(u, `select count(*)::int n from monitoring_visits where id = $1`, [v1.visit_id])).rows[0].n;
     check("the OTP's facility user sees the visit to their facility", 1, await seen(U.otp));
-    check("the LGA store officer does not", 0, await seen(U.lst));
+    // The LGA Nutrition Officer sees the records of the OTP sites in their LGA (0134, R169).
+    check("the LGA Nutrition Officer sees it too (an OTP site in their LGA)", 1, await seen(U.lst));
     check("history says the Finding came from a supervision visit", true,
       /supervision visit/.test((await one(`select note from issue_history where issue_id = $1`, [vf[0]?.id]))?.note ?? ""));
   } finally {

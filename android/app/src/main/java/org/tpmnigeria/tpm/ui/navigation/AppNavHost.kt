@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Scaffold
@@ -69,6 +69,7 @@ import org.tpmnigeria.tpm.ui.otp.OtpMnpScreen
 import org.tpmnigeria.tpm.ui.otp.OtpWeeklyReportScreen
 import org.tpmnigeria.tpm.ui.otp.OtpPhotoScreen
 import org.tpmnigeria.tpm.ui.otp.OtpVisitsListScreen
+import org.tpmnigeria.tpm.ui.otp.OtpSupplyScreen
 import org.tpmnigeria.tpm.ui.stock.IssueStockScreen
 import org.tpmnigeria.tpm.ui.stock.LossAdjustmentScreen
 import org.tpmnigeria.tpm.ui.stock.MyStockScreen
@@ -318,6 +319,7 @@ fun AppNavHost(session: AppSession) {
                                 onMnp = { navController.navigate(Routes.OtpMnp) },
                                 onIycf = { navController.navigate(Routes.OtpIycf) },
                                 onVisits = { navController.navigate(Routes.OtpTasks) },
+                                onSupply = { navController.navigate(Routes.OtpSupply) },
                                 onExit = { navController.popBackStack() },
                             )
                         }
@@ -361,6 +363,9 @@ fun AppNavHost(session: AppSession) {
                                 onExit = { navController.popBackStack() },
                             )
                         }
+                    }
+                    composable(Routes.OtpSupply) {
+                        RequireAccess(otpAllowed, { navController.popBackStack() }) { OtpSupplyScreen(onExit = { navController.popBackStack() }) }
                     }
                     composable(Routes.OtpTasks) {
                         RequireAccess(otpAllowed, { navController.popBackStack() }) {
@@ -475,6 +480,7 @@ private fun headerTitleFor(route: String?, role: UserRole, issueIdArg: String?):
     route == Routes.OtpScreening -> "Screening"
     route.startsWith("otpChild") -> "Child's Card"
     route == Routes.OtpTasks -> "Visits and Tasks"
+    route == Routes.OtpSupply -> "Request RUTF"
     route.startsWith("otpReadmit") -> "Re-admission"
     route.startsWith("otpPhoto") -> "RUTF Photo"
     route.startsWith("otpVisit") -> "OTP Visit"
@@ -493,7 +499,7 @@ private fun bottomNavItems(role: UserRole, pendingSyncCount: Int, unreadNotifica
             MobileAccess.isOversightRole(role) -> "Findings"
             else -> "Assigned"
         },
-        Icons.Filled.List,
+        Icons.AutoMirrored.Filled.List,
     ),
     BottomNavEntry(Routes.Map, "Map", Icons.Filled.Map),
     BottomNavEntry(Routes.SyncQueue, "Sync", Icons.Filled.Cloud, badge = pendingSyncCount > 0),

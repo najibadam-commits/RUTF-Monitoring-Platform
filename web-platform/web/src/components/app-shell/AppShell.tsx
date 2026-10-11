@@ -4,8 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { logout } from "@/lib/actions/auth";
-import { NAV_ITEMS, ROLE_LABELS, NAV_SECTION_LABELS, visibleNavItemsFor, type NavSection } from "@/lib/rbac";
-import type { Profile } from "@/lib/supabase/dal";
+import { NAV_ITEMS, NAV_SECTION_LABELS, roleLabelFor, visibleNavItemsFor, type NavSection } from "@/lib/rbac";
+import type { OfficerLevel, Profile } from "@/lib/supabase/dal";
 import { NotificationsBell } from "./NotificationsBell";
 import { TopSearch } from "./TopSearch";
 import { RutfMark } from "@/components/RutfMark";
@@ -21,6 +21,8 @@ const VIEW_TITLES: Record<string, string> = {
   "/otp-dispensing": "Last-Mile Dispensing",
   "/otp-caseload": "OTP Caseload",
   "/weekly-reports": "Weekly OTP Reports",
+  "/lga-reports": "LGA Weekly Reports",
+  "/supply-requests": "Supply Requests",
   "/supervision": "Risk-Based Supervision",
   "/reporting": "Programme Reporting",
   "/download-requests": "Data Access Requests",
@@ -88,12 +90,13 @@ function viewTitleFor(pathname: string) {
   return section?.label ?? PLATFORM;
 }
 
-export function AppShell({ profile, children }: { profile: Profile; children: React.ReactNode }) {
+export function AppShell({ profile, officerLevel = null, children }: { profile: Profile; officerLevel?: OfficerLevel; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const title = viewTitleFor(pathname);
 
-  const navItems = visibleNavItemsFor(profile.role);
+  const navItems = visibleNavItemsFor(profile.role, officerLevel);
+  const roleLabel = roleLabelFor(profile.role, officerLevel);
   const [signingOut, setSigningOut] = useState(false);
   const collapsed = useSyncExternalStore(subscribeCollapsed, readCollapsed, () => false);
   // The mobile drawer remembers the page it was opened on, so navigating closes it and never
@@ -199,7 +202,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
                 {profile.name}
               </div>
               <div style={{ fontSize: 11, color: "rgba(255,255,255,.65)" }}>
-                {ROLE_LABELS[profile.role]}
+                {roleLabel}
               </div>
             </div>
           </div>
@@ -234,7 +237,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
           <TopSearch onSubmit={(q) => router.push(`/issues?search=${encodeURIComponent(q)}`)} />
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 10, position: "relative" }}>
             <NotificationsBell userId={profile.id} />
-            <div className="tag tag-outline">{ROLE_LABELS[profile.role]}</div>
+            <div className="tag tag-outline">{roleLabel}</div>
           </div>
         </header>
         <main className="app-main" style={{ flex: 1, overflow: "auto" }}>{children}</main>

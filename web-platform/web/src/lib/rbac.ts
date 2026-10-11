@@ -1,5 +1,15 @@
 import type { UserRole } from "@/lib/types/database";
 
+/** A facility officer's level (rutf_officer_level(), 0134): "state" = State Nutrition Officer,
+ *  "lga" = LGA Nutrition Officer, "otp" = OTP Officer; null for every other role. */
+export type OfficerLevel = "state" | "lga" | "otp" | null;
+
+/** The role as people say it: a facility officer by their level (R141). */
+export function roleLabelFor(role: UserRole, level: OfficerLevel = null): string {
+  if (role === "dri") return level === "state" ? "State Nutrition Officer" : level === "lga" ? "LGA Nutrition Officer" : level === "otp" ? "OTP Officer" : ROLE_LABELS.dri;
+  return ROLE_LABELS[role];
+}
+
 /**
  * Frontend mirror of the RLS policies in supabase/migrations/0008-0009.
  * This file is what drives nav visibility, route guards, and disabling
@@ -57,11 +67,22 @@ export function canAccessSettings(role: UserRole) {
 /** Super Admin and Project Admin review/decide requests here (Project Admin scoped to their own
  *  project — see migration 0036/DECISIONS.md #23); Viewer tracks their own — see
  *  download-requests/page.tsx. */
-/** Weekly OTP Site Reports (DECISIONS R148): the State Coordinator reviews and approves;
- *  administrators see them. OTP Officers prepare and submit theirs in the app. */
-export function canAccessWeeklyReports(role: UserRole) {
-  return role === "state_coordinator" || role === "super_admin" || role === "project_admin";
+/** Weekly OTP Site Reports (R148, R171): the LGA Nutrition Officer reviews and accepts the OTP
+ *  reports of their LGA; the State Nutrition Officer, the State Coordinator (technical oversight:
+ *  query or return) and Supervisors (their LGAs) see them; administrators see them. OTP Officers
+ *  prepare and submit theirs in the app. otp_reports_overview() scopes the rows. */
+export function canAccessWeeklyReports(role: UserRole, level: OfficerLevel = null) {
+  return role === "state_coordinator" || role === "super_admin" || role === "project_admin" || role === "tpm_supervisor"
+    || (role === "dri" && (level === "lga" || level === "state"));
 }
+
+/** LGA Weekly Reports (R171): combined from the accepted OTP reports; the LGA Nutrition Officer
+ *  submits, the State Nutrition Officer accepts, the State Coordinator may query or return. */
+export const canAccessLgaReports = canAccessWeeklyReports;
+
+/** Supply Requests (R170): the LGA and State Nutrition Officers review, request and approve on the
+ *  web; OTP Officers request in the app; the State Coordinator and Supervisors see and comment. */
+export const canAccessSupplyRequests = canAccessWeeklyReports;
 
 export function canAccessDownloadRequests(role: UserRole) {
   return role === "super_admin" || role === "project_admin" || role === "viewer";
@@ -184,6 +205,8 @@ export type NavKey =
   | "otpCaseload"
   | "clinicalRules"
   | "weeklyReports"
+  | "lgaReports"
+  | "supplyRequests"
   | "supervision"
   | "dhis2Triangulation";
 
@@ -213,6 +236,8 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   // facility only).
   { key: "stockLedger", label: "Stock Ledger", href: "/stock-ledger", icon: "ph-book-open-text", section: "stock" },
   { key: "transfers", label: "Transfers", href: "/transfers", icon: "ph-truck", section: "stock" },
+  // Supply requests OTP -> LGA store -> State store (R170); approval is separate from the stock issue.
+  { key: "supplyRequests", label: "Supply Requests", href: "/supply-requests", icon: "ph-package", section: "stock" },
   // Analysis pages (brief §9, M5) — facility_metrics() is security invoker, so RLS scopes them too.
   { key: "stockIntegrity", label: "Stock Reconciliation", href: "/stock-integrity", icon: "ph-scales", section: "stock" },
   { key: "reportingCompleteness", label: "Completeness & Timeliness", href: "/reporting-completeness", icon: "ph-check-square-offset", section: "stock" },
@@ -224,6 +249,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "dhis2Triangulation", label: "DHIS2 Triangulation", href: "/dhis2-triangulation", icon: "ph-intersect", section: "analytics" },
   { key: "reportingCentre", label: "Programme Reporting", href: "/reporting", icon: "ph-export", section: "reporting" },
   { key: "weeklyReports", label: "Weekly OTP Reports", href: "/weekly-reports", icon: "ph-calendar-check", section: "reporting" },
+  { key: "lgaReports", label: "LGA Weekly Reports", href: "/lga-reports", icon: "ph-stack", section: "reporting" },
   { key: "devices", label: "Offline Sync Health", href: "/devices", icon: "ph-device-mobile", section: "administration" },
   { key: "auditLog", label: "Audit Trail", href: "/audit-log", icon: "ph-clock-counter-clockwise", section: "administration" },
   { key: "users", label: "Users & Access", href: "/users", icon: "ph-users-three", section: "administration" },
@@ -235,7 +261,7 @@ export const NAV_ITEMS: { key: NavKey; label: string; href: string; icon: string
   { key: "downloadRequests", label: "Data Access Requests", href: "/download-requests", icon: "ph-download-simple", section: "reporting" },
 ];
 
-export function visibleNavItemsFor(role: UserRole) {
+export function visibleNavItemsFor(role: UserRole, level: OfficerLevel = null) {
   return NAV_ITEMS.filter((item) => {
     if (item.key === "actionTracker") return canAccessActionTracker(role);
     if (item.key === "users") return canAccessUsersScreen(role);
@@ -245,7 +271,9 @@ export function visibleNavItemsFor(role: UserRole) {
     if (item.key === "devices") return canAccessDevices(role);
     if (item.key === "auditLog") return canAccessAuditLog(role);
     if (item.key === "downloadRequests") return canAccessDownloadRequests(role);
-    if (item.key === "weeklyReports") return canAccessWeeklyReports(role);
+    if (item.key === "weeklyReports") return canAccessWeeklyReports(role, level);
+    if (item.key === "lgaReports") return canAccessLgaReports(role, level);
+    if (item.key === "supplyRequests") return canAccessSupplyRequests(role, level);
     return true;
   });
 }

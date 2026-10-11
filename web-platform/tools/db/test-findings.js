@@ -109,7 +109,9 @@ function check(what, expected, actual) {
 
     // 5. The reviewer sees them; a facility user can't run the checks.
     await pg.query(`update profiles set managed_state_id = (select state_id from facilities where id = $2) where id = $1`, [U.sc, OTP]);
-    const seenBySc = (await as(U.sc, `select count(*)::int n from issues where facility_id = any($1) and status = 'pending_review'`, [[OTP, OTP2]]))[0].n;
+    // late_reporting depends on the day of the month (the test facilities have no reports), so it is left out.
+    const seenBySc = (await as(U.sc, `select count(*)::int n from issues where facility_id = any($1) and status = 'pending_review'
+      and finding_type <> 'late_reporting'`, [[OTP, OTP2]]))[0].n;
     check("State Coordinator sees both Findings in review", 2, seenBySc);
     let denied = "allowed";
     try { await as(U.otp, `select evaluate_facility_period($1, $2, $3)`, [OTP, month.s, month.e]); } catch { denied = "denied"; }

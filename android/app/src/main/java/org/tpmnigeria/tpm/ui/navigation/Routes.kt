@@ -54,6 +54,7 @@ object Routes {
     const val OtpIycf = "otpIycf"
     // Follow-up (web 0128): the visits list (Child IDs only) and a visit's RUTF photo.
     const val OtpTasks = "otpTasks"
+    const val OtpSupply = "otpSupply"
     const val OtpReadmitPattern = "otpReadmit/{childCode}"
     fun otpReadmit(childCode: String) = "otpReadmit/$childCode"
     const val OtpPhotoPattern = "otpPhoto/{visitId}/{childCode}?folder={folder}"

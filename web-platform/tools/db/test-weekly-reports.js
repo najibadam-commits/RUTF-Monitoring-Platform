@@ -28,6 +28,9 @@ const check = (area, what, expected, actual) => {
     const sc = await one(`select p.id from profiles p join facilities f on f.state_id = p.managed_state_id
       where p.role = 'state_coordinator' and p.status = 'active' and f.id = $1 order by p.name limit 1`, [officer.facility_id]);
     const supervisor = await one(`select id from profiles where role = 'tpm_supervisor' and status = 'active' and name like '%(DUMMY)%' limit 1`);
+    // The LGA Nutrition Officer of the officer's LGA reviews the OTP reports (0136, R171).
+    const lgan = await one(`select p.id from profiles p join facilities s on s.id = p.facility_id join facilities o on o.lga_id = s.lga_id
+      where p.role = 'dri' and p.status = 'active' and s.facility_type = 'lga_store' and o.id = $1 order by p.name limit 1`, [officer.facility_id]);
 
     async function as(userId, fn) {
       await pg.query("savepoint ctx");
@@ -106,16 +109,18 @@ const check = (area, what, expected, actual) => {
       check("submit", "a submitted report is locked", true,
         String(await call(`select otp_report_save_comments($1, '{}'::jsonb)`, [lastReportId])).includes("cannot be changed"));
       check("approve", "the OTP Officer cannot approve", true,
-        String(await call(`select otp_report_decide($1, 'approved', null)`, [lastReportId])).includes("Only the State Coordinator"));
+        String(await call(`select otp_report_decide($1, 'approved', null)`, [lastReportId])).includes("Only the LGA Nutrition Officer"));
       void blocking;
     });
 
-    const notified = await one(`select count(*)::int n from notifications where user_id = $1 and type = 'weekly_report'`, [sc.id]);
-    check("notify", "the State Coordinator was notified", true, notified.n >= 1);
+    const notified = await one(`select count(*)::int n from notifications where user_id = $1 and type = 'weekly_report'`, [lgan.id]);
+    check("notify", "the LGA Nutrition Officer was notified", true, notified.n >= 1);
 
     await as(supervisor.id, async () => {
-      check("access", "a supervisor cannot decide", true, String(await call(`select otp_report_decide($1, 'approved', null)`, [lastReportId])).includes("Only the State Coordinator"));
-      check("access", "a supervisor cannot see the overview", true, String(await call(`select otp_reports_overview(current_date - 7)`)).includes("Only the State Coordinator"));
+      check("access", "a supervisor cannot decide", true, String(await call(`select otp_report_decide($1, 'approved', null)`, [lastReportId])).includes("Only the LGA Nutrition Officer"));
+      const sov = await call(`select otp_reports_overview(current_date - 7)`);
+      const supLgas = (await pg.query(`select count(distinct f.lga_id)::int n from facilities f where f.is_otp_site and f.lga_id in (select lga_id from supervisor_lgas where profile_id = $1)`, [supervisor.id])).rows[0].n;
+      check("access", "a supervisor sees only the OTP sites of their LGAs", true, new Set(sov.sites.map((x) => x.lga)).size <= supLgas);
     });
 
     await as(sc.id, async () => {
@@ -137,12 +142,19 @@ const check = (area, what, expected, actual) => {
     });
 
     await as(sc.id, async () => {
+      check("approve", "the State Coordinator cannot accept (technical oversight only)", true,
+        String(await call(`select otp_report_decide($1, 'approved', null)`, [lastReportId])).includes("Only the LGA Nutrition Officer"));
+    });
+
+    await as(lgan.id, async () => {
+      const ov = await call(`select otp_reports_overview(current_date - 7)`);
+      check("overview", "the LGA Nutrition Officer sees only their LGA", 1, new Set(ov.sites.map((x) => x.lga)).size);
       const ok = await call(`select otp_report_decide($1, 'approved', 'Thank you (DUMMY)')`, [lastReportId]);
-      check("approve", "the State Coordinator approves", "approved", ok.status);
+      check("approve", "the LGA Nutrition Officer accepts", "approved", ok.status);
       const full = await call(`select otp_report_get($1)`, [lastReportId]);
       check("history", "both versions are kept", 2, full.versions.length);
       check("history", "version 1 kept its return note", "Recount the MNP (DUMMY)", full.versions[1].decision_note);
-      check("history", "approval is recorded against the coordinator", true, !!full.versions[0].decided_by && !!full.versions[0].decided_at);
+      check("history", "acceptance is recorded against the LGA Nutrition Officer", true, !!full.versions[0].decided_by && !!full.versions[0].decided_at);
     });
 
     await as(officer.id, async () => {

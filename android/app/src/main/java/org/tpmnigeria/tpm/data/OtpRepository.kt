@@ -41,6 +41,7 @@ class OtpRepository {
             when {
                 body.isEmpty() || body == "null" -> JsonObject(emptyMap())
                 body.startsWith("{") -> json.parseToJsonElement(body).jsonObject
+                body.startsWith("[") -> JsonObject(mapOf("items" to json.parseToJsonElement(body)))
                 else -> JsonObject(mapOf("value" to json.parseToJsonElement(body)))
             },
         )
@@ -105,6 +106,21 @@ class OtpRepository {
         if (!amendmentReason.isNullOrBlank()) put("p_amendment_reason", amendmentReason)
     })
     suspend fun reportStartAmendment(reportId: String) = call("otp_report_start_amendment", buildJsonObject { put("p_report_id", reportId) })
+    /** Answers the reviewer's query (web migration 0136, R171): the same version goes back for review. */
+    suspend fun reportAnswerQuery(reportId: String, answer: String) = call("otp_report_act", buildJsonObject {
+        put("p_report_id", reportId); put("p_action", "answer"); put("p_note", answer)
+    })
+
+    // Supply requests to the LGA store (web migration 0135, R170): the server takes the site and its
+    // store from the account; approving moves no stock — the LGA store's issue does.
+    suspend fun supplyForm() = call("supply_request_form", buildJsonObject { })
+    suspend fun supplyCreate(body: JsonObject) = call("supply_request_create", p(body))
+    suspend fun supplyList() = call("supply_request_list", buildJsonObject { put("p_box", "outgoing") })
+    suspend fun supplyGet(id: String) = call("supply_request_get", buildJsonObject { put("p_id", id) })
+    suspend fun supplyAct(id: String, action: String, note: String?, lines: JsonArray? = null) = call("supply_request_act", buildJsonObject {
+        put("p_id", id); put("p_action", action); put("p_note", note)
+        if (lines != null) put("p_lines", lines)
+    })
     /** Corrects one figure of the draft with a reason (value null removes the correction). */
     suspend fun reportAdjust(reportId: String, path: String, value: Double?, reason: String) = call("otp_report_adjust", buildJsonObject {
         put("p_report_id", reportId); put("p_path", path); put("p_value", value); put("p_reason", reason)

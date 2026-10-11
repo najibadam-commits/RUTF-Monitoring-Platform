@@ -3,17 +3,18 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/supabase/dal";
+import { getCurrentProfile, getOfficerLevel } from "@/lib/supabase/dal";
 import { canAccessWeeklyReports } from "@/lib/rbac";
-import { WeeklyReportDecision } from "@/components/reports/WeeklyReportDecision";
+import { OpenQuery, ReportHistory, ReviewPanel, type ReportEvent } from "@/components/reports/ReviewPanel";
 
 export const metadata: Metadata = { title: "Weekly OTP Report" };
 
 // One weekly OTP report (DECISIONS R148, R153): the submitted version's sections A–L exactly as
 // calculated and submitted (with any figure the officer corrected, its calculated value and the
 // reason), the data-quality issues with the officer's explanations, every version with its
-// decision, and — for the State Coordinator — approve, return or reject. Opening a submitted
-// report marks it "under review". Aggregate only.
+// decision, the review history, and the review actions (R171): the LGA Nutrition Officer of the
+// site's LGA accepts, queries, returns or rejects; the State Coordinator may query or return.
+// Opening a submitted report marks it "under review". Aggregate only.
 
 type BySex = { M: number; F: number; total: number };
 type Issue = { code: string; severity: "blocking" | "warning" | "info"; section: string; message: string };
@@ -28,16 +29,17 @@ type Version = {
 };
 type Report = {
   report_id: string; status: string; amendment: boolean; week_start: string; week_end: string; facility: string; lga: string;
-  can_decide: boolean; can_start_review: boolean; versions: Version[];
+  can_decide: boolean; can_start_review: boolean; can_return: boolean; can_query: boolean; versions: Version[];
+  open_query: { note: string; by: string | null; role: string | null; at: string } | null; events: ReportEvent[];
 };
 
 const fmtDay = (d: string) => new Date(`${d}T00:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 const fmtTime = (d: string) => new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Africa/Lagos" });
 const n = (v: unknown) => (v === null || v === undefined ? "—" : Number(v).toLocaleString("en-GB"));
 const STATUS_LABEL: Record<string, string> = {
-  submitted: "Waiting for review", under_review: "Under review", approved: "Approved", returned: "Returned for correction", rejected: "Rejected", draft: "Draft",
+  submitted: "Waiting for review", under_review: "Under review", queried: "Queried", approved: "Accepted", returned: "Returned for correction", rejected: "Rejected", draft: "Draft",
 };
-const DECISION_LABEL: Record<string, string> = { approved: "Approved", returned: "Returned", rejected: "Rejected" };
+const DECISION_LABEL: Record<string, string> = { approved: "Accepted", returned: "Returned", rejected: "Rejected" };
 // Where a corrected figure sits in the report, in words.
 const FIGURE_LABEL: Record<string, string> = {
   "B.SAM.total": "B. Under treatment at the start", "C.SAM.total": "C. New cases", "D.SAM.in.total": "D. Transfers in", "D.SAM.out.total": "D. Transfers out",
@@ -78,8 +80,8 @@ function SexTable({ rows }: { rows: [string, BySex | null | undefined, string?][
 }
 
 export default async function WeeklyReportPage({ params }: { params: Promise<{ id: string }> }) {
-  const profile = await getCurrentProfile();
-  if (!canAccessWeeklyReports(profile.role)) redirect("/dashboard");
+  const [profile, level] = await Promise.all([getCurrentProfile(), getOfficerLevel()]);
+  if (!canAccessWeeklyReports(profile.role, level)) redirect("/dashboard");
   const { id } = await params;
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("otp_report_get", { p_report_id: id });
@@ -107,7 +109,14 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
         </p>
       </div>
 
-      {r.can_decide && <WeeklyReportDecision reportId={r.report_id} unexplainedBlocking={unexplained} startReview={r.can_start_review} />}
+      <OpenQuery query={r.open_query} waitingFor="the OTP Officer's answer (in the app)" />
+      {(r.can_decide || r.can_return || r.can_query) && (
+        <ReviewPanel kind="otp" id={r.report_id} canAccept={r.can_decide} canReturn={r.can_return} canQuery={r.can_query}
+          startReview={r.can_start_review} unexplainedBlocking={unexplained}
+          intro={r.can_decide
+            ? "Check the caseload reconciliation, the stock movements, any corrected figures and the officer's explanations. Accept the report, query it (the officer answers in the app without changing the figures), return it for correction, or reject it. Accepted reports go into the LGA weekly report."
+            : "As State Coordinator you may query the report or return it for correction on technical grounds. The LGA Nutrition Officer accepts or rejects it."} />
+      )}
 
       {/* K first: the issues and the officer's explanations, which the decision turns on. */}
       <Section letter="K" title="Data-quality checks and the officer's comments">
@@ -285,6 +294,8 @@ export default async function WeeklyReportPage({ params }: { params: Promise<{ i
           </div>
         )}
       </Section>
+
+      <ReportHistory events={r.events ?? []} />
 
       <Section letter="·" title="Versions">
         <table className="table">

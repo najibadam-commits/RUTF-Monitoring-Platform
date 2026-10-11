@@ -236,7 +236,9 @@ function check(area, role, what, expected, actual) {
       await attempt(`update facilities set supplied_by_facility_id = $2 where id = $1`, [OTP2, SST]));
 
     const EXPECT_C = {
-      visibleFacilities: { super_admin: 6, project_admin: 6, state_coordinator: 6, tpm_supervisor: 6, dri: 2 },
+      // Jurisdictions (0134, R169): the test State Coordinator manages another state and the test
+      // Supervisor has no LGAs, so neither sees the test facilities.
+      visibleFacilities: { super_admin: 6, project_admin: 6, state_coordinator: 0, tpm_supervisor: 0, dri: 2 },
       insertFacility:    { super_admin: "allowed", project_admin: "allowed", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
       approveFacility:   { super_admin: "allowed", project_admin: "denied", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
       insertLot:         { super_admin: "allowed", project_admin: "allowed", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
@@ -297,8 +299,8 @@ function check(area, role, what, expected, actual) {
     await pg.query(`update facilities set name = name || ' (audited)' where id = $1`, [OTP2]); // owner, so actor null
 
     const EXPECT_D = {
-      supplierLedgerRows: { super_admin: 2, project_admin: 2, state_coordinator: 2, tpm_supervisor: 2, dri: 0 },
-      supplierBalance:    { super_admin: 850, project_admin: 850, state_coordinator: 850, tpm_supervisor: 850, dri: 0 },
+      supplierLedgerRows: { super_admin: 2, project_admin: 2, state_coordinator: 0, tpm_supervisor: 0, dri: 0 },
+      supplierBalance:    { super_admin: 850, project_admin: 850, state_coordinator: 0, tpm_supervisor: 0, dri: 0 },
       incomingLines:      { super_admin: 1, project_admin: 1, state_coordinator: 1, tpm_supervisor: 1, dri: 1 },
       writeDhis2:         { super_admin: "allowed", project_admin: "allowed", state_coordinator: "denied", tpm_supervisor: "denied", dri: "denied" },
       auditVisible:       { super_admin: true, project_admin: true, state_coordinator: false, tpm_supervisor: false, dri: false },

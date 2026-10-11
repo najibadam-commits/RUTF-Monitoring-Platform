@@ -836,6 +836,20 @@ export interface Database {
       otp_report_get: { Args: { p_report_id: string }; Returns: Json };
       otp_report_decide: { Args: { p_report_id: string; p_decision: string; p_note: string | null }; Returns: Json };
       otp_report_start_review: { Args: { p_report_id: string }; Returns: Json };
+      // Role standardisation (0134–0137, DECISIONS R169–R171)
+      rutf_officer_level: { Args: Record<string, never>; Returns: string | null };
+      otp_report_act: { Args: { p_report_id: string; p_action: string; p_note: string }; Returns: Json };
+      supply_request_form: { Args: Record<string, never>; Returns: Json };
+      supply_request_create: { Args: { p: Json }; Returns: Json };
+      supply_request_list: { Args: { p_box?: string; p_status?: string | null }; Returns: Json };
+      supply_request_get: { Args: { p_id: string }; Returns: Json };
+      supply_request_act: { Args: { p_id: string; p_action: string; p_note?: string | null; p_lines?: Json | null }; Returns: Json };
+      lga_reports_overview: { Args: { p_week_start: string }; Returns: Json };
+      lga_report_open: { Args: { p_week_start: string }; Returns: Json };
+      lga_report_get: { Args: { p_id: string }; Returns: Json };
+      lga_report_save_comments: { Args: { p_id: string; p_comments: string }; Returns: undefined };
+      lga_report_submit: { Args: { p_id: string; p_comments: string | null; p_confirm_reviewed: boolean; p_amendment_reason?: string | null }; Returns: Json };
+      lga_report_act: { Args: { p_id: string; p_action: string; p_note?: string | null }; Returns: Json };
       otp_rules_view: { Args: Record<string, never>; Returns: Json };
       otp_rule_set_approve: { Args: { p_version: string; p_confirm: boolean; p_note: string | null }; Returns: Json };
       otp_followup_aggregates: {

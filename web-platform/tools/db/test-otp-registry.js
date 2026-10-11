@@ -30,7 +30,9 @@ const check = (area, what, expected, actual) => {
     const officer = await one(`select p.id, f.id facility, f.lga_id, f.name from profiles p join facilities f on f.id = p.facility_id
       where p.role = 'dri' and p.status = 'active' and f.facility_type = 'health_facility' and f.is_otp_site and f.is_active and p.name like '%(DUMMY)%'
       order by p.name limit 1`);
-    const supervisor = await one(`select id from profiles where role = 'tpm_supervisor' and status = 'active' and name like '%(DUMMY)%' order by name limit 1`);
+    // A supervisor of the officer's LGA: supervisors see the aggregates of their own LGAs (0134, R169).
+    const supervisor = await one(`select p.id from profiles p join supervisor_lgas s on s.profile_id = p.id
+      where p.role = 'tpm_supervisor' and p.status = 'active' and p.name like '%(DUMMY)%' and s.lga_id = $1 order by p.name limit 1`, [officer.lga_id]);
     const store = await one(`select p.id from profiles p join facilities f on f.id = p.facility_id where p.role = 'dri' and f.facility_type = 'lga_store' and p.status = 'active' limit 1`);
     const otherSite = await one(`select id from facilities where facility_type = 'health_facility' and is_otp_site and is_active and id <> $1 limit 1`, [officer.facility]);
 

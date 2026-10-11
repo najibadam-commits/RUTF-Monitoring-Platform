@@ -44,6 +44,7 @@ fun OtpHomeScreen(
     onMnp: () -> Unit,
     onIycf: () -> Unit,
     onVisits: () -> Unit,
+    onSupply: () -> Unit,
     onExit: () -> Unit,
 ) {
     val repo = remember { OtpRepository() }
@@ -90,9 +91,10 @@ fun OtpHomeScreen(
         }
         TpmCard {
             Text("Weekly report and activities", style = MaterialTheme.typography.titleMedium)
-            Text("The weekly report is calculated from this site's records: review it and submit it to the State Coordinator.",
+            Text("The weekly report is calculated from this site's records: review it and submit it to the LGA Nutrition Officer.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
             TpmButton(text = "Weekly OTP report", onClick = onWeeklyReport, fullWidth = true, blueprint = true)
+            TpmButton(text = "Request RUTF from the LGA store", onClick = onSupply, variant = TpmButtonVariant.Secondary, fullWidth = true)
             TpmButton(text = "MNP stock and doses", onClick = onMnp, variant = TpmButtonVariant.Secondary, fullWidth = true)
             TpmButton(text = "IYCF / health education session", onClick = onIycf, variant = TpmButtonVariant.Secondary, fullWidth = true)
         }

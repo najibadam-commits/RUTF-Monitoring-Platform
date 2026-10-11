@@ -153,7 +153,12 @@ function check(what, expected, actual) {
     const seen = async (userId, f) => (await as(userId, `select count(*)::int n from stock_transactions where facility_id = $1`, [f])).rows[0].n;
     check("OTP user cannot read the State store's ledger", 0, await seen(U.otp, SST));
     check("OTP user reads its own ledger", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [OTP1])).n), await seen(U.otp, OTP1));
-    check("supervisor reads the State store's ledger", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [SST])).n), await seen(U.sup, SST));
+    // A supervisor reads the ledgers of the facilities in their LGAs (0134, R169): give them the
+    // State store's LGA for this check (rolled back with everything else).
+    await pg.query(`insert into supervisor_lgas (profile_id, lga_id) select $1, lga_id from facilities where id = $2 on conflict do nothing`, [U.sup, SST]);
+    check("supervisor reads the State store's ledger (its LGA assigned)", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [SST])).n), await seen(U.sup, SST));
+    check("LGA Nutrition Officer reads an OTP site's ledger in their LGA", Number((await one(`select count(*) n from stock_transactions where facility_id = $1`, [OTP1])).n), await seen(U.lst, OTP1));
+    check("LGA Nutrition Officer cannot read the State store's ledger", 0, await seen(U.lst, SST));
 
     // 11. Voiding by an administrator (migration 0109). Balances now: SST 1500, LST 900, OTP1 160.
     const rowsBeforeVoid = Number((await one(`select count(*) n from stock_transactions where submission_local_id like 'LT-%'`)).n);

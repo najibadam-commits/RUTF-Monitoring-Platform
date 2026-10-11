@@ -56,8 +56,9 @@ import java.time.temporal.TemporalAdjusters
  * The weekly OTP site report (RUTF DECISIONS R147–R149, R153). The figures are calculated live on
  * the server from the site's records — the officer reviews them, explains every flagged issue,
  * corrects a figure only with a reason (kept with the calculated value), confirms and submits to
- * the State Coordinator. A returned report shows the coordinator's note; an approved or rejected
- * one can only change by an amendment, with a reason.
+ * the LGA Nutrition Officer (R171). A queried report shows the question and takes the answer
+ * (the figures stay as submitted); a returned report shows the reviewer's note; an accepted or
+ * rejected one can only change by an amendment, with a reason.
  */
 @Composable
 fun OtpWeeklyReportScreen(onExit: () -> Unit) {
@@ -82,6 +83,7 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
     var amendmentReason by remember { mutableStateOf("") }
     var confirmed by remember { mutableStateOf(false) }
     var busy by remember { mutableStateOf(false) }
+    var answer by remember { mutableStateOf("") }
 
     LaunchedEffect(week, reload) {
         report = null; error = null; confirmed = false
@@ -118,20 +120,41 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
         TpmCard(blueprint = true) {
             Text(
                 when (status) {
-                    "submitted" -> "Submitted: waiting for the State Coordinator"; "under_review" -> "Under review by the State Coordinator"
-                    "approved" -> "Approved"; "returned" -> "Returned for correction"; "rejected" -> "Rejected"
+                    "submitted" -> "Submitted: waiting for the LGA Nutrition Officer"; "under_review" -> "Under review by the LGA Nutrition Officer"
+                    "queried" -> "Queried: please answer below"
+                    "approved" -> "Accepted"; "returned" -> "Returned for correction"; "rejected" -> "Rejected"
                     else -> if (r.bool("amendment")) "Amendment draft" else "Draft: not submitted"
                 },
                 style = MaterialTheme.typography.titleMedium,
-                color = when (status) { "approved" -> OtpGreen; "returned", "rejected" -> OtpRed; "submitted", "under_review" -> OtpAmber; else -> TpmColors.Text },
+                color = when (status) { "approved" -> OtpGreen; "returned", "rejected" -> OtpRed; "submitted", "under_review", "queried" -> OtpAmber; else -> TpmColors.Text },
             )
             ReviewRow("Due", r.str("due").orEmpty())
             r.obj("last_decision")?.let { d ->
-                ReviewRow(when (d.str("decision")) { "approved" -> "Approved by"; "rejected" -> "Rejected by"; else -> "Returned by" }, "${d.str("by")}")
+                ReviewRow(when (d.str("decision")) { "approved" -> "Accepted by"; "rejected" -> "Rejected by"; else -> "Returned by" }, "${d.str("by")}")
                 d.str("note")?.let { Text("“$it”", style = MaterialTheme.typography.bodyMedium) }
             }
             Text("Calculated live from this site's records. Review it, explain anything flagged, correct a figure only with a reason, then submit.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+        }
+
+        // The reviewer's question (R171): answered here; the figures stay as submitted.
+        if (status == "queried") r.obj("open_query")?.let { q ->
+            TpmCard(blueprint = true) {
+                Text("Question from ${q.str("by") ?: "the reviewer"}${q.str("role")?.let { " ($it)" } ?: ""}", style = MaterialTheme.typography.titleMedium)
+                Text("“${q.str("note").orEmpty()}”", style = MaterialTheme.typography.bodyMedium)
+                TpmTextField(label = "Your answer", value = answer, onValueChange = { answer = it }, singleLine = false, minLines = 2)
+                TpmButton(text = if (busy) "Sending…" else "Send the answer", fullWidth = true, enabled = !busy && answer.isNotBlank(), onClick = {
+                    busy = true; error = null
+                    scope.launch {
+                        when (val res = repo.reportAnswerQuery(r.str("report_id").orEmpty(), answer.trim())) {
+                            is OtpResult.Ok -> { toast.show("Answer sent: the report is back with the reviewer"); answer = ""; reload++ }
+                            is OtpResult.Error -> error = res.message
+                        }
+                        busy = false
+                    }
+                })
+                Text("To change a figure instead, the reviewer returns the report for correction.", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            }
         }
 
         // The figures (a compact review of each section; the full report opens on the web).
@@ -219,7 +242,7 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                         busy = false
                     }
                 })
-                TpmButton(text = if (busy) "Submitting…" else "Submit to the State Coordinator",
+                TpmButton(text = if (busy) "Submitting…" else "Submit to the LGA Nutrition Officer",
                     enabled = !busy && confirmed && missing == 0 && weekOver && (!r.bool("amendment") || amendmentReason.isNotBlank()),
                     onClick = {
                         busy = true; error = null
@@ -233,7 +256,7 @@ fun OtpWeeklyReportScreen(onExit: () -> Unit) {
                     })
             }
         } else if (r.bool("can_amend") || status == "approved") {
-            TpmButton(text = if (status == "rejected") "Start a new version (amendment)" else "Amend this approved report", variant = TpmButtonVariant.Ghost, fullWidth = true, onClick = {
+            TpmButton(text = if (status == "rejected") "Start a new version (amendment)" else "Amend this accepted report", variant = TpmButtonVariant.Ghost, fullWidth = true, onClick = {
                 scope.launch {
                     when (val res = repo.reportStartAmendment(r.str("report_id").orEmpty())) {
                         is OtpResult.Ok -> reload++

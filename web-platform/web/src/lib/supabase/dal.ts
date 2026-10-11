@@ -41,6 +41,16 @@ export const getCurrentProfile = cache(async (): Promise<Profile> => {
   return profile;
 });
 
+/** A facility officer's level — "state" (State Nutrition Officer, State store), "lga" (LGA
+ *  Nutrition Officer, LGA store) or "otp" (OTP Officer) — null for every other role. Their
+ *  jurisdiction and workflow follow it (DECISIONS R169–R171). */
+export type OfficerLevel = "state" | "lga" | "otp" | null;
+export const getOfficerLevel = cache(async (): Promise<OfficerLevel> => {
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("rutf_officer_level");
+  return (data as OfficerLevel) ?? null;
+});
+
 /** Non-redirecting variant for places that need to render differently for a signed-out visitor (e.g. the login page itself). */
 export const getOptionalProfile = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
