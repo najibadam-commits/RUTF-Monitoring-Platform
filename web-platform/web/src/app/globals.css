@@ -29,10 +29,13 @@
   --brand-cyan: #36c5e8;
   --brand-turquoise: #40d9c0;
   --brand-mint: #55d6ac;
+  /* The RUTF-DTAP logo's green and navy (R166). */
+  --brand-green: #24a324;
+  --brand-navy: #064687;
 
   --gradient-primary: linear-gradient(120deg, #1264d8 0%, #1687f8 45%, #36c5e8 100%);
   --gradient-hero: linear-gradient(135deg, #1264d8 0%, #1687f8 50%, #40d9c0 100%);
-  --gradient-edge: linear-gradient(90deg, #1687f8, #36c5e8, #40d9c0);
+  --gradient-edge: linear-gradient(90deg, #1687f8, #40d9c0, #24a324);
   /* The page: the light background with soft cyan and mint washes (no images, no animation). */
   --page-bg:
     radial-gradient(1100px 520px at 100% -8%, rgba(54, 197, 232, 0.13), transparent 70%),

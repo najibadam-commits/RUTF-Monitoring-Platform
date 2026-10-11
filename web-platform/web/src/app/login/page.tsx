@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getOptionalProfile } from "@/lib/supabase/dal";
 import { LoginForm } from "./LoginForm";
 import { FragmentAuthHandler } from "./FragmentAuthHandler";
-import { RutfMark } from "@/components/RutfMark";
+import { RutfLogo, RutfMark } from "@/components/RutfMark";
 import { BRAND, QUOTE, TAGLINE, WHY } from "@/lib/rutf-copy";
 import s from "./login.module.css";
 
@@ -38,12 +38,8 @@ export default async function LoginPage({
       <div className={s.backdrop} role="img" aria-label="Children holding RUTF sachets handed out by a community health worker" />
 
       <header className={s.header}>
-        <Link href="/" className={s.brand}>
-          <RutfMark />
-          <span>
-            <span className={s.brandName}>{BRAND.name}</span>
-            <span className={s.brandSub}>{BRAND.line1}<br />{BRAND.line2}</span>
-          </span>
+        <Link href="/" className={s.brand} aria-label={`${BRAND.name}: home`}>
+          <RutfLogo height={46} />
         </Link>
         <Link href="/" className={s.back}>
           <i className="ph ph-arrow-left" aria-hidden="true" /> Back to home
@@ -56,7 +52,7 @@ export default async function LoginPage({
         {/* Floating sign-in card — the form and its behaviour are unchanged. */}
         <section className={s.card}>
           <div className={s.cardHead}>
-            <RutfMark size={52} />
+            <RutfMark size={56} />
             <div>
               <div className={s.cardKicker}>Secure sign-in</div>
               <h2 className={s.cardTitle}>Welcome back</h2>

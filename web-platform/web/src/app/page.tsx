@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getOptionalProfile } from "@/lib/supabase/dal";
-import { RutfMark } from "@/components/RutfMark";
+import { RutfLogo, RutfMark } from "@/components/RutfMark";
 import { BRAND, QUOTE, TAGLINE, WHY } from "@/lib/rutf-copy";
 import s from "./landing.module.css";
 
@@ -56,12 +56,9 @@ export default async function LandingPage() {
     <div className={s.page}>
       <header className={s.header}>
         <div className={s.headerInner}>
-          <Link href="/" className={s.brand}>
-            <RutfMark />
-            <span>
-              <span className={s.brandName}>{BRAND.name}</span>
-              <span className={s.brandSub}>{BRAND.line1}<br />{BRAND.line2}</span>
-            </span>
+          {/* The official RUTF-DTAP logo (R166); the name is in its alt text. */}
+          <Link href="/" className={s.brand} aria-label={`${BRAND.name}: home`}>
+            <RutfLogo height={50} />
           </Link>
           <nav className={s.nav} aria-label="Sections">
             <a href="#how-it-works">How it works</a>
@@ -202,7 +199,7 @@ export default async function LandingPage() {
 
       <footer className={s.footer}>
         <div className={s.footerInner}>
-          <span className={s.footerBrand}><RutfMark size={28} /> {BRAND.name} · Katsina State</span>
+          <span className={s.footerBrand}><span style={{ display: "inline-flex", background: "#fff", borderRadius: "50%", padding: 3 }}><RutfMark size={24} /></span> {BRAND.name} · Katsina State</span>
           <Link href={cta.href} className={s.footerLink}>{cta.label}</Link>
         </div>
       </footer>

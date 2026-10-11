@@ -1,6 +1,9 @@
 package org.tpmnigeria.tpm.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -93,31 +96,32 @@ fun LoginScreen(session: AppSession) {
             verticalArrangement = Arrangement.Center,
         ) {
             Spacer(Modifier.height(TpmSpacing.space8))
-            // The official logo mark, unchanged, on a white tile.
+            // The RUTF-DTAP logo (emblem, wordmark and tagline) on a white plate: its blue and green
+            // lettering needs a light ground (R166).
             Box(
                 modifier = Modifier
-                    .size(76.dp)
-                    .shadow(10.dp, RoundedCornerShape(22.dp), ambientColor = Color.Black.copy(alpha = 0.2f), spotColor = Color.Black.copy(alpha = 0.2f))
-                    .background(TpmColors.White, RoundedCornerShape(22.dp))
-                    .padding(14.dp),
+                    .widthIn(max = 460.dp)
+                    .fillMaxWidth()
+                    .shadow(10.dp, RoundedCornerShape(TpmRadius.large), ambientColor = Color.Black.copy(alpha = 0.18f), spotColor = Color.Black.copy(alpha = 0.18f))
+                    .background(TpmColors.White, RoundedCornerShape(TpmRadius.large))
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_tpm_logo_mark),
-                    contentDescription = "RUTF-DTAP logo",
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(46.dp),
+                Image(
+                    painter = painterResource(R.drawable.rutf_dtap_logo),
+                    contentDescription = "RUTF-DTAP: Traceability, Accountability, Better Nutrition",
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxWidth().heightIn(max = 96.dp),
                 )
             }
-            Spacer(Modifier.height(TpmSpacing.space4))
-            Text("RUTF-DTAP", style = MaterialTheme.typography.headlineMedium, color = TpmColors.White, textAlign = TextAlign.Center)
+            Spacer(Modifier.height(TpmSpacing.space2))
             Text(
-                "RUTF Digital Traceability & Accountability",
+                "RUTF Digital Traceability & Accountability Platform",
                 style = MaterialTheme.typography.bodyMedium,
-                color = TpmColors.White.copy(alpha = 0.92f),
+                color = TpmColors.White.copy(alpha = 0.95f),
                 textAlign = TextAlign.Center,
             )
-            Spacer(Modifier.height(TpmSpacing.space6))
+            Spacer(Modifier.height(TpmSpacing.space4))
 
             // The floating sign-in panel (high opacity so the form reads in sunlight).
             Column(

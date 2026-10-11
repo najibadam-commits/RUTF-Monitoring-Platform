@@ -19,6 +19,9 @@ object TpmColors {
     val Cyan = Color(0xFF36C5E8)
     val Turquoise = Color(0xFF40D9C0)
     val Mint = Color(0xFF55D6AC)
+    /** The RUTF-DTAP logo's green and navy (R166). */
+    val LogoGreen = Color(0xFF24A324)
+    val LogoNavy = Color(0xFF064687)
     val White = Color(0xFFFFFFFF)
 
     // Base
@@ -74,8 +77,8 @@ object TpmGradients {
     val Primary = Brush.linearGradient(listOf(TpmColors.Blue, TpmColors.Cyan))
     /** Highlighted panels: deep blue → blue → turquoise. */
     val Hero = Brush.linearGradient(listOf(TpmColors.DeepBlue, TpmColors.Blue, TpmColors.Turquoise))
-    /** A thin accent edge for highlighted cards. */
-    val Edge = Brush.linearGradient(listOf(TpmColors.Blue, TpmColors.Cyan, TpmColors.Turquoise))
+    /** A thin accent edge for highlighted cards: the logo's blue to its green (R166). */
+    val Edge = Brush.linearGradient(listOf(TpmColors.Blue, TpmColors.Turquoise, TpmColors.LogoGreen))
     /** Horizontal version for buttons. */
     val Button = Brush.horizontalGradient(listOf(TpmColors.DeepBlue, TpmColors.Blue, TpmColors.Cyan))
 }

@@ -1,13 +1,22 @@
-/** RUTF shield-and-leaf mark (landing and login pages), drawn after the landing-page mock-up. */
-export function RutfMark({ size = 44 }: { size?: number }) {
+import Image from "next/image";
+
+/** The RUTF-DTAP emblem (people, leaf and circle) from the official logo (DECISIONS R166). Decorative
+ *  wherever the name is also written next to it; pass a label where it stands alone. */
+export function RutfMark({ size = 44, label }: { size?: number; label?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 48 48" aria-hidden="true">
-      <path d="M24 3 6 9v14c0 11 7.6 19.3 18 22 10.4-2.7 18-11 18-22V9L24 3Z" fill="#123b73" />
-      <path d="M24 7.4 10 12.1V23c0 8.8 5.8 15.6 14 18 8.2-2.4 14-9.2 14-18V12.1L24 7.4Z" fill="#fff" />
-      <path d="M24 35V22" stroke="#2e9b62" strokeWidth="2.6" strokeLinecap="round" />
-      <path d="M24 26c-6.5 0-9.5-4-9.5-9 5.5 0 9.5 3 9.5 9Z" fill="#2e9b62" />
-      <path d="M24 26c6.5 0 9.5-4 9.5-9-5.5 0-9.5 3-9.5 9Z" fill="#3fb874" />
-      <circle cx="24" cy="15" r="3.2" fill="#2e9b62" />
-    </svg>
+    <Image src="/brand/rutf-dtap-mark.png" width={size} height={size} alt={label ?? ""} aria-hidden={label ? undefined : true}
+      style={{ display: "block", width: size, height: size }} priority />
+  );
+}
+
+/** The full RUTF-DTAP logo — emblem, wordmark and "Traceability · Accountability · Better Nutrition".
+ *  Its blue and green lettering needs a light background. */
+export function RutfLogo({ height = 48, maxWidth }: { height?: number; maxWidth?: number }) {
+  // The source lockup is 1400 × 356 px.
+  const width = Math.round((height * 1400) / 356);
+  return (
+    <Image src="/brand/rutf-dtap-logo.png" width={width} height={height}
+      alt="RUTF-DTAP: Traceability, Accountability, Better Nutrition"
+      style={{ display: "block", height: "auto", width: "100%", maxWidth: maxWidth ?? width }} priority />
   );
 }

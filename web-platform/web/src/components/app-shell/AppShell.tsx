@@ -125,9 +125,9 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
         <div style={{ display: "flex", alignItems: "center", gap: collapsed ? 6 : 10, padding: collapsed ? "18px 10px 16px" : "18px 16px 16px" }}>
           <span style={{ flex: "none", lineHeight: 0, background: "#fff", borderRadius: 10, padding: 4, boxShadow: "0 2px 8px rgba(0,0,0,.15)" }}><RutfMark size={26} /></span>
           <span className="app-brand-label" style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 14, lineHeight: 1.25, color: "#fff", whiteSpace: "nowrap", overflow: "hidden" }}>
-            RUTF Monitoring
+            <span style={{ fontSize: 16, fontWeight: 700, letterSpacing: "-0.01em" }}>RUTF-DTAP</span>
             <br />
-            Platform
+            <span style={{ fontSize: 11.5, fontWeight: 500, color: "rgba(255,255,255,.8)" }}>Monitoring Platform</span>
           </span>
           <button
             type="button"
