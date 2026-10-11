@@ -69,6 +69,8 @@ fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onReadmit
     var error by remember { mutableStateOf<String?>(null) }
     var ration by remember { mutableStateOf<JsonObject?>(null) }
     var reload by remember { mutableIntStateOf(0) }
+    var correcting by remember { mutableStateOf(false) }
+    var corrections by remember { mutableStateOf<List<JsonObject>>(emptyList()) }
 
     LaunchedEffect(childCode, reload) {
         error = null
@@ -78,6 +80,7 @@ fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onReadmit
                 val adm = r.data.obj("admission")
                 val lastWeight = r.data.arr("visits").objects().lastOrNull { it.str("weight_kg") != null }?.str("weight_kg") ?: adm?.str("weight_kg")
                 ration = lastWeight?.toDoubleOrNull()?.let { (repo.ration(it) as? OtpResult.Ok)?.data }
+                corrections = (repo.childCorrections(childCode) as? OtpResult.Ok)?.data?.correctionList().orEmpty()
             }
             is OtpResult.Error -> error = r.message
         }
@@ -108,7 +111,11 @@ fun OtpChildScreen(childCode: String, onRecordVisit: (String) -> Unit, onReadmit
             identity?.str("mobile_number")?.let { ReviewRow("Mobile", it) }
             Text("Write the Child ID on the caregiver's paper card: it opens this record at the next visit.",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
+            if (!correcting) TpmButton(text = "Correct the details", variant = TpmButtonVariant.Ghost, onClick = { correcting = true })
         }
+        // Correcting the child's or caregiver's details (R176), and the value-free history.
+        if (correcting) CorrectDetailsCard(c, onSaved = { correcting = false; reload++ }, onCancel = { correcting = false })
+        CorrectionsHistory(corrections)
 
         if (adm != null) TpmCard {
             Text(if (active) "Under treatment" else "Admission closed: ${OUTCOME_LABEL[adm.str("outcome")] ?: adm.str("outcome")}",

@@ -59,6 +59,9 @@ class OtpRepository {
     suspend fun recordVisit(body: JsonObject) = call("otp_record_visit", p(body))
     suspend fun recordMedication(body: JsonObject) = call("otp_record_medication", p(body))
     suspend fun recordOutcome(body: JsonObject) = call("otp_record_outcome", p(body))
+    /** Corrects the child's or caregiver's details with a reason (web migration 0140, R176). */
+    suspend fun correctChild(body: JsonObject) = call("otp_correct_child", p(body))
+    suspend fun childCorrections(childCode: String) = call("otp_child_corrections_list", buildJsonObject { put("p_child_code", childCode.trim().uppercase()) })
     suspend fun ration(weightKg: Double) = call("otp_ration", buildJsonObject { put("p_weight_kg", weightKg) })
 
     // Follow-up (web migration 0128; DECISIONS R150–R153): the visits list (Child IDs only), the

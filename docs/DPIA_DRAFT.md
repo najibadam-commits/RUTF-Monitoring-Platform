@@ -170,8 +170,8 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 | --- | --- | --- |
 | Be informed | The caregiver notice (§5) at registration | **[PROG]** approve the text and translation |
 | Access | The caregiver asks the OTP Officer, who opens the record with the Child ID and reads it out or prints it | No print/export of one child's record yet |
-| Correction | The OTP Officer corrects a wrong measurement through a new visit; **identity details (name, address, phone) cannot yet be corrected in the app** | **[PROG]** build a correction function (logged, value-free audit) before go-live |
-| Object / restrict (e.g. no phone contact) | The officer removes the mobile number | Needs the correction function above |
+| Correction | The OTP Officer corrects a wrong measurement through a new visit, and the child's and caregiver's details (name, sex, date of birth or age, caregiver's name, address, phone) on the child's card with **Correct the details** — who asked and why are required | **[PROG] — built 11 Oct (R176)**: logged value-free (which fields, why, who, when; never the old or new values) |
+| Object / restrict (e.g. no phone contact) | The officer removes the mobile number (**Remove the mobile number**, logged as "mobile number removed") | Built 11 Oct (R176) |
 | Erasure | Limited while the programme must keep treatment records; the identity details go at the end of retention (§8) | **[DPO]** decide how an erasure request during treatment is handled |
 | Complaint | To the programme, then the NDPC | **[PROG]** name the contact on the notice |
 
@@ -200,7 +200,7 @@ Nothing is deleted automatically today; **automatic deletion is not built yet [P
 3. **[DPO]** Decide the cross-border transfer, or move the hosting region (§7).
 4. **[PROG]** File the processors' DPAs (§7).
 5. **[DPO]** Approve retention (§8); **[PROG]** build automatic deletion of identity details.
-6. **[PROG]** Build identity correction in the app (§9).
+6. **[PROG] — done 11 Oct (R176)** Build identity correction in the app (§9).
 7. **[PROG] — done 11 Oct (R168)** Build automatic sign-out on the OTP screens after inactivity (R2). Built for the whole app: 15 minutes, one-minute warning, not resumed after the app is closed.
 8. **[PROG]** Set up the monthly access-log review (R1) and name the service-key holders (R7).
 9. **[DPO]** Decide on small numbers in the State Coordinator's site reports (R5).

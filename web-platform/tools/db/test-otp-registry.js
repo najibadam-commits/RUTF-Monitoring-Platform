@@ -156,6 +156,38 @@ const check = (area, what, expected, actual) => {
     check("ration", "3.9 kg -> no rule (struck-out row, Q2)", false, (await one(`select otp_ration(3.9) r`)).r.ok);
     check("ration", "12.3 kg -> 35 a week (G6 X7)", 35, (await one(`select otp_ration(12.3) r`)).r.packets_per_week);
     check("ration", "5.5 kg -> 18 a week (G6 X2)", 18, (await one(`select otp_ration(5.5) r`)).r.packets_per_week);
+
+    // ── Correcting a child's or caregiver's details (0140, R176; DPIA §9) ──
+    const fix = (p) => call(`select otp_correct_child($1::jsonb)`, [JSON.stringify({ child_code: code, ...p })]);
+    await as(officer.id, async () => {
+      check("correct", "a reason is required", true, String(await fix({ child_name: "Amina Corrected (DUMMY)", source: "caregiver_request" })).includes("reason"));
+      check("correct", "who asked is required", true, String(await fix({ child_name: "Amina Corrected (DUMMY)", reason: "x" })).includes("who asked"));
+      check("correct", "the name cannot be emptied", true, String(await fix({ child_name: " ", reason: "x", source: "officer_error" })).includes("cannot be empty"));
+      check("correct", "a bad mobile number is refused", true, String(await fix({ mobile_number: "12ab", reason: "x", source: "officer_error" })).includes("7 to 15 digits"));
+      const add = await fix({ mobile_number: "0803 123 4567", reason: "Caregiver gave a number (DUMMY)", source: "caregiver_request" });
+      check("correct", "a mobile number can be added", '["mobile number"]', JSON.stringify(add.fields_changed));
+      const ok = await fix({ child_name: "Amina Corrected (DUMMY)", mobile_number: "", reason: "Spelling on the card; caregiver asked not to be phoned (DUMMY)", source: "caregiver_request" });
+      check("correct", "name corrected and mobile removed", '["child name","mobile number removed"]', JSON.stringify(ok.fields_changed));
+      const card = await call(`select otp_child_lookup($1)`, [code]);
+      check("correct", "the card shows the new name", "Amina Corrected (DUMMY)", card.identity.child_name);
+      check("correct", "and no mobile number", null, card.identity.mobile_number ?? null);
+      check("correct", "the history lists fields, reason and who — no values", true,
+        ok.corrections.length === 2 && !JSON.stringify(ok.corrections).includes("Amina Corrected") && !JSON.stringify(ok.corrections).includes("0803") && !!ok.corrections[0].by);
+      check("correct", "nothing changed is refused", true, String(await fix({ child_name: "Amina Corrected (DUMMY)", reason: "x", source: "other" })).includes("Nothing was changed"));
+      const dob = await fix({ date_of_birth: "2024-10-01", reason: "Birth certificate seen (DUMMY)", source: "caregiver_request" });
+      check("correct", "a date of birth recalculates the age at registration", true, dob.fields_changed.includes("date of birth"));
+      check("correct", "a date of birth after registration is refused", true, String(await fix({ date_of_birth: "2099-01-01", reason: "x", source: "other" })).includes("after the registration"));
+    });
+    // Every audit row for this child's identity (one transaction: they share a timestamp).
+    const fixAudit = JSON.stringify((await pg.query(`select changes from audit_log where table_name = 'otp_child_identity' and row_id = (select id::text from otp_children where child_code = $1)`, [code])).rows);
+    check("correct", "the audit trail records fields but not values", true,
+      fixAudit.includes("child_name") && fixAudit.includes("mobile_number") && !fixAudit.includes("Amina Corrected") && !fixAudit.includes("0803"));
+    await as(supervisor.id, async () => {
+      check("correct", "a supervisor cannot correct", true, String(await fix({ child_name: "X", reason: "x", source: "other" })).includes("Only an OTP Officer"));
+    });
+    if (otherOfficer) await as(otherOfficer.id, async () => {
+      check("correct", "another site's officer cannot correct", true, String(await fix({ child_name: "X", reason: "x", source: "other" })).includes("another OTP site"));
+    });
   } catch (e) {
     console.error("ERROR", e.message);
     process.exitCode = 1;
