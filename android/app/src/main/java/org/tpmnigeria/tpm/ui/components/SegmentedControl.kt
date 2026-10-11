@@ -1,5 +1,9 @@
 package org.tpmnigeria.tpm.ui.components
 
+import org.tpmnigeria.tpm.ui.theme.TpmGradients
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,33 +38,31 @@ fun <T> TpmSegmentedControl(
     labelFor: (T) -> String,
     modifier: Modifier = Modifier,
 ) {
-    val shape = RoundedCornerShape(TpmRadius.small)
+    // Glass design (R164): a soft pill track; the selected option is a gradient pill with white text.
+    val track = RoundedCornerShape(TpmRadius.small)
+    val pill = RoundedCornerShape(TpmRadius.small - 3.dp)
     Row(
         modifier = modifier
-            .clip(shape)
-            .border(BorderStroke(1.dp, TpmColors.Divider), shape),
+            .clip(track)
+            .background(TpmColors.SurfaceSubtle, track)
+            .border(BorderStroke(1.dp, TpmColors.Divider), track)
+            .padding(3.dp),
     ) {
-        options.forEachIndexed { index, option ->
-            if (index > 0) {
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(TpmColors.Divider),
-                )
-            }
+        options.forEach { option ->
             val isSelected = option == selected
             Row(
                 modifier = Modifier
                     .weight(1f)
-                    .background(if (isSelected) TpmColors.Accent else Color.Transparent)
-                    .clickable { onSelect(option) }
-                    .padding(vertical = 10.dp, horizontal = 8.dp),
+                    .clip(pill)
+                    .then(if (isSelected) Modifier.background(TpmGradients.Button, pill) else Modifier)
+                    .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(option) })
+                    .heightIn(min = 44.dp)
+                    .padding(vertical = 10.dp, horizontal = 6.dp),
             ) {
                 Text(
                     text = labelFor(option),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (isSelected) TpmColors.Background else TpmColors.Text,
+                    color = if (isSelected) TpmColors.White else TpmColors.Text,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
                 )

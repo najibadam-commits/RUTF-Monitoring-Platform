@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.compose.foundation.layout.Box
@@ -41,7 +42,12 @@ class MainActivity : ComponentActivity() {
         // the exit transition and the automatic swap back to Theme.TpmApp (postSplashScreenTheme).
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // The header and sign-in screen are a blue gradient (glass design, R164): white status-bar
+        // icons; the bottom navigation is white: dark navigation-bar icons.
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(android.graphics.Color.WHITE, android.graphics.Color.WHITE),
+        )
         pendingDeepLinkUri.value = intent?.data?.toString()
         val app = application as TpmApplication
         setContent {

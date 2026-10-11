@@ -1,5 +1,8 @@
 package org.tpmnigeria.tpm.ui.components
 
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,9 +47,19 @@ fun TpmTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     keyboardType: KeyboardType = KeyboardType.Text,
 ) {
+    // A password field gets a show / hide control (unless the caller supplies its own icon).
+    var revealed by remember { mutableStateOf(false) }
+    val passwordToggle: (@Composable () -> Unit)? = if (isPassword && trailingIcon == null) {
+        {
+            IconButton(onClick = { revealed = !revealed }) {
+                Icon(if (revealed) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                    contentDescription = if (revealed) "Hide password" else "Show password", tint = TpmColors.TextMuted)
+            }
+        }
+    } else trailingIcon
     Column(modifier = modifier) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
-        Spacer(Modifier.height(5.dp))
+        Text(label, style = MaterialTheme.typography.bodySmall, color = TpmColors.Neutral700)
+        Spacer(Modifier.height(6.dp))
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -54,10 +67,10 @@ fun TpmTextField(
             enabled = enabled,
             singleLine = singleLine,
             minLines = minLines,
-            placeholder = placeholder?.let { { Text(it, color = TpmColors.TextMuted) } },
-            visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
-            trailingIcon = trailingIcon,
+            placeholder = placeholder?.let { { Text(it, color = TpmColors.Neutral500) } },
+            visualTransformation = if (isPassword && !revealed) PasswordVisualTransformation() else VisualTransformation.None,
+            keyboardOptions = KeyboardOptions(keyboardType = if (isPassword) KeyboardType.Password else keyboardType),
+            trailingIcon = passwordToggle,
             shape = RoundedCornerShape(TpmRadius.small),
             colors = tpmInputColors(),
         )
@@ -66,9 +79,9 @@ fun TpmTextField(
 
 @Composable
 internal fun tpmInputColors() = OutlinedTextFieldDefaults.colors(
-    focusedContainerColor = TpmColors.Surface,
-    unfocusedContainerColor = TpmColors.Surface,
-    disabledContainerColor = TpmColors.Surface.copy(alpha = 0.5f),
+    focusedContainerColor = TpmColors.White,
+    unfocusedContainerColor = TpmColors.SurfaceSubtle,
+    disabledContainerColor = TpmColors.SurfaceSubtle.copy(alpha = 0.6f),
     focusedBorderColor = TpmColors.Accent,
     unfocusedBorderColor = TpmColors.Divider,
     disabledBorderColor = TpmColors.Divider.copy(alpha = 0.45f),
@@ -106,8 +119,8 @@ fun <T> TpmDropdown(
     val displayPlaceholder = if (isEnabled && options.isEmpty()) noDataLabel else placeholder
 
     Column(modifier = modifier) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
-        Spacer(Modifier.height(5.dp))
+        Text(label, style = MaterialTheme.typography.bodySmall, color = TpmColors.Neutral700)
+        Spacer(Modifier.height(6.dp))
         ExposedDropdownMenuBox(
             expanded = expanded && isEnabled,
             onExpandedChange = { if (isEnabled) expanded = it },

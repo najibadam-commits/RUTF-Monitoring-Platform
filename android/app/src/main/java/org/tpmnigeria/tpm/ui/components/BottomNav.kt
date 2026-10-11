@@ -1,5 +1,13 @@
 package org.tpmnigeria.tpm.ui.components
 
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.semantics.Role
+import androidx.compose.foundation.selection.selectable
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,27 +46,35 @@ fun TpmBottomNav(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    // Glass design (R164): a white bar with a soft top shadow; the selected tab sits on a tinted pill.
     Row(
         modifier = modifier
-            .background(TpmColors.Background)
-            .border(BorderStroke(1.dp, TpmColors.Divider))
-            .windowInsetsPadding(WindowInsets.navigationBars),
+            .shadow(12.dp, RectangleShape, ambientColor = TpmColors.Blue.copy(alpha = 0.2f), spotColor = TpmColors.Blue.copy(alpha = 0.2f))
+            .background(TpmColors.White)
+            .windowInsetsPadding(WindowInsets.navigationBars)
+            .padding(horizontal = 6.dp, vertical = 6.dp),
     ) {
         items.forEach { item ->
             val selected = item.route == currentRoute
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .clickable { onSelect(item.route) }
-                    .padding(vertical = 8.dp),
+                    .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(item.route) })
+                    .heightIn(min = 52.dp)
+                    .padding(vertical = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Box(contentAlignment = Alignment.TopEnd) {
+                Box(
+                    contentAlignment = Alignment.TopEnd,
+                    modifier = Modifier
+                        .background(if (selected) TpmColors.Accent100 else Color.Transparent, RoundedCornerShape(TpmRadius.pill))
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                ) {
                     Icon(
                         item.icon,
                         contentDescription = item.label,
-                        tint = if (selected) TpmColors.Accent800 else TpmColors.Text.copy(alpha = 0.62f),
-                        modifier = Modifier.size(20.dp),
+                        tint = if (selected) TpmColors.Accent700 else TpmColors.Neutral600,
+                        modifier = Modifier.size(22.dp),
                     )
                     if (item.badge) {
                         Box(
@@ -71,7 +87,7 @@ fun TpmBottomNav(
                 Text(
                     item.label,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (selected) TpmColors.Accent800 else TpmColors.Text.copy(alpha = 0.62f),
+                    color = if (selected) TpmColors.Accent700 else TpmColors.Neutral600,
                 )
             }
         }

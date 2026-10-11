@@ -113,10 +113,11 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   return (
     <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
       <RealtimeRefresher table="issues" />
-      <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      {/* The welcome panel (glass design, R164): gradient, white text, the month picker. */}
+      <div className="hero-panel" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap", padding: "20px 24px" }}>
         <div>
-          <h2 style={{ marginBottom: 2 }}>Overview Dashboard</h2>
-          <p className="text-muted" style={{ fontSize: 13, margin: 0 }}>
+          <h2 style={{ marginBottom: 4, color: "#fff" }}>Overview Dashboard</h2>
+          <p style={{ fontSize: 13.5, margin: 0, color: "rgba(255,255,255,.92)" }}>
             Katsina State RUTF pipeline, State store → LGA stores → OTP sites · {month.label} ·{" "}
             {k ? `${k.active_facilities.toLocaleString("en-GB")} stores and OTP sites reporting` : "No data for this month"}
           </p>
@@ -127,7 +128,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <option key={m.key} value={m.key}>{m.label}</option>
             ))}
           </select>
-          <button className="btn btn-primary" type="submit">Show</button>
+          <button className="btn btn-secondary" type="submit">Show</button>
         </form>
       </div>
 

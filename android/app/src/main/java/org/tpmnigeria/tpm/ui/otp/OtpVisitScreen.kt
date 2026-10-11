@@ -1,5 +1,7 @@
 package org.tpmnigeria.tpm.ui.otp
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import org.tpmnigeria.tpm.ui.components.TpmSectionHeader
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -175,6 +177,9 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
 
         if (!admissionVisit) ChoiceField("Did the child attend?", listOf(true, false), attended, { attended = it }) { if (it) "Attended" else "Absent" }
         if (attended) {
+          // Glass design (R164): the form in sections, each a card.
+          TpmCard(modifier = Modifier.fillMaxWidth()) {
+            TpmSectionHeader("Measurements")
             DecimalField(label = "Weight (kg)", value = weight, onValueChange = { weight = it })
             ration?.let {
                 if (it.bool("ok")) Text("Ration: ${it.str("packets_per_week")} packets a week (${it.str("packets_per_day")} a day) · ${it.str("source")}",
@@ -186,18 +191,25 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
             ChoiceField("Oedema", OEDEMA, oedema, { oedema = it }, ::oedemaLabel)
             DecimalField(label = "WFH Z-score (if used)", value = wfh, onValueChange = { wfh = it }, signed = true)
             ChoiceField("RUTF appetite test", listOf("good", "poor", "refused"), appetite, { appetite = it }) { it.replaceFirstChar(Char::uppercase) }
-            Text("Medical history (number of days)", style = MaterialTheme.typography.titleSmall)
+          }
+          TpmCard(modifier = Modifier.fillMaxWidth()) {
+            TpmSectionHeader("Medical history (number of days)")
             NumberField(label = "Diarrhoea", value = diarrhoea, onValueChange = { diarrhoea = it })
             NumberField(label = "Vomiting", value = vomiting, onValueChange = { vomiting = it })
             NumberField(label = "Fever", value = fever, onValueChange = { fever = it })
             NumberField(label = "Cough", value = cough, onValueChange = { cough = it })
-            Text("Physical examination", style = MaterialTheme.typography.titleSmall)
+          }
+          TpmCard(modifier = Modifier.fillMaxWidth()) {
+            TpmSectionHeader("Physical examination")
             DecimalField(label = "Temperature (°C)", value = temperature, onValueChange = { temperature = it })
             NumberField(label = "Respiratory rate (per minute)", value = respiratory, onValueChange = { respiratory = it })
             ChoiceField("Dehydrated", yesNo, dehydrated, { dehydrated = it }) { if (it) "Yes" else "No" }
             ChoiceField("Palmar pallor / anaemia", yesNo, pallor, { pallor = it }) { if (it) "Yes" else "No" }
             ChoiceField("Superficial infection", yesNo, infection, { infection = it }) { if (it) "Yes" else "No" }
             TpmTextField(label = "Action / medication required (details)", value = actionDetails, onValueChange = { actionDetails = it }, singleLine = false, minLines = 2)
+          }
+          TpmCard(modifier = Modifier.fillMaxWidth(), blueprint = true) {
+            TpmSectionHeader("RUTF given")
             if (withheld != null) Text("No RUTF recommended: $withheld. As the OTP Officer you may still give RUTF, with the reason.",
                 color = OtpRed, style = MaterialTheme.typography.bodyMedium)
             NumberField(label = "RUTF packets given", value = dispensed, onValueChange = { dispensed = it })
@@ -211,6 +223,7 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
             if ((dispensed.toIntOrNull() ?: 0) > 0) Text("After saving, take a photo of the RUTF given (sachets only).",
                 style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
             TpmTextField(label = "Examiner's initials", value = initials, onValueChange = { initials = it })
+          }
         }
 
         val given = dispensed.toIntOrNull()
@@ -228,6 +241,9 @@ fun OtpVisitScreen(childCode: String, onDone: () -> Unit, onExit: () -> Unit) {
                     val body = buildJsonObject {
                         put("child_code", childCode); put("attended", attended || admissionVisit); put("client_id", clientId)
                         if (admissionVisit) put("admission_visit", true)
+                        // The phone's date, so a visit just after midnight is not dated the day before
+                        // (the server runs in UTC; web 0133). The admission visit takes the admission date.
+                        else put("visit_on", java.time.LocalDate.now().toString())
                         if (attended) {
                             weight.toDoubleOrNull()?.let { put("weight_kg", it) }; height.toDoubleOrNull()?.let { put("height_cm", it) }
                             muac.toDoubleOrNull()?.let { put("muac_cm", it) }; oedema?.let { put("oedema", it) }

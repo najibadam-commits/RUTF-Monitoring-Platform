@@ -1,5 +1,42 @@
 package org.tpmnigeria.tpm.ui.screens
 
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import org.tpmnigeria.tpm.ui.components.TpmSectionHeader
+import org.tpmnigeria.tpm.ui.components.TpmMetricCard
+import org.tpmnigeria.tpm.ui.components.TpmGradientBackground
+import org.tpmnigeria.tpm.ui.components.TpmFeatureTile
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material.icons.filled.VerifiedUser
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.TaskAlt
+import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.RemoveCircleOutline
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.MoveToInbox
+import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.LocalShipping
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Inventory
+import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.automirrored.filled.FactCheck
+import androidx.compose.material.icons.filled.EventBusy
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.ChildCare
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.shape.RoundedCornerShape
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -74,22 +111,23 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(TpmSpacing.space2),
     ) {
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            // The welcome panel (glass design, R164): gradient, soft shapes, white text.
+            TpmGradientBackground(
+                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(TpmRadius.large)),
             ) {
-                Column {
-                    Text("Good day,", style = MaterialTheme.typography.bodyMedium, color = TpmColors.TextMuted)
-                    Text(user.name, style = MaterialTheme.typography.headlineMedium)
+                Column(modifier = Modifier.fillMaxWidth().padding(TpmSpacing.space4), verticalArrangement = Arrangement.spacedBy(TpmSpacing.space1)) {
+                    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Good day,", style = MaterialTheme.typography.bodyMedium, color = TpmColors.White.copy(alpha = 0.9f))
+                            Text(user.name, style = MaterialTheme.typography.headlineSmall, color = TpmColors.White)
+                        }
+                        androidx.compose.material3.TextButton(onClick = onLogout) {
+                            Text("Sign out", style = MaterialTheme.typography.labelLarge, color = TpmColors.White)
+                        }
+                    }
+                    SyncStatusLine(pendingSync, onNavigateToSyncQueue)
                 }
-                TpmButton(
-                    text = "Sign out",
-                    onClick = onLogout,
-                    variant = TpmButtonVariant.Ghost,
-                )
             }
-            SyncStatusLine(pendingSync, onNavigateToSyncQueue)
             Spacer(Modifier.height(TpmSpacing.space3))
             if (MobileAccess.canSupervise(role) && user.supervisionLevel != null) {
                 SupervisionActions(user.supervisionLevel, onStartStock)
@@ -129,25 +167,28 @@ fun HomeScreen(
             Spacer(Modifier.height(TpmSpacing.space2))
         }
 
+        item { TpmSectionHeader("Findings") }
         items(kpis.chunked(2)) { pair ->
-            Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space2), modifier = Modifier.fillMaxWidth()) {
+            Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space3), modifier = Modifier.fillMaxWidth()) {
                 pair.forEach { kpi ->
-                    TpmCard(
-                        modifier = Modifier
-                            .weight(1f)
-                            .clickable { if (kpi.toSyncQueue) onNavigateToSyncQueue() else onNavigateToIssueList(kpi.filter) },
-                    ) {
-                        Text(kpi.count.toString(), style = MaterialTheme.typography.headlineSmall)
-                        Text(kpi.label, style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted)
-                    }
+                    val (icon, tint, bg) = kpiStyle(kpi)
+                    TpmMetricCard(
+                        label = kpi.label,
+                        value = kpi.count.toString(),
+                        icon = icon,
+                        accent = tint,
+                        accentBg = bg,
+                        modifier = Modifier.weight(1f),
+                        onClick = { if (kpi.toSyncQueue) onNavigateToSyncQueue() else onNavigateToIssueList(kpi.filter) },
+                    )
                 }
                 if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
         }
 
         item {
-            Spacer(Modifier.height(TpmSpacing.space4))
-            Text("Recent Findings", style = MaterialTheme.typography.titleSmall, color = TpmColors.TextMuted)
+            Spacer(Modifier.height(TpmSpacing.space2))
+            TpmSectionHeader("Recent Findings")
         }
 
         if (recent.isEmpty()) {
@@ -225,10 +266,10 @@ private fun SyncStatusLine(pendingSync: Int, onOpen: () -> Unit) {
         if (pendingSync == 0) "✓ Everything is synced"
         else "$pendingSync ${if (pendingSync == 1) "entry is" else "entries are"} on this phone, waiting to sync. They send by themselves when you're online.",
         style = MaterialTheme.typography.bodySmall,
-        color = if (pendingSync == 0) TpmColors.TextMuted else TpmColors.Accent800,
+        color = TpmColors.White,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onOpen)
+            .clickable(onClickLabel = "Open the sync queue", onClick = onOpen)
             .padding(top = TpmSpacing.space1),
     )
 }
@@ -275,7 +316,7 @@ private fun MyFacilityCard(facilityId: String?) {
             Text(
                 "On hand: ${"%,d".format(p.total)} sachets",
                 style = MaterialTheme.typography.titleSmall,
-                color = if (p.total <= 0) TpmColors.Accent800 else MaterialTheme.colorScheme.onSurface,
+                color = if (p.total <= 0) TpmColors.Error else MaterialTheme.colorScheme.onSurface,
             )
         }
         supplier?.let { Text("Supplied by ${it.name}", style = MaterialTheme.typography.bodySmall, color = TpmColors.TextMuted) }
@@ -293,6 +334,13 @@ private fun MyFacilityCard(facilityId: String?) {
 private fun StockActions(facilityId: String, onStart: (String) -> Unit) {
     val references = LocalReferenceRepository.current
     val facility by remember(facilityId) { references.observeFacility(facilityId) }.collectAsState(initial = null)
+    // The officer's facility decides which actions show (OTP Admission Card, Daily Dispensing). If it
+    // is not on the phone yet (a fresh install, or the first download failed), fetch it now rather
+    // than waiting for the next sign-in; offline this just fails quietly and the cache stays as it was.
+    LaunchedEffect(facilityId) {
+        delay(1500)
+        if (references.observeFacility(facilityId).first() == null) runCatching { references.refreshFacilities() }
+    }
     val isStore = facility?.facilityType == "state_store" || facility?.facilityType == "lga_store"
     val isOtp = facility?.isOtpSite == true
     val actions = buildList {
@@ -305,15 +353,92 @@ private fun StockActions(facilityId: String, onStart: (String) -> Unit) {
         add("Stock Count" to Routes.StockCount)
         add("Record Loss / Adjustment" to Routes.LossAdjustment)
     }
-    actions.forEachIndexed { i, (label, route) ->
-        TpmButton(
-            text = label,
-            onClick = { onStart(route) },
-            variant = if (i == 0) TpmButtonVariant.Primary else TpmButtonVariant.Secondary,
-            blueprint = true,
-            fullWidth = true,
-        )
+    if (isOtp && facility?.facilityType == "health_facility") {
+        OtpTaskSummary(onOpen = { onStart(Routes.OtpTasks) })
         Spacer(Modifier.height(TpmSpacing.space2))
+    }
+    TpmSectionHeader("My work")
+    Spacer(Modifier.height(TpmSpacing.space2))
+    ActionGrid(actions, onStart)
+}
+
+/** Actions as a two-column grid of tiles; the first (the role's main workflow) is highlighted. */
+@Composable
+private fun ActionGrid(actions: List<Pair<String, String>>, onStart: (String) -> Unit) {
+    actions.chunked(2).forEachIndexed { row, pair ->
+        Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space3), modifier = Modifier.fillMaxWidth()) {
+            pair.forEachIndexed { col, (label, route) ->
+                TpmFeatureTile(
+                    label = label,
+                    icon = actionIcon(route),
+                    onClick = { onStart(route) },
+                    highlighted = row == 0 && col == 0,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+            if (pair.size == 1) Spacer(Modifier.weight(1f))
+        }
+        Spacer(Modifier.height(TpmSpacing.space3))
+    }
+}
+
+private fun actionIcon(route: String): ImageVector = when (route) {
+    Routes.OtpHome -> Icons.Filled.ChildCare
+    Routes.MyStock -> Icons.Filled.Inventory
+    Routes.ReceiveStock -> Icons.Filled.MoveToInbox
+    Routes.IssueStock -> Icons.Filled.LocalShipping
+    Routes.DailyDispensing -> Icons.Filled.MedicalServices
+    Routes.StockCount -> Icons.Filled.Calculate
+    Routes.LossAdjustment -> Icons.Filled.RemoveCircleOutline
+    Routes.StoreCheck -> Icons.Filled.Store
+    Routes.OtpVerification -> Icons.Filled.VerifiedUser
+    Routes.ConfirmAdjustments -> Icons.Filled.TaskAlt
+    else -> Icons.Filled.Apps
+}
+
+/** Icon and colours for a Findings count, so the cards read at a glance (status is also in words). */
+private fun kpiStyle(kpi: Kpi): Triple<ImageVector, Color, Color> = when {
+    kpi.toSyncQueue -> Triple(Icons.Filled.CloudUpload, TpmColors.Accent700, TpmColors.Accent100)
+    kpi.filter == "overdue" -> Triple(Icons.Filled.Schedule, TpmColors.Error, TpmColors.ErrorBg)
+    kpi.filter == IssueStatus.Reopened.name -> Triple(Icons.Filled.Replay, TpmColors.Error, TpmColors.ErrorBg)
+    kpi.filter == IssueStatus.VerifiedClosed.name -> Triple(Icons.Filled.CheckCircle, TpmColors.Success, TpmColors.SuccessBg)
+    kpi.filter == IssueStatus.ResolvedPendingVerification.name -> Triple(Icons.AutoMirrored.Filled.FactCheck, TpmColors.Success, TpmColors.SuccessBg)
+    kpi.filter == IssueStatus.Ongoing.name -> Triple(Icons.Filled.Build, TpmColors.Warning, TpmColors.WarningBg)
+    kpi.filter == IssueStatus.PendingReview.name || kpi.filter == IssueStatus.New.name -> Triple(Icons.Filled.HourglassTop, TpmColors.Warning, TpmColors.WarningBg)
+    else -> Triple(Icons.Filled.Flag, TpmColors.Accent700, TpmColors.Accent100)
+}
+
+/**
+ * The OTP Officer's live task counts (from otp_my_visits: counts only, no child details), each
+ * opening Visits and tasks. Online only, like the rest of the OTP Admission Card: nothing shows
+ * offline rather than stale numbers.
+ */
+@Composable
+private fun OtpTaskSummary(onOpen: () -> Unit) {
+    val repo = remember { org.tpmnigeria.tpm.data.OtpRepository() }
+    var counts by remember { mutableStateOf<kotlinx.serialization.json.JsonObject?>(null) }
+    LaunchedEffect(Unit) {
+        counts = (repo.myVisits() as? org.tpmnigeria.tpm.data.OtpResult.Ok)?.data?.let { it["counts"] as? kotlinx.serialization.json.JsonObject }
+    }
+    val c = counts ?: return
+    fun n(k: String) = (c[k] as? kotlinx.serialization.json.JsonPrimitive)?.content ?: "0"
+    TpmSectionHeader("OTP visits and tasks")
+    Spacer(Modifier.height(TpmSpacing.space2))
+    val cards = listOf(
+        Triple("Visits overdue", n("overdue"), Icons.Filled.EventBusy),
+        Triple("Visits due today", n("today"), Icons.Filled.Today),
+        Triple("RUTF photos to send", n("awaiting_photo"), Icons.Filled.PhotoCamera),
+        Triple("Open referrals", n("referrals"), Icons.Filled.LocalHospital),
+    )
+    cards.chunked(2).forEach { pair ->
+        Row(horizontalArrangement = Arrangement.spacedBy(TpmSpacing.space3), modifier = Modifier.fillMaxWidth()) {
+            pair.forEach { (label, value, icon) ->
+                val urgent = value != "0" && (label.startsWith("Visits overdue") || label.startsWith("Open referrals"))
+                TpmMetricCard(label = label, value = value, icon = icon, onClick = onOpen, modifier = Modifier.weight(1f),
+                    accent = if (urgent) TpmColors.Error else TpmColors.Accent700, accentBg = if (urgent) TpmColors.ErrorBg else TpmColors.Accent100)
+            }
+        }
+        Spacer(Modifier.height(TpmSpacing.space3))
     }
 }
 
@@ -326,14 +451,7 @@ private fun SupervisionActions(level: String, onStart: (String) -> Unit) {
         if (level == "otp_sites") add("OTP Verification" to Routes.OtpVerification)
         add("Confirm Adjustments" to Routes.ConfirmAdjustments)
     }
-    actions.forEachIndexed { i, (label, route) ->
-        TpmButton(
-            text = label,
-            onClick = { onStart(route) },
-            variant = if (i == 0) TpmButtonVariant.Primary else TpmButtonVariant.Secondary,
-            blueprint = true,
-            fullWidth = true,
-        )
-        Spacer(Modifier.height(TpmSpacing.space2))
-    }
+    TpmSectionHeader("Supervision")
+    Spacer(Modifier.height(TpmSpacing.space2))
+    ActionGrid(actions, onStart)
 }

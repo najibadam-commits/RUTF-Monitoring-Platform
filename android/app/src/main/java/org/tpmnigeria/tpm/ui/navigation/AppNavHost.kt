@@ -1,5 +1,8 @@
 package org.tpmnigeria.tpm.ui.navigation
 
+import androidx.compose.foundation.background
+import org.tpmnigeria.tpm.ui.theme.TpmColors
+import org.tpmnigeria.tpm.ui.theme.TpmGradients
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -138,8 +141,10 @@ fun AppNavHost(session: AppSession) {
     ) {
       Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
+            containerColor = TpmColors.Background,
             topBar = {
-                Column(modifier = Modifier.statusBarsPadding()) {
+                // The gradient runs under the status bar; the header's content is white (R164).
+                Column(modifier = Modifier.background(TpmGradients.Primary).statusBarsPadding()) {
                     TpmHeader(
                         title = headerTitle,
                         showBack = !isTopLevel,

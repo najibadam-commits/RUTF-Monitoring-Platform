@@ -52,8 +52,8 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
     }
     // A read as the database owner from inside an as() block (the test's own check, not the user's access).
     const sys = async (sql, params = []) => { await pg.query("reset role"); try { return await one(sql, params); } finally { await pg.query("set local role authenticated"); } };
-    const today = (await one(`select current_date::text d`)).d;
-    const day = async (n) => (await one(`select (current_date + $1::int)::text d`, [n])).d;
+    const today = (await one(`select (now() at time zone 'Africa/Lagos')::date::text d`)).d;
+    const day = async (n) => (await one(`select ((now() at time zone 'Africa/Lagos')::date + $1::int)::text d`, [n])).d;
 
     // ── First visit: screen, register, then (dated three weeks ago) the admission visit ──
     let code, admId, v1;
@@ -65,7 +65,7 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("first visit", "after registration the next step is the admission visit", "admission_visit", look.next_step.step);
     });
     admId = (await one(`select a.id from otp_admissions a join otp_children c on c.id = a.child_id where c.child_code = $1`, [code])).id;
-    await pg.query(`update otp_admissions set admitted_on = current_date - 21 where id = $1`, [admId]);
+    await pg.query(`update otp_admissions set admitted_on = (now() at time zone 'Africa/Lagos')::date - 21 where id = $1`, [admId]);
 
     const visit = (p) => call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: code, ...p })]);
     await as(officer.id, async () => {
@@ -143,9 +143,9 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
     // beyond 12 weeks a referral to a doctor is suggested (RUTF still recommended).
     const rs = (await one(`select params from otp_rule_sets where version = '2026-10-draft'`)).params;
     check("12 weeks", "rule set: weekly, up to 12 weeks; the visit-count rule off", "7/12/null", `${rs.visit_interval_days}/${rs.max_weeks}/${rs.max_visits}`);
-    const wk11 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', current_date + 56)) r`, [admId]);
+    const wk11 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', (now() at time zone 'Africa/Lagos')::date + 56)) r`, [admId]);
     check("12 weeks", "week 11: no referral flag", false, wk11.r.flags.some((f) => f.code === "beyond_max_weeks"));
-    const wk13 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', current_date + 70)) r`, [admId]);
+    const wk13 = await one(`select otp_recovery_assessment($1, 5, jsonb_build_object('weight_kg', 7.4, 'visit_on', (now() at time zone 'Africa/Lagos')::date + 70)) r`, [admId]);
     const f13 = wk13.r.flags.find((f) => f.code === "beyond_max_weeks");
     check("12 weeks", "beyond 12 weeks: refer to a doctor", "refer", f13 && f13.action);
     check("12 weeks", "beyond 12 weeks: RUTF still recommended (a suggestion)", false, f13 && f13.withhold_ration);
@@ -193,13 +193,13 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("access", "another site's officer cannot view the photo", false, await call(`select otp_rutf_photo_can_view($1)`, [photoPath]));
     });
     if (coordinator) await as(coordinator.id, async () => {
-      const agg = await call(`select otp_followup_aggregates(current_date - 30, current_date)`);
+      const agg = await call(`select otp_followup_aggregates((now() at time zone 'Africa/Lagos')::date - 30, (now() at time zone 'Africa/Lagos')::date)`);
       check("aggregates", "follow-up figures for the coordinator", true, !!agg && !!agg.counts);
       check("aggregates", "no child-level data in them", false, has(agg, code) || has(agg, "Zainab"));
     });
 
     // ── Weekly report: section L, a correction, under review, rejected ──
-    const week = (await one(`select lower(otp_week_of(current_date - 14))::text w`)).w;
+    const week = (await one(`select lower(otp_week_of((now() at time zone 'Africa/Lagos')::date - 14))::text w`)).w;
     await pg.query(`delete from otp_weekly_report_adjustments where report_id in (select id from otp_weekly_reports where facility_id = $1 and week_start = $2)`, [officer.facility, week]);
     await pg.query(`delete from otp_weekly_report_versions where report_id in (select id from otp_weekly_reports where facility_id = $1 and week_start = $2)`, [officer.facility, week]);
     await pg.query(`delete from otp_weekly_reports where facility_id = $1 and week_start = $2`, [officer.facility, week]);
@@ -251,7 +251,7 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       const scr = await call(`select otp_screen($1::jsonb)`, [JSON.stringify({ sex: "F", age_months: 30, weight_kg: 9.0, height_cm: 82, muac_cm: 11.2, oedema: "absent", medical_complications: false, appetite_test: "pass" })]);
       code3 = (await call(`select otp_register_child($1::jsonb)`, [JSON.stringify({ screening_id: scr.screening_id, child_name: "Hafsat Pathway (DUMMY)", sex: "F", confirm_not_duplicate: true })])).child_code;
     });
-    await pg.query(`update otp_admissions set admitted_on = current_date - 21 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
+    await pg.query(`update otp_admissions set admitted_on = (now() at time zone 'Africa/Lagos')::date - 21 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
     await as(officer.id, async () => {
       const v = (p) => call(`select otp_record_visit($1::jsonb)`, [JSON.stringify({ child_code: code3, appetite_test: "good", oedema: "absent", ...p })]);
       await v({ admission_visit: true, rutf_dispensed: 25 });
@@ -264,7 +264,7 @@ const has = (v, text) => String(typeof v === "string" ? v : JSON.stringify(v)).i
       check("pathway", "a 5th visit is scheduled", true, !!fourth.next_visit_due);
     });
     // 12 weeks without recovery: admitted 12 weeks ago, the latest visit today -> refer to a doctor.
-    await pg.query(`update otp_admissions set admitted_on = current_date - 84 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
+    await pg.query(`update otp_admissions set admitted_on = (now() at time zone 'Africa/Lagos')::date - 84 where child_id = (select id from otp_children where child_code = $1)`, [code3]);
     await as(officer.id, async () => {
       const look = await call(`select otp_child_lookup($1)`, [code3]);
       check("pathway", "12 weeks without recovery -> refer to see a doctor", true, look.next_step.step === "refer" && look.next_step.message.includes("12 weeks"));

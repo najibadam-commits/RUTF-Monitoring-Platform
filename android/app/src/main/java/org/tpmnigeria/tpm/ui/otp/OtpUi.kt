@@ -24,10 +24,11 @@ import org.tpmnigeria.tpm.ui.components.TpmSegmentedControl
 import org.tpmnigeria.tpm.ui.components.TpmTextField
 import org.tpmnigeria.tpm.ui.theme.TpmColors
 
-/** Colours for the pathway result (the Corrective Action Tracker's: green go, red refer, amber wait). */
-internal val OtpGreen = Color(0xFF2E9B62)
-internal val OtpRed = Color(0xFFD62828)
-internal val OtpAmber = Color(0xFFE8590C)
+/** Colours for the pathway result: green go, red refer, amber wait — the design system's semantic
+ *  colours (R164), always next to words, never alone. */
+internal val OtpGreen = TpmColors.Success
+internal val OtpRed = TpmColors.Error
+internal val OtpAmber = TpmColors.Warning
 
 /** Blocks screenshots and screen recording while a child's details are on screen (privacy rule). */
 @Composable

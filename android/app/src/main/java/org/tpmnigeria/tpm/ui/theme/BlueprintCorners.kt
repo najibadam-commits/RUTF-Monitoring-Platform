@@ -18,11 +18,14 @@ import androidx.compose.ui.unit.Dp
  * Usage: `Modifier.blueprintCorners()` — draws on top of the content, brackets extend slightly
  * outside the composable's bounds so pair it with a little extra padding/margin from neighbors.
  */
+/** The glass design system (R164) replaces the bracket motif with gradient-edged cards; kept switchable. */
+private const val BLUEPRINT_CORNERS_ENABLED = false
+
 fun Modifier.blueprintCorners(
     color: Color? = null,
     armLength: Dp = TpmBlueprint.armLength,
     strokeWidth: Dp = TpmBlueprint.strokeWidth,
-): Modifier = composed {
+): Modifier = if (!BLUEPRINT_CORNERS_ENABLED) this else composed {
     val brushColor = color ?: TpmColors.Accent
     this.drawWithContent {
         drawContent()

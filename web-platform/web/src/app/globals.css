@@ -14,88 +14,112 @@
    system's look — extend it, don't reintroduce one-off inline colors.
    ══════════════════════════════════════════════════════════════════════ */
 :root {
-  --color-bg: #f6f8fb;
+  /* RUTF-DTAP glass design system (DECISIONS R164), shared with the Android app
+     (ui/theme/Color.kt). Token NAMES are unchanged, so every page picks up the values. */
+  --color-bg: #f4f9fd;
   --color-surface: #ffffff;
-  --color-text: #14213d;
-  --color-accent: #1677d2;
-  --color-accent-2: #123b73;
-  --color-divider: #d9e2ec;
+  --color-text: #19324d;
+  --color-text-muted: #71869a;
+  --color-accent: #1687f8;
+  --color-accent-2: #1264d8;
+  --color-divider: #dce8f4;
 
-  --color-neutral-100: #f6f8fb;
-  --color-neutral-200: #eef2f7;
-  --color-neutral-300: #e1e7ee;
-  --color-neutral-400: #c9d2dc;
-  --color-neutral-500: #a6b0bf;
-  --color-neutral-600: #808a99;
-  --color-neutral-700: #667085;
-  --color-neutral-800: #4a5568;
-  --color-neutral-900: #2d3748;
+  --brand-blue: #1687f8;
+  --brand-deep-blue: #1264d8;
+  --brand-cyan: #36c5e8;
+  --brand-turquoise: #40d9c0;
+  --brand-mint: #55d6ac;
 
-  --color-accent-100: #dceeff;
-  --color-accent-200: #c3e2ff;
-  --color-accent-300: #9bcdfc;
-  --color-accent-400: #6bb3f7;
-  --color-accent-500: #3b94ed;
-  --color-accent-600: #1677d2;
-  --color-accent-700: #125fad;
-  --color-accent-800: #123b73;
-  --color-accent-900: #0c2850;
+  --gradient-primary: linear-gradient(120deg, #1264d8 0%, #1687f8 45%, #36c5e8 100%);
+  --gradient-hero: linear-gradient(135deg, #1264d8 0%, #1687f8 50%, #40d9c0 100%);
+  --gradient-edge: linear-gradient(90deg, #1687f8, #36c5e8, #40d9c0);
+  /* The page: the light background with soft cyan and mint washes (no images, no animation). */
+  --page-bg:
+    radial-gradient(1100px 520px at 100% -8%, rgba(54, 197, 232, 0.13), transparent 70%),
+    radial-gradient(900px 480px at -8% 108%, rgba(85, 214, 172, 0.11), transparent 70%),
+    #f4f9fd;
 
-  /* Subtle cyan accent ramp — used sparingly (secondary tags, chart highlight),
-     never as the dominant color, per the brief's "don't make every component
-     blue" guidance. */
-  --color-accent-2-100: #e4f7fd;
-  --color-accent-2-200: #c7eefb;
-  --color-accent-2-300: #9fe0f7;
-  --color-accent-2-400: #6fcdf0;
-  --color-accent-2-500: #43bae8;
-  --color-accent-2-600: #29a9e8;
-  --color-accent-2-700: #1d86bb;
-  --color-accent-2-800: #17638c;
-  --color-accent-2-900: #0f415e;
+  /* Glass surfaces: near-opaque white (text-heavy content stays readable) over the page. */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  --glass-strong: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-blur: 14px;
 
-  /* Status / priority — hue meaning preserved from Nocturne, re-tuned for
-     light-background contrast. Reuses the brief's system colors (success/
-     warning/danger) where the status maps cleanly onto one. */
-  --status-new: #94a3b8;
-  --status-pending-review: #8b5cf6;
-  --status-returned-for-correction: #f2994a;
-  --status-assigned: #3b82f6;
-  --status-in-progress: #e7a52b;
-  --status-resolved: #2e9b62;
-  --status-verified-closed: #123b73;
-  --status-reopened: #d9534f;
-  --priority-critical: #d9534f;
-  --priority-high: #e7a52b;
-  --priority-medium: #3b94ed;
-  --priority-low: #94a3b8;
+  --color-neutral-100: #f3f7fb;
+  --color-neutral-200: #e9f0f7;
+  --color-neutral-300: #dce6f0;
+  --color-neutral-400: #c3d1df;
+  --color-neutral-500: #a3b3c4;
+  --color-neutral-600: #71869a;
+  --color-neutral-700: #5a6e82;
+  --color-neutral-800: #3e5266;
+  --color-neutral-900: #243649;
+
+  --color-accent-100: #e8f3fe;
+  --color-accent-200: #cfe6fd;
+  --color-accent-300: #a9d3fb;
+  --color-accent-400: #6fb4f9;
+  --color-accent-500: #3f9cf9;
+  --color-accent-600: #1687f8;
+  --color-accent-700: #1264d8;
+  --color-accent-800: #0f4ea8;
+  --color-accent-900: #0b3a7d;
+
+  /* Cyan / turquoise ramp — secondary tags and chart highlights, used sparingly. */
+  --color-accent-2-100: #e3f8fc;
+  --color-accent-2-200: #c3eff8;
+  --color-accent-2-300: #94e2f2;
+  --color-accent-2-400: #5fd2ec;
+  --color-accent-2-500: #36c5e8;
+  --color-accent-2-600: #1fa9cc;
+  --color-accent-2-700: #1787a6;
+  --color-accent-2-800: #136680;
+  --color-accent-2-900: #0d4659;
+
+  /* Status / priority — meaning unchanged; accessible on white, always with a word or icon. */
+  --status-new: #8798aa;
+  --status-pending-review: #7c5cf0;
+  --status-returned-for-correction: #e8590c;
+  --status-assigned: #1687f8;
+  --status-in-progress: #d4930f;
+  --status-resolved: #1e8e5a;
+  --status-verified-closed: #0f4ea8;
+  --status-reopened: #c62828;
+  --priority-critical: #c62828;
+  --priority-high: #d4930f;
+  --priority-medium: #1687f8;
+  --priority-low: #8798aa;
+  --color-success: #1e8e5a;
+  --color-warning: #b45309;
+  --color-danger: #c62828;
 
   --font-heading: var(--font-inter), system-ui, sans-serif;
-  --font-heading-weight: 500;
+  --font-heading-weight: 600;
   --font-body: var(--font-inter), system-ui, sans-serif;
 
-  --space-1: 2.8px;
-  --space-2: 5.6px;
-  --space-3: 8.4px;
-  --space-4: 11.2px;
-  --space-6: 16.8px;
-  --space-8: 22.4px;
+  /* Spacing on 4px steps. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
 
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 14px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
 
-  /* Sidebar — professional slate-blue, distinct from the light content area (see
-     AppShell.tsx). White text on this bg is ~7.7:1 contrast, well past WCAG AA. */
-  --color-sidebar: #3c548a;
-  --color-sidebar-border: color-mix(in srgb, #fff 14%, transparent);
-  --color-sidebar-hover: color-mix(in srgb, #fff 10%, transparent);
+  /* Sidebar — deep blue gradient; white text stays above 4.5:1 throughout. */
+  --color-sidebar: #0f4ea8;
+  --sidebar-bg: linear-gradient(180deg, #0b3a7d 0%, #0f4ea8 45%, #1264d8 100%);
+  --color-sidebar-border: color-mix(in srgb, #fff 16%, transparent);
+  --color-sidebar-hover: color-mix(in srgb, #fff 12%, transparent);
 
-  /* Thin border ring + soft blur, tuned light — matches the brief's login-card
-     spec ("subtle shadow, thin border") and stays subtle everywhere else. */
-  --shadow-sm: 0 0 0 1px #d9e2ec;
-  --shadow-md: 0 0 0 1px #d9e2ec, 0 4px 16px rgba(20, 33, 61, 0.08);
-  --shadow-lg: 0 0 0 1px #d9e2ec, 0 12px 32px rgba(20, 33, 61, 0.12);
+  /* Soft, blue-tinted shadows with a thin ring. */
+  --shadow-sm: 0 0 0 1px rgba(22, 135, 248, 0.09), 0 1px 3px rgba(25, 50, 77, 0.05);
+  --shadow-md: 0 0 0 1px rgba(22, 135, 248, 0.09), 0 8px 24px rgba(22, 100, 216, 0.09);
+  --shadow-lg: 0 0 0 1px rgba(22, 135, 248, 0.10), 0 18px 44px rgba(22, 100, 216, 0.15);
 }
 
 @theme inline {
@@ -111,7 +135,8 @@
 html, body { height: 100%; }
 body {
   margin: 0;
-  background: var(--color-bg);
+  background: var(--page-bg);
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 15px;
@@ -131,12 +156,12 @@ h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
 p { margin: 0 0 var(--space-3); }
 a { color: var(--color-accent); text-underline-offset: 3px; }
 img { display: block; max-width: 100%; }
-.text-muted { color: color-mix(in srgb, var(--color-text) 55%, transparent); }
+.text-muted { color: var(--color-text-muted); }
 :focus { outline: none; }
 :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 ::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-thumb { background: var(--color-neutral-700); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--color-neutral-400); border-radius: 4px; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
@@ -169,36 +194,38 @@ img { display: block; max-width: 100%; }
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 14px; line-height: 1.2; color: var(--color-text);
   background: transparent; border: 1px solid transparent;
-  padding: var(--space-2) calc(var(--space-3) * 1.2);
-  border-radius: var(--radius-md);
+  min-height: 38px; padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  transition: filter 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .btn svg { display: block; }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
-.btn-primary:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
-.btn-primary:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
-.btn-secondary { border-color: var(--color-divider); }
-.btn-secondary:hover:not(:disabled) { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
-.btn-secondary:active:not(:disabled) { background: color-mix(in srgb, var(--color-text) 14%, transparent); }
-.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-primary { color: #fff; background: var(--gradient-primary); border-color: transparent; box-shadow: 0 4px 14px rgba(22, 135, 248, 0.28); }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.06); box-shadow: 0 6px 18px rgba(22, 135, 248, 0.34); }
+.btn-primary:active:not(:disabled) { filter: brightness(0.96); }
+.btn-secondary { color: var(--color-accent-700); background: #fff; border-color: var(--color-accent-300); }
+.btn-secondary:hover:not(:disabled) { background: var(--color-accent-100); }
+.btn-secondary:active:not(:disabled) { background: var(--color-accent-200); }
+.btn-ghost { color: var(--color-accent-700); padding-inline: var(--space-2); }
 .btn-ghost:hover:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
 .btn-ghost:active:not(:disabled) { background: color-mix(in srgb, var(--color-accent) 18%, transparent); }
-.btn-icon { width: 36px; height: 36px; padding: 0; }
+.btn-icon { width: 38px; height: 38px; padding: 0; border-radius: 50%; }
 .btn-block { width: 100%; margin-top: var(--space-2); }
 
 /* — forms — */
 .field > label {
-  display: block; font-size: 12px; margin-bottom: 5px;
-  color: color-mix(in srgb, var(--color-text) 70%, transparent);
+  display: block; font-size: 12.5px; font-weight: 500; margin-bottom: 6px;
+  color: var(--color-neutral-700);
 }
 .input {
-  width: 100%; min-height: 36px; padding: 6px 10px; font: inherit;
+  width: 100%; min-height: 40px; padding: 8px 12px; font: inherit;
   font-size: 14px; color: var(--color-text); caret-color: var(--color-accent);
-  background: var(--color-surface);
-  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  background: #f6fafe;
+  border: 1px solid var(--color-divider); border-radius: 12px;
+  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
-.input:hover { border-color: color-mix(in srgb, var(--color-text) 45%, transparent); }
-.input:focus-visible { border-color: var(--color-accent); outline-offset: 0; }
+.input:hover { border-color: var(--color-accent-300); }
+.input:focus-visible { border-color: var(--color-accent); background: #fff; outline: none; box-shadow: 0 0 0 3px rgba(22, 135, 248, 0.18); }
 textarea.input { min-height: 90px; resize: vertical; }
 select.input {
   appearance: none;
@@ -220,32 +247,43 @@ select.input {
 }
 .radio input:focus-visible + .dot { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 .seg {
-  display: inline-flex; overflow: hidden;
-  border: 1px solid var(--color-divider); border-radius: var(--radius-md);
+  display: inline-flex; overflow: hidden; padding: 3px; gap: 2px;
+  background: #f1f6fc; border: 1px solid var(--color-divider); border-radius: var(--radius-pill);
 }
 .seg-opt {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 7px 12px; font-size: 13px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; border-radius: var(--radius-pill);
+  padding: 6px 13px; font-size: 13px; cursor: pointer;
 }
-.seg-opt + .seg-opt { border-left: 1px solid var(--color-divider); }
-.seg-opt:has(input:checked) { color: var(--color-accent); box-shadow: inset 0 0 0 1px var(--color-accent); }
+.seg-opt:has(input:checked) { color: #fff; background: var(--gradient-primary); box-shadow: 0 2px 8px rgba(22, 135, 248, 0.25); }
 .seg-opt:not(:has(input:checked)):hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); }
 .seg-opt:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: -2px; }
 
 /* — cards — */
 .card {
   display: flex; flex-direction: column; gap: var(--space-2);
-  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
+  padding: var(--space-4); border-radius: var(--radius-lg);
+  background: var(--glass-bg); border: 1px solid var(--glass-border);
 }
-.card-kicker { font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .dialog, .app-topbar { background: var(--color-surface) !important; }
+}
+/* A highlighted card: the gradient edge (the Android app's "key card"). */
+.card-highlight { border: 1.5px solid transparent; background: linear-gradient(var(--glass-strong), var(--glass-strong)) padding-box, var(--gradient-edge) border-box; }
+/* The gradient welcome / hero panel. */
+.hero-panel { position: relative; overflow: hidden; border-radius: var(--radius-lg); padding: var(--space-6); color: #fff; background: var(--gradient-hero); box-shadow: var(--shadow-md); }
+.hero-panel::before, .hero-panel::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; }
+.hero-panel::before { width: 340px; height: 340px; right: -110px; top: -150px; background: rgba(255, 255, 255, 0.12); }
+.hero-panel::after { width: 220px; height: 220px; left: -70px; bottom: -120px; background: rgba(85, 214, 172, 0.28); }
+.hero-panel > * { position: relative; }
+.card-kicker { font-size: 12.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-accent-700); }
 .card-title {
   font-family: var(--font-heading); font-weight: var(--font-heading-weight);
   font-size: 17px; line-height: 1.2;
 }
-.card-body { margin: 0; font-size: 13px; opacity: 0.8; flex: 1; }
+.card-body { margin: 0; font-size: 13.5px; color: var(--color-neutral-800); flex: 1; }
 .card-meta {
-  display: flex; align-items: center; gap: 6px; font-size: 11px;
-  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+  display: flex; align-items: center; gap: 6px; font-size: 12px;
+  color: var(--color-text-muted);
 }
 .elev-sm { box-shadow: var(--shadow-sm); }
 .elev-md { box-shadow: var(--shadow-md); }
@@ -255,33 +293,33 @@ select.input {
    filter controls doesn't have to fight .card's default flex-direction:column via inline style. */
 .filter-bar {
   display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--space-3);
-  padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg);
+  background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--shadow-sm);
 }
 
 /* — tags — */
 .tag {
   display: inline-flex; align-items: center; font-size: 11px;
-  letter-spacing: 0.02em; padding: 3px 10px;
-  border-radius: calc(var(--radius-md) * 0.75);
+  letter-spacing: 0.02em; padding: 3px 11px; font-weight: 500;
+  border-radius: var(--radius-pill);
 }
-.tag-accent { background: var(--color-accent-800); color: var(--color-accent-100); }
-.tag-accent-2 { background: var(--color-accent-2-800); color: var(--color-accent-2-100); }
-.tag-neutral { background: var(--color-neutral-800); color: var(--color-neutral-100); }
-.tag-outline { border: 1px solid var(--color-accent); color: var(--color-accent); }
+.tag-accent { background: var(--color-accent-100); color: var(--color-accent-800); }
+.tag-accent-2 { background: var(--color-accent-2-100); color: var(--color-accent-2-800); }
+.tag-neutral { background: var(--color-neutral-200); color: var(--color-neutral-800); }
+.tag-outline { border: 1px solid var(--color-accent-300); color: var(--color-accent-700); background: #fff; }
 
 /* — tables — */
 .table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .table th {
-  text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: color-mix(in srgb, var(--color-text) 60%, transparent);
-  padding: var(--space-3); border-bottom: 1px solid transparent;
+  text-align: left; font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--color-neutral-700);
+  padding: 10px var(--space-3); border-bottom: 1px solid transparent;
 }
-.table td { padding: var(--space-3); border-bottom: 1px solid transparent; }
+.table td { padding: 10px var(--space-3); border-bottom: 1px solid transparent; }
 .table thead tr {
-  background: linear-gradient(to right,
-    transparent, var(--color-divider) 48px,
-    var(--color-divider) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
+  background:
+    linear-gradient(rgba(22, 135, 248, 0.05), rgba(22, 135, 248, 0.05)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(var(--color-divider), var(--color-divider)) no-repeat bottom / 100% 1px;
 }
 .table tbody tr {
   background: linear-gradient(to right,
@@ -290,8 +328,7 @@ select.input {
 }
 .table tbody tr:hover {
   background:
-    linear-gradient(color-mix(in srgb, var(--color-text) 4%, transparent),
-                    color-mix(in srgb, var(--color-text) 4%, transparent)) no-repeat 0 0 / 100% 100%,
+    linear-gradient(rgba(22, 135, 248, 0.05), rgba(22, 135, 248, 0.05)) no-repeat 0 0 / 100% 100%,
     linear-gradient(to right,
       transparent, color-mix(in srgb, var(--color-text) 8%, transparent) 48px,
       color-mix(in srgb, var(--color-text) 8%, transparent) calc(100% - 48px), transparent) no-repeat bottom / 100% 1px;
@@ -305,7 +342,7 @@ select.input {
 .app-sidebar.collapsed { width: 68px; }
 .app-nav-section-label {
   font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: color-mix(in srgb, #fff 55%, transparent);
+  color: color-mix(in srgb, #fff 70%, transparent);
   padding: var(--space-3) var(--space-3) var(--space-1);
   white-space: nowrap; overflow: hidden;
 }
@@ -314,6 +351,15 @@ select.input {
 .app-sidebar.collapsed .app-brand-label,
 .app-sidebar.collapsed .app-profile-detail { display: none; }
 .app-hamburger { display: none; }
+.app-nav-link { transition: background-color 0.15s ease, color 0.15s ease; }
+.app-nav-link:hover { background: var(--color-sidebar-hover) !important; color: #fff !important; }
+.app-nav-link:focus-visible { outline: 2px solid #fff; outline-offset: -2px; }
+/* The top bar: frosted glass over the page, sticky. */
+.app-topbar {
+  background: rgba(255, 255, 255, 0.72); border-bottom: 1px solid rgba(22, 135, 248, 0.10) !important;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  position: relative; z-index: 20;
+}
 .app-sidebar-backdrop {
   position: fixed; inset: 0; background: color-mix(in srgb, #000 45%, transparent);
   z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
@@ -341,23 +387,25 @@ select.input {
 /* — login page: enlarged form scale (scoped to the login card only, does not affect
    .field/.input/.btn anywhere else in the app) — */
 .login-form-lg .field > label { font-size: 14px; margin-bottom: 6px; }
-.login-form-lg .input { min-height: 46px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; }
-.login-form-lg .btn { font-size: 16px; padding: 12px 20px; min-height: 48px; }
+.login-form-lg .input { min-height: 48px; padding-top: 10px; padding-bottom: 10px; font-size: 16px; }
+.login-form-lg .btn { font-size: 16px; padding: 12px 20px; min-height: 50px; }
 
 /* — dialog — */
 .dialog-backdrop {
   position: fixed; inset: 0; display: grid; place-items: center;
-  padding: var(--space-4); background: color-mix(in srgb, #000 45%, transparent);
+  padding: var(--space-4); background: rgba(11, 58, 125, 0.35);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
   z-index: 50;
 }
 .dialog {
-  width: min(440px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
-  padding: var(--space-4); border-radius: var(--radius-lg);
-  background: var(--color-surface); box-shadow: var(--shadow-lg);
+  width: min(460px, 100%); display: flex; flex-direction: column; gap: var(--space-3);
+  padding: var(--space-6); border-radius: var(--radius-lg);
+  background: var(--glass-strong); border: 1px solid var(--glass-border); box-shadow: var(--shadow-lg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur));
   max-height: 90vh; overflow: auto;
 }
 .dialog-title { font-family: var(--font-heading); font-weight: var(--font-heading-weight); font-size: 20px; }
-.dialog-body { font-size: 14px; opacity: 0.85; }
+.dialog-body { font-size: 14px; color: var(--color-neutral-800); }
 .dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
 
 /* — leaflet theme overrides — */
@@ -369,7 +417,9 @@ select.input {
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--color-surface) !important; color: var(--color-text) !important; box-shadow: var(--shadow-md) !important; }
 
 /* Basemap/layers control (L.control.layers) — GIS map */
-.leaflet-control-layers { background: var(--color-surface) !important; color: var(--color-text) !important; border: 1px solid var(--color-divider) !important; border-radius: var(--radius-md) !important; box-shadow: var(--shadow-md) !important; }
+.leaflet-control-layers { background: var(--glass-strong) !important; color: var(--color-text) !important; border: 1px solid var(--glass-border) !important; border-radius: var(--radius-md) !important; box-shadow: var(--shadow-md) !important; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
+.leaflet-bar { border-radius: 12px !important; overflow: hidden; box-shadow: var(--shadow-md) !important; border: none !important; }
+.leaflet-popup-content-wrapper { border-radius: var(--radius-md) !important; }
 .leaflet-control-layers-toggle { filter: none; }
 .leaflet-control-layers-list { font-size: 12.5px; }
 .leaflet-control-layers-separator { border-top: 1px solid var(--color-divider) !important; margin: 6px -6px !important; }
@@ -399,12 +449,14 @@ select.input {
 
 /* Compact KPI cards (DECISIONS R104): one row where the screen allows, wrapping on narrower ones. */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; }
-.kpi-card { padding: 10px 12px !important; gap: 1px !important; }
-.kpi-label { display: flex; align-items: center; gap: 5px; font-size: 11.5px; line-height: 1.3; color: var(--color-neutral-700); }
+.kpi-card { position: relative; overflow: hidden; padding: 12px 14px 11px !important; gap: 2px !important; }
+.kpi-card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--gradient-edge); opacity: 0.85; }
+a.kpi-card:hover { box-shadow: var(--shadow-md) !important; }
+.kpi-label { display: flex; align-items: center; gap: 5px; font-size: 12px; line-height: 1.3; color: var(--color-neutral-700); }
 .kpi-label i { font-size: 14px; flex: none; }
-.kpi-value { font-family: var(--font-heading); font-size: 20px; font-weight: 700; line-height: 1.15; }
+.kpi-value { font-family: var(--font-heading); font-size: 22px; font-weight: 700; line-height: 1.15; color: var(--color-text); }
 .kpi-unit { font-size: 12px; font-weight: 600; margin-left: 3px; color: var(--color-neutral-700); }
-.kpi-sub { font-size: 11px; line-height: 1.35; color: var(--color-neutral-600); }
+.kpi-sub { font-size: 11.5px; line-height: 1.35; color: var(--color-neutral-600); }
 
 /* Corrective Action Tracker stage colours (R104; Reopen case in red, R133). */
 :root {
@@ -420,3 +472,8 @@ select.input {
 @media (max-width: 1180px) { .stage-board { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 820px) { .stage-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .stage-board { grid-template-columns: minmax(0, 1fr); } }
+
+/* Reduced motion: no shimmer, no transitions (glass design, R164). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

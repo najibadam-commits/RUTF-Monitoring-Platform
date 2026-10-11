@@ -111,7 +111,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
   })).filter((group) => group.items.length > 0);
 
   return (
-    <div className="app-root" style={{ display: "flex", height: "100vh", background: "var(--color-bg)", color: "var(--color-text)", fontFamily: "var(--font-body)", fontSize: 14 }}>
+    <div className="app-root" style={{ display: "flex", height: "100vh", background: "var(--page-bg)", color: "var(--color-text)", fontFamily: "var(--font-body)", fontSize: 14 }}>
       <div
         className={`app-sidebar-backdrop${mobileOpen ? " open" : ""}`}
         onClick={() => setDrawerOpenOn(null)}
@@ -120,10 +120,10 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
 
       <aside
         className={`app-sidebar${collapsed ? " collapsed" : ""}${mobileOpen ? " mobile-open" : ""}`}
-        style={{ flex: "none", display: "flex", flexDirection: "column", background: "var(--color-sidebar)" }}
+        style={{ flex: "none", display: "flex", flexDirection: "column", background: "var(--sidebar-bg)", boxShadow: "4px 0 24px rgba(11, 58, 125, 0.18)" }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: collapsed ? 6 : 10, padding: collapsed ? "18px 10px 16px" : "18px 16px 16px" }}>
-          <span style={{ flex: "none", lineHeight: 0 }}><RutfMark size={28} /></span>
+          <span style={{ flex: "none", lineHeight: 0, background: "#fff", borderRadius: 10, padding: 4, boxShadow: "0 2px 8px rgba(0,0,0,.15)" }}><RutfMark size={26} /></span>
           <span className="app-brand-label" style={{ fontFamily: "var(--font-heading)", fontWeight: 600, fontSize: 14, lineHeight: 1.25, color: "#fff", whiteSpace: "nowrap", overflow: "hidden" }}>
             RUTF Monitoring
             <br />
@@ -151,16 +151,19 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
                     key={item.key}
                     href={item.href}
                     title={item.label}
+                    className="app-nav-link"
+                    aria-current={active ? "page" : undefined}
                     style={{
                       display: "flex",
                       alignItems: "center",
                       gap: 10,
-                      padding: "9px 10px",
-                      borderRadius: "var(--radius-md)",
+                      padding: "9px 11px",
+                      borderRadius: 12,
                       textDecoration: "none",
-                      color: active ? "var(--color-accent-200)" : "rgba(255,255,255,.82)",
-                      background: active ? "color-mix(in srgb, #fff 14%, transparent)" : "transparent",
-                      borderLeft: active ? "3px solid var(--color-accent-200)" : "3px solid transparent",
+                      fontWeight: active ? 600 : 400,
+                      color: active ? "#fff" : "rgba(255,255,255,.86)",
+                      background: active ? "rgba(255,255,255,.18)" : "transparent",
+                      boxShadow: active ? "inset 3px 0 0 var(--brand-turquoise), 0 2px 10px rgba(0,0,0,.08)" : "none",
                     }}
                   >
                     <i className={`ph ${item.icon}`} style={{ fontSize: 16, flex: "none" }} />
@@ -180,11 +183,11 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
                 height: 32,
                 flex: "none",
                 borderRadius: "50%",
-                background: "var(--color-accent-100)",
+                background: "var(--gradient-edge)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "var(--color-accent-800)",
+                color: "#fff",
                 fontSize: 12,
                 fontWeight: 600,
               }}
@@ -204,7 +207,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
             className="btn btn-secondary btn-block"
             disabled={signingOut}
             title="Sign Out"
-            style={{ color: "#fff", borderColor: "rgba(255,255,255,.35)" }}
+            style={{ color: "#fff", background: "rgba(255,255,255,.10)", borderColor: "rgba(255,255,255,.35)" }}
             onClick={() => {
               setSigningOut(true);
               logout();
@@ -217,7 +220,7 @@ export function AppShell({ profile, children }: { profile: Profile; children: Re
       </aside>
 
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <header className="app-topbar" style={{ height: 58, flex: "none", display: "flex", alignItems: "center", gap: 16, padding: "0 24px", borderBottom: "1px solid var(--color-divider)" }}>
+        <header className="app-topbar" style={{ height: 60, flex: "none", display: "flex", alignItems: "center", gap: 16, padding: "0 24px" }}>
           <button
             type="button"
             className="app-hamburger"

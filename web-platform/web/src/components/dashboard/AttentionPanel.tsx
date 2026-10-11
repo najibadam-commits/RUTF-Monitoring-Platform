@@ -65,7 +65,7 @@ export function AttentionPanel({ k, pastTarget, targetDays, monthLabel }: { k: K
           <i className="ph-fill ph-check-circle" aria-hidden="true" /> All clear: no stock, reporting or Finding issues need action.
         </div>
       ) : (
-        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 8 }}>
+        <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 320px), 1fr))", gap: 8 }}>
           {items.map((it) => {
             const st = LEVEL_STYLE[it.level];
             return (

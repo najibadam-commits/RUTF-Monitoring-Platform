@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
  */
 private val TpmColorScheme = lightColorScheme(
     primary = TpmColors.Accent,
-    onPrimary = TpmColors.Background,
+    onPrimary = TpmColors.White,
     primaryContainer = TpmColors.Accent100,
     onPrimaryContainer = TpmColors.Accent800,
     secondary = TpmColors.Accent700,
@@ -24,8 +24,11 @@ private val TpmColorScheme = lightColorScheme(
     surfaceVariant = TpmColors.Neutral200,
     onSurfaceVariant = TpmColors.Neutral800,
     outline = TpmColors.Divider,
-    error = TpmColors.Accent800,
-    onError = TpmColors.Background,
+    error = TpmColors.Error,
+    onError = TpmColors.White,
+    surfaceContainer = TpmColors.White,
+    surfaceContainerHigh = TpmColors.White,
+    surfaceContainerLowest = TpmColors.White,
 )
 
 private val TpmShapes = Shapes(

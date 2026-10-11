@@ -28,7 +28,10 @@
 .backdrop::after {
   content: ""; position: absolute; inset: 0;
   background:
-    linear-gradient(0deg, rgba(8, 22, 46, 0.82) 0%, rgba(8, 22, 46, 0.35) 30%, rgba(8, 22, 46, 0.12) 55%, rgba(8, 22, 46, 0.18) 100%);
+    /* Glass design (R164): the brand's blue → turquoise wash over the photo, darker at the foot
+       so the statements there stay readable. */
+    linear-gradient(0deg, rgba(11, 58, 125, 0.85) 0%, rgba(11, 58, 125, 0.40) 32%, rgba(11, 58, 125, 0.10) 58%, rgba(11, 58, 125, 0.22) 100%),
+    linear-gradient(120deg, rgba(18, 100, 216, 0.30) 0%, rgba(54, 197, 232, 0.14) 55%, rgba(64, 217, 192, 0.22) 100%);
 }
 
 /* ── Header over the photo ──────────────────────────────────────────────────── */
@@ -59,21 +62,25 @@
 .card {
   width: min(430px, 100%);
   color: var(--color-text);
-  background: var(--color-surface);
-  border-radius: 18px;
+  /* A floating frosted panel: high opacity so the form reads over the photo. */
+  background: rgba(255, 255, 255, 0.93);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  border-radius: 24px;
   padding: 30px 34px;
-  box-shadow: 0 24px 60px rgba(4, 12, 28, 0.45), 0 2px 8px rgba(4, 12, 28, 0.2);
+  box-shadow: 0 24px 60px rgba(11, 58, 125, 0.40), 0 2px 8px rgba(11, 58, 125, 0.18);
 }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .card { background: #fff; } }
 .cardHead { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
 .cardKicker { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
 .cardTitle { font-size: 22px; font-weight: 700; color: var(--navy); line-height: 1.2; margin: 0 0 4px; }
 .cardSub { font-size: 14.5px; color: var(--color-neutral-700); margin: 0; }
 .help { margin: 10px 0 0; text-align: center; font-size: 12.5px; color: var(--color-neutral-600); }
 .card :global(.btn-primary) {
-  background: var(--blue); color: #fff; border-color: var(--blue); border-radius: 999px;
-  height: 46px; font-weight: 600; box-shadow: 0 4px 14px rgba(22, 119, 210, 0.28);
+  background: var(--gradient-primary); color: #fff; border-color: transparent; border-radius: 999px;
+  height: 48px; font-weight: 600; box-shadow: 0 6px 18px rgba(22, 135, 248, 0.32);
 }
-.card :global(.btn-primary:hover:not(:disabled)) { background: var(--color-accent-700); }
+.card :global(.btn-primary:hover:not(:disabled)) { filter: brightness(1.06); }
 .assurances {
   display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px;
   margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--color-divider);

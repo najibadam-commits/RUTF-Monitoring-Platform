@@ -3,16 +3,17 @@ package org.tpmnigeria.tpm.ui.theme
 import androidx.compose.ui.unit.dp
 
 /**
- * Spacing scale — 1:1 port of --space-1..8 from _ds_styles.css (values are already a fixed
- * 3.4dp-multiple scale in the source; note 5 and 7 are intentionally absent, matching the CSS).
+ * Spacing scale on 4dp increments (glass design system, DECISIONS R164): 8–12dp between related
+ * controls, 16–20dp screen and card padding. The step names are the original ones (5 and 7 are
+ * absent) so every screen keeps its relative spacing.
  */
 object TpmSpacing {
-    val space1 = 3.4.dp
-    val space2 = 6.8.dp
-    val space3 = 10.2.dp
-    val space4 = 13.6.dp
-    val space6 = 20.4.dp
-    val space8 = 27.2.dp
+    val space1 = 4.dp
+    val space2 = 8.dp
+    val space3 = 12.dp
+    val space4 = 16.dp
+    val space6 = 24.dp
+    val space8 = 32.dp
 }
 
 /**
@@ -27,10 +28,16 @@ object TpmSpacing {
  * two sources per-detail.
  */
 object TpmRadius {
-    val small = 6.dp
-    val medium = 8.dp
-    val large = 12.dp
-    val pill = 999.dp
+    val small = 14.dp   // inputs, segmented controls
+    val medium = 20.dp  // cards, panels
+    val large = 24.dp   // sheets, hero panels
+    val pill = 999.dp   // buttons, tags
+}
+
+/** Elevation for glass panels: soft and restrained. */
+object TpmElevation {
+    val card = 6.dp
+    val raised = 10.dp
 }
 
 /** Blueprint corner-bracket geometry (Modifier.blueprintCorners()) — see README's "Signature motif". */

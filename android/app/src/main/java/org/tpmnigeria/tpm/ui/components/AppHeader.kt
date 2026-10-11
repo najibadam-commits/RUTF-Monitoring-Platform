@@ -1,5 +1,7 @@
 package org.tpmnigeria.tpm.ui.components
 
+import org.tpmnigeria.tpm.ui.theme.TpmRadius
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -31,7 +33,8 @@ import org.tpmnigeria.tpm.R
 import org.tpmnigeria.tpm.ui.theme.TpmColors
 
 /**
- * Shared header — back arrow (space always reserved, invisible+non-interactive when hidden, per
+ * Shared header (glass design, R164: white content on the gradient the app shell draws behind it) —
+ * back arrow (space always reserved, invisible+non-interactive when hidden, per
  * the prototype's `visibility:hidden` backBtnStyle so the title never shifts), blueprint app
  * mark + screen title (+ role pill on Home), circular initials avatar. See README "App Structure
  * & Navigation" and the header markup in TPM Field App.dc.html.
@@ -48,8 +51,8 @@ fun TpmHeader(
 ) {
     Row(
         modifier = modifier
-            .height(56.dp)
-            .padding(start = 2.dp, end = 10.dp),
+            .height(60.dp)
+            .padding(start = 2.dp, end = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
@@ -57,50 +60,61 @@ fun TpmHeader(
             enabled = showBack,
             modifier = Modifier.alpha(if (showBack) 1f else 0f),
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = TpmColors.White)
         }
 
         Row(
             modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // The official logo mark on a white tile (unchanged proportions and colours).
             Box(
                 modifier = Modifier
-                    .size(26.dp)
-                    .border(BorderStroke(1.dp, TpmColors.Divider))
-                    .padding(4.dp),
+                    .size(34.dp)
+                    .background(TpmColors.White, RoundedCornerShape(10.dp))
+                    .padding(5.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_tpm_logo_mark),
-                    contentDescription = null,
+                    contentDescription = "RUTF-DTAP",
                     tint = Color.Unspecified,
-                    modifier = Modifier.size(16.dp),
+                    modifier = Modifier.size(22.dp),
                 )
             }
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(10.dp))
             Column {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleLarge,
+                    color = TpmColors.White,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
                 if (rolePill != null) {
                     Spacer(Modifier.height(3.dp))
-                    TpmTag(rolePill, TpmTagVariant.Outline)
+                    Text(
+                        rolePill,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = TpmColors.White,
+                        modifier = Modifier
+                            .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(TpmRadius.pill))
+                            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.45f)), RoundedCornerShape(TpmRadius.pill))
+                            .padding(horizontal = 10.dp, vertical = 2.dp),
+                    )
                 }
             }
         }
 
         Box(
             modifier = Modifier
-                .size(36.dp)
-                .background(TpmColors.Accent800, CircleShape)
-                .clickable(onClick = onAvatarClick),
+                .size(40.dp)
+                .background(Color.White.copy(alpha = 0.22f), CircleShape)
+                .border(BorderStroke(1.5.dp, Color.White.copy(alpha = 0.7f)), CircleShape)
+                .clickable(onClickLabel = "Open your profile", onClick = onAvatarClick),
             contentAlignment = Alignment.Center,
         ) {
-            Text(userInitials, color = TpmColors.Background, style = MaterialTheme.typography.labelLarge)
+            Text(userInitials, color = TpmColors.White, style = MaterialTheme.typography.labelLarge)
         }
     }
 }
